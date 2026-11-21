@@ -36,7 +36,7 @@ export function AdminShell() {
             <div className="ml-auto flex items-center gap-3">
               <div className="hidden items-center gap-2 rounded-md border border-border bg-card px-2.5 py-1.5 text-xs text-muted-foreground sm:flex">
                 <span className="h-1.5 w-1.5 rounded-full bg-success" />
-                Imported Sales MVP
+                MVP импорта продаж
               </div>
               <button
                 type="button"

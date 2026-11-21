@@ -1,0 +1,37 @@
+{
+  "slug": "garazh",
+  "title": "Музей современного искусства «Гараж»",
+  "shortTitle": "Гараж",
+  "venueType": "ART_SPACE",
+  "description": "Один из важнейших центров современной культуры в Москве, расположенный в Парке Горького. Выставки, образовательные программы, архив, книжный магазин.",
+  "shortDescription": "Современное искусство в Парке Горького",
+  "address": "ул. Крымский Вал, 9, стр. 32, Москва",
+  "lat": 55.7312,
+  "lng": 37.604,
+  "metro": "Октябрьская",
+  "district": "Якиманка",
+  "phone": "+7 (495) 645-05-20",
+  "website": "https://garagemca.org",
+  "priceFrom": 50000,
+  "openingHours": {
+    "mon": "11:00–22:00",
+    "tue": "11:00–22:00",
+    "wed": "11:00–22:00",
+    "thu": "11:00–22:00",
+    "fri": "11:00–22:00",
+    "sat": "11:00–22:00",
+    "sun": "11:00–22:00"
+  },
+  "citySlug": "moscow",
+  "features": ["wheelchair", "cafe", "gift_shop"],
+  "highlights": null,
+  "faq": null,
+  "_source": "F:/coding/SPBBOATS/packages/backend/prisma/seed-venues.ts",
+  "_slugAliases": {
+    "seedVenues": "garazh",
+    "seedVenueLinksImagesKeywords": "muzej-garazh",
+    "daibiletCatalog": "moscow-muzey-garazh",
+    "scenarioDemo": "garage-moscow-demo"
+  },
+  "_notes": "Канонический SPBBOATS seed арт-пространства. Беднее Эрмитажа: нет highlights/faq. Внимание: slug расходится с seed-venue-links (muzej-garazh) и Daibilet (moscow-muzey-garazh)."
+}

@@ -1,0 +1,49 @@
+{
+  "eventId": "evt_6a785524324788c002ef8d77",
+  "eventPageId": "f40f5fad-0e0c-438d-b673-75b75c06f235",
+  "eventPageSlug": "sova-moskva",
+  "archiveStatus": "UNUSED_ORIGINAL_SOURCE",
+  "retrievedAt": "2026-11-05",
+  "sourceSnapshot": {
+    "id": "evt_6a785524324788c002ef8d77",
+    "kind": "SINGLE",
+    "slug": "сова-6a785524324788c002ef8d77",
+    "seoH1": null,
+    "title": "Сова",
+    "sources": [
+      {
+        "code": "TICKETSCLOUD",
+        "name": "Ticketscloud",
+        "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6a785524324788c002ef8d77",
+        "externalId": "6a785524324788c002ef8d77",
+        "metaExternalId": null
+      }
+    ],
+    "venueId": "venue_6a15c938a5fa5f085e50be0b",
+    "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net/production/image/2026-08/6a785523f231796eef5fc2c1.jpg",
+    "seoTitle": null,
+    "cityTitle": "Москва",
+    "venueTitle": "ПЛАТФОРМА",
+    "description": null,
+    "isIndexable": true,
+    "purchaseFlow": "EXTERNAL",
+    "venueAddress": "ул. Смирновская, д. 2, стр. 1.",
+    "canonicalPath": null,
+    "primaryCityId": "city_524901",
+    "supplierTitle": null,
+    "managementMode": "SOURCE_MANAGED",
+    "seoDescription": null,
+    "shortDescription": null
+  },
+  "originalDescription": null,
+  "previousEventOverride": "«Сова» - инди-концерт на площадке «ПЛАТФОРМА» в Москве. Екатеринбургская группа, основанная в 2017 году Тарасом Овсянниковым и Павлом Штонденко. Играет на стыке инди-попа и пост-панка, известна песнями «Гроза», «Сериал» и «Главный герой».\n\n## Практическая информация\n\n- Место - «ПЛАТФОРМА», Москва\n- Адрес - ул. Смирновская, д. 2, стр. 1.\n- Продолжительность - около 120 минут\n- Возрастное ограничение - 12+\n- Билеты - от 2 500 ₽\n\nБилеты продаются онлайн. Оплата на сайте, электронный билет приходит на почту.",
+  "activeSessions": [
+    {
+      "start": "2026-12-17T17:00:00",
+      "end": "2026-12-17T19:00:00",
+      "price": 2500
+    }
+  ],
+  "mainChars": 643,
+  "previousEffectiveChars": 510
+}

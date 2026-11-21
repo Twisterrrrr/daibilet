@@ -1,24 +1,22 @@
 import * as React from 'react';
-import { Clock, MapPin, Star, Ticket } from 'lucide-react';
+import { Clock, Star, Ticket } from 'lucide-react';
 
-import { collectCatalogLabels } from '@/lib/catalog-labels';
+import { resolveEditorialEventImage } from '@/lib/event-cover-images';
 import { resolveEventCardDestinationLabel, resolveEventCardLocationLabel } from '@/lib/event-location';
 import { EventFavoriteButton } from '@/components/EventFavoriteButton';
 import { LandingPurchaseButton } from '@/components/landing/LandingPurchaseButton';
 import { EventImageBadges } from '@/lib/event-card-badges';
 import {
   collectDisplaySlotLabels,
-  collectDisplaySlotTimes,
   formatEventNextSession,
   formatPriceRub,
   formatShowcasePriceLabel,
   formatShowcaseSessionDate,
   formatShowcaseSessionDateCompact,
   getDepartingSoonMinutes,
-  hasMultipleCatalogSlots,
-  isEventSessionToday,
   isOpenDate,
   MIN_DISPLAY_PRICE_RUB,
+  resolveAgeBadge,
   resolvePseudoRating,
 } from '@/lib/event-card-meta';
 import { eventHref } from '@/routes';
@@ -49,33 +47,21 @@ export function EventCard({
     return <ShowcaseEventCard event={event} rail={showcaseRail} editorsPickBadge={editorsPickBadge} />;
   }
   const [hasImageError, setHasImageError] = React.useState(false);
-  const showImage = Boolean(event.imageUrl && !hasImageError);
+  const coverImageUrl =
+    resolveEditorialEventImage(event.id, event.slug, event.imageUrl) || event.imageUrl || '';
+  const showImage = Boolean(coverImageUrl && !hasImageError);
   const detailsHref = eventHref(event);
   const hasPrice = typeof event.priceFrom === 'number' && event.priceFrom >= MIN_DISPLAY_PRICE_RUB;
-  const destinationLabel = resolveEventCardDestinationLabel(event);
-  const highlights = collectCatalogLabels(event);
   const openDate = isOpenDate(event);
   const departingSoonMinutes = openDate ? null : getDepartingSoonMinutes(event.startsAt);
   const nextSessionLabel = openDate ? null : formatEventNextSession(event);
-  const isToday = isEventSessionToday(event);
-  const multipleSlots = hasMultipleCatalogSlots(event);
-  const displaySlotLabels = multipleSlots ? collectDisplaySlotLabels(event) : [];
-  const displaySlots = collectDisplaySlotTimes(event, { todayOnly: isToday && !multipleSlots });
-  const showSlotPills = multipleSlots
-    ? displaySlotLabels.length > 1
-    : isToday && displaySlots.length > 1;
-  const sessionMetaLabel = openDate
-    ? null
-    : multipleSlots && displaySlotLabels.length > 1
-      ? `${displaySlotLabels.length} ближайших даты`
-      : isToday && displaySlots.length > 0
-        ? displaySlots.length === 1
-          ? `Сегодня, ${displaySlots[0]}`
-          : 'Сегодня'
-        : nextSessionLabel;
+  const displaySlotLabels = collectDisplaySlotLabels(event);
+  const showSlotPills = displaySlotLabels.length > 0;
+  const sessionMetaLabel = openDate ? null : nextSessionLabel;
   const pseudoRating = resolvePseudoRating(event.groupKey || event.id);
   const locationLabel = resolveEventCardLocationLabel(event);
   const showSoonBadge = !hasPrice && !openDate && !departingSoonMinutes;
+  const ageLabel = resolveAgeBadge(event.tags, event.ageLimit);
   const cardClassName =
     'group flex flex-col overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-lg hover:shadow-slate-200/60';
 
@@ -97,7 +83,7 @@ export function EventCard({
 
         {showImage ? (
           <img
-            src={event.imageUrl || ''}
+            src={coverImageUrl}
             alt={event.title}
             loading="lazy"
             onError={() => setHasImageError(true)}
@@ -131,10 +117,9 @@ export function EventCard({
               {event.category}
             </span>
           ) : null}
-          {destinationLabel ? (
-            <span className="inline-flex min-w-0 max-w-full items-center gap-0.5 text-slate-500">
-              <MapPin className="h-3 w-3 shrink-0" />
-              <span className="truncate">{destinationLabel}</span>
+          {ageLabel ? (
+            <span className="font-semibold tabular-nums text-slate-600" title="Возрастное ограничение">
+              {ageLabel}
             </span>
           ) : null}
         </div>
@@ -163,29 +148,18 @@ export function EventCard({
           {locationLabel ? <span className="line-clamp-1">{locationLabel}</span> : null}
         </div>
 
-        {highlights.length > 0 ? (
-          <ul className="mt-2 space-y-0.5 text-[10px] leading-relaxed text-slate-600 sm:text-xs">
-            {highlights.map((highlight) => (
-              <li key={highlight} className="flex gap-1.5">
-                <span className="text-primary-500">•</span>
-                <span className="line-clamp-1">{highlight}</span>
-              </li>
+        {showSlotPills ? (
+          <div className="mt-2 flex flex-wrap items-center justify-center gap-1.5">
+            {displaySlotLabels.map((label) => (
+              <span
+                key={label}
+                className="inline-flex h-6 min-h-6 shrink-0 items-center justify-center rounded-lg border border-slate-300 bg-white px-2.5 text-[10px] font-medium leading-none text-slate-800"
+              >
+                {label}
+              </span>
             ))}
-          </ul>
+          </div>
         ) : null}
-
-        <div className="mt-2 flex min-h-6 flex-wrap items-start gap-1.5">
-          {showSlotPills
-            ? (multipleSlots ? displaySlotLabels : displaySlots).map((label) => (
-                <span
-                  key={label}
-                  className="inline-flex h-6 min-h-6 shrink-0 items-center justify-center rounded-lg border border-slate-300 bg-white px-2.5 text-[10px] font-medium leading-none text-slate-800"
-                >
-                  {label}
-                </span>
-              ))
-            : null}
-        </div>
 
         <div className="mt-auto flex items-center justify-between gap-2 pt-3">
           {landingActions ? (
@@ -232,7 +206,9 @@ function ShowcaseEventCard({
   editorsPickBadge?: boolean;
 }) {
   const [hasImageError, setHasImageError] = React.useState(false);
-  const showImage = Boolean(event.imageUrl && !hasImageError);
+  const coverImageUrl =
+    resolveEditorialEventImage(event.id, event.slug, event.imageUrl) || event.imageUrl || '';
+  const showImage = Boolean(coverImageUrl && !hasImageError);
   const detailsHref = eventHref(event);
   const hasPrice = typeof event.priceFrom === 'number' && event.priceFrom >= MIN_DISPLAY_PRICE_RUB;
   const pseudoRating = resolvePseudoRating(event.groupKey || event.id);
@@ -265,7 +241,7 @@ function ShowcaseEventCard({
         </div>
         {showImage ? (
           <img
-            src={event.imageUrl || ''}
+            src={coverImageUrl}
             alt={event.title}
             loading="lazy"
             onError={() => setHasImageError(true)}

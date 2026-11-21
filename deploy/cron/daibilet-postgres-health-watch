@@ -1,0 +1,5 @@
+SHELL=/bin/bash
+PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+
+# MSK catalog Postgres - liveness alert every 5 min (incident 2026-11-20).
+*/5 * * * * root APP_DIR=/opt/daibilet /opt/daibilet/deploy/cron/postgres-health-watch.sh >> /var/log/daibilet/postgres-health-watch.log 2>&1

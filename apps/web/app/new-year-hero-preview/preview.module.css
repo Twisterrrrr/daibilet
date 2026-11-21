@@ -1,0 +1,51 @@
+.page {
+  min-height: 100vh;
+  padding: 28px clamp(14px, 3vw, 44px) 48px;
+  background: #f5f5f0;
+  color: #17211d;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+}
+
+.pageTitle { max-width: 1440px; margin: 0 auto 24px; font-size: 20px; font-weight: 700; }
+.desktop, .mobileSection { max-width: 1440px; margin: 0 auto 28px; }
+.desktop h2, .mobileSection h2 { margin: 0 0 10px; color: #65716b; font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+
+.hero {
+  position: relative;
+  isolation: isolate;
+  min-height: 260px;
+  overflow: hidden;
+  border: 1px solid #254f42;
+  background:
+    radial-gradient(ellipse 60% 120% at 82% 12%, rgb(71 121 83 / 38%), transparent 70%),
+    linear-gradient(112deg, #08271f 0%, #103e2e 56%, #092b23 100%);
+  color: #fff;
+}
+
+.ornament { position: absolute; z-index: 3; inset: 0 0 auto; display: block; width: 100%; height: 14px; }
+.inner { position: relative; display: flex; min-height: 260px; align-items: center; max-width: 1440px; margin: 0 auto; padding: 28px clamp(22px, 4.1vw, 60px); }
+.copy { position: relative; z-index: 2; width: min(850px, 74%); }
+.kicker { margin-bottom: 10px; color: #e8cc7d; font-size: 10px; font-weight: 800; letter-spacing: .11em; }
+.copy h1 { max-width: 100%; margin: 0; color: #fff; font-size: clamp(32px, 3.05vw, 38px); font-weight: 760; line-height: 1.08; letter-spacing: -.035em; }
+.copy p { max-width: 680px; margin: 12px 0 0; color: rgb(248 249 245 / 82%); font-size: 14px; line-height: 1.48; }
+.art { position: absolute; z-index: 1; inset: 14px 0 0 auto; display: grid; width: min(36%, 420px); place-items: center; overflow: hidden; color: #eed38e; opacity: .2; pointer-events: none; mask-image: linear-gradient(90deg, transparent 0%, #000 24%, #000 100%); }
+.snowflake { display: block; width: min(220px, 70%); height: auto; }
+
+.phone { width: 390px; max-width: 100%; margin: 0 auto; overflow: hidden; border: 8px solid #202320; border-radius: 30px; background: #fff; box-shadow: 0 18px 45px rgb(13 35 27 / 16%); container-type: inline-size; }
+
+@container (max-width: 620px) {
+  .hero { min-height: 0; }
+  .inner { min-height: 0; padding: 25px 20px 24px; }
+  .copy { width: 100%; }
+  .kicker { margin-bottom: 8px; font-size: 9px; }
+  .copy h1 { max-width: 14ch; font-size: clamp(26px, 8.2cqw, 32px); line-height: 1.08; }
+  .copy p { max-width: 33ch; margin-top: 10px; font-size: 12px; line-height: 1.45; }
+  .art { inset: 14px -28px 0 auto; width: 180px; opacity: .105; mask-image: linear-gradient(90deg, transparent 0%, #000 30%, #000 100%); }
+  .snowflake { width: 150px; }
+}
+
+@media (min-width: 640px) and (max-width: 1023px) {
+  .hero, .inner { min-height: 230px; }
+  .copy { width: min(760px, 76%); }
+  .copy h1 { font-size: clamp(30px, 4vw, 36px); }
+}

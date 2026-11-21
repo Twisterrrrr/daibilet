@@ -37,10 +37,11 @@ POST_DEPLOY_PUBLIC_BASE=https://staging.daibilet.ru PORT=4001 npm run check:post
 POST_DEPLOY_PUBLIC_BASE=https://daibilet.ru PORT=4000 npm run check:post-deploy
 ```
 
-### Deploy staging (на сервере)
+### Deploy staging (исторический чеклист; хост `.16` = труп)
 
 ```bash
-ssh root@213.171.7.16
+# Не SSH на 213.171.7.16. При необходимости staging - на MSK или `.159` reserve.
+ssh daibilet-msk
 cd /opt/daibilet-staging
 git pull origin integrate/mvp-launch
 BRANCH=integrate/mvp-launch ./deploy/scripts/deploy-staging.sh

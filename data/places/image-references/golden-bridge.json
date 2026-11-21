@@ -1,0 +1,17 @@
+{
+  "sourceKey": "pdp:f0a4a114f539113085b3",
+  "place": "Золотой мост",
+  "city": "Владивосток",
+  "referenceUrl": "https://commons.wikimedia.org/wiki/File:Golden_bridge_from_the_Eagle%27s_Nest_(21467932753).jpg",
+  "author": "Raita Futo",
+  "license": "CC BY 2.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by/2.0/",
+  "referenceVerified": true,
+  "visualFacts": [
+    "The bridge is seen from Eagle's Nest above the Golden Horn Bay.",
+    "The Golden Bridge pylons and suspended deck occupy the right side of the reference view.",
+    "The distant Russky Bridge is a separate structure in the background."
+  ],
+  "generationStatus": "rejected_geometry_mismatch",
+  "publicImageAssigned": false
+}

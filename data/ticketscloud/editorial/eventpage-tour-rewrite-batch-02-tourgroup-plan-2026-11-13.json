@@ -1,0 +1,319 @@
+{
+  "groups": [
+    {
+      "groupNo": 1,
+      "title": "Симфония Гарри Поттера и Саундтреки волшебных миров",
+      "candidatePageIds": [
+        "945a3f6a-d846-454b-bf70-6dc6f1d59ed7",
+        "bc3d85c5-6597-41f6-9706-38d6db2eb8f8",
+        "3a0a19ba-1be7-4f84-9412-5c14b08ce1c6",
+        "b00f0eee-de7a-466b-bb18-ef853b51a68b",
+        "01e06f14-db05-4820-bd9f-abaf931ca790",
+        "d7a28851-6ec9-4f19-8ce3-245da1fed800",
+        "ce6e923c-e2a5-4bee-ad39-07f764d6af06",
+        "9962c20b-8792-453e-9c0d-843acef2830a",
+        "79c1c1f5-d837-4b80-a40e-d31a13cc1506"
+      ],
+      "extraSameCityPageIds": []
+    },
+    {
+      "groupNo": 2,
+      "title": "Александр Бессонов. Почему девушки выбирают плохих парней?!",
+      "candidatePageIds": [
+        "5f56e71f-2a78-44e9-86c2-0b8249201d2d",
+        "adb64f66-0eeb-482c-ba54-2522d61aff5a",
+        "a2583299-5a1c-436c-926f-6b741dbe3b71",
+        "f71d91e9-c0bc-49da-b4bd-9f5e3db93c95",
+        "41de85af-9f98-429b-9e1c-0872430aa027",
+        "cfdd8908-b016-47ea-9496-321206f29b53",
+        "04bae8ce-be28-4d3f-a853-90285992131b",
+        "65bc66c7-c2df-49e2-8056-102213275bc9"
+      ],
+      "extraSameCityPageIds": []
+    },
+    {
+      "groupNo": 3,
+      "title": "Новый год в BANANA PARK",
+      "candidatePageIds": [
+        "105148a2-106d-4cfd-978e-44382d399f6c",
+        "f3e94f0d-1adb-4a26-aae6-e3b076fbfd7d"
+      ],
+      "extraSameCityPageIds": [
+        "b71a3712-6d69-4aa8-8665-c192c480270f",
+        "4423e433-b6af-4011-b11e-fcc7d0a234cf"
+      ]
+    },
+    {
+      "groupNo": 4,
+      "title": "Обе-Рек — «Лучшее и новое»",
+      "candidatePageIds": [
+        "f6ba0637-113a-4c18-b6b5-222fcf2d496a",
+        "447e3175-44fb-4f1c-9416-cc5284e092a1",
+        "50038c0e-c77c-4e95-bb9c-1b7069d23cec",
+        "84db60e5-de98-4fc3-bdd6-88a267722cba"
+      ],
+      "extraSameCityPageIds": []
+    },
+    {
+      "groupNo": 5,
+      "title": "Мадияр Сатвалдин — сольный стендап-концерт",
+      "candidatePageIds": [
+        "71e54652-e33a-43c5-b772-3c1666d60017",
+        "2d17027b-7afd-454b-917a-f7b7db6bfc7d",
+        "d8c52577-8abd-4c9f-9598-3a03b9b302a1",
+        "036e511b-8c5f-4a3f-8db3-d6d19b201aa7"
+      ],
+      "extraSameCityPageIds": []
+    },
+    {
+      "groupNo": 6,
+      "title": "Александр Демидов — «От мировых хитов до собственных сочинений»",
+      "candidatePageIds": [
+        "679d1aba-7d93-4694-8cb7-fd7bd419bd71",
+        "b736b9fc-4779-4f74-ad4e-6274b261049b",
+        "dc79b8fe-20c3-4d19-b3d0-72ec13d9ce6a",
+        "4e41af42-fe23-439e-a6ac-179a935efae4"
+      ],
+      "extraSameCityPageIds": []
+    },
+    {
+      "groupNo": 7,
+      "title": "«Алиса в Стране чудес» — иллюзионный спектакль",
+      "candidatePageIds": [
+        "fe549c3a-ee9f-4bd2-b641-957015664727",
+        "4340e45c-f5c5-4e09-a141-8aa124439d87",
+        "343a076e-63fe-405d-bbfd-b8a19598fde8"
+      ],
+      "extraSameCityPageIds": [
+        "e21a338f-8dcf-482a-bb9b-ea9f28d7eb46"
+      ]
+    },
+    {
+      "groupNo": 8,
+      "title": "«МОЙ 2008» в «Руки Вверх! Бар»",
+      "candidatePageIds": [
+        "595bdbd3-e6fb-470e-89e5-8ef2fe93c2e2",
+        "00417c1f-2ab8-4513-a536-1cb8cfe824de",
+        "61df2003-2932-4957-9e43-90c534403163",
+        "f972e15a-dfcc-4016-9c44-f06730ebc0ca"
+      ],
+      "extraSameCityPageIds": []
+    },
+    {
+      "groupNo": 9,
+      "title": "Валерия Яковлева — «Расслабься, так у всех!»",
+      "candidatePageIds": [
+        "248f7ab7-fa16-49ca-8768-abea1e0ab5cf",
+        "cf9cc6ac-2b15-4371-b608-7a08eab07e2a",
+        "10245629-af80-4ca6-aba9-dc034dcb9ae9",
+        "78604721-59c9-45eb-8e6a-a91285e3f440"
+      ],
+      "extraSameCityPageIds": []
+    },
+    {
+      "groupNo": 10,
+      "title": "Антон и Виктория Макарские — «Живая встреча»",
+      "candidatePageIds": [
+        "78b573fd-f192-43d2-bf42-ff3f7b4eaab5",
+        "8e1629d7-fe4c-48db-a5d8-e94f15b3f2af",
+        "6a77c425-95f8-416b-b5af-8dc60181bf40",
+        "85e8c264-0712-4e5d-a38e-ebf1d1f501fe",
+        "0dc5e681-9edc-4e40-aea7-c83847c5a843"
+      ],
+      "extraSameCityPageIds": []
+    },
+    {
+      "groupNo": 11,
+      "title": "Концерт этно-группы «Хун Хурту»",
+      "candidatePageIds": [
+        "98306fda-940f-4ccb-a5e8-0f17e17dd252",
+        "78f1f696-d03b-4c9b-ae26-475ebed947cd",
+        "b2e8dfa9-ba13-4e2b-88a8-f87bc4f3f302"
+      ],
+      "extraSameCityPageIds": []
+    },
+    {
+      "groupNo": 12,
+      "title": "«Мировые саундтреки при свечах — The Best» с АСО-оркестром",
+      "candidatePageIds": [
+        "3a724b72-f5ab-4cad-81d8-f6320e97b94c",
+        "31abbb1a-81af-4ccc-84ff-836a1609c547"
+      ],
+      "extraSameCityPageIds": [
+        "861f70be-be44-458b-ad71-ffeb3b9a9433"
+      ]
+    },
+    {
+      "groupNo": 13,
+      "title": "«ХРЕН» — презентация альбома «Мифическая реальность»",
+      "candidatePageIds": [
+        "8844e3ea-cb0f-4015-b53e-6d9b2f9fe3cf",
+        "963779e2-849f-4946-a437-cf5fa9c93ec3",
+        "42f4344f-1f79-4cc5-85c7-5ae531e206f8"
+      ],
+      "extraSameCityPageIds": []
+    },
+    {
+      "groupNo": 14,
+      "title": "Симфония рока - Акт первый",
+      "candidatePageIds": [
+        "48c818c1-d023-4167-bfd1-8bc3e489fe44",
+        "9dd73a25-5a85-4922-98da-7339f96024ee",
+        "6a96b975-0578-484d-ae67-0b68f9be0234"
+      ],
+      "extraSameCityPageIds": []
+    },
+    {
+      "groupNo": 15,
+      "title": "«Звёзды 80–90-х»",
+      "candidatePageIds": [
+        "47649c0b-b383-47c2-b3a1-441e50d27905",
+        "f962342b-3867-4e01-ba55-b25af4dcc577"
+      ],
+      "extraSameCityPageIds": [
+        "9704d7e7-c1c2-45cf-97c2-77991cd986ae"
+      ]
+    },
+    {
+      "groupNo": 16,
+      "title": "Рок-опера «Гермес»",
+      "candidatePageIds": [
+        "7bddbf11-2b4c-470f-a177-f7395f43118a",
+        "abea6f71-815e-4529-91d8-51c4be5f00bd"
+      ],
+      "extraSameCityPageIds": [
+        "5cdb78ae-41a4-4836-b2c2-ec9da747bf36"
+      ]
+    },
+    {
+      "groupNo": 17,
+      "title": "TumaniYO",
+      "candidatePageIds": [
+        "b7829c6d-0c5e-4815-8600-a5faaae33f89",
+        "7711b830-0618-447d-b373-348e0d46aa68",
+        "fddf0b32-3f3c-461b-a601-fa25fd2a61ef"
+      ],
+      "extraSameCityPageIds": []
+    },
+    {
+      "groupNo": 18,
+      "title": "«Для милых дам! Мировые саундтреки при свечах»",
+      "candidatePageIds": [
+        "8e139338-1ee5-4db7-a1e1-49ecb18ca2f8",
+        "c97df886-1c7d-41ce-9d2a-c125c0340044",
+        "febbaf03-41ed-400c-a6f8-ad8de6b287ab"
+      ],
+      "extraSameCityPageIds": []
+    },
+    {
+      "groupNo": 19,
+      "title": "Ростислав Чебыкин — акустика",
+      "candidatePageIds": [
+        "823ca0d6-b006-48ce-a3db-e7c71a63b997",
+        "18de8ac6-2e70-461f-a84c-f83fc3fafc44",
+        "b107633e-1c22-4f61-82d5-e760e23a0515"
+      ],
+      "extraSameCityPageIds": []
+    },
+    {
+      "groupNo": 20,
+      "title": "Фаина Раневская — «Одинокая насмешница»",
+      "candidatePageIds": [
+        "92114b4d-7b8b-4bc8-a5c4-0c9d64c81877",
+        "0dd89da9-19cc-4aa1-bfb7-f20eacded251",
+        "59ef9c4c-b8f2-4bfa-b3b3-c533c98e7e20"
+      ],
+      "extraSameCityPageIds": []
+    },
+    {
+      "groupNo": 21,
+      "title": "«Сериалы мира при свечах» с АСО-оркестром",
+      "candidatePageIds": [
+        "700a899f-a2eb-4ad4-96e5-a5dac1739003",
+        "293bf176-c4c6-479d-ab55-e4510133133a"
+      ],
+      "extraSameCityPageIds": []
+    },
+    {
+      "groupNo": 22,
+      "title": "Антон и Виктория Макарские — «Живой концерт»",
+      "candidatePageIds": [
+        "ac9c0f08-3bdd-42fa-b339-92f128ba5a1f",
+        "d4d98185-c822-4eda-8e05-f1d9bc6a22eb"
+      ],
+      "extraSameCityPageIds": []
+    },
+    {
+      "groupNo": 23,
+      "title": "«Шоу под дождём: Мужчина VS Женщина»",
+      "candidatePageIds": [
+        "52c3a6ba-95d4-4d81-a000-9e723c488742",
+        "ee0dbab9-6eb6-41b2-a49a-b53a359e5000"
+      ],
+      "extraSameCityPageIds": []
+    },
+    {
+      "groupNo": 24,
+      "title": "Неоклассический концерт Дениса Стельмаха",
+      "candidatePageIds": [
+        "658e0c7d-cbd9-4e89-9bcf-858a80b80660",
+        "1e83c514-aac7-4271-a807-14aa3df4d7a6"
+      ],
+      "extraSameCityPageIds": []
+    },
+    {
+      "groupNo": 25,
+      "title": "«Что творят мужчины» с Сергеем Астаховым",
+      "candidatePageIds": [
+        "979e9692-dfa2-4849-8053-49be803d3d52",
+        "c4bf1618-bd01-46d4-b8a9-ae1a9dba0fb1"
+      ],
+      "extraSameCityPageIds": []
+    },
+    {
+      "groupNo": 26,
+      "title": "HELVEGEN - презентация нового альбома",
+      "candidatePageIds": [
+        "1412abfb-be64-4e9f-97b8-babb0e436cbf",
+        "6978ed1d-dfb7-44ad-9fe1-059aa8dd7edd"
+      ],
+      "extraSameCityPageIds": []
+    },
+    {
+      "groupNo": 27,
+      "title": "System of a Down Tribute — CHOPSY",
+      "candidatePageIds": [
+        "733430a3-8969-48ed-a624-11c3388b4753",
+        "d34aa564-7189-4749-8b8c-52ff8b02cc23"
+      ],
+      "extraSameCityPageIds": []
+    },
+    {
+      "groupNo": 28,
+      "title": "Saphath",
+      "candidatePageIds": [
+        "0c9d5d25-0099-4d33-a572-612cf4112006",
+        "f08f5535-d1c2-4996-afeb-564365244dda"
+      ],
+      "extraSameCityPageIds": []
+    },
+    {
+      "groupNo": 29,
+      "title": "СВАРГА — презентация альбома",
+      "candidatePageIds": [
+        "17130850-04a3-494d-8d57-c3c48daec1b6",
+        "91b770fe-6304-4945-9681-e37462006848"
+      ],
+      "extraSameCityPageIds": []
+    },
+    {
+      "groupNo": 30,
+      "title": "Нигатив с ансамблем",
+      "candidatePageIds": [
+        "3dd3dd48-9f67-429d-9e7b-61a9ad5f7b34",
+        "72ec1b7b-4131-4eea-bdb1-0bb84a54c0bf"
+      ],
+      "extraSameCityPageIds": []
+    }
+  ]
+}

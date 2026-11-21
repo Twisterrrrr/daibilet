@@ -1,0 +1,49 @@
+{
+  "eventId": "evt_6abada9da5015085a739d69e",
+  "eventPageId": "20a56d74-eecc-4a9a-ab54-15a83267deb5",
+  "eventPageSlug": "v-obyatiyah-dozhdya-tancevalnoe-shou-s-dozhdem-bataysk",
+  "archiveStatus": "UNUSED_ORIGINAL_SOURCE",
+  "retrievedAt": "2026-11-05",
+  "sourceSnapshot": {
+    "id": "evt_6abada9da5015085a739d69e",
+    "kind": "SINGLE",
+    "slug": "в-объятиях-дождя-танцевальное-шоу-с-дождем-6abada9da5015085a739d69e",
+    "seoH1": null,
+    "title": "В ОБЪЯТИЯХ ДОЖДЯ - танцевальное шоу с дождем",
+    "sources": [
+      {
+        "code": "TICKETSCLOUD",
+        "name": "Ticketscloud",
+        "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6abada9da5015085a739d69e",
+        "externalId": "6abada9da5015085a739d69e",
+        "metaExternalId": null
+      }
+    ],
+    "venueId": "venue_6a27bc390563a75a17d67395",
+    "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net/production/image/2026-09/6abada9439427634df32d447.png",
+    "seoTitle": null,
+    "cityTitle": "Батайск",
+    "venueTitle": "ГКДЦ",
+    "description": null,
+    "isIndexable": true,
+    "purchaseFlow": "EXTERNAL",
+    "venueAddress": "пл. Ленина, дом 5",
+    "canonicalPath": null,
+    "primaryCityId": "city_578740",
+    "supplierTitle": null,
+    "managementMode": "SOURCE_MANAGED",
+    "seoDescription": null,
+    "shortDescription": null
+  },
+  "originalDescription": null,
+  "previousEventOverride": "«В объятиях дождя» - танцевальное шоу с настоящим дождём на сцене.\n\n## Что вас ждет\n\nТанцевальные номера в сопровождении водного шоу.\n- Необычные спецэффекты и динамичная программа.\n- Формат шоу для всей семьи.\n\nЭто 9-й город тура (даты с 25 октября 2026 - 15 января 2027): всего таких городов 9. Можно сравнить даты и остановиться на удобной.\n\n## Практическая информация\n\n- Место - «ГКДЦ», Батайск\n- Адрес - пл. Ленина, дом 5\n- Продолжительность - около 90 минут\n- Возрастное ограничение - 16+\n- Билеты - от 2 100 ₽\n\nБилеты продаются онлайн. Оплата на сайте, электронный билет приходит на почту.",
+  "activeSessions": [
+    {
+      "start": "2027-01-15T16:00:00",
+      "end": "2027-01-15T17:30:00",
+      "price": 2100
+    }
+  ],
+  "mainChars": 637,
+  "previousEffectiveChars": 597
+}

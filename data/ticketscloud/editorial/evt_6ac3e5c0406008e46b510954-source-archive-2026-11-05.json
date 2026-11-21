@@ -1,0 +1,49 @@
+{
+  "eventId": "evt_6ac3e5c0406008e46b510954",
+  "eventPageId": "d237b6a2-9d43-4cd2-ad2c-83cb206536b9",
+  "eventPageSlug": "muzyka-lyubvi-v-siyanii-tysyachi-svechei-roslavl",
+  "archiveStatus": "UNUSED_ORIGINAL_SOURCE",
+  "retrievedAt": "2026-11-05",
+  "sourceSnapshot": {
+    "id": "evt_6ac3e5c0406008e46b510954",
+    "kind": "SINGLE",
+    "slug": "музыка-любви-в-сиянии-тысячи-свечеи-6ac3e5c0406008e46b510954",
+    "seoH1": null,
+    "title": "СИМФОНИЯ ЛЮБВИ. Симфонический концерт в сиянии тысячи свечей",
+    "sources": [
+      {
+        "code": "TICKETSCLOUD",
+        "name": "Ticketscloud",
+        "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6ac3e5c0406008e46b510954",
+        "externalId": "6ac3e5c0406008e46b510954",
+        "metaExternalId": null
+      }
+    ],
+    "venueId": "venue_63072308bd1394f6967a8429",
+    "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net/production/image/2026-10/6ac3e5bf97d3dfb69fb7e6ee.jpg",
+    "seoTitle": null,
+    "cityTitle": "Рославль",
+    "venueTitle": "ДК Ростислав",
+    "description": null,
+    "isIndexable": true,
+    "purchaseFlow": "EXTERNAL",
+    "venueAddress": "40, Рославль, Смоленская обл., Россия, 216509",
+    "canonicalPath": null,
+    "primaryCityId": "city_501283",
+    "supplierTitle": null,
+    "managementMode": "SOURCE_MANAGED",
+    "seoDescription": null,
+    "shortDescription": null
+  },
+  "originalDescription": null,
+  "previousEventOverride": "Музыка Любви в сиянии тысячи свечей - концерт в Рославле, на площадке «ДК Ростислав». Тур по городам, с 14 февраля - 17 марта 2027: всего 2 вечера, это 2-й. Если эта дата не подходит, в серии есть и другие.\n\n## Практическая информация\n\n- Место - «ДК Ростислав», Рославль\n- Адрес - 40, Рославль, Смоленская обл., Россия, 216509\n- Продолжительность - около 90 минут\n- Билеты - от 1 990 ₽\n\nБилеты продаются онлайн. Оплата на сайте, электронный билет приходит на почту.",
+  "activeSessions": [
+    {
+      "start": "2027-03-17T16:00:00",
+      "end": "2027-03-17T17:30:00",
+      "price": 1990
+    }
+  ],
+  "mainChars": 632,
+  "previousEffectiveChars": 466
+}

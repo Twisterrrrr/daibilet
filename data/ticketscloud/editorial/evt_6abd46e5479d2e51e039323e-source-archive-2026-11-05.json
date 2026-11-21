@@ -1,0 +1,30 @@
+{
+  "eventId": "evt_6abd46e5479d2e51e039323e",
+  "eventTitle": "Ислам Итляшев - 19 ноября в Каменск - Шахтинский",
+  "eventPageId": "80eb4c76-7a35-4570-9dd1-6354de5f34c2",
+  "eventPageSlug": "islam-itlyashev-19-noyabrya-v-kamensk-shahtinskii-kamensk-shahtinskiy",
+  "archiveStatus": "UNUSED_ORIGINAL_SOURCE",
+  "retrievedAt": "2026-11-05",
+  "originalDescription": null,
+  "previousEventOverride": "«Ислам Итляшев - 19 ноября в Каменск - Шахтинский» - поп-концерт на площадке «ДК им. Маяковского».\n\n## Практическая информация\n\n- Место - «ДК им. Маяковского», Каменск-Шахтинский\n- Адрес - ул. Парк Культуры, 13\n- Продолжительность - около 120 минут\n- Возрастное ограничение - 6+\n- Билеты - от 2 700 ₽\n\nБилеты продаются онлайн. Оплата на сайте, электронный билет приходит на почту.",
+  "previousEventPageContent": {
+    "sections": []
+  },
+  "verifiedCurrentData": {
+    "city": "Каменск-Шахтинский",
+    "venue": "ДК им. Маяковского",
+    "address": "ул. Парк Культуры, 13",
+    "sessions": [
+      {
+        "start": "2026-11-19T16:00:00",
+        "end": "2026-11-19T18:00:00",
+        "price": 2700
+      }
+    ],
+    "activeOfferCount": "13",
+    "priceFromRub": 2700,
+    "ageLimit": "6"
+  },
+  "mainTextChars": 973,
+  "previousEffectiveChars": 380
+}

@@ -2,8 +2,10 @@
 
 **Дата старта:** 2026-07-10  
 **Ветка Cursor:** `integrate/mvp-launch` → `feat/next-monorepo`  
-**Ветка Codex:** `codex/phase2-finance-next` (от `feat/next-monorepo` после F1)  
-**Статус:** 🔄 Планирование / F1
+**Ветка Codex:** `codex/phase2-foundation` (Phase 2 backend; **не** merge Next/proxy)  
+**Статус:** ✅ F2 done → **F3** cutover (`feat/next-monorepo`)
+
+**F2 read path:** Prisma напрямую в Server Components и Route Handlers (full-stack), без proxy fetch к legacy backend.
 
 ---
 
@@ -27,7 +29,7 @@
 |-------------------------|--------------|
 | `/events` — контент после JS + fetch | SSR первой страницы каталога в HTML |
 | `/events/:slug`, `/cities/*`, `/venues/*` — meta в client | `generateMetadata` + server fetch |
-| Lazy load 60 — бот видит мало | SSR **N** карточек (120 default), «ещё» — enhancement |
+| Lazy load 60 — бот видит мало | SSR **100** карточек (default), selector **100/200/300**, «ещё» — enhancement |
 | Нет crawlable pagination | URL `?page=` / `<link rel="next">` |
 
 **Правило:** всё с `index,follow` рендерится на сервере. Client-only — только buyer account, admin auth flows.
@@ -58,7 +60,7 @@ daibilet/
 | Кто | Ветка | Scope |
 |-----|-------|-------|
 | **Cursor** | `feat/next-monorepo` | F1–F4: Next shell, public SSR, Prisma read, deploy, parity |
-| **Codex** | `codex/phase2-finance-next` | Phase 2: Supplier, Checkout schema, YooKassa *foundation*, admin supplier read — **feature-flagged off** |
+| **Codex** | `codex/phase2-foundation` | Phase 2 schema, event change requests, supplier foundation — cherry-pick **после F3**, без Codex Next/proxy |
 | **Prod** | `integrate/mvp-launch` | Стабильный widget MVP до cutover F3 |
 
 Codex **не мержит** в prod до review. Cherry-pick только после parity.
@@ -71,43 +73,53 @@ Handoff для Codex: [codex-phase2-next-handoff.md](../codex-phase2-next-handof
 
 ### F1 — Monorepo shell (1–2 нед) 🔄
 
-- [ ] `pnpm-workspace.yaml`, `apps/web` Next 15 + Tailwind
-- [ ] Перенос `packages/db` без изменения schema
-- [ ] `packages/contracts` — public + admin types из `apps/backend/src/types`
-- [ ] Health route, env loader, deploy stub
-- [ ] CI: `pnpm build`, typecheck
+- [x] `pnpm-workspace.yaml`, `apps/web` Next 15
+- [x] `packages/contracts`, `packages/config` (from Codex reference)
+- [x] `packages/db` exports для workspace import
+- [x] Health route `/api/health`, root `.env` loader
+- [x] Deploy stub `deploy/scripts/start-web.sh`
+- [x] CI: `pnpm build`, typecheck on `feat/next-monorepo`
 
 **Exit:** `apps/web` builds, подключается к staging DB.
 
-### F2 — Public SSR (2–3 нед)
+### F2 — Public SSR (2–3 нед) ✅
 
-- [ ] **Каталог** `/events` — SSR page 1 (limit=120), facets server-side
-- [ ] **Event** `/events/[slug]` — SSR + `generateMetadata`
-- [ ] **City** `/cities/[slug]` — SSR
-- [ ] **Venue/location** `/venues/[slug]`, `/locations/[slug]` — SSR
-- [ ] **Landings** top slugs — SSG или ISR
-- [ ] Route Handlers: thin wrapper над Prisma DTO (port from `public-*.dto.ts`)
-- [ ] Parity scripts against legacy on staging
+- [x] **Каталог** `/events` — SSR page 1 (limit=100), crawlable `?page=`
+- [x] **Event** `/events/[slug]` — SSR + `generateMetadata`
+- [x] **City** `/cities/[slug]` — SSR + `/cities` index
+- [x] **Venue/location** `/venues/[slug]`, `/locations/[slug]` — SSR + indexes
+- [x] **Landings** `/podborki`, SEO paths — ISR (`revalidate=3600`) + top slugs SSG
+- [x] Route Handlers `/api/public/events|events/[slug]|cities/[slug]|venues/[slug]|landings/*`
+- [x] Prisma read via `@daibilet/backend/public-read` (no HTTP proxy)
+- [x] **Catalog filters SSR** — city, date, sort, q (GET form)
+- [x] **Widgets** — TC/Teplohod client enhancement на event page
+- [x] Parity: `pnpm backend:next:parity` (+ optional HTTP staging compare)
 
 **SEO exit:** View Source содержит карточки + title/description без JS.
 
 **Catalog pagination:**
-- SSR: page 1 (120 items) в HTML
+- SSR: page 1 (**100** items default) в HTML
 - «Показать ещё» / `?page=2` — crawlable links, не только JS
-- Опционально: selector 60/120/200 — **первая порция всегда в SSR**
+- Selector **100 / 200 / 300** — **первая SSR-порция всегда 100** (default)
 
-### F3 — Cutover public (1 нед)
+### F3 — Cutover public (1 нед) 🔄
 
-- [ ] nginx → Next на staging
-- [ ] Smoke: widgets, post-deploy, parity
-- [ ] Prod cutover public routes
-- [ ] Deprecate `apps/public` Vite (archive)
+См. [phase-f3-cutover-checklist.md](./phase-f3-cutover-checklist.md)
 
-### F4 — Admin + worker (2–3 нед)
+- [x] Deploy artifacts: `deploy-staging-next.sh`, systemd, nginx snippet, smoke script
+- [ ] Staging deploy + smoke on server
+- [ ] Prod cutover + rollback plan
+- [ ] Post-F3: Codex cherry-pick ([plan](../codex-cherry-pick-plan.md))
 
-- [ ] Admin route group `(admin)` в Next, Basic Auth middleware
-- [ ] Port admin pages from Vite
-- [ ] Sync jobs → `apps/worker` or Route Handlers + cron
+### F4 — Admin + worker (2–3 нед) 🔄
+
+- [x] Admin route group `(admin)` в Next, Basic Auth middleware (kickoff `/admin` stub)
+- [x] Port Dashboard live metrics (`/api/admin/dashboard` + sources + orders)
+- [x] Port Events / Landings lists + Articles CRUD (F4.1a); Vite for event override / landing matches
+- [x] Port Sources + sync triggers + read-only Settings (F4.1b)
+- [x] Cutover admin.daibilet.ru → Next; Vite deep CRUD at `/legacy` (F4.1c)
+- [x] Orders list/detail + Venues/Cities SEO CRUD (F4.4); `/legacy` soft-deprecated
+- [ ] Remaining rare Vite ops (taxonomy, candidates, ticket-link, ECR) / hard retire
 - [ ] Writes still via ported services (Prisma transactions)
 
 ### F5 — Retire legacy (2+ нед)
@@ -120,7 +132,7 @@ Handoff для Codex: [codex-phase2-next-handoff.md](../codex-phase2-next-handof
 
 ## Phase 2 (Codex) — вне runtime F
 
-Codex готовит в `codex/phase2-finance-next`:
+Codex продолжает в `codex/phase2-foundation`; интеграция в Cursor — [codex-cherry-pick-plan.md](../codex-cherry-pick-plan.md) **после F3**.
 
 - Prisma models: Supplier, CheckoutOrder, Payment, FiscalReceipt, …
 - Migrations **additive only**

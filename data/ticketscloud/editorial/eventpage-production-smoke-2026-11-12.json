@@ -1,0 +1,15 @@
+{
+  "checkedAt": "2026-11-12T19:40:48.035Z",
+  "pages": 86,
+  "http200": 86,
+  "canonicalSelf": 86,
+  "indexable": 86,
+  "practicalRendered": 86,
+  "sitemap": {
+    "status": 200,
+    "cache": "MISS",
+    "totalUrls": 5309,
+    "publishedEventPagesListed": 86
+  },
+  "failures": []
+}

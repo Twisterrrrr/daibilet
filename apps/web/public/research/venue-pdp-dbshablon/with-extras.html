@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex,nofollow" />
+  <title>Джаз-клуб Игоря Бутмана - афиша и билеты в Санкт-Петербурге</title>
+  <meta
+    name="description"
+    content="Все события джаз-клуба Игоря Бутмана в Санкт-Петербурге: расписание концертов, цены, схема зала и покупка билетов онлайн на АфишаПлюс."
+  />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <!--
+    Exact dbshablon slide + Daibilet keep blocks: map, FAQ, reviews.
+    Base layout/classes match src/routes/index.tsx (Twisterrrrr/dbshablon).
+  -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          screens: { '3xl': '120rem' },
+          fontFamily: {
+            sans: ['Manrope', 'system-ui', 'sans-serif'],
+          },
+          colors: {
+            background: '#faf9f7',
+            foreground: '#2a241f',
+            card: '#ffffff',
+            primary: '#e85d2c',
+            'primary-foreground': '#fffefb',
+            muted: '#f3f1ec',
+            'muted-foreground': '#7a7168',
+            accent: '#f5ebe0',
+            'accent-foreground': '#6b4528',
+            border: '#e4e0d8',
+          },
+          borderRadius: {
+            lg: '0.625rem',
+            xl: '0.75rem',
+          },
+        },
+      },
+    };
+  </script>
+  <style>
+    body { background: #faf9f7; color: #2a241f; }
+    .line-clamp-2 {
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+  </style>
+</head>
+<body>
+  <div class="min-h-screen bg-background font-sans text-foreground">
+    <!-- ===== Aggregator header ===== -->
+    <header class="sticky top-0 z-50 border-b border-border bg-card">
+      <div class="mx-auto max-w-[1280px] px-4 sm:px-6 3xl:max-w-[1700px]">
+        <div class="flex h-16 items-center gap-3 sm:gap-6">
+          <a href="./with-extras.html" class="flex shrink-0 items-baseline gap-1 text-xl font-extrabold tracking-tight">
+            <span class="text-primary">Афиша</span>
+            <span>Плюс</span>
+          </a>
+          <button type="button" class="hidden shrink-0 items-center gap-1 rounded-lg px-2 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted md:flex">
+            Санкт-Петербург
+            <svg class="h-3.5 w-3.5 rotate-90" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
+          </button>
+          <label class="flex h-10 min-w-0 flex-1 items-center gap-2 rounded-lg bg-muted px-3">
+            <svg class="h-4 w-4 shrink-0 text-muted-foreground" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+            <input
+              placeholder="Событие, артист или площадка"
+              class="w-full min-w-0 bg-transparent text-sm outline-none placeholder:text-muted-foreground"
+            />
+          </label>
+          <button type="button" class="hidden shrink-0 rounded-lg border border-border px-4 py-2 text-sm font-semibold transition-colors hover:bg-muted sm:block">
+            Войти
+          </button>
+        </div>
+        <nav class="hidden gap-5 overflow-x-auto pb-3 text-sm text-muted-foreground md:flex">
+          <a href="#" class="shrink-0 transition-colors hover:text-primary">Концерты</a>
+          <a href="#" class="shrink-0 transition-colors hover:text-primary">Театр</a>
+          <a href="#" class="shrink-0 transition-colors hover:text-primary">Кино</a>
+          <a href="#" class="shrink-0 transition-colors hover:text-primary">Детям</a>
+          <a href="#" class="shrink-0 transition-colors hover:text-primary">Стендап</a>
+          <a href="#" class="shrink-0 transition-colors hover:text-primary">Выставки</a>
+          <a href="#" class="shrink-0 transition-colors hover:text-primary">Спорт</a>
+          <a href="#" class="shrink-0 transition-colors hover:text-primary">Ещё</a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="mx-auto max-w-[1280px] px-4 sm:px-6 3xl:max-w-[1700px]">
+      <!-- ===== Breadcrumbs ===== -->
+      <nav aria-label="Хлебные крошки" class="flex flex-wrap items-center gap-1.5 pt-5 text-xs text-muted-foreground sm:text-sm">
+        <a href="#" class="hover:text-primary">Главная</a>
+        <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
+        <a href="#" class="hover:text-primary">Места</a>
+        <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
+        <span class="text-foreground">Джаз-клуб Игоря Бутмана</span>
+      </nav>
+
+      <!-- ===== Venue header ===== -->
+      <section class="mt-5 grid gap-5 lg:grid-cols-[380px_minmax(0,1fr)] 3xl:grid-cols-[460px_minmax(0,1fr)]">
+        <div class="relative overflow-hidden rounded-xl">
+          <img
+            src="./assets/hero-club.jpg"
+            alt="Зал джаз-клуба Игоря Бутмана: сцена под кирпичными сводами"
+            width="1920"
+            height="1088"
+            class="h-56 w-full object-cover sm:h-72 lg:h-full lg:min-h-[320px]"
+          />
+          <span class="absolute left-3 top-3 rounded-md bg-background/90 px-2 py-1 text-xs font-semibold backdrop-blur">
+            3 фото
+          </span>
+        </div>
+
+        <div class="min-w-0">
+          <div class="flex flex-wrap items-center gap-2">
+            <span class="rounded-md bg-accent px-2 py-1 text-xs font-semibold text-accent-foreground">Джаз-клуб</span>
+            <span class="rounded-md bg-muted px-2 py-1 text-xs font-medium text-muted-foreground">18+</span>
+            <span class="flex items-center gap-1 rounded-md bg-muted px-2 py-1 text-xs font-semibold">
+              <svg class="h-3.5 w-3.5 fill-primary text-primary" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+              4,9 <span class="font-normal text-muted-foreground">· 1 240 отзывов</span>
+            </span>
+          </div>
+          <h1 class="mt-3 text-2xl font-extrabold leading-tight tracking-tight sm:text-4xl 3xl:text-5xl">
+            Джаз-клуб Игоря Бутмана
+          </h1>
+          <div class="mt-4 space-y-2 text-sm sm:text-base">
+            <p class="flex items-center gap-2 text-muted-foreground">
+              <svg class="h-4 w-4 shrink-0 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+              наб. канала Грибоедова, 7, Санкт-Петербург
+            </p>
+            <p class="flex items-center gap-2 text-muted-foreground">
+              <svg class="h-4 w-4 shrink-0 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect width="16" height="12" x="4" y="5" rx="2"/><path d="M2 19h20"/><path d="M8 19v-2"/><path d="M16 19v-2"/></svg>
+              Невский проспект · 5 минут пешком
+            </p>
+            <p class="flex items-center gap-2 text-muted-foreground">
+              <svg class="h-4 w-4 shrink-0 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.81.36 1.6.7 2.34a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.74.34 1.53.57 2.34.7A2 2 0 0 1 22 16.92z"/></svg>
+              +7 (812) 000-00-00 · касса клуба
+            </p>
+            <p class="flex items-center gap-2 text-muted-foreground">
+              <svg class="h-4 w-4 shrink-0 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+              butmanclub.ru
+            </p>
+          </div>
+          <div class="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center">
+            <a
+              href="#afisha"
+              class="rounded-lg bg-primary px-6 py-3 text-center text-sm font-bold text-primary-foreground transition-opacity hover:opacity-90"
+            >
+              Купить билет · от 2 000 ₽
+            </a>
+            <div class="flex gap-2">
+              <button
+                type="button"
+                aria-label="Добавить в избранное"
+                class="flex h-11 flex-1 items-center justify-center gap-2 rounded-lg border border-border px-4 text-sm font-semibold transition-colors hover:bg-muted sm:flex-none"
+              >
+                <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
+                В избранное
+              </button>
+              <button
+                type="button"
+                aria-label="Поделиться"
+                class="flex h-11 w-11 items-center justify-center rounded-lg border border-border transition-colors hover:bg-muted"
+              >
+                <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.59 13.51 6.83 3.98"/><path d="m15.41 6.51-6.82 3.98"/></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== Afisha ===== -->
+      <section id="afisha" class="mt-12">
+        <div class="flex items-end justify-between gap-4">
+          <h2 class="text-xl font-extrabold tracking-tight sm:text-2xl 3xl:text-3xl">
+            Афиша в джаз-клубе Игоря Бутмана
+          </h2>
+          <a href="#" class="hidden shrink-0 items-center gap-1 text-sm font-semibold text-primary sm:flex">
+            Все события <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
+          </a>
+        </div>
+
+        <div class="mt-4 flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none]">
+          <button type="button" class="flex shrink-0 items-center gap-1.5 rounded-full bg-foreground px-4 py-2 text-xs font-bold text-background sm:text-sm">Сегодня</button>
+          <button type="button" class="flex shrink-0 items-center gap-1.5 rounded-full border border-border bg-card px-4 py-2 text-xs font-semibold transition-colors hover:bg-muted sm:text-sm">Завтра</button>
+          <button type="button" class="flex shrink-0 items-center gap-1.5 rounded-full border border-border bg-card px-4 py-2 text-xs font-semibold transition-colors hover:bg-muted sm:text-sm">Сентябрь</button>
+          <button type="button" class="flex shrink-0 items-center gap-1.5 rounded-full border border-border bg-card px-4 py-2 text-xs font-semibold transition-colors hover:bg-muted sm:text-sm">Октябрь</button>
+          <button type="button" class="flex shrink-0 items-center gap-1.5 rounded-full border border-border bg-card px-4 py-2 text-xs font-semibold transition-colors hover:bg-muted sm:text-sm">Выходные</button>
+          <button type="button" class="flex shrink-0 items-center gap-1.5 rounded-full border border-border bg-card px-4 py-2 text-xs font-semibold transition-colors hover:bg-muted sm:text-sm">
+            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M16 2v4"/><path d="M8 2v4"/><path d="M3 10h18"/></svg>
+            Выбрать дату
+          </button>
+        </div>
+
+        <ul class="mt-6 grid grid-cols-2 gap-x-4 gap-y-7 sm:grid-cols-3 lg:grid-cols-4 3xl:grid-cols-5">
+          <li class="group min-w-0">
+            <a href="#" class="block">
+              <div class="relative overflow-hidden rounded-xl bg-muted">
+                <img src="./assets/poster-sax.jpg" alt="Афиша концерта: Олег и Наталья Бутман Бэнд" loading="lazy" width="768" height="1024" class="aspect-[3/4] w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]" />
+                <span class="absolute left-2 top-2 rounded-md bg-background/90 px-2 py-1 text-[11px] font-semibold backdrop-blur">Джаз</span>
+              </div>
+              <div class="mt-3">
+                <p class="text-xs font-semibold text-primary sm:text-sm">5 сентября, пт · 20:00</p>
+                <h3 class="mt-1 line-clamp-2 text-sm font-bold leading-snug sm:text-base">Олег и Наталья Бутман Бэнд</h3>
+                <p class="mt-1.5 text-sm font-extrabold sm:text-base">от 2 500 ₽</p>
+                <button type="button" class="mt-3 w-full rounded-lg bg-primary px-4 py-2.5 text-xs font-bold text-primary-foreground transition-opacity hover:opacity-90 sm:text-sm">Купить</button>
+              </div>
+            </a>
+          </li>
+          <li class="group min-w-0">
+            <a href="#" class="block">
+              <div class="relative overflow-hidden rounded-xl bg-muted">
+                <img src="./assets/poster-swing.jpg" alt="Афиша концерта: Валерий Сюткин и ансамбль S.O.S" loading="lazy" width="768" height="1024" class="aspect-[3/4] w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]" />
+                <span class="absolute left-2 top-2 rounded-md bg-background/90 px-2 py-1 text-[11px] font-semibold backdrop-blur">Свинг</span>
+              </div>
+              <div class="mt-3">
+                <p class="text-xs font-semibold text-primary sm:text-sm">14 сентября, вс · 20:00</p>
+                <h3 class="mt-1 line-clamp-2 text-sm font-bold leading-snug sm:text-base">Валерий Сюткин и ансамбль S.O.S</h3>
+                <p class="mt-1.5 text-sm font-extrabold sm:text-base">от 2 500 ₽</p>
+                <button type="button" class="mt-3 w-full rounded-lg bg-primary px-4 py-2.5 text-xs font-bold text-primary-foreground transition-opacity hover:opacity-90 sm:text-sm">Купить</button>
+              </div>
+            </a>
+          </li>
+          <li class="group min-w-0">
+            <a href="#" class="block">
+              <div class="relative overflow-hidden rounded-xl bg-muted">
+                <img src="./assets/poster-vocal.jpg" alt="Афиша концерта: Валерий Сюткин и «Лайт Джаз»" loading="lazy" width="768" height="1024" class="aspect-[3/4] w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]" />
+                <span class="absolute left-2 top-2 rounded-md bg-background/90 px-2 py-1 text-[11px] font-semibold backdrop-blur">Свинг</span>
+              </div>
+              <div class="mt-3">
+                <p class="text-xs font-semibold text-primary sm:text-sm">15 сентября, пн · 20:00</p>
+                <h3 class="mt-1 line-clamp-2 text-sm font-bold leading-snug sm:text-base">Валерий Сюткин и «Лайт Джаз»</h3>
+                <p class="mt-1.5 text-sm font-extrabold sm:text-base">от 2 500 ₽</p>
+                <button type="button" class="mt-3 w-full rounded-lg bg-primary px-4 py-2.5 text-xs font-bold text-primary-foreground transition-opacity hover:opacity-90 sm:text-sm">Купить</button>
+              </div>
+            </a>
+          </li>
+          <li class="group min-w-0">
+            <a href="#" class="block">
+              <div class="relative overflow-hidden rounded-xl bg-muted">
+                <img src="./assets/poster-sax.jpg" alt="Афиша концерта: Виталий Погосян Duduk-Band" loading="lazy" width="768" height="1024" class="aspect-[3/4] w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]" />
+                <span class="absolute left-2 top-2 rounded-md bg-background/90 px-2 py-1 text-[11px] font-semibold backdrop-blur">Этно-джаз</span>
+              </div>
+              <div class="mt-3">
+                <p class="text-xs font-semibold text-primary sm:text-sm">16 сентября, вт · 20:00</p>
+                <h3 class="mt-1 line-clamp-2 text-sm font-bold leading-snug sm:text-base">Виталий Погосян Duduk-Band</h3>
+                <p class="mt-1.5 text-sm font-extrabold sm:text-base">от 2 000 ₽</p>
+                <button type="button" class="mt-3 w-full rounded-lg bg-primary px-4 py-2.5 text-xs font-bold text-primary-foreground transition-opacity hover:opacity-90 sm:text-sm">Купить</button>
+              </div>
+            </a>
+          </li>
+          <li class="group min-w-0">
+            <a href="#" class="block">
+              <div class="relative overflow-hidden rounded-xl bg-muted">
+                <img src="./assets/poster-vocal.jpg" alt="Афиша концерта: Elena et les garçons" loading="lazy" width="768" height="1024" class="aspect-[3/4] w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]" />
+                <span class="absolute left-2 top-2 rounded-md bg-background/90 px-2 py-1 text-[11px] font-semibold backdrop-blur">Вокал</span>
+              </div>
+              <div class="mt-3">
+                <p class="text-xs font-semibold text-primary sm:text-sm">17 сентября, ср · 20:00</p>
+                <h3 class="mt-1 line-clamp-2 text-sm font-bold leading-snug sm:text-base">Elena et les garçons</h3>
+                <p class="mt-1.5 text-sm font-extrabold sm:text-base">от 2 500 ₽</p>
+                <button type="button" class="mt-3 w-full rounded-lg bg-primary px-4 py-2.5 text-xs font-bold text-primary-foreground transition-opacity hover:opacity-90 sm:text-sm">Купить</button>
+              </div>
+            </a>
+          </li>
+          <li class="group min-w-0">
+            <a href="#" class="block">
+              <div class="relative overflow-hidden rounded-xl bg-muted">
+                <img src="./assets/poster-sax.jpg" alt="Афиша концерта: Дмитрий Носков и его квинтет" loading="lazy" width="768" height="1024" class="aspect-[3/4] w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]" />
+                <span class="absolute left-2 top-2 rounded-md bg-background/90 px-2 py-1 text-[11px] font-semibold backdrop-blur">Джаз</span>
+              </div>
+              <div class="mt-3">
+                <p class="text-xs font-semibold text-primary sm:text-sm">18 сентября, чт · 20:00</p>
+                <h3 class="mt-1 line-clamp-2 text-sm font-bold leading-snug sm:text-base">Дмитрий Носков и его квинтет</h3>
+                <p class="mt-1.5 text-sm font-extrabold sm:text-base">от 2 500 ₽</p>
+                <button type="button" class="mt-3 w-full rounded-lg bg-primary px-4 py-2.5 text-xs font-bold text-primary-foreground transition-opacity hover:opacity-90 sm:text-sm">Купить</button>
+              </div>
+            </a>
+          </li>
+          <li class="group min-w-0">
+            <a href="#" class="block">
+              <div class="relative overflow-hidden rounded-xl bg-muted">
+                <img src="./assets/poster-swing.jpg" alt="Афиша концерта: Квартет Игоря Бутмана. День рождения клуба" loading="lazy" width="768" height="1024" class="aspect-[3/4] w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]" />
+                <span class="absolute left-2 top-2 rounded-md bg-background/90 px-2 py-1 text-[11px] font-semibold backdrop-blur">Спецконцерт</span>
+              </div>
+              <div class="mt-3">
+                <p class="text-xs font-semibold text-primary sm:text-sm">1 октября, ср · 21:00</p>
+                <h3 class="mt-1 line-clamp-2 text-sm font-bold leading-snug sm:text-base">Квартет Игоря Бутмана. День рождения клуба</h3>
+                <p class="mt-1.5 text-sm font-extrabold sm:text-base">от 3 500 ₽</p>
+                <button type="button" class="mt-3 w-full rounded-lg bg-primary px-4 py-2.5 text-xs font-bold text-primary-foreground transition-opacity hover:opacity-90 sm:text-sm">Купить</button>
+              </div>
+            </a>
+          </li>
+          <li class="group min-w-0">
+            <a href="#" class="block">
+              <div class="relative overflow-hidden rounded-xl bg-muted">
+                <img src="./assets/poster-vocal.jpg" alt="Афиша концерта: Бутман и Друзья: вечер блюза" loading="lazy" width="768" height="1024" class="aspect-[3/4] w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]" />
+                <span class="absolute left-2 top-2 rounded-md bg-background/90 px-2 py-1 text-[11px] font-semibold backdrop-blur">Блюз</span>
+              </div>
+              <div class="mt-3">
+                <p class="text-xs font-semibold text-primary sm:text-sm">12 октября, вс · 20:00</p>
+                <h3 class="mt-1 line-clamp-2 text-sm font-bold leading-snug sm:text-base">Бутман &amp; Друзья: вечер блюза</h3>
+                <p class="mt-1.5 text-sm font-extrabold sm:text-base">от 2 800 ₽</p>
+                <button type="button" class="mt-3 w-full rounded-lg bg-primary px-4 py-2.5 text-xs font-bold text-primary-foreground transition-opacity hover:opacity-90 sm:text-sm">Купить</button>
+              </div>
+            </a>
+          </li>
+        </ul>
+
+        <button type="button" class="mt-8 w-full rounded-lg border border-border py-3 text-sm font-bold transition-colors hover:bg-muted">
+          Показать ещё
+        </button>
+      </section>
+
+      <!-- ===== About ===== -->
+      <section class="mt-14 grid gap-8 lg:grid-cols-[minmax(0,1fr)_380px] lg:items-start 3xl:grid-cols-[minmax(0,1fr)_460px]">
+        <div class="min-w-0">
+          <h2 class="text-xl font-extrabold tracking-tight sm:text-2xl">О площадке</h2>
+          <div class="mt-4 space-y-4 text-sm leading-relaxed text-muted-foreground sm:text-base">
+            <p>
+              Джаз-клуб Игоря Бутмана на канале Грибоедова - камерный двухуровневый зал в
+              историческом здании Служебного корпуса Придворного конюшенного ведомства XVIII
+              века. Старинные кирпичные своды создают глубокое естественное звучание, которое
+              дополняет современное концертное оборудование.
+            </p>
+            <p>
+              Здесь каждый вечер выступают звёзды российского и мирового джаза. Кухня сочетает
+              средиземноморские блюда с латиноамериканскими акцентами, барная карта - авторские
+              коктейли и классические вина. Рекомендуем приходить за 30-40 минут до начала
+              концерта.
+            </p>
+          </div>
+          <dl class="mt-6 grid grid-cols-1 gap-3 rounded-xl bg-muted p-5 sm:grid-cols-2">
+            <div>
+              <dt class="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Вместимость</dt>
+              <dd class="mt-1 text-sm font-semibold">до 200 гостей</dd>
+            </div>
+            <div>
+              <dt class="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Формат мест</dt>
+              <dd class="mt-1 text-sm font-semibold">столики, барная стойка, VIP-диваны</dd>
+            </div>
+            <div>
+              <dt class="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Ресторан</dt>
+              <dd class="mt-1 text-sm font-semibold">средиземноморская кухня</dd>
+            </div>
+            <div>
+              <dt class="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Возрастное ограничение</dt>
+              <dd class="mt-1 text-sm font-semibold">18+</dd>
+            </div>
+          </dl>
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <img src="./assets/hall.jpg" alt="Двухъярусный зал клуба с роялем на сцене" loading="lazy" width="1200" height="900" class="col-span-2 aspect-[16/10] w-full rounded-xl object-cover" />
+          <img src="./assets/dinner.jpg" alt="Стол с блюдами и коктейлем при свечах" loading="lazy" width="1200" height="900" class="aspect-square w-full rounded-xl object-cover" />
+          <img src="./assets/poster-vocal.jpg" alt="Вокалистка у винтажного микрофона" loading="lazy" width="768" height="1024" class="aspect-square w-full rounded-xl object-cover" />
+        </div>
+      </section>
+
+      <!-- ===== Daibilet keep: map ===== -->
+      <section id="map" class="mt-14">
+        <h2 class="text-xl font-extrabold tracking-tight sm:text-2xl">Карта</h2>
+        <p class="mt-2 text-sm text-muted-foreground sm:text-base">
+          Вход со стороны канала. Ориентир - Казанский собор, 3 минуты пешком.
+        </p>
+        <div class="mt-5 grid gap-5 lg:grid-cols-[minmax(0,1fr)_280px]">
+          <div class="overflow-hidden rounded-xl border border-border bg-muted">
+            <iframe
+              title="Карта: Джаз-клуб Игоря Бутмана"
+              loading="lazy"
+              referrerpolicy="no-referrer-when-downgrade"
+              class="h-64 w-full border-0 sm:h-80"
+              src="https://yandex.ru/map-widget/v1/?ll=30.3208%2C59.9345&z=16&pt=30.3208,59.9345,pm2rdm"
+            ></iframe>
+          </div>
+          <aside class="rounded-xl border border-border bg-card p-5">
+            <h3 class="text-sm font-extrabold">Контакты</h3>
+            <ul class="mt-3 space-y-2 text-sm text-muted-foreground">
+              <li>наб. канала Грибоедова, 7</li>
+              <li>Невский проспект · 5 минут</li>
+              <li>Запуск гостей за 30-45 минут до концерта</li>
+            </ul>
+            <div class="mt-5 flex flex-col gap-2">
+              <a
+                class="rounded-lg bg-foreground px-4 py-2.5 text-center text-sm font-bold text-background transition-opacity hover:opacity-90"
+                href="https://yandex.ru/maps/?pt=30.3208,59.9345&z=17&l=map"
+                target="_blank"
+                rel="noreferrer"
+              >Яндекс.Карты</a>
+              <a
+                class="rounded-lg border border-border px-4 py-2.5 text-center text-sm font-semibold transition-colors hover:bg-muted"
+                href="https://2gis.ru/spb/search/%D0%BD%D0%B0%D0%B1.%20%D0%BA%D0%B0%D0%BD%D0%B0%D0%BB%D0%B0%20%D0%93%D1%80%D0%B8%D0%B1%D0%BE%D0%B5%D0%B4%D0%BE%D0%B2%D0%B0%2C%207"
+                target="_blank"
+                rel="noreferrer"
+              >2ГИС</a>
+            </div>
+          </aside>
+        </div>
+      </section>
+
+      <!-- ===== Daibilet keep: FAQ ===== -->
+      <section id="faq" class="mt-14">
+        <h2 class="text-xl font-extrabold tracking-tight sm:text-2xl">Частые вопросы</h2>
+        <div class="mt-5 divide-y divide-border overflow-hidden rounded-xl border border-border bg-card">
+          <details class="group open:bg-muted/40" open>
+            <summary class="cursor-pointer list-none px-5 py-4 text-sm font-bold marker:content-none sm:text-base">
+              Есть ли дресс-код?
+            </summary>
+            <p class="px-5 pb-4 text-sm leading-relaxed text-muted-foreground">
+              Строгого дресс-кода нет. Уместны smart casual и вечерний повседневный стиль.
+            </p>
+          </details>
+          <details class="group">
+            <summary class="cursor-pointer list-none px-5 py-4 text-sm font-bold marker:content-none sm:text-base">
+              Во сколько пускают гостей?
+            </summary>
+            <p class="px-5 pb-4 text-sm leading-relaxed text-muted-foreground">
+              Обычно запуск за 30-45 минут до начала программы. Точное время смотрите в карточке события.
+            </p>
+          </details>
+          <details class="group">
+            <summary class="cursor-pointer list-none px-5 py-4 text-sm font-bold marker:content-none sm:text-base">
+              Можно ли заказать еду во время концерта?
+            </summary>
+            <p class="px-5 pb-4 text-sm leading-relaxed text-muted-foreground">
+              Да, зал рассчитан на ужин со сценой. Меню и барная карта доступны на месте.
+            </p>
+          </details>
+          <details class="group">
+            <summary class="cursor-pointer list-none px-5 py-4 text-sm font-bold marker:content-none sm:text-base">
+              Где проходит оплата билета?
+            </summary>
+            <p class="px-5 pb-4 text-sm leading-relaxed text-muted-foreground">
+              Покупка - в виджете билетной системы или на сайте организатора. Агрегатор помогает выбрать событие и хранит статус заказа.
+            </p>
+          </details>
+        </div>
+      </section>
+
+      <!-- ===== Daibilet keep: reviews ===== -->
+      <section id="reviews" class="mt-14">
+        <div class="flex flex-wrap items-end justify-between gap-3">
+          <h2 class="text-xl font-extrabold tracking-tight sm:text-2xl">Отзывы</h2>
+          <p class="flex items-center gap-1.5 text-sm font-semibold">
+            <svg class="h-4 w-4 fill-primary text-primary" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            4,9 <span class="font-normal text-muted-foreground">· на основе 1 240 оценок</span>
+          </p>
+        </div>
+        <div class="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <article class="rounded-xl border border-border bg-card p-5">
+            <p class="text-xs font-semibold text-muted-foreground">Анна · ★★★★★ · сентябрь 2026</p>
+            <p class="mt-2 text-sm leading-relaxed">Звук отличный, столики близко к сцене. Ужин не мешал концерту - наоборот, задал ритм вечера.</p>
+          </article>
+          <article class="rounded-xl border border-border bg-card p-5">
+            <p class="text-xs font-semibold text-muted-foreground">Игорь · ★★★★★ · август 2026</p>
+            <p class="mt-2 text-sm leading-relaxed">Дошли по навигатору от Невского без сюрпризов. Вернёмся на late set.</p>
+          </article>
+          <article class="rounded-xl border border-border bg-card p-5">
+            <p class="text-xs font-semibold text-muted-foreground">Мария · ★★★★☆ · июль 2026</p>
+            <p class="mt-2 text-sm leading-relaxed">Атмосфера клуба тёплая, VIP-ложи реально тише. Лучше бронировать столик заранее в выходные.</p>
+          </article>
+        </div>
+        <button type="button" class="mt-6 w-full rounded-lg border border-border py-3 text-sm font-bold transition-colors hover:bg-muted">
+          Написать отзыв
+        </button>
+      </section>
+
+      <!-- ===== Similar venues ===== -->
+      <section class="mt-14">
+        <div class="flex items-end justify-between gap-4">
+          <h2 class="text-xl font-extrabold tracking-tight sm:text-2xl">Похожие места</h2>
+          <a href="#" class="hidden shrink-0 items-center gap-1 text-sm font-semibold text-primary sm:flex">
+            Все площадки <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
+          </a>
+        </div>
+        <ul class="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 3xl:grid-cols-5">
+          <li>
+            <a href="#" class="flex items-center gap-4 rounded-xl border border-border bg-card p-3 transition-shadow hover:shadow-md">
+              <img src="./assets/hall.jpg" alt="Козлов Club" loading="lazy" width="1200" height="900" class="h-16 w-16 shrink-0 rounded-lg object-cover" />
+              <div class="min-w-0">
+                <p class="truncate text-sm font-bold">Козлов Club</p>
+                <p class="mt-0.5 text-xs text-muted-foreground">Джаз-клуб</p>
+                <p class="mt-0.5 flex items-center gap-1 text-xs text-muted-foreground">
+                  <svg class="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect width="16" height="12" x="4" y="5" rx="2"/><path d="M2 19h20"/></svg>
+                  Сенная площадь
+                </p>
+              </div>
+            </a>
+          </li>
+          <li>
+            <a href="#" class="flex items-center gap-4 rounded-xl border border-border bg-card p-3 transition-shadow hover:shadow-md">
+              <img src="./assets/dinner.jpg" alt="JFC Jazz Club" loading="lazy" width="1200" height="900" class="h-16 w-16 shrink-0 rounded-lg object-cover" />
+              <div class="min-w-0">
+                <p class="truncate text-sm font-bold">JFC Jazz Club</p>
+                <p class="mt-0.5 text-xs text-muted-foreground">Джаз-клуб</p>
+                <p class="mt-0.5 flex items-center gap-1 text-xs text-muted-foreground">
+                  <svg class="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect width="16" height="12" x="4" y="5" rx="2"/><path d="M2 19h20"/></svg>
+                  Невский проспект
+                </p>
+              </div>
+            </a>
+          </li>
+          <li>
+            <a href="#" class="flex items-center gap-4 rounded-xl border border-border bg-card p-3 transition-shadow hover:shadow-md">
+              <img src="./assets/hero-club.jpg" alt="The Hat Bar" loading="lazy" width="1920" height="1088" class="h-16 w-16 shrink-0 rounded-lg object-cover" />
+              <div class="min-w-0">
+                <p class="truncate text-sm font-bold">The Hat Bar</p>
+                <p class="mt-0.5 text-xs text-muted-foreground">Бар с живой музыкой</p>
+                <p class="mt-0.5 flex items-center gap-1 text-xs text-muted-foreground">
+                  <svg class="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect width="16" height="12" x="4" y="5" rx="2"/><path d="M2 19h20"/></svg>
+                  Гостиный двор
+                </p>
+              </div>
+            </a>
+          </li>
+          <li>
+            <a href="#" class="flex items-center gap-4 rounded-xl border border-border bg-card p-3 transition-shadow hover:shadow-md">
+              <img src="./assets/hall.jpg" alt="Эрарта. Сцена" loading="lazy" width="1200" height="900" class="h-16 w-16 shrink-0 rounded-lg object-cover" />
+              <div class="min-w-0">
+                <p class="truncate text-sm font-bold">Эрарта. Сцена</p>
+                <p class="mt-0.5 text-xs text-muted-foreground">Концертная площадка</p>
+                <p class="mt-0.5 flex items-center gap-1 text-xs text-muted-foreground">
+                  <svg class="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect width="16" height="12" x="4" y="5" rx="2"/><path d="M2 19h20"/></svg>
+                  Приморская
+                </p>
+              </div>
+            </a>
+          </li>
+        </ul>
+      </section>
+    </main>
+
+    <!-- ===== Aggregator footer ===== -->
+    <footer class="mt-16 border-t border-border bg-card">
+      <div class="mx-auto grid max-w-[1280px] gap-8 px-4 py-10 text-sm sm:grid-cols-2 sm:px-6 lg:grid-cols-4 3xl:max-w-[1700px]">
+        <div>
+          <p class="flex items-baseline gap-1 text-lg font-extrabold tracking-tight">
+            <span class="text-primary">Афиша</span>Плюс
+          </p>
+          <p class="mt-3 text-xs leading-relaxed text-muted-foreground">
+            Билеты на концерты, спектакли и выставки. Официальная продажа без наценок.
+          </p>
+        </div>
+        <div>
+          <p class="text-xs font-bold uppercase tracking-wide text-muted-foreground">События</p>
+          <ul class="mt-3 space-y-2">
+            <li><a href="#" class="text-muted-foreground transition-colors hover:text-primary">Концерты</a></li>
+            <li><a href="#" class="text-muted-foreground transition-colors hover:text-primary">Театр</a></li>
+            <li><a href="#" class="text-muted-foreground transition-colors hover:text-primary">Стендап</a></li>
+            <li><a href="#" class="text-muted-foreground transition-colors hover:text-primary">Выставки</a></li>
+          </ul>
+        </div>
+        <div>
+          <p class="text-xs font-bold uppercase tracking-wide text-muted-foreground">Города</p>
+          <ul class="mt-3 space-y-2">
+            <li><a href="#" class="text-muted-foreground transition-colors hover:text-primary">Санкт-Петербург</a></li>
+            <li><a href="#" class="text-muted-foreground transition-colors hover:text-primary">Москва</a></li>
+            <li><a href="#" class="text-muted-foreground transition-colors hover:text-primary">Казань</a></li>
+            <li><a href="#" class="text-muted-foreground transition-colors hover:text-primary">Екатеринбург</a></li>
+          </ul>
+        </div>
+        <div>
+          <p class="text-xs font-bold uppercase tracking-wide text-muted-foreground">Помощь</p>
+          <ul class="mt-3 space-y-2">
+            <li><a href="#" class="text-muted-foreground transition-colors hover:text-primary">Как купить билет</a></li>
+            <li><a href="#" class="text-muted-foreground transition-colors hover:text-primary">Возврат билетов</a></li>
+            <li><a href="#" class="text-muted-foreground transition-colors hover:text-primary">Контакты</a></li>
+            <li><a href="#" class="text-muted-foreground transition-colors hover:text-primary">Партнёрам</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="border-t border-border">
+        <p class="mx-auto max-w-[1280px] px-4 py-5 text-xs text-muted-foreground sm:px-6 3xl:max-w-[1700px]">
+          © 2026 АфишаПлюс · dbshablon + карта / FAQ / отзывы
+        </p>
+      </div>
+    </footer>
+  </div>
+</body>
+</html>

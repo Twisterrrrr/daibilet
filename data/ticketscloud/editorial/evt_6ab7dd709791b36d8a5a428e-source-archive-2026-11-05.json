@@ -1,0 +1,72 @@
+{
+  "eventId": "evt_6ab7dd709791b36d8a5a428e",
+  "eventTitle": "Интонация. Хиты сериала Молодёжка. Тур \"За Мечтой...\"",
+  "eventPageId": "f7c747f7-5df2-4a97-98f0-1e9db0ec3854",
+  "eventPageSlug": "intonaciya-hity-seriala-molodezhka-tur-za-mechtoi-tula",
+  "archiveStatus": "UNUSED_ORIGINAL_SOURCE",
+  "retrievedAt": "2026-11-05",
+  "sourceSnapshot": {
+    "id": "evt_6ab7dd709791b36d8a5a428e",
+    "kind": "SINGLE",
+    "slug": "интонация-хиты-сериала-молодежка-тур-за-мечтои-6ab7dd709791b36d8a5a428e",
+    "seoH1": null,
+    "title": "Интонация. Хиты сериала Молодёжка. Тур \"За Мечтой...\"",
+    "sources": [
+      {
+        "code": "TICKETSCLOUD",
+        "name": "Ticketscloud",
+        "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6ab7dd709791b36d8a5a428e",
+        "externalId": "6ab7dd709791b36d8a5a428e",
+        "metaExternalId": null
+      }
+    ],
+    "venueId": "venue_665a0471424d05476eece6e3",
+    "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net/production/image/2026-09/6ab7dd70ef7b3619ce8a9412.jpg",
+    "seoTitle": null,
+    "cityTitle": "Тула",
+    "venueTitle": "Ночной клуб \"sQer\"",
+    "description": null,
+    "isIndexable": true,
+    "purchaseFlow": "EXTERNAL",
+    "venueAddress": "ул. Каминского, 24в",
+    "canonicalPath": null,
+    "primaryCityId": "city_480562",
+    "supplierTitle": null,
+    "managementMode": "SOURCE_MANAGED",
+    "seoDescription": null,
+    "shortDescription": null
+  },
+  "originalDescription": null,
+  "previousEventOverride": "Интонация. Хиты сериала Молодёжка. Тур \"За Мечтой.\" - экскурсия в Туле, на площадке «Ночной клуб \"sQer\"».\n\nТакая программа проходит в нескольких городах, с 12 декабря - 13 декабря 2026: это 1-я остановка тура. Если эта дата не подходит, в серии есть и другие.\n\n## Практическая информация\n\n- Место - Ночной клуб \"sQer\", Тула\n- Адрес - ул. Каминского, 24в\n- Продолжительность - около 105 минут\n- Возрастное ограничение - 6+\n- Билеты - от 2 500 ₽\n\nБилеты продаются онлайн. Оплата на сайте, электронный билет приходит на почту.",
+  "activeSessions": [
+    {
+      "startsAt": "2026-12-12T16:00:00",
+      "endsAt": "2026-12-12T17:45:00",
+      "priceFromRub": 2500
+    }
+  ],
+  "activeOffers": [
+    {
+      "title": "VIP Зона",
+      "priceRub": 4900
+    },
+    {
+      "title": "Балкон",
+      "priceRub": 3900
+    },
+    {
+      "title": "Балкон",
+      "priceRub": 4900
+    },
+    {
+      "title": "Танцпол",
+      "priceRub": 2500
+    },
+    {
+      "title": "Танцпол + встреча с артистом в 17:30",
+      "priceRub": 6900
+    }
+  ],
+  "originalEffectiveChars": 524,
+  "rewriteMainChars": 633
+}

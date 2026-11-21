@@ -1,0 +1,3511 @@
+{
+  "sourceRows": 1598,
+  "review": 701,
+  "reviewRows": [
+    {
+      "row": 3,
+      "name": "Русский мост",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 5,
+      "name": "Приморский океанариум",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 12,
+      "name": "Корабельная набережная",
+      "reason": "coordinate_outlier"
+    },
+    {
+      "row": 25,
+      "name": "Лютеранская кирха Святого Павла",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 57,
+      "name": "Мамаев курган и монумент Родина-мать зовет!",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 59,
+      "name": "Мельница Гергардта (руины)",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 61,
+      "name": "Музей Память (Бункер Паулюса)",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 66,
+      "name": "Центральная набережная имени 62-й Армии",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 77,
+      "name": "Храм Всех Святых на Мамаевом кургане",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 82,
+      "name": "Памятник мирным жителям Сталинграда",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 89,
+      "name": "Волгоградский метротрам (Скоростной трамвай)",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 97,
+      "name": "Волгоградский музыкальный театр",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 102,
+      "name": "Корабль-музей Гото Предестинация",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 104,
+      "name": "Памятник Котенку с улицы Лизюкова",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 106,
+      "name": "Воронежский областной краеведческий музей",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 112,
+      "name": "Проспект Революции (Большая Дворянская)",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 114,
+      "name": "Улица Карла Маркса (Воронежский Арбат)",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 116,
+      "name": "Центральный парк культуры и отдыха (Динамо)",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 118,
+      "name": "Парк Алые паруса",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 119,
+      "name": "Парк Патриотов",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 120,
+      "name": "Сквер имени Бунина",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 121,
+      "name": "Успенский Адмиралтейский храм",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 123,
+      "name": "Покровский собор",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 127,
+      "name": "Памятник Митрофану Воронежскому",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 128,
+      "name": "Памятник Самуилу Маршаку",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 129,
+      "name": "Памятник Владимиру Высоцкому",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 131,
+      "name": "Памятник Незнакомке",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 133,
+      "name": "Воронежский планетарий",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 135,
+      "name": "Дом связи (Главпочтамт)",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 136,
+      "name": "Здание гостиницы Бристоль",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 137,
+      "name": "Здание железнодорожного вокзала Воронеж-1",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 138,
+      "name": "Дом купеческого собрания",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 139,
+      "name": "Особняк Тулиновых",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 140,
+      "name": "Дом губернатора",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 142,
+      "name": "Воронежский государственный академический театр драмы им. А. Кольцова",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 143,
+      "name": "Воронежский государственный театр оперы и балета",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 146,
+      "name": "Ресторан Платонов",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 147,
+      "name": "Кафе-блинная Блинок",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 148,
+      "name": "Здание Управления ЮВЖД",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 151,
+      "name": "Советская площадь",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 155,
+      "name": "Пельмен-бар «Олень»",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 156,
+      "name": "Кондитерское ателье «Мармелад»",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 157,
+      "name": "Воронежский Центральный рынок",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 159,
+      "name": "Кофейня «Правда Кофе»",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 161,
+      "name": "Плотина городского пруда (Плотинка)",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 162,
+      "name": "Ельцин Центр",
+      "reason": "ambiguous_exact"
+    },
+    {
+      "row": 163,
+      "name": "Дом Севастьянова",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 164,
+      "name": "Небоскреб Высоцкий",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 165,
+      "name": "Свердловский областной краеведческий музей",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 166,
+      "name": "Музей изобразительных искусств (ЕМИИ)",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 167,
+      "name": "Музей истории Екатеринбурга",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 168,
+      "name": "Музей камей и ювелирного искусства",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 169,
+      "name": "Музей Эрмитаж-Урал",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 170,
+      "name": "Набережная Рабочей Молодежи",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 172,
+      "name": "Набережная реки Исеть у Академии",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 173,
+      "name": "Улица Вайнера (Уральский Арбат)",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 174,
+      "name": "Городок чекистов",
+      "reason": "coordinate_outlier"
+    },
+    {
+      "row": 175,
+      "name": "Литературный квартал",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 176,
+      "name": "Харитоновский сад",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 182,
+      "name": "Большой Златоуст",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 186,
+      "name": "Памятник клавиатуре",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 187,
+      "name": "Памятник группе The Beatles",
+      "reason": "coordinate_outlier"
+    },
+    {
+      "row": 188,
+      "name": "Памятник Человеку-невидимке",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 189,
+      "name": "Памятник Поппову",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 192,
+      "name": "Памятник Коробейнику",
+      "reason": "coordinate_outlier"
+    },
+    {
+      "row": 193,
+      "name": "Памятник Гене Букину",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 196,
+      "name": "Аутентичный Свердловский рок-клуб",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 197,
+      "name": "Штаб-квартира Русской медной компании",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 199,
+      "name": "Усадьба Расторгуевых-Харитоновых",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 200,
+      "name": "Дом купца Коробкова",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 201,
+      "name": "Дом старых Городских учреждений",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 202,
+      "name": "Дом обороны ДОСААФ",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 204,
+      "name": "Особняк Тупиковой",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 205,
+      "name": "Особняк Поклевских-Козелл",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 206,
+      "name": "Коляда-Театр",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 207,
+      "name": "Урал Опера Балет",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 216,
+      "name": "Национальный музей Республики Татарстан",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 217,
+      "name": "Центр Эрмитаж-Казань",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 220,
+      "name": "Музей исламской культуры",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 223,
+      "name": "Набережная озера Кабан",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 224,
+      "name": "Смотрительная площадка Центра семьи Казан",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 225,
+      "name": "Улица Баумана",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 227,
+      "name": "Парк Черное озеро",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 228,
+      "name": "Парк культуры имени Горького",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 232,
+      "name": "Петропавловский собор",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 234,
+      "name": "Казанский Богородицкий мужской монастырь",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 235,
+      "name": "Богоявленский собор",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 236,
+      "name": "Закабанная мечеть",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 237,
+      "name": "Храм всех религий",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 239,
+      "name": "Апанаевская мечеть",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 240,
+      "name": "Мечеть Нурулла",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 242,
+      "name": "Памятник Коту Казанскому",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 243,
+      "name": "Памятник Дракону Зиланту",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 244,
+      "name": "Карета Екатерины II",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 247,
+      "name": "Арт-объект Загадки Шурале",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 248,
+      "name": "Скульптура Тайказан",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 250,
+      "name": "Памятник зодчим Казанского Кремля",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 252,
+      "name": "Памятник Льву Толстому",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 253,
+      "name": "Памятник Николаю Лобачевскому",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 256,
+      "name": "Казанский Метрополитен",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 261,
+      "name": "Главный корпус Казанского университета",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 262,
+      "name": "Татарский театр имени Камала",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 263,
+      "name": "Сеть кафе Тюбетей",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 264,
+      "name": "Ресторан Чирэм",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 267,
+      "name": "Коктейльный бар More",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 270,
+      "name": "Рыбная деревня",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 271,
+      "name": "Музей янтаря",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 272,
+      "name": "Королевские ворота",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 275,
+      "name": "Историко-художественный музей",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 276,
+      "name": "Музей изобразительных искусств",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 278,
+      "name": "Форт № 5 Король Фридрих Вильгельм III",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 279,
+      "name": "Музей Бункер Ляша",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 282,
+      "name": "Верхнее озеро",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 283,
+      "name": "Нижнее озеро",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 286,
+      "name": "Район Амалиенау",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 287,
+      "name": "Район Марауненхоф",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 288,
+      "name": "Центральный парк культуры",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 292,
+      "name": "Калининградский зоопарк",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 293,
+      "name": "Кирха Святой Семейства",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 294,
+      "name": "Кирха памяти королевы Луизы",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 299,
+      "name": "Памятник Иммануилу Канту",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 300,
+      "name": "Памятник барону Мюнхгаузену",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 303,
+      "name": "Арт-объект Хомлин Дедушка Карл",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 304,
+      "name": "Арт-объект Хомлин Бабушка Марта",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 307,
+      "name": "Арт-объект Хомлин Малыш Витёк",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 309,
+      "name": "Заброшенное здание Кёнигсбергской биржи",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 310,
+      "name": "Исторический Закхаймские ворота",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 316,
+      "name": "Музыкальный театр",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 318,
+      "name": "Научно-исследовательское судно Витязь",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 320,
+      "name": "Гастробар Соль",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 321,
+      "name": "Ресторан Борщ и Сало",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 322,
+      "name": "Национальный парк Красноярские Столбы",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 325,
+      "name": "Музейный центр Площадь Мира",
+      "reason": "ambiguous_exact"
+    },
+    {
+      "row": 329,
+      "name": "Литературный музей имени Астафьева",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 330,
+      "name": "Центральная левобережная набережная",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 331,
+      "name": "Ярыгинская правобережная набережная",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 336,
+      "name": "Экопарк Гремячая грива",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 338,
+      "name": "Центральный парк",
+      "reason": "coordinate_outlier"
+    },
+    {
+      "row": 340,
+      "name": "Парк флоры и фауны Роев ручей",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 341,
+      "name": "Свято-Покровский кафедральный собор",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 347,
+      "name": "Памятник Андрею Дубенскому",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 348,
+      "name": "Памятник Виктору Астафьеву",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 349,
+      "name": "Скульптура Царь-рыба",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 350,
+      "name": "Памятник Антону Чехову",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 351,
+      "name": "Скульптурная композиция Похищение Европы",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 353,
+      "name": "Скульптурная композиция Река Енисей",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 355,
+      "name": "Арт-объект Суслик-путешественник",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 357,
+      "name": "Скульптурная группа Дядя Яша и стажер",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 362,
+      "name": "Дом купца Цукерман",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 363,
+      "name": "Здание Общественного собрания",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 364,
+      "name": "Дом врача Гланца",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 365,
+      "name": "Усадьба купца Гадалова",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 368,
+      "name": "Театр оперы и балета имени Хворостовского",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 373,
+      "name": "Ресторан Чешуя",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 376,
+      "name": "Лестница на Торгашинский хребет",
+      "reason": "duplicate_source_key"
+    },
+    {
+      "row": 379,
+      "name": "Винный бар и ресторан «0.75 Please»",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 380,
+      "name": "Ресторан «Fresco»",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 383,
+      "name": "Храм Василия Блаженного",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 384,
+      "name": "Храм Христа Спасителя",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 387,
+      "name": "Смотровая площадка Воробьевы горы",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 389,
+      "name": "Государственный исторический музей",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 411,
+      "name": "Музей-панорама Бородинская битва",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 414,
+      "name": "Якиманская набережная",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 445,
+      "name": "Музей-усадба Кусково",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 450,
+      "name": "Новодевичий монастырь",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 462,
+      "name": "Памятник Владимиру Маяковскому",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 479,
+      "name": "Большой театр",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 482,
+      "name": "Московский цирк Никулина на Цветном бульваре",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 487,
+      "name": "Ресторан Savva",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 490,
+      "name": "Ресторан доктор Живаго",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 492,
+      "name": "Северный речной вокзал",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 512,
+      "name": "Природный заказник Воробьевы горы",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 520,
+      "name": "Памятник Минину и Пожарскому",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 521,
+      "name": "Памятник Кириллу и Мефодию",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 535,
+      "name": "Печатный двор на Никольской",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 548,
+      "name": "Ресторан Белуга",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 551,
+      "name": "Ресторан «Twins Garden»",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 556,
+      "name": "Московская детская железная дорога",
+      "reason": "region_not_city"
+    },
+    {
+      "row": 557,
+      "name": "Храм Знамения Иконы Божией Матери в Дубровицах",
+      "reason": "region_not_city"
+    },
+    {
+      "row": 560,
+      "name": "Нижегородская канатная дорога",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 561,
+      "name": "Стрелка Оки и Волги",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 564,
+      "name": "Арсенал ГЦСИ",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 567,
+      "name": "Верхне-Волжская набережная",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 568,
+      "name": "Набережная Федоровского",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 569,
+      "name": "Нижне-Волжская набережная",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 570,
+      "name": "Большая Покровская улица",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 571,
+      "name": "Рождественская улица",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 572,
+      "name": "Александровский сад",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 573,
+      "name": "Парк Швейцария",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 575,
+      "name": "Парк Победы",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 576,
+      "name": "Сквер на площади Минина и Пожарского",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 577,
+      "name": "Строгановская церковь",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 578,
+      "name": "Александро-Невский Новоярмарочный собор",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 580,
+      "name": "Вознесенский Печерский монастырь",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 581,
+      "name": "Михайло-Архангельский собор в Кремле",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 588,
+      "name": "Памятник Минину и Пожарскому",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 590,
+      "name": "Скульптура Веселая коза",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 591,
+      "name": "Памятник Жюлю Верну",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 592,
+      "name": "Памятник Петру I",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 593,
+      "name": "Памятник Георгию Всеволодовичу",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 594,
+      "name": "Памятник Почтальону",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 595,
+      "name": "Памятник Фотографу",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 597,
+      "name": "Памятник Милиционеру",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 598,
+      "name": "Скульптурная композиция Дворянская пара",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 601,
+      "name": "Парк чудес Галилео",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 602,
+      "name": "Усадьба Рукавишниковых",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 603,
+      "name": "Особняк Сироткина",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 606,
+      "name": "Дом Чернонебова",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 607,
+      "name": "Нижегородский драматический театр",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 608,
+      "name": "Ресторан Пяткинъ",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 609,
+      "name": "Креативный кластер «Почаина»",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 611,
+      "name": "Ресторан «Yale» (Йель)",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 613,
+      "name": "Новосибирский театр оперы и балета",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 616,
+      "name": "Новосибирский краеведческий музей",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 619,
+      "name": "Музей железнодорожной техники имени Н. А. Акулинина",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 621,
+      "name": "Михайловская набережная",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 624,
+      "name": "Красный проспект",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 626,
+      "name": "Тихий центр (улица Горького)",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 628,
+      "name": "Центральный парк",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 631,
+      "name": "Первомайский сквер",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 632,
+      "name": "Собор Александра Невского",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 633,
+      "name": "Вознесенский кафедральный собор",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 638,
+      "name": "Часовня Святителя Николая",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 640,
+      "name": "Памятник лабораторной мыши",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 646,
+      "name": "Памятник первому трамваю",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 649,
+      "name": "Дом с часами",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 650,
+      "name": "Здание Крайисполкома",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 654,
+      "name": "Особняк купца Жернакова",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 658,
+      "name": "Новосибирская государственная филармония",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 660,
+      "name": "Кафе-пельменная Горячие Пельмени",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 661,
+      "name": "Театр «Глобус» (Новосибирский академический молодежный театр)",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 663,
+      "name": "Гастробар «Pardon My French»",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 664,
+      "name": "Культурный центр «Дом да Винчи»",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 665,
+      "name": "Дом Маштакова (Музей молочной архитектуры)",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 666,
+      "name": "Омская крепость",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 667,
+      "name": "Пожарная каланча",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 669,
+      "name": "Иртышская набережная",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 670,
+      "name": "Улица Ленина (Любинский проспект)",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 672,
+      "name": "Омский музей изобразительных искусств имени Врубеля",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 673,
+      "name": "Центр Эрмитаж-Сибирь",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 674,
+      "name": "Литературный музей имени Достоевского",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 675,
+      "name": "Омский историко-краеведческий музей",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 676,
+      "name": "Музейный комплекс воинской славы омичей",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 679,
+      "name": "Омский музей просвещения",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 680,
+      "name": "Художественный музей Либеров-центр",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 684,
+      "name": "Улица Чокана Валиханова",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 686,
+      "name": "Казачий форштадт",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 690,
+      "name": "Советский парк",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 691,
+      "name": "Воскресенский сквер",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 694,
+      "name": "Воскресенский военный собор",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 695,
+      "name": "Сибирская соборная мечеть",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 696,
+      "name": "Крестовоздвиженский собор",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 697,
+      "name": "Памятник Сантехнику Степанычу",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 698,
+      "name": "Памятник Любочке",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 699,
+      "name": "Памятник Достоевскому Несущий крест",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 700,
+      "name": "Скульптура Дон Кихот",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 702,
+      "name": "Арт-объект Встреча",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 705,
+      "name": "Арт-центр на Любинском",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 706,
+      "name": "Омский планетарий",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 707,
+      "name": "Дом купца Ганшина",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 708,
+      "name": "Торговые ряды на Любинском",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 712,
+      "name": "Омский академический театр драмы",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 715,
+      "name": "Ресторан Осип Терлеев",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 717,
+      "name": "Кофейня Скуратов Кофи",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 718,
+      "name": "Особняк Рейнеке",
+      "reason": "coordinate_outlier"
+    },
+    {
+      "row": 722,
+      "name": "Дом со шпилем (Здание треста «Омскстрой»)",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 724,
+      "name": "Ресторан «Корова на бочке»",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 725,
+      "name": "Ачаирский Крестовый монастырь",
+      "reason": "region_not_city"
+    },
+    {
+      "row": 726,
+      "name": "Памятник Первопоселенцу",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 728,
+      "name": "Набережная Суры",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 730,
+      "name": "Улица Московская",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 733,
+      "name": "Музей Ключевского",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 734,
+      "name": "Пензенский государственный краеведческий музей",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 735,
+      "name": "Литературный музей",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 737,
+      "name": "Музей почты",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 738,
+      "name": "Тропа здоровья",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 739,
+      "name": "Фонтанная площадь",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 740,
+      "name": "Сквер имени Давыдова",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 741,
+      "name": "Сквер Копилка пословиц",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 742,
+      "name": "Оборонительный вал крепости",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 745,
+      "name": "Олимпийская аллея",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 747,
+      "name": "Сквер имени Лермонтова",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 753,
+      "name": "Пензенская соборная мечеть",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 754,
+      "name": "Памятник Кукушка",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 755,
+      "name": "Скульптура Дама с собачкой",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 760,
+      "name": "Дом торговли Черняева",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 762,
+      "name": "Здание Мясного пассажа",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 766,
+      "name": "Дом губернатора",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 767,
+      "name": "Дом жилой Ершова",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 768,
+      "name": "Пензенский областной драматический театр имени Луначарского",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 770,
+      "name": "Пензенская областная филармония",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 772,
+      "name": "Ресторан Бочка",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 773,
+      "name": "Кофейня Давыдов",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 775,
+      "name": "Пермская соборная мечеть",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 776,
+      "name": "Арт-объект Счастье не за горами",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 777,
+      "name": "Пермская государственная художественная галерея",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 779,
+      "name": "Музей современного искусства PERMM",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 780,
+      "name": "Музей пермских древностей",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 781,
+      "name": "Мемориальный дом-музей С. П. Дягилева",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 782,
+      "name": "Музей-диорама в Мотовилихе",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 785,
+      "name": "Комсомольский проспект",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 786,
+      "name": "Улица Сибирская",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 787,
+      "name": "Пешеходная улица Пермская",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 788,
+      "name": "Сквер у Пермского театра оперы и балета",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 798,
+      "name": "Памятник Пермяк соленые уши",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 799,
+      "name": "Памятник Легенда о медведе",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 800,
+      "name": "Памятник Пастернаку",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 806,
+      "name": "Дом Грибушина",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 808,
+      "name": "Особняк Тупицыной",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 809,
+      "name": "Пермский академический Театр-Театр",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 810,
+      "name": "Пермский театр оперы и балета имени Чайковского",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 814,
+      "name": "Пермский музей кукол",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 815,
+      "name": "Ресторан коми-пермяцкой кухни «Чоскыт Важ»",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 816,
+      "name": "Ресторан «Строгановская Солодовня»",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 817,
+      "name": "Спешелти-кофейня «Cup by Cup»",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 818,
+      "name": "Дом чекистов (Конструктивистский комбинат)",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 819,
+      "name": "Набережная реки Дон",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 820,
+      "name": "Парамоновские склады",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 821,
+      "name": "Парк культуры имени Максима Горького",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 823,
+      "name": "Ростовский областной музей краеведения",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 824,
+      "name": "Ростовский областной музей изобразительных искусств",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 826,
+      "name": "Музей истории Северо-Кавказской железной дороги",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 827,
+      "name": "Донская государственная публичная библиотека",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 828,
+      "name": "Пушкинская улица",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 830,
+      "name": "Соборный переулок",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 831,
+      "name": "Переулок Семашко",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 832,
+      "name": "Улица Станиславского",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 833,
+      "name": "Газетный переулок",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 836,
+      "name": "Парк 1 Мая",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 839,
+      "name": "Кафедральный собор Рождества Пресвятой Богородицы",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 845,
+      "name": "Синагога Солдатская",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 846,
+      "name": "Памятник Тачанка-Ростовчанка",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 847,
+      "name": "Памятник Ростовскому водопроводу",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 848,
+      "name": "Памятник Степану Разину",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 849,
+      "name": "Памятник Нахалёнку и Деду Щукарю",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 852,
+      "name": "Памятник купечеству Дона",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 853,
+      "name": "Памятник Сантехнику",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 855,
+      "name": "Памятник Дмитрию Ростовскому",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 857,
+      "name": "Ростовский планетарий",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 860,
+      "name": "Здание Городской Думы",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 862,
+      "name": "Доходный дом Карапета Чернова",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 863,
+      "name": "Особняк Парамонова (Библиотека ЮФУ)",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 864,
+      "name": "Особняк барона Врангеля",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 867,
+      "name": "Ростовский государственный цирк",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 869,
+      "name": "Кафе-блинная Маруся",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 870,
+      "name": "Театральная площадь",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 871,
+      "name": "Ресторан «Раки и Гады»",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 872,
+      "name": "Гастробар «LEO Wine & Kitchen»",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 873,
+      "name": "Рязанский кремль",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 874,
+      "name": "Успенский собор",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 875,
+      "name": "Глебовский мост и Соборная колокольня",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 877,
+      "name": "Памятник Сергею Есенину",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 879,
+      "name": "Музей-усадьба академика Павлова",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 881,
+      "name": "Музей истории воздушно-десантных войск",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 882,
+      "name": "Музей истории рязанского леденца",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 884,
+      "name": "Галерея пряников",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 886,
+      "name": "Кремлевская набережная",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 888,
+      "name": "Улица Мюнстерская",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 889,
+      "name": "Улица Свободы",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 891,
+      "name": "Лесопарк",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 897,
+      "name": "Спасо-Преображенский монастырь",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 900,
+      "name": "Церковь Спаса на Яру",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 901,
+      "name": "Памятник Евпатию Коловрату",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 903,
+      "name": "Памятник Олегу Рязанскому",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 904,
+      "name": "Памятник черному коту",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 905,
+      "name": "Памятник Василию Маргелову",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 908,
+      "name": "Арт-пространство Fabrika",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 909,
+      "name": "Старинные Торговые ряды",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 911,
+      "name": "Гостиница Лауреата",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 912,
+      "name": "Каменное здание Городского казначейства",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 914,
+      "name": "Дом Херасковых",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 916,
+      "name": "Дом-музей Салтыкова-Щедрина",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 917,
+      "name": "Рязанский государственный областной театр драмы",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 918,
+      "name": "Рязанский областной музыкальный театр",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 921,
+      "name": "Ресторан Графин",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 922,
+      "name": "Ресторан Старый Мельник",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 924,
+      "name": "Католический храм Непорочного Зачатия Пресвятой Девы Марии",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 925,
+      "name": "Дом П. М. Попова (Деревянный терем)",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 927,
+      "name": "Трактир «Белый»",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 930,
+      "name": "Монумент ракеты-носителя Союз",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 933,
+      "name": "Бункер Сталина",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 934,
+      "name": "Жигулевский пивоваренный завод",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 937,
+      "name": "Музей модерна (Особняк Курлиной)",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 938,
+      "name": "Самарский литературный музей",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 945,
+      "name": "Загородный парк",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 947,
+      "name": "Сквер 30-летия Победы",
+      "reason": "coordinate_outlier"
+    },
+    {
+      "row": 948,
+      "name": "Ботанический сад Самарского университета",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 950,
+      "name": "Католический храм Пресвятого Сердца Иисуса",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 952,
+      "name": "Покровский кафедральный собор",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 953,
+      "name": "Кирха Святого Георга",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 955,
+      "name": "Самарская соборная мечеть",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 959,
+      "name": "Памятник Юрию Деточкину",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 961,
+      "name": "Памятник Красноармейцу Сухову",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 964,
+      "name": "Памятник Бравому солдату Швейку",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 966,
+      "name": "Памятник батарее центрального отопления",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 967,
+      "name": "Скульптура Дядя Степа",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 968,
+      "name": "Памятник Алексею Толстому",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 969,
+      "name": "Парк чудес Галилео",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 970,
+      "name": "Самарский планетарий",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 973,
+      "name": "Особняк Ивана Клодта",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 977,
+      "name": "Самарский театр оперы и балета",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 978,
+      "name": "7-я линия Васильевского острова",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 981,
+      "name": "Александринский театр",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 984,
+      "name": "Аничков дворец",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 985,
+      "name": "Анненкирхе",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 988,
+      "name": "Арт-кафе Подвал Бродячей Собаки",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 990,
+      "name": "Бар El Copitas",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 991,
+      "name": "Бар Orthodox",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 993,
+      "name": "Бар Коммуналочка",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 994,
+      "name": "Бар Поэты",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 996,
+      "name": "Бар Хроники",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 998,
+      "name": "Башня Городской Думы",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1001,
+      "name": "Большой драматический театр",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1004,
+      "name": "Булочная Ф. Вольчека № 22",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1005,
+      "name": "Веган-кафе Рада и К",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1006,
+      "name": "Витебский железнодорожный вокзал",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1009,
+      "name": "Государственный Русский музей",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1011,
+      "name": "Гранд Макет Россия",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 1012,
+      "name": "Гранд-кафе Зингер",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1017,
+      "name": "Дворец Великого Князя Владимира (Дом Ученых)",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1018,
+      "name": "Дворец великого князя Михаила Александровича",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1019,
+      "name": "Двор-колодец Бака",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1020,
+      "name": "Дворцовая набережная",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 1021,
+      "name": "Дворцовая площадь",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 1023,
+      "name": "Дворы Капеллы",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1025,
+      "name": "Джаз-клуб Игоря Бутмана",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 1027,
+      "name": "Дом Зингера (Дом Книги)",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1028,
+      "name": "Дом торгового товарищества Братья Елисеевы",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1029,
+      "name": "Доходный дом Бубыря",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 1030,
+      "name": "Доходный дом Веге",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 1032,
+      "name": "Доходный дом Иоффа (Пять углов)",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 1034,
+      "name": "Доходный дом Полежаева",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 1035,
+      "name": "Доходный дом Ратькова-Рожнова",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1036,
+      "name": "Елагиноостровский дворец",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 1037,
+      "name": "Дача Гаусвальд",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 1039,
+      "name": "Зоологический музей",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1040,
+      "name": "Исаакиевский собор",
+      "reason": "ambiguous_exact"
+    },
+    {
+      "row": 1043,
+      "name": "Катакомбы Петрикирхе",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1044,
+      "name": "Кафе Мечтатели",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1045,
+      "name": "Кафе-кондитерская Север-Метрополь",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1046,
+      "name": "Кафе-чебуречная Брынза",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1050,
+      "name": "Кондитерская Тройка",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 1051,
+      "name": "Кофейня Характер кофе",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1052,
+      "name": "Кунсткамера",
+      "reason": "ambiguous_exact"
+    },
+    {
+      "row": 1054,
+      "name": "Летний сад",
+      "reason": "ambiguous_exact"
+    },
+    {
+      "row": 1056,
+      "name": "Лютеранская церковь Святого Петра (Петрикирхе)",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1057,
+      "name": "Малая Конюшенная улица",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1058,
+      "name": "Мариинский дворец",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 1063,
+      "name": "Михайловский сад",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 1064,
+      "name": "Михайловский театр",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1068,
+      "name": "Музей железных дорог России",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 1071,
+      "name": "Музей магии",
+      "reason": "ambiguous_exact"
+    },
+    {
+      "row": 1073,
+      "name": "Музей прикладного искусства Академии Штиглица",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1074,
+      "name": "Музей связи имени Попова",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1075,
+      "name": "Музей театрального и музыкального искусства",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1076,
+      "name": "Музей Фаберже",
+      "reason": "ambiguous_exact"
+    },
+    {
+      "row": 1077,
+      "name": "Музей-квартира А. С. Пушкина",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1078,
+      "name": "Музей-квартира Федора Достоевского",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1083,
+      "name": "Набережная реки Мойки",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 1084,
+      "name": "Невский проспект",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 1087,
+      "name": "Новая Голландия (здание Бутылка)",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1088,
+      "name": "Ново-Михайловский дворец",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 1089,
+      "name": "Нос Майора Ковалева",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1091,
+      "name": "Особняк Кельха",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 1094,
+      "name": "Особняк Мясникова",
+      "reason": "ambiguous_exact"
+    },
+    {
+      "row": 1095,
+      "name": "Особняк Нарышкиных-Шуваловых",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1096,
+      "name": "Особняк купцов Брусницыных",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1097,
+      "name": "Особняк Половцова (Дом Архитектора)",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 1098,
+      "name": "Особняк Румянцева",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 1099,
+      "name": "Памятник Александру Пушкину",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1100,
+      "name": "Памятник Гоголю",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1101,
+      "name": "Памятник Дворнику",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 1103,
+      "name": "Памятник зодчим Петербурга",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1106,
+      "name": "Памятник коту Елисею и кошке Василисе",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1107,
+      "name": "Памятник Крылатым Львам (Банковский мост)",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1109,
+      "name": "Памятник Николаю I",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 1114,
+      "name": "Памятник фонарщику",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 1115,
+      "name": "Памятник Фотографу",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1116,
+      "name": "Памятник Чижику-Пыжику",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1117,
+      "name": "Парадная отеля Пале Рояль",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1118,
+      "name": "Парадная Сатана (Дом Дернова)",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1119,
+      "name": "Парк 300-летия Санкт-Петербурга",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1121,
+      "name": "Парк чудес Галилео",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 1122,
+      "name": "Петровская набережная",
+      "reason": "ambiguous_exact"
+    },
+    {
+      "row": 1123,
+      "name": "Петропавловская крепость",
+      "reason": "ambiguous_exact"
+    },
+    {
+      "row": 1124,
+      "name": "Пешеходная набережная реки Фонтанки",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1125,
+      "name": "Пироговская набережная",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1126,
+      "name": "Пиццерия 22 сантиметра",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1127,
+      "name": "Планетарий № 1",
+      "reason": "ambiguous_exact"
+    },
+    {
+      "row": 1128,
+      "name": "Приморский парк Победы",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1130,
+      "name": "Ресторан Birch",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 1132,
+      "name": "Ресторан Duo Gastrobar",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1134,
+      "name": "Ресторан Jerome",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1135,
+      "name": "Ресторан Бельвью",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1136,
+      "name": "Ресторан Блок",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 1137,
+      "name": "Ресторан Кококо",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 1138,
+      "name": "Ресторан Корюшка",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 1139,
+      "name": "Ресторан Литературное кафе",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1140,
+      "name": "Ресторан Метрополь",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 1142,
+      "name": "Ресторан Палкинъ",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 1143,
+      "name": "Ресторан Терраса",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1144,
+      "name": "Ресторан Smoke BBQ",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1147,
+      "name": "Рюмочная Ипполит",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1150,
+      "name": "Секретный бар Кабинет",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1151,
+      "name": "Спас на Крови",
+      "reason": "ambiguous_exact"
+    },
+    {
+      "row": 1155,
+      "name": "Строгановский дворец",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 1156,
+      "name": "Сфинксы на Университетской набережной",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 1157,
+      "name": "Таврический дворец",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1158,
+      "name": "Таврический сад",
+      "reason": "ambiguous_exact"
+    },
+    {
+      "row": 1160,
+      "name": "Толстовский дом (дворы)",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1161,
+      "name": "Траттория Little Italy",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1162,
+      "name": "Улица Рубинштейна",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 1163,
+      "name": "Университетская набережная",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 1164,
+      "name": "Центр современного искусства Эрарта",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1166,
+      "name": "Церковь Святой Екатерины на Васильевском",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1167,
+      "name": "ЦПКиО имени Кирова (Елагин остров)",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1168,
+      "name": "Чесменская церковь",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 1169,
+      "name": "Шереметевский дворец (Фонтанный дом)",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 1170,
+      "name": "Шуваловский дворец",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1171,
+      "name": "Юсуповский дворец на Мойке",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1172,
+      "name": "Юсуповский сад",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 1173,
+      "name": "Саратовский консерваторский комплекс",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1174,
+      "name": "Парк Победы на Соколовой горе",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 1177,
+      "name": "Набережная Космонавтов",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 1179,
+      "name": "Саратовский художественный музей имени Радищева",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1190,
+      "name": "Липки",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1198,
+      "name": "Католический собор Святого Климента",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1199,
+      "name": "Памятник саратовской гармошке",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1200,
+      "name": "Памятник Николаю Чернышевскому",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1201,
+      "name": "Памятник Петру Столыпину",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1202,
+      "name": "Скульптура Огней так много золотых",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1210,
+      "name": "Доходный дом Питшу",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1217,
+      "name": "Саратовский театр драмы имени Слонова",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1218,
+      "name": "Саратовский тюз имени Киселева",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1221,
+      "name": "Кафе Кондитерская от Прачкина",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1228,
+      "name": "Парк Дендрарий",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1230,
+      "name": "Зимний театр",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 1243,
+      "name": "Сквер влюбленных",
+      "reason": "coordinate_outlier"
+    },
+    {
+      "row": 1244,
+      "name": "Поющий фонтан Чаша Олимпийского огня",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1252,
+      "name": "Памятник Петру I в Сочи",
+      "reason": "coordinate_outlier"
+    },
+    {
+      "row": 1255,
+      "name": "Памятник Многодетным отцам (Памятник Уху)",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1256,
+      "name": "Скульптурная композиция Взаимопонимание",
+      "reason": "coordinate_outlier"
+    },
+    {
+      "row": 1257,
+      "name": "Памятник персонажам фильма Бриллиантовая рука",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1258,
+      "name": "Арт-объект Скамейка влюбленных",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1268,
+      "name": "Здание железнодорожного вокзала Сочи",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1274,
+      "name": "Ресторан Плакучая Ива",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1275,
+      "name": "Музей спортивной славы Сочи",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1276,
+      "name": "Центральный Почтамт Сочи",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1280,
+      "name": "Староволжский мост",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 1282,
+      "name": "Памятник Афанасию Никитину",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 1283,
+      "name": "Улица Трехсвятская",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1284,
+      "name": "Тверской областной краеведческий музей",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1285,
+      "name": "Музей Тверского быта",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 1287,
+      "name": "Музей Салтыкова-Щедрина",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1288,
+      "name": "Выставочный центр им. Лизы Чайкиной",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1289,
+      "name": "Музей связи Тверской области",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 1290,
+      "name": "Музей Плюшкина",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 1293,
+      "name": "Городской сад",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1294,
+      "name": "Ландшафтный парк Тьмака",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 1296,
+      "name": "Ботанический сад ТвГУ",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 1299,
+      "name": "Спасо-Преображенский собор",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1301,
+      "name": "Собор Вознесения Господня",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1302,
+      "name": "Тверская соборная мечеть",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 1303,
+      "name": "Католический храм Преображения Господня",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 1304,
+      "name": "Памятник Михаилу Кругу",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 1305,
+      "name": "Памятник Александру Пушкину",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1306,
+      "name": "Памятник Михаилу Ярославичу",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1308,
+      "name": "Памятник Кириллу и Мефодию",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 1309,
+      "name": "Памятник Карлу Марксу",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 1312,
+      "name": "Тверской планетарий",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1313,
+      "name": "Арт-пространство Рельсы",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1314,
+      "name": "Детская железная дорога в Горсаду",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1315,
+      "name": "Старинные Торговые ряды",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1316,
+      "name": "Доходный дом Аваева",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1317,
+      "name": "Доходный дом Шлыгина",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1318,
+      "name": "Каменное здание Городского магистрата",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1319,
+      "name": "Особняк купца Вагина",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1321,
+      "name": "Дом деревянного модерна на Рыбацкой",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1323,
+      "name": "Тверской академический театр драмы",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1324,
+      "name": "Тверской государственный театр кукол",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 1325,
+      "name": "Тверской государственный цирк",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1326,
+      "name": "Тверская академическая областная филармония",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1327,
+      "name": "Ресторан Люблин",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 1328,
+      "name": "Ресторан Старая Тверь",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 1329,
+      "name": "Кофейня Таун",
+      "reason": "coordinate_outlier"
+    },
+    {
+      "row": 1332,
+      "name": "Смотровая площадка БЦ «Тверь» («Панорама»)",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1334,
+      "name": "Гастробар «Locals» (Локалс)",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1336,
+      "name": "Музей оружия (Шлем)",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 1338,
+      "name": "Креативный кластер Октава",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1340,
+      "name": "Тульский государственный музей оружия (историческое здание)",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1341,
+      "name": "Музей Тульский пряник",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 1343,
+      "name": "Историко-архитектурный музей",
+      "reason": "coordinate_outlier"
+    },
+    {
+      "row": 1345,
+      "name": "Променад на Металлистов",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1354,
+      "name": "Успенский кафедральный собор",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1357,
+      "name": "Храм Сергия Радонежского",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1365,
+      "name": "Памятник юному оружейнику",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1366,
+      "name": "Памятник Городовому",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1368,
+      "name": "Скульптурная композиция Грибы с глазами",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1375,
+      "name": "Дом Белолипецких",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1377,
+      "name": "Особняк купца Ливенцева",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1378,
+      "name": "Особняк Ермолаева-Зверева",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1379,
+      "name": "Дом Конопацких",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1382,
+      "name": "Тульская областная филармония",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1387,
+      "name": "Музей «Международный пряник»",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1389,
+      "name": "Пешеходный мост Влюбленных",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1392,
+      "name": "Музейный комплекс имени И. Я. Словцова",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1393,
+      "name": "Музей Усадьба Колокольниковых",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1397,
+      "name": "Улица Дзержинского (Тюменский Арбат)",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1398,
+      "name": "Круглый двор жилого дома БК",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1399,
+      "name": "Сквер Сибирских кошек",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 1400,
+      "name": "ЦПКиО (Цветной бульвар)",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1401,
+      "name": "Гилёвская роща",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 1404,
+      "name": "Знаменский кафедральный собор",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 1410,
+      "name": "Синагога Сфард",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1411,
+      "name": "Памятник Ермаку",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 1412,
+      "name": "Памятник Почтальону",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1415,
+      "name": "Скульптурная композиция Студенчество",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1419,
+      "name": "Дом связи (Главпочтамт)",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1420,
+      "name": "Здание Тюменского пассажа (ТД Купеческий)",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1423,
+      "name": "Особняк Поповой",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1425,
+      "name": "Дом Буркова",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 1426,
+      "name": "Тюменский драматический театр",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1427,
+      "name": "Тюменский государственный цирк",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1428,
+      "name": "Тюменская филармония",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1429,
+      "name": "Театр кукол",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 1430,
+      "name": "Ресторан Чум",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 1432,
+      "name": "Пельменная Три Богатыря",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1433,
+      "name": "Дом российско-американской торговой компании",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1434,
+      "name": "Гастробар «Реалисты»",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1439,
+      "name": "Фонтан Семь девушек",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 1440,
+      "name": "Национальный музей Республики Башкортостан",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 1441,
+      "name": "Башкирский государственный художественный музей имени Нестерова",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1442,
+      "name": "Музей археологии и этнографии",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 1445,
+      "name": "Набережная реки Белой",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1447,
+      "name": "Смотрительная площадка парка Ватан",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1448,
+      "name": "Улица Ленина",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1450,
+      "name": "Арт-квадрат",
+      "reason": "ambiguous_exact"
+    },
+    {
+      "row": 1452,
+      "name": "Парк Победы",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 1459,
+      "name": "Мечеть Ихлас",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 1460,
+      "name": "Спасский храм",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 1461,
+      "name": "Покровский храм",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 1464,
+      "name": "Памятник Мустаю Кариму",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 1465,
+      "name": "Памятник Шаляпину",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1466,
+      "name": "Памятник Дворнику",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 1467,
+      "name": "Памятник Минигали Шаймуратову",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1468,
+      "name": "Скульптура Куница",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1469,
+      "name": "Памятник трибуну революции (Памятник Цюрупе)",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1470,
+      "name": "Памятник Кириллу и Мефодию",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1471,
+      "name": "Памятник пчеле Бурзянке",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1477,
+      "name": "Купеческий Пассаж (Торговый дом Костерина)",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1479,
+      "name": "Особняк купца Лаптева",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1480,
+      "name": "Здание Почтово-телеграфной конторы",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1481,
+      "name": "Особняк Тушнова",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1483,
+      "name": "Башкирский государственный академический театр драмы",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1486,
+      "name": "Ресторан MusicHall27",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 1489,
+      "name": "Гастробар «Разжигатели»",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1490,
+      "name": "Пешеходная Кировка",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1491,
+      "name": "Челябинский краеведческий музей",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1494,
+      "name": "Смотрительная площадка Челябинск-Сити",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1496,
+      "name": "Челябинский государственный музей изобразительных искусств",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1498,
+      "name": "Музей камня Музеум",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1500,
+      "name": "Набережная реки Миасс",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 1502,
+      "name": "Променад у Алого поля",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1504,
+      "name": "Квартал белых домов (Городок МВД)",
+      "reason": "coordinate_outlier"
+    },
+    {
+      "row": 1505,
+      "name": "Сквер на площади Революции",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1507,
+      "name": "Городской сад имени А. С. Пушкина",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1509,
+      "name": "Сад Победы",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 1510,
+      "name": "Сквер Алое поле",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1511,
+      "name": "Храм Александра Невского",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 1515,
+      "name": "Челябинская соборная мечеть",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1516,
+      "name": "Синагога Сфард в Челябинске",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1518,
+      "name": "Памятник Прокофьеву",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1519,
+      "name": "Памятник сказу об Урале",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1520,
+      "name": "Памятник Левше подковывающему блоху",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1521,
+      "name": "Памятник нищему профессионалу",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1522,
+      "name": "Памятник Пожарному",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1523,
+      "name": "Скульптура Мальчик с верблюдами",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1524,
+      "name": "Памятник воинам-танкистам Танкограда",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1525,
+      "name": "Памятник Александру Пушкину",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1529,
+      "name": "Челябинский Пассаж (Торговый дом Валеева)",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1531,
+      "name": "Дом связи (Главпочтамт)",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1532,
+      "name": "Особняк купца Благовещенского",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1533,
+      "name": "Особняк Ахметова",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1536,
+      "name": "Челябинский государственный академический театр драмы им. Наума Орлова",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1537,
+      "name": "Челябинский государственный театр оперы и балета им. М. И. Глинки",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1538,
+      "name": "Челябинский государственный цирк",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1539,
+      "name": "Челябинская государственная филармония (Зал им. Прокофьева)",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1542,
+      "name": "Пельменная Три Богатыря",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1547,
+      "name": "Ярославский музей-заповедник",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1549,
+      "name": "Волжская набережная",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 1555,
+      "name": "Ярославский художественный музей",
+      "reason": "identity_or_source_conflict"
+    },
+    {
+      "row": 1557,
+      "name": "Музей зарубежного искусства",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1564,
+      "name": "Даманский парк",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1565,
+      "name": "Юбилейный парк",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1574,
+      "name": "Кирилло-Афанасиевский монастырь",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1575,
+      "name": "Памятник Ярославу Мудрому",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1577,
+      "name": "Памятник Медведю",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1578,
+      "name": "Памятник Копейке 1612 года",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1579,
+      "name": "Памятник Афоне и штукатуру Коле",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1588,
+      "name": "Дом Мукомолов",
+      "reason": "nearby_existing_venue"
+    },
+    {
+      "row": 1595,
+      "name": "Ресторан Иоанн Васильевич",
+      "reason": "nearby_existing_venue"
+    }
+  ]
+}

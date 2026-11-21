@@ -1,0 +1,36 @@
+{
+  "mode": "read-only-copy-preflight",
+  "checkedAt": "2026-11-13T06:23:23.331Z",
+  "groupCount": 3,
+  "pageCount": 43,
+  "distinctEventIds": 43,
+  "noOverlapWithEarlierCampaign": true,
+  "copyRulesPass": true,
+  "groups": [
+    {
+      "key": "шура",
+      "title": "Шура — сольный концерт",
+      "pages": 17,
+      "minRewriteChars": 1951,
+      "maxSourceChars": 1676,
+      "minSubstantiveParagraphs": 5
+    },
+    {
+      "key": "мегамозг",
+      "title": "МЕГАМОЗГ — концерт в рамках тура",
+      "pages": 16,
+      "minRewriteChars": 1043,
+      "maxSourceChars": 460,
+      "minSubstantiveParagraphs": 3
+    },
+    {
+      "key": "call me karizma",
+      "title": "Call Me Karizma — концерт в рамках тура",
+      "pages": 10,
+      "minRewriteChars": 1000,
+      "maxSourceChars": 806,
+      "minSubstantiveParagraphs": 3
+    }
+  ],
+  "errors": []
+}

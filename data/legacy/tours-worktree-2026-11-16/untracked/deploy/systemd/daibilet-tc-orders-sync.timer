@@ -1,0 +1,11 @@
+[Unit]
+Description=Poll Ticketscloud orders every five minutes
+
+[Timer]
+OnBootSec=2min
+OnUnitActiveSec=5min
+AccuracySec=30s
+Unit=daibilet-tc-orders-sync.service
+
+[Install]
+WantedBy=timers.target

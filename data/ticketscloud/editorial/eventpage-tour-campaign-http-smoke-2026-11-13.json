@@ -1,0 +1,4867 @@
+{
+  "checkedAt": "2026-11-13T06:28:55.272Z",
+  "pages": 485,
+  "http200": 485,
+  "indexFollow": 485,
+  "selfCanonical": 485,
+  "h1Present": 485,
+  "practicalPresent": 485,
+  "practicalRenderedAsUl": 485,
+  "sitemapStatus": 200,
+  "sitemapUrlCount": 5321,
+  "sitemapContains": 485,
+  "missingFromSitemap": [],
+  "failures": [],
+  "results": [
+    {
+      "slug": "spektakl-master-i-margarita-g-voronezh",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/spektakl-master-i-margarita-g-voronezh",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/spektakl-master-i-margarita-g-voronezh",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "spektakl-master-i-margarita-g-staryi-oskol-staryy-oskol",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/spektakl-master-i-margarita-g-staryi-oskol-staryy-oskol",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/spektakl-master-i-margarita-g-staryi-oskol-staryy-oskol",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "spektakl-master-i-margarita-g-sosnovyi-bor-sosnovyy-bor",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/spektakl-master-i-margarita-g-sosnovyi-bor-sosnovyy-bor",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/spektakl-master-i-margarita-g-sosnovyi-bor-sosnovyy-bor",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "spektakl-master-i-margarita-g-vologda",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/spektakl-master-i-margarita-g-vologda",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/spektakl-master-i-margarita-g-vologda",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "spektakl-master-i-margarita-g-cherepovec",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/spektakl-master-i-margarita-g-cherepovec",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/spektakl-master-i-margarita-g-cherepovec",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "spektakl-master-i-margarita-g-novosibirsk",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/spektakl-master-i-margarita-g-novosibirsk",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/spektakl-master-i-margarita-g-novosibirsk",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "spektakl-master-i-margarita-g-astrahan",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/spektakl-master-i-margarita-g-astrahan",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/spektakl-master-i-margarita-g-astrahan",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "spektakl-master-i-margarita-g-naberezhnye-chelny",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/spektakl-master-i-margarita-g-naberezhnye-chelny",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/spektakl-master-i-margarita-g-naberezhnye-chelny",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "spektakl-master-i-margarita-g-kazan-2",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/spektakl-master-i-margarita-g-kazan-2",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/spektakl-master-i-margarita-g-kazan-2",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "spektakl-master-i-margarita-g-vyksa",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/spektakl-master-i-margarita-g-vyksa",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/spektakl-master-i-margarita-g-vyksa",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "spektakl-master-i-margarita-g-ekaterinburg",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/spektakl-master-i-margarita-g-ekaterinburg",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/spektakl-master-i-margarita-g-ekaterinburg",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "spektakl-master-i-margarita-g-lipeck",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/spektakl-master-i-margarita-g-lipeck",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/spektakl-master-i-margarita-g-lipeck",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "spektakl-master-i-margarita-g-nizhnii-novgorod-nizhniy-novgorod",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/spektakl-master-i-margarita-g-nizhnii-novgorod-nizhniy-novgorod",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/spektakl-master-i-margarita-g-nizhnii-novgorod-nizhniy-novgorod",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "spektakl-master-i-margarita-g-chelyabinsk",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/spektakl-master-i-margarita-g-chelyabinsk",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/spektakl-master-i-margarita-g-chelyabinsk",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "spektakl-master-i-margarita-g-tver",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/spektakl-master-i-margarita-g-tver",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/spektakl-master-i-margarita-g-tver",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "spektakl-master-i-margarita-g-magnitogorsk",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/spektakl-master-i-margarita-g-magnitogorsk",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/spektakl-master-i-margarita-g-magnitogorsk",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "spektakl-master-i-margarita-g-volgograd",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/spektakl-master-i-margarita-g-volgograd",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/spektakl-master-i-margarita-g-volgograd",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "spektakl-master-i-margarita-g-bryansk",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/spektakl-master-i-margarita-g-bryansk",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/spektakl-master-i-margarita-g-bryansk",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "spektakl-master-i-margarita-g-marks",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/spektakl-master-i-margarita-g-marks",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/spektakl-master-i-margarita-g-marks",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "spektakl-master-i-margarita-g-nizhnekamsk",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/spektakl-master-i-margarita-g-nizhnekamsk",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/spektakl-master-i-margarita-g-nizhnekamsk",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "spektakl-master-i-margarita-g-saratov",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/spektakl-master-i-margarita-g-saratov",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/spektakl-master-i-margarita-g-saratov",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "spektakl-master-i-margarita-g-orenburg",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/spektakl-master-i-margarita-g-orenburg",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/spektakl-master-i-margarita-g-orenburg",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "spektakl-master-i-margarita-g-tula",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/spektakl-master-i-margarita-g-tula",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/spektakl-master-i-margarita-g-tula",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "spektakl-master-i-margarita-g-severodvinsk",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/spektakl-master-i-margarita-g-severodvinsk",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/spektakl-master-i-margarita-g-severodvinsk",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "spektakl-master-i-margarita-g-arhangelsk",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/spektakl-master-i-margarita-g-arhangelsk",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/spektakl-master-i-margarita-g-arhangelsk",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "spektakl-master-i-margarita-g-samara",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/spektakl-master-i-margarita-g-samara",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/spektakl-master-i-margarita-g-samara",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "spektakl-master-i-margarita-g-chapaevsk",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/spektakl-master-i-margarita-g-chapaevsk",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/spektakl-master-i-margarita-g-chapaevsk",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "spektakl-master-i-margarita-g-angarsk",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/spektakl-master-i-margarita-g-angarsk",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/spektakl-master-i-margarita-g-angarsk",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "spektakl-master-i-margarita-g-irkutsk",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/spektakl-master-i-margarita-g-irkutsk",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/spektakl-master-i-margarita-g-irkutsk",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "spektakl-master-i-margarita-g-usole-sibirskoe",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/spektakl-master-i-margarita-g-usole-sibirskoe",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/spektakl-master-i-margarita-g-usole-sibirskoe",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "spektakl-master-i-margarita-g-chita",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/spektakl-master-i-margarita-g-chita",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/spektakl-master-i-margarita-g-chita",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "spektakl-master-i-margarita-g-maikop-maykop",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/spektakl-master-i-margarita-g-maikop-maykop",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/spektakl-master-i-margarita-g-maikop-maykop",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "spektakl-master-i-margarita-g-belgorod",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/spektakl-master-i-margarita-g-belgorod",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/spektakl-master-i-margarita-g-belgorod",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "spektakl-master-i-margarita-g-yakutsk-2",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/spektakl-master-i-margarita-g-yakutsk-2",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/spektakl-master-i-margarita-g-yakutsk-2",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "spektakl-master-i-margarita-g-yakutsk",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/spektakl-master-i-margarita-g-yakutsk",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/spektakl-master-i-margarita-g-yakutsk",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "spektakl-master-i-margarita-g-orsk",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/spektakl-master-i-margarita-g-orsk",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/spektakl-master-i-margarita-g-orsk",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "solnyi-stendap-koncert-vani-usovicha-naberezhnye-chelny",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/solnyi-stendap-koncert-vani-usovicha-naberezhnye-chelny",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/solnyi-stendap-koncert-vani-usovicha-naberezhnye-chelny",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "solnyi-stendap-koncert-vani-usovicha-nizhnekamsk",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/solnyi-stendap-koncert-vani-usovicha-nizhnekamsk",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/solnyi-stendap-koncert-vani-usovicha-nizhnekamsk",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "solnyi-stendap-koncert-vani-usovicha-kursk",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/solnyi-stendap-koncert-vani-usovicha-kursk",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/solnyi-stendap-koncert-vani-usovicha-kursk",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "solnyi-stendap-koncert-vani-usovicha-saransk",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/solnyi-stendap-koncert-vani-usovicha-saransk",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/solnyi-stendap-koncert-vani-usovicha-saransk",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "solnyi-stendap-koncert-vani-usovicha-rybinsk",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/solnyi-stendap-koncert-vani-usovicha-rybinsk",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/solnyi-stendap-koncert-vani-usovicha-rybinsk",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "solnyi-stendap-koncert-vani-usovicha-cherepovec",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/solnyi-stendap-koncert-vani-usovicha-cherepovec",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/solnyi-stendap-koncert-vani-usovicha-cherepovec",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "solnyi-stendap-koncert-vani-usovicha-krasnodar-2",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/solnyi-stendap-koncert-vani-usovicha-krasnodar-2",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/solnyi-stendap-koncert-vani-usovicha-krasnodar-2",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "solnyi-stendap-koncert-vani-usovicha-kurgan",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/solnyi-stendap-koncert-vani-usovicha-kurgan",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/solnyi-stendap-koncert-vani-usovicha-kurgan",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "solnyi-stendap-koncert-vani-usovicha-ekaterinburg",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/solnyi-stendap-koncert-vani-usovicha-ekaterinburg",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/solnyi-stendap-koncert-vani-usovicha-ekaterinburg",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "solnyi-stendap-koncert-vani-usovicha-nizhniy-tagil",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/solnyi-stendap-koncert-vani-usovicha-nizhniy-tagil",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/solnyi-stendap-koncert-vani-usovicha-nizhniy-tagil",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "solnyi-stendap-koncert-vani-usovicha-izhevsk",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/solnyi-stendap-koncert-vani-usovicha-izhevsk",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/solnyi-stendap-koncert-vani-usovicha-izhevsk",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "solnyi-stendap-koncert-vani-usovicha-bryansk",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/solnyi-stendap-koncert-vani-usovicha-bryansk",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/solnyi-stendap-koncert-vani-usovicha-bryansk",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "solnyi-stendap-koncert-vani-usovicha-tambov-2",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/solnyi-stendap-koncert-vani-usovicha-tambov-2",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/solnyi-stendap-koncert-vani-usovicha-tambov-2",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "solnyi-stendap-koncert-vani-usovicha-egorevsk",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/solnyi-stendap-koncert-vani-usovicha-egorevsk",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/solnyi-stendap-koncert-vani-usovicha-egorevsk",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "solnyi-stendap-koncert-vani-usovicha-orel",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/solnyi-stendap-koncert-vani-usovicha-orel",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/solnyi-stendap-koncert-vani-usovicha-orel",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "solnyi-stendap-koncert-vani-usovicha-chelyabinsk",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/solnyi-stendap-koncert-vani-usovicha-chelyabinsk",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/solnyi-stendap-koncert-vani-usovicha-chelyabinsk",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "solnyi-stendap-koncert-vani-usovicha-tyumen",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/solnyi-stendap-koncert-vani-usovicha-tyumen",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/solnyi-stendap-koncert-vani-usovicha-tyumen",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "solnyi-stendap-koncert-vani-usovicha-stupino",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/solnyi-stendap-koncert-vani-usovicha-stupino",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/solnyi-stendap-koncert-vani-usovicha-stupino",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "solnyi-stendap-koncert-vani-usovicha-obninsk",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/solnyi-stendap-koncert-vani-usovicha-obninsk",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/solnyi-stendap-koncert-vani-usovicha-obninsk",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "solnyi-stendap-koncert-vani-usovicha-krasnodar",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/solnyi-stendap-koncert-vani-usovicha-krasnodar",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/solnyi-stendap-koncert-vani-usovicha-krasnodar",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "solnyi-stendap-koncert-vani-usovicha-armavir",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/solnyi-stendap-koncert-vani-usovicha-armavir",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/solnyi-stendap-koncert-vani-usovicha-armavir",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "solnyi-stendap-koncert-vani-usovicha-elektrostal",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/solnyi-stendap-koncert-vani-usovicha-elektrostal",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/solnyi-stendap-koncert-vani-usovicha-elektrostal",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "solnyi-stendap-koncert-vani-usovicha-lyubercy",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/solnyi-stendap-koncert-vani-usovicha-lyubercy",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/solnyi-stendap-koncert-vani-usovicha-lyubercy",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "solnyi-stendap-koncert-vani-usovicha-rostov-na-donu",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/solnyi-stendap-koncert-vani-usovicha-rostov-na-donu",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/solnyi-stendap-koncert-vani-usovicha-rostov-na-donu",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "solnyi-stendap-koncert-vani-usovicha-ulyanovsk",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/solnyi-stendap-koncert-vani-usovicha-ulyanovsk",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/solnyi-stendap-koncert-vani-usovicha-ulyanovsk",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "solnyi-stendap-koncert-vani-usovicha-fryazino",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/solnyi-stendap-koncert-vani-usovicha-fryazino",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/solnyi-stendap-koncert-vani-usovicha-fryazino",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "solnyi-stendap-koncert-vani-usovicha-smolensk",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/solnyi-stendap-koncert-vani-usovicha-smolensk",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/solnyi-stendap-koncert-vani-usovicha-smolensk",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "solnyi-stendap-koncert-vani-usovicha-penza",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/solnyi-stendap-koncert-vani-usovicha-penza",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/solnyi-stendap-koncert-vani-usovicha-penza",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "solnyi-stendap-koncert-vani-usovicha-domodedovo",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/solnyi-stendap-koncert-vani-usovicha-domodedovo",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/solnyi-stendap-koncert-vani-usovicha-domodedovo",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "solnyi-stendap-koncert-vani-usovicha-murmansk",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/solnyi-stendap-koncert-vani-usovicha-murmansk",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/solnyi-stendap-koncert-vani-usovicha-murmansk",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "solnyi-stendap-koncert-vani-usovicha-monino",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/solnyi-stendap-koncert-vani-usovicha-monino",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/solnyi-stendap-koncert-vani-usovicha-monino",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "solnyi-stendap-koncert-vani-usovicha-chehov-moskovskaya-oblast",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/solnyi-stendap-koncert-vani-usovicha-chehov-moskovskaya-oblast",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/solnyi-stendap-koncert-vani-usovicha-chehov-moskovskaya-oblast",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "solnyi-stendap-koncert-vani-usovicha-tambov",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/solnyi-stendap-koncert-vani-usovicha-tambov",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/solnyi-stendap-koncert-vani-usovicha-tambov",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "solnyi-stendap-koncert-bogdana-lisevskogo-moskva",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/solnyi-stendap-koncert-bogdana-lisevskogo-moskva",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/solnyi-stendap-koncert-bogdana-lisevskogo-moskva",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "solnyi-stendap-koncert-bogdana-lisevskogo-moskva-2",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/solnyi-stendap-koncert-bogdana-lisevskogo-moskva-2",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/solnyi-stendap-koncert-bogdana-lisevskogo-moskva-2",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "solnyi-stendap-koncert-bogdana-lisevskogo-saransk",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/solnyi-stendap-koncert-bogdana-lisevskogo-saransk",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/solnyi-stendap-koncert-bogdana-lisevskogo-saransk",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "solnyi-stendap-koncert-bogdana-lisevskogo-barnaul",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/solnyi-stendap-koncert-bogdana-lisevskogo-barnaul",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/solnyi-stendap-koncert-bogdana-lisevskogo-barnaul",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "solnyi-stendap-koncert-bogdana-lisevskogo-petrozavodsk",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/solnyi-stendap-koncert-bogdana-lisevskogo-petrozavodsk",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/solnyi-stendap-koncert-bogdana-lisevskogo-petrozavodsk",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "solnyi-stendap-koncert-bogdana-lisevskogo-ulyanovsk",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/solnyi-stendap-koncert-bogdana-lisevskogo-ulyanovsk",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/solnyi-stendap-koncert-bogdana-lisevskogo-ulyanovsk",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "solnyi-stendap-koncert-bogdana-lisevskogo-kemerovo",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/solnyi-stendap-koncert-bogdana-lisevskogo-kemerovo",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/solnyi-stendap-koncert-bogdana-lisevskogo-kemerovo",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "solnyi-stendap-koncert-bogdana-lisevskogo-omsk",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/solnyi-stendap-koncert-bogdana-lisevskogo-omsk",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/solnyi-stendap-koncert-bogdana-lisevskogo-omsk",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "solnyi-stendap-koncert-bogdana-lisevskogo-tomsk",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/solnyi-stendap-koncert-bogdana-lisevskogo-tomsk",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/solnyi-stendap-koncert-bogdana-lisevskogo-tomsk",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "solnyi-stendap-koncert-bogdana-lisevskogo-novokuzneck",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/solnyi-stendap-koncert-bogdana-lisevskogo-novokuzneck",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/solnyi-stendap-koncert-bogdana-lisevskogo-novokuzneck",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "solnyi-stendap-koncert-bogdana-lisevskogo-novosibirsk",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/solnyi-stendap-koncert-bogdana-lisevskogo-novosibirsk",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/solnyi-stendap-koncert-bogdana-lisevskogo-novosibirsk",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "solnyi-stendap-koncert-bogdana-lisevskogo-penza",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/solnyi-stendap-koncert-bogdana-lisevskogo-penza",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/solnyi-stendap-koncert-bogdana-lisevskogo-penza",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "solnyi-stendap-koncert-bogdana-lisevskogo-ekaterinburg",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/solnyi-stendap-koncert-bogdana-lisevskogo-ekaterinburg",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/solnyi-stendap-koncert-bogdana-lisevskogo-ekaterinburg",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "solnyi-stendap-koncert-bogdana-lisevskogo-tyumen",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/solnyi-stendap-koncert-bogdana-lisevskogo-tyumen",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/solnyi-stendap-koncert-bogdana-lisevskogo-tyumen",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "solnyi-stendap-koncert-bogdana-lisevskogo-chelyabinsk",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/solnyi-stendap-koncert-bogdana-lisevskogo-chelyabinsk",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/solnyi-stendap-koncert-bogdana-lisevskogo-chelyabinsk",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "solnyi-stendap-koncert-bogdana-lisevskogo-ufa",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/solnyi-stendap-koncert-bogdana-lisevskogo-ufa",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/solnyi-stendap-koncert-bogdana-lisevskogo-ufa",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "tataro-bashkirskaya-chak-chak-diskoteka-sterlitamak",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/tataro-bashkirskaya-chak-chak-diskoteka-sterlitamak",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/tataro-bashkirskaya-chak-chak-diskoteka-sterlitamak",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "tataro-bashkirskaya-chak-chak-diskoteka-izhevsk",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/tataro-bashkirskaya-chak-chak-diskoteka-izhevsk",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/tataro-bashkirskaya-chak-chak-diskoteka-izhevsk",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "tataro-bashkirskaya-chak-chak-diskoteka-tyumen",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/tataro-bashkirskaya-chak-chak-diskoteka-tyumen",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/tataro-bashkirskaya-chak-chak-diskoteka-tyumen",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "tataro-bashkirskaya-chak-chak-diskoteka-neftekamsk",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/tataro-bashkirskaya-chak-chak-diskoteka-neftekamsk",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/tataro-bashkirskaya-chak-chak-diskoteka-neftekamsk",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "tataro-bashkirskaya-chak-chak-diskoteka-ufa-3",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/tataro-bashkirskaya-chak-chak-diskoteka-ufa-3",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/tataro-bashkirskaya-chak-chak-diskoteka-ufa-3",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "tataro-bashkirskaya-chak-chak-diskoteka-ulyanovsk",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/tataro-bashkirskaya-chak-chak-diskoteka-ulyanovsk",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/tataro-bashkirskaya-chak-chak-diskoteka-ulyanovsk",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "tataro-bashkirskaya-chak-chak-diskoteka-saratov",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/tataro-bashkirskaya-chak-chak-diskoteka-saratov",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/tataro-bashkirskaya-chak-chak-diskoteka-saratov",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "tataro-bashkirskaya-chak-chak-diskoteka-perm",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/tataro-bashkirskaya-chak-chak-diskoteka-perm",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/tataro-bashkirskaya-chak-chak-diskoteka-perm",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "tataro-bashkirskaya-chak-chak-diskoteka-chelyabinsk",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/tataro-bashkirskaya-chak-chak-diskoteka-chelyabinsk",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/tataro-bashkirskaya-chak-chak-diskoteka-chelyabinsk",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "tataro-bashkirskaya-chak-chak-diskoteka-ufa-2",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/tataro-bashkirskaya-chak-chak-diskoteka-ufa-2",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/tataro-bashkirskaya-chak-chak-diskoteka-ufa-2",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "tataro-bashkirskaya-chak-chak-diskoteka-ufa",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/tataro-bashkirskaya-chak-chak-diskoteka-ufa",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/tataro-bashkirskaya-chak-chak-diskoteka-ufa",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "tataro-bashkirskaya-chak-chak-diskoteka-ekaterinburg",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/tataro-bashkirskaya-chak-chak-diskoteka-ekaterinburg",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/tataro-bashkirskaya-chak-chak-diskoteka-ekaterinburg",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "tataro-bashkirskaya-chak-chak-diskoteka-samara",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/tataro-bashkirskaya-chak-chak-diskoteka-samara",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/tataro-bashkirskaya-chak-chak-diskoteka-samara",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "tatarskaya-chak-chak-diskoteka-18-moskva",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/tatarskaya-chak-chak-diskoteka-18-moskva",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/tatarskaya-chak-chak-diskoteka-18-moskva",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "dima-ilyuhin-solnyi-stendap-koncert-kursk-2",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/dima-ilyuhin-solnyi-stendap-koncert-kursk-2",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/dima-ilyuhin-solnyi-stendap-koncert-kursk-2",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "dima-ilyuhin-solnyi-stendap-koncert-samara",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/dima-ilyuhin-solnyi-stendap-koncert-samara",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/dima-ilyuhin-solnyi-stendap-koncert-samara",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "dima-ilyuhin-solnyi-stendap-koncert-volgograd",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/dima-ilyuhin-solnyi-stendap-koncert-volgograd",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/dima-ilyuhin-solnyi-stendap-koncert-volgograd",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "dima-ilyuhin-solnyi-stendap-koncert-irkutsk",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/dima-ilyuhin-solnyi-stendap-koncert-irkutsk",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/dima-ilyuhin-solnyi-stendap-koncert-irkutsk",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "dima-ilyuhin-solnyi-stendap-koncert-voronezh-2",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/dima-ilyuhin-solnyi-stendap-koncert-voronezh-2",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/dima-ilyuhin-solnyi-stendap-koncert-voronezh-2",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "dima-ilyuhin-solnyi-stendap-koncert-ekaterinburg",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/dima-ilyuhin-solnyi-stendap-koncert-ekaterinburg",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/dima-ilyuhin-solnyi-stendap-koncert-ekaterinburg",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "dima-ilyuhin-solnyi-stendap-koncert-novosibirsk",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/dima-ilyuhin-solnyi-stendap-koncert-novosibirsk",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/dima-ilyuhin-solnyi-stendap-koncert-novosibirsk",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "dima-ilyuhin-solnyi-stendap-koncert-omsk",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/dima-ilyuhin-solnyi-stendap-koncert-omsk",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/dima-ilyuhin-solnyi-stendap-koncert-omsk",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "dima-ilyuhin-solnyi-stendap-koncert-tyumen",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/dima-ilyuhin-solnyi-stendap-koncert-tyumen",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/dima-ilyuhin-solnyi-stendap-koncert-tyumen",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "dima-ilyuhin-solnyi-stendap-koncert-tambov",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/dima-ilyuhin-solnyi-stendap-koncert-tambov",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/dima-ilyuhin-solnyi-stendap-koncert-tambov",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "dima-ilyuhin-solnyi-stendap-koncert-saratov",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/dima-ilyuhin-solnyi-stendap-koncert-saratov",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/dima-ilyuhin-solnyi-stendap-koncert-saratov",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "dima-ilyuhin-solnyi-stendap-koncert-bryansk",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/dima-ilyuhin-solnyi-stendap-koncert-bryansk",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/dima-ilyuhin-solnyi-stendap-koncert-bryansk",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "dima-ilyuhin-solnyi-stendap-koncert-kursk",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/dima-ilyuhin-solnyi-stendap-koncert-kursk",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/dima-ilyuhin-solnyi-stendap-koncert-kursk",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "dima-ilyuhin-solnyi-stendap-koncert-voronezh",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/dima-ilyuhin-solnyi-stendap-koncert-voronezh",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/dima-ilyuhin-solnyi-stendap-koncert-voronezh",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "kamazz-sankt-peterburg",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/kamazz-sankt-peterburg",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/kamazz-sankt-peterburg",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "kamazz-krasnodar",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/kamazz-krasnodar",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/kamazz-krasnodar",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "kamazz-shahty",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/kamazz-shahty",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/kamazz-shahty",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "kamazz-volgodonsk",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/kamazz-volgodonsk",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/kamazz-volgodonsk",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "kamazz-armavir",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/kamazz-armavir",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/kamazz-armavir",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "kamazz-elec",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/kamazz-elec",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/kamazz-elec",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "kamazz-kuzneck",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/kamazz-kuzneck",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/kamazz-kuzneck",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "kamazz-rostov-na-donu",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/kamazz-rostov-na-donu",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/kamazz-rostov-na-donu",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "kamazz-tambov",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/kamazz-tambov",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/kamazz-tambov",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "kamazz-kaliningrad",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/kamazz-kaliningrad",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/kamazz-kaliningrad",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "cirk-buduschego-za-granyu-vozmozhnogo-gubkinskiy-2",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/cirk-buduschego-za-granyu-vozmozhnogo-gubkinskiy-2",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/cirk-buduschego-za-granyu-vozmozhnogo-gubkinskiy-2",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "cirk-buduschego-za-granyu-vozmozhnogo-tazovskiy-2",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/cirk-buduschego-za-granyu-vozmozhnogo-tazovskiy-2",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/cirk-buduschego-za-granyu-vozmozhnogo-tazovskiy-2",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "cirk-buduschego-za-granyu-vozmozhnogo-tarko-sale",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/cirk-buduschego-za-granyu-vozmozhnogo-tarko-sale",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/cirk-buduschego-za-granyu-vozmozhnogo-tarko-sale",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "cirk-buduschego-za-granyu-vozmozhnogo-gubkinskiy",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/cirk-buduschego-za-granyu-vozmozhnogo-gubkinskiy",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/cirk-buduschego-za-granyu-vozmozhnogo-gubkinskiy",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "cirk-buduschego-za-granyu-vozmozhnogo-tazovskiy",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/cirk-buduschego-za-granyu-vozmozhnogo-tazovskiy",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/cirk-buduschego-za-granyu-vozmozhnogo-tazovskiy",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "cirk-buduschego-za-granyu-vozmozhnogo-izluchinsk",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/cirk-buduschego-za-granyu-vozmozhnogo-izluchinsk",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/cirk-buduschego-za-granyu-vozmozhnogo-izluchinsk",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "cirk-buduschego-za-granyu-vozmozhnogo-langepas",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/cirk-buduschego-za-granyu-vozmozhnogo-langepas",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/cirk-buduschego-za-granyu-vozmozhnogo-langepas",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "cirk-buduschego-za-granyu-vozmozhnogo-megion",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/cirk-buduschego-za-granyu-vozmozhnogo-megion",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/cirk-buduschego-za-granyu-vozmozhnogo-megion",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "cirk-buduschego-za-granyu-vozmozhnogo-pokachi",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/cirk-buduschego-za-granyu-vozmozhnogo-pokachi",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/cirk-buduschego-za-granyu-vozmozhnogo-pokachi",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "vasilii-beinarovich-faust-21-veka-kak-ne-vospitat-seriinogo-ubiicu-krasnodar",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/vasilii-beinarovich-faust-21-veka-kak-ne-vospitat-seriinogo-ubiicu-krasnodar",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/vasilii-beinarovich-faust-21-veka-kak-ne-vospitat-seriinogo-ubiicu-krasnodar",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "vasilii-beinarovich-faust-21-veka-kak-ne-vospitat-seriinogo-ubiicu-voronezh",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/vasilii-beinarovich-faust-21-veka-kak-ne-vospitat-seriinogo-ubiicu-voronezh",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/vasilii-beinarovich-faust-21-veka-kak-ne-vospitat-seriinogo-ubiicu-voronezh",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "vasilii-beinarovich-faust-21-veka-kak-ne-vospitat-seriinogo-ubiicu-kaliningrad",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/vasilii-beinarovich-faust-21-veka-kak-ne-vospitat-seriinogo-ubiicu-kaliningrad",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/vasilii-beinarovich-faust-21-veka-kak-ne-vospitat-seriinogo-ubiicu-kaliningrad",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "vasilii-beinarovich-faust-21-veka-kak-ne-vospitat-seriinogo-ubiicu-vladivostok",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/vasilii-beinarovich-faust-21-veka-kak-ne-vospitat-seriinogo-ubiicu-vladivostok",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/vasilii-beinarovich-faust-21-veka-kak-ne-vospitat-seriinogo-ubiicu-vladivostok",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "vasilii-beinarovich-faust-21-veka-kak-ne-vospitat-seriinogo-ubiicu-irkutsk",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/vasilii-beinarovich-faust-21-veka-kak-ne-vospitat-seriinogo-ubiicu-irkutsk",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/vasilii-beinarovich-faust-21-veka-kak-ne-vospitat-seriinogo-ubiicu-irkutsk",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "vasilii-beinarovich-faust-21-veka-kak-ne-vospitat-seriinogo-ubiicu-rostov-na-donu",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/vasilii-beinarovich-faust-21-veka-kak-ne-vospitat-seriinogo-ubiicu-rostov-na-donu",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/vasilii-beinarovich-faust-21-veka-kak-ne-vospitat-seriinogo-ubiicu-rostov-na-donu",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "vasilii-beinarovich-faust-21-veka-kak-ne-vospitat-seriinogo-ubiicu-habarovsk",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/vasilii-beinarovich-faust-21-veka-kak-ne-vospitat-seriinogo-ubiicu-habarovsk",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/vasilii-beinarovich-faust-21-veka-kak-ne-vospitat-seriinogo-ubiicu-habarovsk",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "vasilii-beinarovich-faust-21-veka-kak-ne-vospitat-seriinogo-ubiicu-perm",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/vasilii-beinarovich-faust-21-veka-kak-ne-vospitat-seriinogo-ubiicu-perm",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/vasilii-beinarovich-faust-21-veka-kak-ne-vospitat-seriinogo-ubiicu-perm",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "marko-polo-nizhniy-novgorod",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/marko-polo-nizhniy-novgorod",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/marko-polo-nizhniy-novgorod",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "marko-polo-ivanovo",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/marko-polo-ivanovo",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/marko-polo-ivanovo",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "marko-polo-tver",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/marko-polo-tver",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/marko-polo-tver",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "marko-polo-moskva",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/marko-polo-moskva",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/marko-polo-moskva",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "marko-polo-smolensk",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/marko-polo-smolensk",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/marko-polo-smolensk",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "marko-polo-moskva-2",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/marko-polo-moskva-2",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/marko-polo-moskva-2",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "marko-polo-sankt-peterburg",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/marko-polo-sankt-peterburg",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/marko-polo-sankt-peterburg",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "marko-polo-samara",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/marko-polo-samara",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/marko-polo-samara",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "rossiya-vs-hollywood-blokbaster-shou-pri-svechah-s-aso-orkestrom-rostov-na-donu-3",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/rossiya-vs-hollywood-blokbaster-shou-pri-svechah-s-aso-orkestrom-rostov-na-donu-3",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/rossiya-vs-hollywood-blokbaster-shou-pri-svechah-s-aso-orkestrom-rostov-na-donu-3",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "rossiya-vs-hollywood-blokbaster-shou-pri-svechah-s-aso-orkestrom-ufa",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/rossiya-vs-hollywood-blokbaster-shou-pri-svechah-s-aso-orkestrom-ufa",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/rossiya-vs-hollywood-blokbaster-shou-pri-svechah-s-aso-orkestrom-ufa",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "rossiya-vs-hollywood-blokbaster-shou-pri-svechah-s-aso-orkestrom-rostov-na-donu-2",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/rossiya-vs-hollywood-blokbaster-shou-pri-svechah-s-aso-orkestrom-rostov-na-donu-2",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/rossiya-vs-hollywood-blokbaster-shou-pri-svechah-s-aso-orkestrom-rostov-na-donu-2",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "rossiya-vs-hollywood-blokbaster-shou-pri-svechah-s-aso-orkestrom-rostov-na-donu-6",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/rossiya-vs-hollywood-blokbaster-shou-pri-svechah-s-aso-orkestrom-rostov-na-donu-6",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/rossiya-vs-hollywood-blokbaster-shou-pri-svechah-s-aso-orkestrom-rostov-na-donu-6",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "rossiya-vs-hollywood-blokbaster-shou-pri-svechah-s-aso-orkestrom-ufa-3",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/rossiya-vs-hollywood-blokbaster-shou-pri-svechah-s-aso-orkestrom-ufa-3",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/rossiya-vs-hollywood-blokbaster-shou-pri-svechah-s-aso-orkestrom-ufa-3",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "rossiya-vs-hollywood-blokbaster-shou-pri-svechah-s-aso-orkestrom-rostov-na-donu-5",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/rossiya-vs-hollywood-blokbaster-shou-pri-svechah-s-aso-orkestrom-rostov-na-donu-5",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/rossiya-vs-hollywood-blokbaster-shou-pri-svechah-s-aso-orkestrom-rostov-na-donu-5",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "rossiya-vs-hollywood-blokbaster-shou-pri-svechah-s-aso-orkestrom-ufa-2",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/rossiya-vs-hollywood-blokbaster-shou-pri-svechah-s-aso-orkestrom-ufa-2",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/rossiya-vs-hollywood-blokbaster-shou-pri-svechah-s-aso-orkestrom-ufa-2",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "rossiya-vs-hollywood-blokbaster-shou-pri-svechah-s-aso-orkestrom-rostov-na-donu-4",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/rossiya-vs-hollywood-blokbaster-shou-pri-svechah-s-aso-orkestrom-rostov-na-donu-4",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/rossiya-vs-hollywood-blokbaster-shou-pri-svechah-s-aso-orkestrom-rostov-na-donu-4",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "novogodnie-saundtreki-pri-svechah-s-aso-orkestrom-shou-kotoroe-podarit-vam-chudo-ufa-4",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/novogodnie-saundtreki-pri-svechah-s-aso-orkestrom-shou-kotoroe-podarit-vam-chudo-ufa-4",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/novogodnie-saundtreki-pri-svechah-s-aso-orkestrom-shou-kotoroe-podarit-vam-chudo-ufa-4",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "novogodnie-saundtreki-pri-svechah-s-aso-orkestrom-shou-kotoroe-podarit-vam-chudo-ufa-2",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/novogodnie-saundtreki-pri-svechah-s-aso-orkestrom-shou-kotoroe-podarit-vam-chudo-ufa-2",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/novogodnie-saundtreki-pri-svechah-s-aso-orkestrom-shou-kotoroe-podarit-vam-chudo-ufa-2",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "novogodnie-saundtreki-pri-svechah-s-aso-orkestrom-shou-kotoroe-podarit-vam-chudo-rostov-na-donu-3",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/novogodnie-saundtreki-pri-svechah-s-aso-orkestrom-shou-kotoroe-podarit-vam-chudo-rostov-na-donu-3",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/novogodnie-saundtreki-pri-svechah-s-aso-orkestrom-shou-kotoroe-podarit-vam-chudo-rostov-na-donu-3",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "novogodnie-saundtreki-pri-svechah-s-aso-orkestrom-shou-kotoroe-podarit-vam-chudo-rostov-na-donu",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/novogodnie-saundtreki-pri-svechah-s-aso-orkestrom-shou-kotoroe-podarit-vam-chudo-rostov-na-donu",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/novogodnie-saundtreki-pri-svechah-s-aso-orkestrom-shou-kotoroe-podarit-vam-chudo-rostov-na-donu",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "novogodnie-saundtreki-pri-svechah-s-aso-orkestrom-shou-kotoroe-podarit-vam-chudo-ufa",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/novogodnie-saundtreki-pri-svechah-s-aso-orkestrom-shou-kotoroe-podarit-vam-chudo-ufa",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/novogodnie-saundtreki-pri-svechah-s-aso-orkestrom-shou-kotoroe-podarit-vam-chudo-ufa",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "novogodnie-saundtreki-pri-svechah-s-aso-orkestrom-shou-kotoroe-podarit-vam-chudo-rostov-na-donu-2",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/novogodnie-saundtreki-pri-svechah-s-aso-orkestrom-shou-kotoroe-podarit-vam-chudo-rostov-na-donu-2",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/novogodnie-saundtreki-pri-svechah-s-aso-orkestrom-shou-kotoroe-podarit-vam-chudo-rostov-na-donu-2",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "novogodnie-saundtreki-pri-svechah-s-aso-orkestrom-shou-kotoroe-podarit-vam-chudo-krasnodar",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/novogodnie-saundtreki-pri-svechah-s-aso-orkestrom-shou-kotoroe-podarit-vam-chudo-krasnodar",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/novogodnie-saundtreki-pri-svechah-s-aso-orkestrom-shou-kotoroe-podarit-vam-chudo-krasnodar",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "novogodnie-saundtreki-pri-svechah-s-aso-orkestrom-shou-kotoroe-podarit-vam-chudo-ufa-3",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/novogodnie-saundtreki-pri-svechah-s-aso-orkestrom-shou-kotoroe-podarit-vam-chudo-ufa-3",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/novogodnie-saundtreki-pri-svechah-s-aso-orkestrom-shou-kotoroe-podarit-vam-chudo-ufa-3",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "koncert-gruppy-doktor-shlyager-chita",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/koncert-gruppy-doktor-shlyager-chita",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/koncert-gruppy-doktor-shlyager-chita",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "koncert-gruppy-doktor-shlyager-gusinoozersk",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/koncert-gruppy-doktor-shlyager-gusinoozersk",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/koncert-gruppy-doktor-shlyager-gusinoozersk",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "koncert-gruppy-doktor-shlyager-mogoytuy",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/koncert-gruppy-doktor-shlyager-mogoytuy",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/koncert-gruppy-doktor-shlyager-mogoytuy",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "koncert-gruppy-doktor-shlyager-borzya",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/koncert-gruppy-doktor-shlyager-borzya",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/koncert-gruppy-doktor-shlyager-borzya",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "koncert-gruppy-doktor-shlyager-zabaykalsk",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/koncert-gruppy-doktor-shlyager-zabaykalsk",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/koncert-gruppy-doktor-shlyager-zabaykalsk",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "koncert-gruppy-doktor-shlyager-petrovsk-zabaykalskiy",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/koncert-gruppy-doktor-shlyager-petrovsk-zabaykalskiy",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/koncert-gruppy-doktor-shlyager-petrovsk-zabaykalskiy",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "koncert-gruppy-doktor-shlyager-ulan-ude",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/koncert-gruppy-doktor-shlyager-ulan-ude",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/koncert-gruppy-doktor-shlyager-ulan-ude",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "koncert-gruppy-doktor-shlyager-angarsk",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/koncert-gruppy-doktor-shlyager-angarsk",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/koncert-gruppy-doktor-shlyager-angarsk",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "plamenev-ulyanovsk",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/plamenev-ulyanovsk",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/plamenev-ulyanovsk",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "plamenev-korolev",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/plamenev-korolev",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/plamenev-korolev",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "plamenev-ramenskoe",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/plamenev-ramenskoe",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/plamenev-ramenskoe",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "plamenev-odincovo",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/plamenev-odincovo",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/plamenev-odincovo",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "plamenev-sergiev-posad",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/plamenev-sergiev-posad",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/plamenev-sergiev-posad",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "plamenev-kaliningrad",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/plamenev-kaliningrad",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/plamenev-kaliningrad",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "plamenev-kazan",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/plamenev-kazan",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/plamenev-kazan",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "plamenev-cheboksary",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/plamenev-cheboksary",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/plamenev-cheboksary",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "spektakl-chto-tvoryat-muzhchiny-s-sergeem-astahovym-v-g-kotovsk",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/spektakl-chto-tvoryat-muzhchiny-s-sergeem-astahovym-v-g-kotovsk",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/spektakl-chto-tvoryat-muzhchiny-s-sergeem-astahovym-v-g-kotovsk",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "spektakl-chto-tvoryat-muzhchiny-s-sergeem-astahovym-v-g-kalach-na-donu",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/spektakl-chto-tvoryat-muzhchiny-s-sergeem-astahovym-v-g-kalach-na-donu",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/spektakl-chto-tvoryat-muzhchiny-s-sergeem-astahovym-v-g-kalach-na-donu",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "spektakl-chto-tvoryat-muzhchiny-s-sergeem-astahovym-v-g-gryazi",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/spektakl-chto-tvoryat-muzhchiny-s-sergeem-astahovym-v-g-gryazi",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/spektakl-chto-tvoryat-muzhchiny-s-sergeem-astahovym-v-g-gryazi",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "spektakl-chto-tvoryat-muzhchiny-s-sergeem-astahovym-v-g-zhirnovsk",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/spektakl-chto-tvoryat-muzhchiny-s-sergeem-astahovym-v-g-zhirnovsk",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/spektakl-chto-tvoryat-muzhchiny-s-sergeem-astahovym-v-g-zhirnovsk",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "spektakl-chto-tvoryat-muzhchiny-s-sergeem-astahovym-v-g-skopin",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/spektakl-chto-tvoryat-muzhchiny-s-sergeem-astahovym-v-g-skopin",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/spektakl-chto-tvoryat-muzhchiny-s-sergeem-astahovym-v-g-skopin",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "spektakl-chto-tvoryat-muzhchiny-s-sergeem-astahovym-v-g-zherdevka",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/spektakl-chto-tvoryat-muzhchiny-s-sergeem-astahovym-v-g-zherdevka",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/spektakl-chto-tvoryat-muzhchiny-s-sergeem-astahovym-v-g-zherdevka",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "spektakl-chto-tvoryat-muzhchiny-s-sergeem-astahovym-v-g-usman",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/spektakl-chto-tvoryat-muzhchiny-s-sergeem-astahovym-v-g-usman",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/spektakl-chto-tvoryat-muzhchiny-s-sergeem-astahovym-v-g-usman",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "spektakl-chto-tvoryat-muzhchiny-s-sergeem-astahovym-v-uryupinske-uryupinsk",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/spektakl-chto-tvoryat-muzhchiny-s-sergeem-astahovym-v-uryupinske-uryupinsk",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/spektakl-chto-tvoryat-muzhchiny-s-sergeem-astahovym-v-uryupinske-uryupinsk",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "spektakl-chto-tvoryat-muzhchiny-s-sergeem-astahovym-v-ahtubinske-ahtubinsk",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/spektakl-chto-tvoryat-muzhchiny-s-sergeem-astahovym-v-ahtubinske-ahtubinsk",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/spektakl-chto-tvoryat-muzhchiny-s-sergeem-astahovym-v-ahtubinske-ahtubinsk",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "spektakl-chto-tvoryat-muzhchiny-s-sergeem-astahovym-v-borisoglebske-borisoglebsk",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/spektakl-chto-tvoryat-muzhchiny-s-sergeem-astahovym-v-borisoglebske-borisoglebsk",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/spektakl-chto-tvoryat-muzhchiny-s-sergeem-astahovym-v-borisoglebske-borisoglebsk",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "spektakl-chto-tvoryat-muzhchiny-s-sergeem-astahovym-v-boguchare-boguchar",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/spektakl-chto-tvoryat-muzhchiny-s-sergeem-astahovym-v-boguchare-boguchar",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/spektakl-chto-tvoryat-muzhchiny-s-sergeem-astahovym-v-boguchare-boguchar",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "spektakl-chto-tvoryat-muzhchiny-s-sergeem-astahovym-v-ostrogozhske-ostrogozhsk",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/spektakl-chto-tvoryat-muzhchiny-s-sergeem-astahovym-v-ostrogozhske-ostrogozhsk",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/spektakl-chto-tvoryat-muzhchiny-s-sergeem-astahovym-v-ostrogozhske-ostrogozhsk",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "spektakl-chto-tvoryat-muzhchiny-s-sergeem-astahovym-v-novovoronezhe-novovoronezh",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/spektakl-chto-tvoryat-muzhchiny-s-sergeem-astahovym-v-novovoronezhe-novovoronezh",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/spektakl-chto-tvoryat-muzhchiny-s-sergeem-astahovym-v-novovoronezhe-novovoronezh",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "sveta-bolshoi-solnyi-koncert-omsk",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/sveta-bolshoi-solnyi-koncert-omsk",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/sveta-bolshoi-solnyi-koncert-omsk",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "sveta-bolshoi-solnyi-koncert-surgut",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/sveta-bolshoi-solnyi-koncert-surgut",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/sveta-bolshoi-solnyi-koncert-surgut",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "sveta-bolshoi-solnyi-koncert-krasnodar",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/sveta-bolshoi-solnyi-koncert-krasnodar",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/sveta-bolshoi-solnyi-koncert-krasnodar",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "sveta-bolshoi-solnyi-koncert-tula",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/sveta-bolshoi-solnyi-koncert-tula",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/sveta-bolshoi-solnyi-koncert-tula",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "sveta-bolshoi-solnyi-koncert-lipeck",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/sveta-bolshoi-solnyi-koncert-lipeck",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/sveta-bolshoi-solnyi-koncert-lipeck",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "sveta-bolshoi-solnyi-koncert-voronezh",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/sveta-bolshoi-solnyi-koncert-voronezh",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/sveta-bolshoi-solnyi-koncert-voronezh",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "sveta-bolshoi-solnyi-koncert-ryazan",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/sveta-bolshoi-solnyi-koncert-ryazan",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/sveta-bolshoi-solnyi-koncert-ryazan",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "pryzhok-v-svobodu-sankt-peterburg",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/pryzhok-v-svobodu-sankt-peterburg",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/pryzhok-v-svobodu-sankt-peterburg",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "pryzhok-v-svobodu-omsk",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/pryzhok-v-svobodu-omsk",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/pryzhok-v-svobodu-omsk",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "pryzhok-v-svobodu-novosibirsk",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/pryzhok-v-svobodu-novosibirsk",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/pryzhok-v-svobodu-novosibirsk",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "pryzhok-v-svobodu-krasnoyarsk",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/pryzhok-v-svobodu-krasnoyarsk",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/pryzhok-v-svobodu-krasnoyarsk",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "pryzhok-v-svobodu-irkutsk",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/pryzhok-v-svobodu-irkutsk",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/pryzhok-v-svobodu-irkutsk",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "pryzhok-v-svobodu-moskva",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/pryzhok-v-svobodu-moskva",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/pryzhok-v-svobodu-moskva",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "pryzhok-v-svobodu-abakan",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/pryzhok-v-svobodu-abakan",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/pryzhok-v-svobodu-abakan",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "koncert-zvezdy-80-90h-gruppa-karolina-bogdanovich",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/koncert-zvezdy-80-90h-gruppa-karolina-bogdanovich",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/koncert-zvezdy-80-90h-gruppa-karolina-bogdanovich",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "koncert-zvezdy-80-90h-gruppa-karolina-verhniy-tagil",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/koncert-zvezdy-80-90h-gruppa-karolina-verhniy-tagil",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/koncert-zvezdy-80-90h-gruppa-karolina-verhniy-tagil",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "koncert-zvezdy-80-90h-gruppa-karolina-ekaterinburg",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/koncert-zvezdy-80-90h-gruppa-karolina-ekaterinburg",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/koncert-zvezdy-80-90h-gruppa-karolina-ekaterinburg",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "koncert-zvezdy-80-90h-gruppa-karolina-sol-ileck",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/koncert-zvezdy-80-90h-gruppa-karolina-sol-ileck",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/koncert-zvezdy-80-90h-gruppa-karolina-sol-ileck",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "koncert-zvezdy-80-90h-gruppa-karolina-nizhniy-novgorod",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/koncert-zvezdy-80-90h-gruppa-karolina-nizhniy-novgorod",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/koncert-zvezdy-80-90h-gruppa-karolina-nizhniy-novgorod",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "koncert-zvezdy-80-90h-gruppa-karolina-buguruslan",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/koncert-zvezdy-80-90h-gruppa-karolina-buguruslan",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/koncert-zvezdy-80-90h-gruppa-karolina-buguruslan",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "koncert-zvezdy-80-90h-gruppa-karolina-bogorodsk",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/koncert-zvezdy-80-90h-gruppa-karolina-bogorodsk",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/koncert-zvezdy-80-90h-gruppa-karolina-bogorodsk",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "15-11-evgeniya-rybakova-i-gruppa-obnimi-kita-rok-s-barabanami-i-skripkoi-nizhnii-novgorod-nizhniy-novgorod",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/15-11-evgeniya-rybakova-i-gruppa-obnimi-kita-rok-s-barabanami-i-skripkoi-nizhnii-novgorod-nizhniy-novgorod",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/15-11-evgeniya-rybakova-i-gruppa-obnimi-kita-rok-s-barabanami-i-skripkoi-nizhnii-novgorod-nizhniy-novgorod",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "14-11-evgeniya-rybakova-i-gruppa-obnimi-kita-rok-s-barabanami-i-skripkoi-yaroslavl",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/14-11-evgeniya-rybakova-i-gruppa-obnimi-kita-rok-s-barabanami-i-skripkoi-yaroslavl",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/14-11-evgeniya-rybakova-i-gruppa-obnimi-kita-rok-s-barabanami-i-skripkoi-yaroslavl",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "25-11-evgeniya-rybakova-i-gruppa-obnimi-kita-rok-s-barabanami-i-skripkoi-sankt-peterburg",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/25-11-evgeniya-rybakova-i-gruppa-obnimi-kita-rok-s-barabanami-i-skripkoi-sankt-peterburg",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/25-11-evgeniya-rybakova-i-gruppa-obnimi-kita-rok-s-barabanami-i-skripkoi-sankt-peterburg",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "26-11-evgeniya-rybakova-i-gruppa-obnimi-kita-rok-s-barabanami-i-skripkoi-moskva",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/26-11-evgeniya-rybakova-i-gruppa-obnimi-kita-rok-s-barabanami-i-skripkoi-moskva",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/26-11-evgeniya-rybakova-i-gruppa-obnimi-kita-rok-s-barabanami-i-skripkoi-moskva",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "21-11-evgeniya-rybakova-i-gruppa-obnimi-kita-rok-s-barabanami-i-skripkoi-tula",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/21-11-evgeniya-rybakova-i-gruppa-obnimi-kita-rok-s-barabanami-i-skripkoi-tula",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/21-11-evgeniya-rybakova-i-gruppa-obnimi-kita-rok-s-barabanami-i-skripkoi-tula",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "24-11-evgeniya-rybakova-i-gruppa-obnimi-kita-rok-s-barabanami-i-skripkoi-tver",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/24-11-evgeniya-rybakova-i-gruppa-obnimi-kita-rok-s-barabanami-i-skripkoi-tver",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/24-11-evgeniya-rybakova-i-gruppa-obnimi-kita-rok-s-barabanami-i-skripkoi-tver",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "20-11-evgeniya-rybakova-i-gruppa-obnimi-kita-rok-s-barabanami-i-skripkoi-ryazan",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/20-11-evgeniya-rybakova-i-gruppa-obnimi-kita-rok-s-barabanami-i-skripkoi-ryazan",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/20-11-evgeniya-rybakova-i-gruppa-obnimi-kita-rok-s-barabanami-i-skripkoi-ryazan",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "gruppa-lesopoval-kolomna",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/gruppa-lesopoval-kolomna",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/gruppa-lesopoval-kolomna",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "gruppa-lesopoval-balashiha",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/gruppa-lesopoval-balashiha",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/gruppa-lesopoval-balashiha",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "gruppa-lesopoval-moskva",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/gruppa-lesopoval-moskva",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/gruppa-lesopoval-moskva",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "gruppa-lesopoval-moskva-2",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/gruppa-lesopoval-moskva-2",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/gruppa-lesopoval-moskva-2",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "gruppa-lesopoval-obninsk",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/gruppa-lesopoval-obninsk",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/gruppa-lesopoval-obninsk",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "gruppa-lesopoval-domodedovo",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/gruppa-lesopoval-domodedovo",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/gruppa-lesopoval-domodedovo",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "gruppa-lesopoval-zelenograd",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/gruppa-lesopoval-zelenograd",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/gruppa-lesopoval-zelenograd",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "cirk-fantastik-lobnya-3",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/cirk-fantastik-lobnya-3",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/cirk-fantastik-lobnya-3",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "cirk-fantastik-lyubercy-3",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/cirk-fantastik-lyubercy-3",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/cirk-fantastik-lyubercy-3",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "cirk-fantastik-lyubercy-4",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/cirk-fantastik-lyubercy-4",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/cirk-fantastik-lyubercy-4",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "cirk-fantastik-lobnya-4",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/cirk-fantastik-lobnya-4",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/cirk-fantastik-lobnya-4",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "cirk-fantastik-lobnya-2",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/cirk-fantastik-lobnya-2",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/cirk-fantastik-lobnya-2",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "cirk-fantastik-lobnya",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/cirk-fantastik-lobnya",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/cirk-fantastik-lobnya",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "cirk-fantastik-lyubercy-2",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/cirk-fantastik-lyubercy-2",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/cirk-fantastik-lyubercy-2",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "gruppa-mirazh-korolev",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/gruppa-mirazh-korolev",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/gruppa-mirazh-korolev",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "gruppa-mirazh-domodedovo",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/gruppa-mirazh-domodedovo",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/gruppa-mirazh-domodedovo",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "gruppa-mirazh-podolsk",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/gruppa-mirazh-podolsk",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/gruppa-mirazh-podolsk",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "gruppa-mirazh-zelenograd",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/gruppa-mirazh-zelenograd",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/gruppa-mirazh-zelenograd",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "gruppa-mirazh-chehov-moskovskaya-oblast",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/gruppa-mirazh-chehov-moskovskaya-oblast",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/gruppa-mirazh-chehov-moskovskaya-oblast",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "gruppa-mirazh-obninsk",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/gruppa-mirazh-obninsk",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/gruppa-mirazh-obninsk",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "intonaciya-hity-seriala-molodezhka-tur-za-mechtoi-penza",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/intonaciya-hity-seriala-molodezhka-tur-za-mechtoi-penza",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/intonaciya-hity-seriala-molodezhka-tur-za-mechtoi-penza",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "intonaciya-hity-seriala-molodezhka-tur-za-mechtoi-cheboksary",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/intonaciya-hity-seriala-molodezhka-tur-za-mechtoi-cheboksary",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/intonaciya-hity-seriala-molodezhka-tur-za-mechtoi-cheboksary",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "intonaciya-hity-seriala-molodezhka-tur-za-mechtoi-yoshkar-ola",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/intonaciya-hity-seriala-molodezhka-tur-za-mechtoi-yoshkar-ola",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/intonaciya-hity-seriala-molodezhka-tur-za-mechtoi-yoshkar-ola",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "intonaciya-hity-seriala-molodezhka-tur-za-mechtoi-kirov-kirovskaya-oblast",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/intonaciya-hity-seriala-molodezhka-tur-za-mechtoi-kirov-kirovskaya-oblast",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/intonaciya-hity-seriala-molodezhka-tur-za-mechtoi-kirov-kirovskaya-oblast",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "intonaciya-hity-seriala-molodezhka-tur-za-mechtoi-syktyvkar",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/intonaciya-hity-seriala-molodezhka-tur-za-mechtoi-syktyvkar",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/intonaciya-hity-seriala-molodezhka-tur-za-mechtoi-syktyvkar",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "intonaciya-hity-seriala-molodezhka-tur-za-mechtoi-saransk",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/intonaciya-hity-seriala-molodezhka-tur-za-mechtoi-saransk",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/intonaciya-hity-seriala-molodezhka-tur-za-mechtoi-saransk",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "intonaciya-hity-seriala-molodezhka-tur-za-mechtoi-perm",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/intonaciya-hity-seriala-molodezhka-tur-za-mechtoi-perm",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/intonaciya-hity-seriala-molodezhka-tur-za-mechtoi-perm",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "intonaciya-hity-seriala-molodezhka-tur-za-mechtoi-tula",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/intonaciya-hity-seriala-molodezhka-tur-za-mechtoi-tula",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/intonaciya-hity-seriala-molodezhka-tur-za-mechtoi-tula",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "intonaciya-hity-seriala-molodezhka-tur-za-mechtoi-ryazan",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/intonaciya-hity-seriala-molodezhka-tur-za-mechtoi-ryazan",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/intonaciya-hity-seriala-molodezhka-tur-za-mechtoi-ryazan",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "intonaciya-hity-seriala-molodezhka-tur-za-mechtoi-izhevsk",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/intonaciya-hity-seriala-molodezhka-tur-za-mechtoi-izhevsk",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/intonaciya-hity-seriala-molodezhka-tur-za-mechtoi-izhevsk",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "intonaciya-hity-seriala-molodezhka-tur-za-mechtoi-kaluga",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/intonaciya-hity-seriala-molodezhka-tur-za-mechtoi-kaluga",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/intonaciya-hity-seriala-molodezhka-tur-za-mechtoi-kaluga",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "maks-evdokimov-solnyi-stendap-koncert-balans-krasnoyarsk",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/maks-evdokimov-solnyi-stendap-koncert-balans-krasnoyarsk",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/maks-evdokimov-solnyi-stendap-koncert-balans-krasnoyarsk",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "maks-evdokimov-solnyi-stendap-koncert-balans-kemerovo",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/maks-evdokimov-solnyi-stendap-koncert-balans-kemerovo",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/maks-evdokimov-solnyi-stendap-koncert-balans-kemerovo",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "maks-evdokimov-solnyi-stendap-koncert-novokuzneck",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/maks-evdokimov-solnyi-stendap-koncert-novokuzneck",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/maks-evdokimov-solnyi-stendap-koncert-novokuzneck",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "maks-evdokimov-solnyi-stendap-koncert-abakan",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/maks-evdokimov-solnyi-stendap-koncert-abakan",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/maks-evdokimov-solnyi-stendap-koncert-abakan",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "maks-evdokimov-solnyi-stendap-koncert-novosibirsk",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/maks-evdokimov-solnyi-stendap-koncert-novosibirsk",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/maks-evdokimov-solnyi-stendap-koncert-novosibirsk",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "maks-evdokimov-solnyi-koncert-barnaul",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/maks-evdokimov-solnyi-koncert-barnaul",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/maks-evdokimov-solnyi-koncert-barnaul",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "stendap-koncert-viktorii-skladchikovoi-krasnoyarsk",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/stendap-koncert-viktorii-skladchikovoi-krasnoyarsk",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/stendap-koncert-viktorii-skladchikovoi-krasnoyarsk",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "stendap-koncert-viktorii-skladchikovoi-yurga",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/stendap-koncert-viktorii-skladchikovoi-yurga",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/stendap-koncert-viktorii-skladchikovoi-yurga",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "stendap-koncert-viktorii-skladchikovoi-balakovo",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/stendap-koncert-viktorii-skladchikovoi-balakovo",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/stendap-koncert-viktorii-skladchikovoi-balakovo",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "stendap-koncert-viktorii-skladchikovoi-egorevsk",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/stendap-koncert-viktorii-skladchikovoi-egorevsk",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/stendap-koncert-viktorii-skladchikovoi-egorevsk",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "stendap-koncert-viktorii-skladchikovoi-murom",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/stendap-koncert-viktorii-skladchikovoi-murom",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/stendap-koncert-viktorii-skladchikovoi-murom",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "cink-urodov-rostov-na-donu-28-11-rostov-na-donu",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/cink-urodov-rostov-na-donu-28-11-rostov-na-donu",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/cink-urodov-rostov-na-donu-28-11-rostov-na-donu",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "cink-urodov-sankt-peterburg-06-12-sankt-peterburg",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/cink-urodov-sankt-peterburg-06-12-sankt-peterburg",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/cink-urodov-sankt-peterburg-06-12-sankt-peterburg",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "cink-urodov-moskva-19-12-moskva",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/cink-urodov-moskva-19-12-moskva",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/cink-urodov-moskva-19-12-moskva",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "cink-urodov-krasnodar-27-11-krasnodar",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/cink-urodov-krasnodar-27-11-krasnodar",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/cink-urodov-krasnodar-27-11-krasnodar",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "cink-urodov-voronezh-29-11-voronezh",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/cink-urodov-voronezh-29-11-voronezh",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/cink-urodov-voronezh-29-11-voronezh",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "dmitrii-dubrov-i-alla-luzheckaya-volgograd-3-12-2026-volgograd",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/dmitrii-dubrov-i-alla-luzheckaya-volgograd-3-12-2026-volgograd",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/dmitrii-dubrov-i-alla-luzheckaya-volgograd-3-12-2026-volgograd",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "dmitrii-dubrov-i-alla-luzheckaya-penza-5-12-2026-penza",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/dmitrii-dubrov-i-alla-luzheckaya-penza-5-12-2026-penza",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/dmitrii-dubrov-i-alla-luzheckaya-penza-5-12-2026-penza",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "dmitrii-dubrov-i-alla-luzheckaya-saratov-4-12-26-saratov",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/dmitrii-dubrov-i-alla-luzheckaya-saratov-4-12-26-saratov",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/dmitrii-dubrov-i-alla-luzheckaya-saratov-4-12-26-saratov",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "dmitrii-dubrov-i-alla-luzheckaya-voronezh-29-11-2026-voronezh",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/dmitrii-dubrov-i-alla-luzheckaya-voronezh-29-11-2026-voronezh",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/dmitrii-dubrov-i-alla-luzheckaya-voronezh-29-11-2026-voronezh",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "dmitrii-dubrov-i-alla-luzheckaya-lipeck-28-11-26-lipeck",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/dmitrii-dubrov-i-alla-luzheckaya-lipeck-28-11-26-lipeck",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/dmitrii-dubrov-i-alla-luzheckaya-lipeck-28-11-26-lipeck",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "simfoniya-lyubvi-simfonicheskii-koncert-v-siyanii-tysyachi-svechei-bugulma",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/simfoniya-lyubvi-simfonicheskii-koncert-v-siyanii-tysyachi-svechei-bugulma",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/simfoniya-lyubvi-simfonicheskii-koncert-v-siyanii-tysyachi-svechei-bugulma",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "simfoniya-lyubvi-simfonicheskii-koncert-v-siyanii-tysyachi-svechei-krasnoturinsk",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/simfoniya-lyubvi-simfonicheskii-koncert-v-siyanii-tysyachi-svechei-krasnoturinsk",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/simfoniya-lyubvi-simfonicheskii-koncert-v-siyanii-tysyachi-svechei-krasnoturinsk",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "simfoniya-lyubvi-simfonicheskii-koncert-v-siyanii-tysyachi-svechei-salavat",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/simfoniya-lyubvi-simfonicheskii-koncert-v-siyanii-tysyachi-svechei-salavat",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/simfoniya-lyubvi-simfonicheskii-koncert-v-siyanii-tysyachi-svechei-salavat",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "simfoniya-lyubvi-simfonicheskii-koncert-v-siyanii-tysyachi-svechei-buzuluk",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/simfoniya-lyubvi-simfonicheskii-koncert-v-siyanii-tysyachi-svechei-buzuluk",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/simfoniya-lyubvi-simfonicheskii-koncert-v-siyanii-tysyachi-svechei-buzuluk",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "muzyka-lyubvi-v-siyanii-tysyachi-svechei-roslavl",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/muzyka-lyubvi-v-siyanii-tysyachi-svechei-roslavl",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/muzyka-lyubvi-v-siyanii-tysyachi-svechei-roslavl",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "novogodnii-ogonek-so-zvezdami-80-90h-gruppa-karolina-smolensk",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/novogodnii-ogonek-so-zvezdami-80-90h-gruppa-karolina-smolensk",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/novogodnii-ogonek-so-zvezdami-80-90h-gruppa-karolina-smolensk",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "novogodnii-ogonek-so-zvezdami-80-90h-gruppa-karolina-istra",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/novogodnii-ogonek-so-zvezdami-80-90h-gruppa-karolina-istra",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/novogodnii-ogonek-so-zvezdami-80-90h-gruppa-karolina-istra",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "novogodnii-ogonek-so-zvezdami-80-90h-gruppa-karolina-kursk",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/novogodnii-ogonek-so-zvezdami-80-90h-gruppa-karolina-kursk",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/novogodnii-ogonek-so-zvezdami-80-90h-gruppa-karolina-kursk",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "novogodnii-ogonek-so-zvezdami-80-90h-gruppa-karolina-moskva",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/novogodnii-ogonek-so-zvezdami-80-90h-gruppa-karolina-moskva",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/novogodnii-ogonek-so-zvezdami-80-90h-gruppa-karolina-moskva",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "novogodnii-ogonek-so-zvezdami-80-90h-gruppa-karolina-tver",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/novogodnii-ogonek-so-zvezdami-80-90h-gruppa-karolina-tver",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/novogodnii-ogonek-so-zvezdami-80-90h-gruppa-karolina-tver",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "solnyi-koncert-olega-maiami-v-krasnodare-krasnodar",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/solnyi-koncert-olega-maiami-v-krasnodare-krasnodar",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/solnyi-koncert-olega-maiami-v-krasnodare-krasnodar",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "solnyi-koncert-olega-maiami-v-sankt-peterburge-sankt-peterburg",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/solnyi-koncert-olega-maiami-v-sankt-peterburge-sankt-peterburg",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/solnyi-koncert-olega-maiami-v-sankt-peterburge-sankt-peterburg",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "solnyi-koncert-olega-maiami-v-novosibirske-novosibirsk",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/solnyi-koncert-olega-maiami-v-novosibirske-novosibirsk",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/solnyi-koncert-olega-maiami-v-novosibirske-novosibirsk",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "solnyi-koncert-olega-maiami-v-ekaterinburge-ekaterinburg",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/solnyi-koncert-olega-maiami-v-ekaterinburge-ekaterinburg",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/solnyi-koncert-olega-maiami-v-ekaterinburge-ekaterinburg",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "aikko-koncert-v-krasnodare-krasnodar",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/aikko-koncert-v-krasnodare-krasnodar",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/aikko-koncert-v-krasnodare-krasnodar",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "aikko-koncert-v-saratove-saratov",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/aikko-koncert-v-saratove-saratov",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/aikko-koncert-v-saratove-saratov",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "aikko-koncert-v-voronezhe-voronezh",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/aikko-koncert-v-voronezhe-voronezh",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/aikko-koncert-v-voronezhe-voronezh",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "aikko-koncert-v-volgograde-volgograd",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/aikko-koncert-v-volgograde-volgograd",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/aikko-koncert-v-volgograde-volgograd",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "simfoniya-garri-pottera-i-saundtreki-volshebnyh-mirov-vladikavkaz",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/simfoniya-garri-pottera-i-saundtreki-volshebnyh-mirov-vladikavkaz",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/simfoniya-garri-pottera-i-saundtreki-volshebnyh-mirov-vladikavkaz",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "simfoniya-garri-pottera-i-saundtreki-volshebnyh-mirov-kazan",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/simfoniya-garri-pottera-i-saundtreki-volshebnyh-mirov-kazan",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/simfoniya-garri-pottera-i-saundtreki-volshebnyh-mirov-kazan",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "novogodnii-koncert-v-siyanii-tysyachi-svechei-efremov",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/novogodnii-koncert-v-siyanii-tysyachi-svechei-efremov",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/novogodnii-koncert-v-siyanii-tysyachi-svechei-efremov",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "novogodnii-koncert-v-siyanii-tysyachi-svechei-ryazan",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/novogodnii-koncert-v-siyanii-tysyachi-svechei-ryazan",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/novogodnii-koncert-v-siyanii-tysyachi-svechei-ryazan",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "simfoniya-garri-pottera-i-saundtreki-volshebnyh-mirov-zaraysk",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/simfoniya-garri-pottera-i-saundtreki-volshebnyh-mirov-zaraysk",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/simfoniya-garri-pottera-i-saundtreki-volshebnyh-mirov-zaraysk",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "simfoniya-garri-pottera-i-saundtreki-volshebnyh-mirov-zelenograd",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/simfoniya-garri-pottera-i-saundtreki-volshebnyh-mirov-zelenograd",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/simfoniya-garri-pottera-i-saundtreki-volshebnyh-mirov-zelenograd",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "simfoniya-garri-pottera-i-saundtreki-volshebnyh-mirov-sergiev-posad",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/simfoniya-garri-pottera-i-saundtreki-volshebnyh-mirov-sergiev-posad",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/simfoniya-garri-pottera-i-saundtreki-volshebnyh-mirov-sergiev-posad",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "simfoniya-garri-pottera-i-saundtreki-volshebnyh-mirov-solnechnogorsk",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/simfoniya-garri-pottera-i-saundtreki-volshebnyh-mirov-solnechnogorsk",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/simfoniya-garri-pottera-i-saundtreki-volshebnyh-mirov-solnechnogorsk",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "simfoniya-garri-pottera-i-saundtreki-volshebnyh-mirov-vologda",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/simfoniya-garri-pottera-i-saundtreki-volshebnyh-mirov-vologda",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/simfoniya-garri-pottera-i-saundtreki-volshebnyh-mirov-vologda",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "aleksandr-bessonov-pochemu-devushki-vybirayut-plohih-parnei-volgograd",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/aleksandr-bessonov-pochemu-devushki-vybirayut-plohih-parnei-volgograd",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/aleksandr-bessonov-pochemu-devushki-vybirayut-plohih-parnei-volgograd",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "aleksandr-bessonov-pochemu-devushki-vybirayut-plohih-parnei-penza",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/aleksandr-bessonov-pochemu-devushki-vybirayut-plohih-parnei-penza",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/aleksandr-bessonov-pochemu-devushki-vybirayut-plohih-parnei-penza",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "aleksandr-bessonov-pochemu-devushki-vybirayut-plohih-parnei-saratov",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/aleksandr-bessonov-pochemu-devushki-vybirayut-plohih-parnei-saratov",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/aleksandr-bessonov-pochemu-devushki-vybirayut-plohih-parnei-saratov",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "aleksandr-bessonov-pochemu-devushki-vybirayut-plohih-parnei-yoshkar-ola",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/aleksandr-bessonov-pochemu-devushki-vybirayut-plohih-parnei-yoshkar-ola",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/aleksandr-bessonov-pochemu-devushki-vybirayut-plohih-parnei-yoshkar-ola",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "aleksandr-bessonov-pochemu-devushki-vybirayut-plohih-parnei-cheboksary",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/aleksandr-bessonov-pochemu-devushki-vybirayut-plohih-parnei-cheboksary",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/aleksandr-bessonov-pochemu-devushki-vybirayut-plohih-parnei-cheboksary",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "aleksandr-bessonov-pochemu-devushki-vybirayut-plohih-parnei-perm",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/aleksandr-bessonov-pochemu-devushki-vybirayut-plohih-parnei-perm",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/aleksandr-bessonov-pochemu-devushki-vybirayut-plohih-parnei-perm",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "aleksandr-bessonov-pochemu-devushki-vybirayut-plohih-parnei-izhevsk",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/aleksandr-bessonov-pochemu-devushki-vybirayut-plohih-parnei-izhevsk",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/aleksandr-bessonov-pochemu-devushki-vybirayut-plohih-parnei-izhevsk",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "aleksandr-bessonov-pochemu-devushki-vybirayut-plohih-parnei-naberezhnye-chelny",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/aleksandr-bessonov-pochemu-devushki-vybirayut-plohih-parnei-naberezhnye-chelny",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/aleksandr-bessonov-pochemu-devushki-vybirayut-plohih-parnei-naberezhnye-chelny",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "novyi-god-v-banana-park-novosibirsk",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/novyi-god-v-banana-park-novosibirsk",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/novyi-god-v-banana-park-novosibirsk",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "novyi-god-v-banana-park-novosibirsk-2",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/novyi-god-v-banana-park-novosibirsk-2",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/novyi-god-v-banana-park-novosibirsk-2",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "novyi-god-v-banana-park-novosibirsk-3",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/novyi-god-v-banana-park-novosibirsk-3",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/novyi-god-v-banana-park-novosibirsk-3",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "novyi-god-v-banana-park-omsk",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/novyi-god-v-banana-park-omsk",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/novyi-god-v-banana-park-omsk",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "obe-rek-moskva-15-11-moskva",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/obe-rek-moskva-15-11-moskva",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/obe-rek-moskva-15-11-moskva",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "obe-rek-sankt-peterburg-29-11-sankt-peterburg",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/obe-rek-sankt-peterburg-29-11-sankt-peterburg",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/obe-rek-sankt-peterburg-29-11-sankt-peterburg",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "obe-rek-smolensk-22-11-smolensk",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/obe-rek-smolensk-22-11-smolensk",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/obe-rek-smolensk-22-11-smolensk",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "obe-rek-bryansk-21-11-bryansk",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/obe-rek-bryansk-21-11-bryansk",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/obe-rek-bryansk-21-11-bryansk",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "madiyar-satvaldin-solnyi-stendap-koncert-voronezh",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/madiyar-satvaldin-solnyi-stendap-koncert-voronezh",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/madiyar-satvaldin-solnyi-stendap-koncert-voronezh",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "madiyar-satvaldin-solnyi-stendap-koncert-ekaterinburg",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/madiyar-satvaldin-solnyi-stendap-koncert-ekaterinburg",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/madiyar-satvaldin-solnyi-stendap-koncert-ekaterinburg",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "madiyar-satvaldin-solnyi-stendap-koncert-tyumen",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/madiyar-satvaldin-solnyi-stendap-koncert-tyumen",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/madiyar-satvaldin-solnyi-stendap-koncert-tyumen",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "madiyar-satvaldin-solnyi-stendap-koncert-krasnodar",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/madiyar-satvaldin-solnyi-stendap-koncert-krasnodar",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/madiyar-satvaldin-solnyi-stendap-koncert-krasnodar",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "aleksandr-demidov-ot-mirovyh-hitov-do-sobstvennyh-sochinenii-samara",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/aleksandr-demidov-ot-mirovyh-hitov-do-sobstvennyh-sochinenii-samara",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/aleksandr-demidov-ot-mirovyh-hitov-do-sobstvennyh-sochinenii-samara",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "aleksandr-demidov-ot-mirovyh-hitov-do-sobstvennyh-sochinenii-kazan",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/aleksandr-demidov-ot-mirovyh-hitov-do-sobstvennyh-sochinenii-kazan",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/aleksandr-demidov-ot-mirovyh-hitov-do-sobstvennyh-sochinenii-kazan",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "kompozitor-aleksandr-demidov-ot-mirovyh-hitov-do-sobstvennyh-sochinenii-saratov",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/kompozitor-aleksandr-demidov-ot-mirovyh-hitov-do-sobstvennyh-sochinenii-saratov",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/kompozitor-aleksandr-demidov-ot-mirovyh-hitov-do-sobstvennyh-sochinenii-saratov",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "aleksandr-demidov-ot-mirovyh-hitov-do-sobstvennyh-sochinenii-ekaterinburg",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/aleksandr-demidov-ot-mirovyh-hitov-do-sobstvennyh-sochinenii-ekaterinburg",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/aleksandr-demidov-ot-mirovyh-hitov-do-sobstvennyh-sochinenii-ekaterinburg",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "alisa-v-strane-chudes-illyuzionnyi-spektakl-dlya-vsei-semi-nizhniy-tagil",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/alisa-v-strane-chudes-illyuzionnyi-spektakl-dlya-vsei-semi-nizhniy-tagil",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/alisa-v-strane-chudes-illyuzionnyi-spektakl-dlya-vsei-semi-nizhniy-tagil",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "alisa-v-strane-chudes-illyuzionnyi-spektakl-dlya-vsei-semi-nizhniy-tagil-2",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/alisa-v-strane-chudes-illyuzionnyi-spektakl-dlya-vsei-semi-nizhniy-tagil-2",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/alisa-v-strane-chudes-illyuzionnyi-spektakl-dlya-vsei-semi-nizhniy-tagil-2",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "alisa-v-strane-chudes-illyuzionnyi-spektakl-dlya-vsei-semi-serov",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/alisa-v-strane-chudes-illyuzionnyi-spektakl-dlya-vsei-semi-serov",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/alisa-v-strane-chudes-illyuzionnyi-spektakl-dlya-vsei-semi-serov",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "alisa-v-strane-chudes-illyuzionnyi-spektakl-dlya-vsei-semi-ekaterinburg",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/alisa-v-strane-chudes-illyuzionnyi-spektakl-dlya-vsei-semi-ekaterinburg",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/alisa-v-strane-chudes-illyuzionnyi-spektakl-dlya-vsei-semi-ekaterinburg",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "moi-2008-ruki-vverh-bar-arhangelsk",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/moi-2008-ruki-vverh-bar-arhangelsk",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/moi-2008-ruki-vverh-bar-arhangelsk",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "moi-2008-ruki-vverh-bar-ryazan",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/moi-2008-ruki-vverh-bar-ryazan",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/moi-2008-ruki-vverh-bar-ryazan",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "moi-2008-ruki-vverh-bar-cherepovec",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/moi-2008-ruki-vverh-bar-cherepovec",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/moi-2008-ruki-vverh-bar-cherepovec",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "moi-2008-ruki-vverh-bar-yaroslavl",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/moi-2008-ruki-vverh-bar-yaroslavl",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/moi-2008-ruki-vverh-bar-yaroslavl",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "solnyi-stendap-koncert-rasslabsya-tak-u-vseh-kaliningrad",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/solnyi-stendap-koncert-rasslabsya-tak-u-vseh-kaliningrad",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/solnyi-stendap-koncert-rasslabsya-tak-u-vseh-kaliningrad",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "solnyi-stendap-koncert-rasslabsya-tak-u-vseh-kirov-kirovskaya-oblast",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/solnyi-stendap-koncert-rasslabsya-tak-u-vseh-kirov-kirovskaya-oblast",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/solnyi-stendap-koncert-rasslabsya-tak-u-vseh-kirov-kirovskaya-oblast",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "solnyi-stendap-koncert-rasslabsya-tak-u-vseh-chita",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/solnyi-stendap-koncert-rasslabsya-tak-u-vseh-chita",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/solnyi-stendap-koncert-rasslabsya-tak-u-vseh-chita",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "solnyi-stendap-koncert-rasslabsya-tak-u-vseh-ulan-ude",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/solnyi-stendap-koncert-rasslabsya-tak-u-vseh-ulan-ude",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/solnyi-stendap-koncert-rasslabsya-tak-u-vseh-ulan-ude",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "anton-i-viktoriya-makarskie-zhivaya-vstrecha-v-novocherkasske-novocherkassk",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/anton-i-viktoriya-makarskie-zhivaya-vstrecha-v-novocherkasske-novocherkassk",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/anton-i-viktoriya-makarskie-zhivaya-vstrecha-v-novocherkasske-novocherkassk",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "anton-i-viktoriya-makarskie-zhivaya-vstrecha-v-pskove-pskov",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/anton-i-viktoriya-makarskie-zhivaya-vstrecha-v-pskove-pskov",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/anton-i-viktoriya-makarskie-zhivaya-vstrecha-v-pskove-pskov",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "anton-i-viktoriya-makarskie-zhivaya-vstrecha-v-taganroge-taganrog",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/anton-i-viktoriya-makarskie-zhivaya-vstrecha-v-taganroge-taganrog",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/anton-i-viktoriya-makarskie-zhivaya-vstrecha-v-taganroge-taganrog",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "koncert-etno-gruppy-hun-hurtu-g-chelyabinsk",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/koncert-etno-gruppy-hun-hurtu-g-chelyabinsk",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/koncert-etno-gruppy-hun-hurtu-g-chelyabinsk",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "koncert-etno-gruppy-hun-hurtu-g-cheboksary",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/koncert-etno-gruppy-hun-hurtu-g-cheboksary",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/koncert-etno-gruppy-hun-hurtu-g-cheboksary",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "koncert-etno-gruppy-hun-hurtu-g-sankt-peterburg",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/koncert-etno-gruppy-hun-hurtu-g-sankt-peterburg",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/koncert-etno-gruppy-hun-hurtu-g-sankt-peterburg",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "mirovye-saundtreki-pri-svechah-the-best-s-aso-orkestrom-krasnodar",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/mirovye-saundtreki-pri-svechah-the-best-s-aso-orkestrom-krasnodar",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/mirovye-saundtreki-pri-svechah-the-best-s-aso-orkestrom-krasnodar",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "mirovye-saundtreki-pri-svechah-the-best-s-aso-orkestrom-rostov-na-donu",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/mirovye-saundtreki-pri-svechah-the-best-s-aso-orkestrom-rostov-na-donu",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/mirovye-saundtreki-pri-svechah-the-best-s-aso-orkestrom-rostov-na-donu",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "mirovye-saundtreki-pri-svechah-the-best-s-aso-orkestrom-rostov-na-donu-2",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/mirovye-saundtreki-pri-svechah-the-best-s-aso-orkestrom-rostov-na-donu-2",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/mirovye-saundtreki-pri-svechah-the-best-s-aso-orkestrom-rostov-na-donu-2",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "hren-prezentaciya-alboma-yaroslavl",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/hren-prezentaciya-alboma-yaroslavl",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/hren-prezentaciya-alboma-yaroslavl",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "hren-prezentaciya-alboma-nizhniy-novgorod",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/hren-prezentaciya-alboma-nizhniy-novgorod",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/hren-prezentaciya-alboma-nizhniy-novgorod",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "hren-prezentaciya-alboma-kazan",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/hren-prezentaciya-alboma-kazan",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/hren-prezentaciya-alboma-kazan",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "simfoniya-roka-akt-pervyi-cheboksary",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/simfoniya-roka-akt-pervyi-cheboksary",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/simfoniya-roka-akt-pervyi-cheboksary",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "simfoniya-roka-akt-pervyi-ulyanovsk",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/simfoniya-roka-akt-pervyi-ulyanovsk",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/simfoniya-roka-akt-pervyi-ulyanovsk",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "simfoniya-roka-akt-pervyi-volzhsk",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/simfoniya-roka-akt-pervyi-volzhsk",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/simfoniya-roka-akt-pervyi-volzhsk",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "zvezdy-80-90-h-moskva",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/zvezdy-80-90-h-moskva",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/zvezdy-80-90-h-moskva",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "zvezdy-80-90-h-zelenograd",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/zvezdy-80-90-h-zelenograd",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/zvezdy-80-90-h-zelenograd",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "zvezdy-80-90-h-moskva-2",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/zvezdy-80-90-h-moskva-2",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/zvezdy-80-90-h-moskva-2",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "rok-opera-germes-moskva",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/rok-opera-germes-moskva",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/rok-opera-germes-moskva",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "rok-opera-germes-moskva-2",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/rok-opera-germes-moskva-2",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/rok-opera-germes-moskva-2",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "rok-opera-germes-sankt-peterburg",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/rok-opera-germes-sankt-peterburg",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/rok-opera-germes-sankt-peterburg",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "tumaniyo-nizhniy-novgorod",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/tumaniyo-nizhniy-novgorod",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/tumaniyo-nizhniy-novgorod",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "tumaniyo-samara",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/tumaniyo-samara",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/tumaniyo-samara",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "tumaniyo-kazan",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/tumaniyo-kazan",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/tumaniyo-kazan",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "dlya-milyh-dam-mirovye-saundtreki-pri-svechah-s-aso-orkestrom-rostov-na-donu",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/dlya-milyh-dam-mirovye-saundtreki-pri-svechah-s-aso-orkestrom-rostov-na-donu",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/dlya-milyh-dam-mirovye-saundtreki-pri-svechah-s-aso-orkestrom-rostov-na-donu",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "dlya-milyh-dam-mirovye-saundtreki-pri-svechah-s-aso-orkestrom-ufa",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/dlya-milyh-dam-mirovye-saundtreki-pri-svechah-s-aso-orkestrom-ufa",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/dlya-milyh-dam-mirovye-saundtreki-pri-svechah-s-aso-orkestrom-ufa",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "dlya-milyh-dam-mirovye-saundtreki-pri-svechah-s-aso-orkestrom-krasnodar",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/dlya-milyh-dam-mirovye-saundtreki-pri-svechah-s-aso-orkestrom-krasnodar",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/dlya-milyh-dam-mirovye-saundtreki-pri-svechah-s-aso-orkestrom-krasnodar",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "rostislav-chebykin-akustika-omsk",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/rostislav-chebykin-akustika-omsk",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/rostislav-chebykin-akustika-omsk",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "rostislav-chebykin-akustika-ekaterinburg",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/rostislav-chebykin-akustika-ekaterinburg",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/rostislav-chebykin-akustika-ekaterinburg",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "rostislav-chebykin-akustika-ufa",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/rostislav-chebykin-akustika-ufa",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/rostislav-chebykin-akustika-ufa",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "faina-ranevskaya-odinokaya-nasmeshnica-moskva",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/faina-ranevskaya-odinokaya-nasmeshnica-moskva",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/faina-ranevskaya-odinokaya-nasmeshnica-moskva",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "faina-ranevskaya-odinokaya-nasmeshnica-podolsk",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/faina-ranevskaya-odinokaya-nasmeshnica-podolsk",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/faina-ranevskaya-odinokaya-nasmeshnica-podolsk",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "faina-ranevskaya-odinokaya-nasmeshnica-zheleznodorozhnyy",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/faina-ranevskaya-odinokaya-nasmeshnica-zheleznodorozhnyy",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/faina-ranevskaya-odinokaya-nasmeshnica-zheleznodorozhnyy",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "serialy-mira-pri-svechah-s-aso-orkestrom-premera-rostov-na-donu",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/serialy-mira-pri-svechah-s-aso-orkestrom-premera-rostov-na-donu",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/serialy-mira-pri-svechah-s-aso-orkestrom-premera-rostov-na-donu",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "serialy-mira-pri-svechah-s-aso-orkestrom-premera-krasnodar",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/serialy-mira-pri-svechah-s-aso-orkestrom-premera-krasnodar",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/serialy-mira-pri-svechah-s-aso-orkestrom-premera-krasnodar",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "anton-i-viktoriya-makarskie-zhivaya-vstrecha-matveev-kurgan",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/anton-i-viktoriya-makarskie-zhivaya-vstrecha-matveev-kurgan",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/anton-i-viktoriya-makarskie-zhivaya-vstrecha-matveev-kurgan",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "anton-i-viktoriya-makarskie-zhivaya-vstrecha-azov",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/anton-i-viktoriya-makarskie-zhivaya-vstrecha-azov",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/anton-i-viktoriya-makarskie-zhivaya-vstrecha-azov",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "anton-i-viktoriya-makarskie-zhivoi-koncert-v-orehovo-zuevo",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/anton-i-viktoriya-makarskie-zhivoi-koncert-v-orehovo-zuevo",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/anton-i-viktoriya-makarskie-zhivoi-koncert-v-orehovo-zuevo",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "anton-i-viktoriya-makarskie-zhivoi-koncert-v-domodedovo",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/anton-i-viktoriya-makarskie-zhivoi-koncert-v-domodedovo",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/anton-i-viktoriya-makarskie-zhivoi-koncert-v-domodedovo",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "shou-pod-dozhdem-muzhchina-vs-zhenschina-kirovo-chepeck",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/shou-pod-dozhdem-muzhchina-vs-zhenschina-kirovo-chepeck",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/shou-pod-dozhdem-muzhchina-vs-zhenschina-kirovo-chepeck",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "shou-pod-dozhdem-muzhchina-vs-zhenschina-syktyvkar",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/shou-pod-dozhdem-muzhchina-vs-zhenschina-syktyvkar",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/shou-pod-dozhdem-muzhchina-vs-zhenschina-syktyvkar",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "neoklassicheskii-koncert-kompozitora-denisa-stelmaha-v-irkutske-irkutsk",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/neoklassicheskii-koncert-kompozitora-denisa-stelmaha-v-irkutske-irkutsk",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/neoklassicheskii-koncert-kompozitora-denisa-stelmaha-v-irkutske-irkutsk",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "neoklassicheskii-koncert-kompozitora-denisa-stelmaha-v-novosibirske-novosibirsk",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/neoklassicheskii-koncert-kompozitora-denisa-stelmaha-v-novosibirske-novosibirsk",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/neoklassicheskii-koncert-kompozitora-denisa-stelmaha-v-novosibirske-novosibirsk",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "spektakl-chto-tvoryat-muzhchiny-s-sergeem-astahovym-v-surovikino",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/spektakl-chto-tvoryat-muzhchiny-s-sergeem-astahovym-v-surovikino",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/spektakl-chto-tvoryat-muzhchiny-s-sergeem-astahovym-v-surovikino",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "spektakl-chto-tvoryat-muzhchiny-s-sergeem-astahovym-v-kotovo",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/spektakl-chto-tvoryat-muzhchiny-s-sergeem-astahovym-v-kotovo",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/spektakl-chto-tvoryat-muzhchiny-s-sergeem-astahovym-v-kotovo",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "helvegen-prezentaciya-novogo-alboma-sankt-peterburg",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/helvegen-prezentaciya-novogo-alboma-sankt-peterburg",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/helvegen-prezentaciya-novogo-alboma-sankt-peterburg",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "helvegen-prezentaciya-novogo-alboma-moskva",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/helvegen-prezentaciya-novogo-alboma-moskva",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/helvegen-prezentaciya-novogo-alboma-moskva",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "system-of-a-down-tribute-chopsy-msk-nizhniy-novgorod",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/system-of-a-down-tribute-chopsy-msk-nizhniy-novgorod",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/system-of-a-down-tribute-chopsy-msk-nizhniy-novgorod",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "system-of-a-down-tribute-chopsy-msk-saratov",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/system-of-a-down-tribute-chopsy-msk-saratov",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/system-of-a-down-tribute-chopsy-msk-saratov",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "saphath-sankt-peterburg",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/saphath-sankt-peterburg",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/saphath-sankt-peterburg",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "saphath-moskva",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/saphath-moskva",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/saphath-moskva",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "svarga-prezentaciya-alboma-moskva",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/svarga-prezentaciya-alboma-moskva",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/svarga-prezentaciya-alboma-moskva",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "svarga-prezentaciya-alboma-sankt-peterburg",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/svarga-prezentaciya-alboma-sankt-peterburg",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/svarga-prezentaciya-alboma-sankt-peterburg",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "nigativ-c-ansamblem-26-11-tyumen-maksimilians-tyumen",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/nigativ-c-ansamblem-26-11-tyumen-maksimilians-tyumen",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/nigativ-c-ansamblem-26-11-tyumen-maksimilians-tyumen",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "nigativ-c-ansamblem-25-11-ekaterinburg-maksimilians-ekaterinburg",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/nigativ-c-ansamblem-25-11-ekaterinburg-maksimilians-ekaterinburg",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/nigativ-c-ansamblem-25-11-ekaterinburg-maksimilians-ekaterinburg",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "cirk-shou-bravo-g-mcensk",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/cirk-shou-bravo-g-mcensk",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/cirk-shou-bravo-g-mcensk",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "cirk-shou-bravo-g-miass",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/cirk-shou-bravo-g-miass",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/cirk-shou-bravo-g-miass",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "cirk-shou-bravo-g-zlatoust",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/cirk-shou-bravo-g-zlatoust",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/cirk-shou-bravo-g-zlatoust",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "cirk-shou-bravo-g-korkino",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/cirk-shou-bravo-g-korkino",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/cirk-shou-bravo-g-korkino",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "cirk-shou-bravo-g-chebarkul",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/cirk-shou-bravo-g-chebarkul",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/cirk-shou-bravo-g-chebarkul",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "dostoinyi-stendap-naberezhnye-chelny",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/dostoinyi-stendap-naberezhnye-chelny",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/dostoinyi-stendap-naberezhnye-chelny",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "dostoinyi-stendap-kazan",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/dostoinyi-stendap-kazan",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/dostoinyi-stendap-kazan",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "dostoinyi-stendap-kazan-2",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/dostoinyi-stendap-kazan-2",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/dostoinyi-stendap-kazan-2",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "cirk-bruno-v-g-ob",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/cirk-bruno-v-g-ob",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/cirk-bruno-v-g-ob",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "cirk-bruno-v-g-tobolsk",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/cirk-bruno-v-g-tobolsk",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/cirk-bruno-v-g-tobolsk",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "cirk-bruno-v-g-ishim",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/cirk-bruno-v-g-ishim",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/cirk-bruno-v-g-ishim",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "konstantin-butakov-omsk",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/konstantin-butakov-omsk",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/konstantin-butakov-omsk",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "konstantin-butakov-sankt-peterburg",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/konstantin-butakov-sankt-peterburg",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/konstantin-butakov-sankt-peterburg",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "animaciya-sankt-peterburg",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/animaciya-sankt-peterburg",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/animaciya-sankt-peterburg",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "animaciya-moskva",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/animaciya-moskva",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/animaciya-moskva",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "mediomodo-fest-stanislav-drobyshevskii-kirill-domnin-burenok-aleksei-vodovozov-sankt-peterburg",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/mediomodo-fest-stanislav-drobyshevskii-kirill-domnin-burenok-aleksei-vodovozov-sankt-peterburg",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/mediomodo-fest-stanislav-drobyshevskii-kirill-domnin-burenok-aleksei-vodovozov-sankt-peterburg",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "medio-modo-fest-moskva",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/medio-modo-fest-moskva",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/medio-modo-fest-moskva",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "masha-i-medvedi-samara",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/masha-i-medvedi-samara",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/masha-i-medvedi-samara",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "masha-i-medvedi-kazan",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/masha-i-medvedi-kazan",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/masha-i-medvedi-kazan",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "artemiziya-i-satarova-solnyi-koncert-moskva",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/artemiziya-i-satarova-solnyi-koncert-moskva",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/artemiziya-i-satarova-solnyi-koncert-moskva",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "artemiziya-i-satarova-solnyi-koncert-sankt-peterburg",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/artemiziya-i-satarova-solnyi-koncert-sankt-peterburg",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/artemiziya-i-satarova-solnyi-koncert-sankt-peterburg",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "bessonov-lirika-novosibirsk",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/bessonov-lirika-novosibirsk",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/bessonov-lirika-novosibirsk",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "bessonov-lirika-kazan",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/bessonov-lirika-kazan",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/bessonov-lirika-kazan",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "konstantin-lem-white-fox-music-rostov-na-donu",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/konstantin-lem-white-fox-music-rostov-na-donu",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/konstantin-lem-white-fox-music-rostov-na-donu",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "konstantin-lem-white-fox-music-krasnodar",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/konstantin-lem-white-fox-music-krasnodar",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/konstantin-lem-white-fox-music-krasnodar",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "stendap-koncert-viktorii-skladchikovoi-povtor-materiala-2026-goda-samara",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/stendap-koncert-viktorii-skladchikovoi-povtor-materiala-2026-goda-samara",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/stendap-koncert-viktorii-skladchikovoi-povtor-materiala-2026-goda-samara",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "stendap-koncert-viktorii-skladchikovoi-povtor-materiala-2026-goda-ryazan",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/stendap-koncert-viktorii-skladchikovoi-povtor-materiala-2026-goda-ryazan",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/stendap-koncert-viktorii-skladchikovoi-povtor-materiala-2026-goda-ryazan",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "torba-na-kruche-moskva",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/torba-na-kruche-moskva",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/torba-na-kruche-moskva",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "torba-na-kruche-sankt-peterburg",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/torba-na-kruche-sankt-peterburg",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/torba-na-kruche-sankt-peterburg",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "yuliya-kogan-ekaterinburg",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/yuliya-kogan-ekaterinburg",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/yuliya-kogan-ekaterinburg",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "yuliya-kogan-chelyabinsk",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/yuliya-kogan-chelyabinsk",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/yuliya-kogan-chelyabinsk",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "norma-tale-solnyi-koncert-sankt-peterburg",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/norma-tale-solnyi-koncert-sankt-peterburg",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/norma-tale-solnyi-koncert-sankt-peterburg",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "norma-tale-solnyi-koncert-moskva",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/norma-tale-solnyi-koncert-moskva",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/norma-tale-solnyi-koncert-moskva",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "aleksei-reshetun-novyi-god-po-sudebno-medicinske-moskva",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/aleksei-reshetun-novyi-god-po-sudebno-medicinske-moskva",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/aleksei-reshetun-novyi-god-po-sudebno-medicinske-moskva",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "aleksei-reshetun-novyi-god-po-sudebno-medicinski-sankt-peterburg",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/aleksei-reshetun-novyi-god-po-sudebno-medicinski-sankt-peterburg",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/aleksei-reshetun-novyi-god-po-sudebno-medicinski-sankt-peterburg",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "palc-solnyi-koncert-moskva",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/palc-solnyi-koncert-moskva",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/palc-solnyi-koncert-moskva",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "palc-solnyi-koncert-sankt-peterburg",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/palc-solnyi-koncert-sankt-peterburg",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/palc-solnyi-koncert-sankt-peterburg",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "hity-2000h-karaoke-s-orkestrom-moskva",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/hity-2000h-karaoke-s-orkestrom-moskva",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/hity-2000h-karaoke-s-orkestrom-moskva",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "hity-2000h-karaoke-s-orkestrom-simferopol",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/hity-2000h-karaoke-s-orkestrom-simferopol",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/hity-2000h-karaoke-s-orkestrom-simferopol",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "aleksei-tretyakov-eto-tochno-ikona-nauchno-istoricheskii-vzglyad-na-samye-neobychnye-obrazy-v-ikonop-moskva",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/aleksei-tretyakov-eto-tochno-ikona-nauchno-istoricheskii-vzglyad-na-samye-neobychnye-obrazy-v-ikonop-moskva",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/aleksei-tretyakov-eto-tochno-ikona-nauchno-istoricheskii-vzglyad-na-samye-neobychnye-obrazy-v-ikonop-moskva",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "aleksei-tretyakov-eto-tochno-ikona-nauchno-istoricheskii-vzglyad-na-samye-neobychnye-obrazy-v-ikonop-sankt-peterburg",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/aleksei-tretyakov-eto-tochno-ikona-nauchno-istoricheskii-vzglyad-na-samye-neobychnye-obrazy-v-ikonop-sankt-peterburg",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/aleksei-tretyakov-eto-tochno-ikona-nauchno-istoricheskii-vzglyad-na-samye-neobychnye-obrazy-v-ikonop-sankt-peterburg",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "merilin-monro-kak-pautina-na-vetru-orel",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/merilin-monro-kak-pautina-na-vetru-orel",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/merilin-monro-kak-pautina-na-vetru-orel",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "merilin-monro-kak-pautina-na-vetru-moskva",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/merilin-monro-kak-pautina-na-vetru-moskva",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/merilin-monro-kak-pautina-na-vetru-moskva",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "voroth-vorot-lipeck",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/voroth-vorot-lipeck",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/voroth-vorot-lipeck",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "voroth-vorot-voronezh",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/voroth-vorot-voronezh",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/voroth-vorot-voronezh",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "5-02-zheka-basotskii-sankt-peterburg",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/5-02-zheka-basotskii-sankt-peterburg",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/5-02-zheka-basotskii-sankt-peterburg",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "6-02-zheka-basotskii-moskva",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/6-02-zheka-basotskii-moskva",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/6-02-zheka-basotskii-moskva",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "muzykalnoe-loto-bingo-fm-sankt-peterburg",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/muzykalnoe-loto-bingo-fm-sankt-peterburg",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/muzykalnoe-loto-bingo-fm-sankt-peterburg",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "muzykalnoe-loto-bingo-fm-moskva",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/muzykalnoe-loto-bingo-fm-moskva",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/muzykalnoe-loto-bingo-fm-moskva",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "solnyi-koncert-miroslavy-i-zlaty-bykovyh-v-ekaterinburge-ekaterinburg",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/solnyi-koncert-miroslavy-i-zlaty-bykovyh-v-ekaterinburge-ekaterinburg",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/solnyi-koncert-miroslavy-i-zlaty-bykovyh-v-ekaterinburge-ekaterinburg",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "solnyi-koncert-miroslavy-i-zlaty-bykovyh-v-chelyabinske-chelyabinsk",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/solnyi-koncert-miroslavy-i-zlaty-bykovyh-v-chelyabinske-chelyabinsk",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/solnyi-koncert-miroslavy-i-zlaty-bykovyh-v-chelyabinske-chelyabinsk",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "shura-penza",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/shura-penza",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/shura-penza",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "shura-kemerovo",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/shura-kemerovo",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/shura-kemerovo",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "shura-kazan",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/shura-kazan",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/shura-kazan",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "shura-volgograd",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/shura-volgograd",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/shura-volgograd",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "shura-ulan-ude",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/shura-ulan-ude",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/shura-ulan-ude",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "shura-tomsk",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/shura-tomsk",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/shura-tomsk",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "shura-lipeck",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/shura-lipeck",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/shura-lipeck",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "shura-saratov",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/shura-saratov",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/shura-saratov",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "shura-sankt-peterburg",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/shura-sankt-peterburg",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/shura-sankt-peterburg",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "shura-irkutsk",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/shura-irkutsk",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/shura-irkutsk",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "shura-vladivostok",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/shura-vladivostok",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/shura-vladivostok",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "shura-volgograd-2",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/shura-volgograd-2",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/shura-volgograd-2",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "shura-chelyabinsk",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/shura-chelyabinsk",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/shura-chelyabinsk",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "shura-ufa",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/shura-ufa",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/shura-ufa",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "shura-samara",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/shura-samara",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/shura-samara",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "shura-nizhniy-novgorod",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/shura-nizhniy-novgorod",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/shura-nizhniy-novgorod",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "shura-voronezh",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/shura-voronezh",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/shura-voronezh",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "megamozg-voronezh",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/megamozg-voronezh",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/megamozg-voronezh",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "megamozg-rostov-na-donu",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/megamozg-rostov-na-donu",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/megamozg-rostov-na-donu",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "megamozg-krasnodar",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/megamozg-krasnodar",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/megamozg-krasnodar",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "megamozg-chelyabinsk",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/megamozg-chelyabinsk",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/megamozg-chelyabinsk",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "megamozg-ufa",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/megamozg-ufa",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/megamozg-ufa",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "megamozg-tyumen",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/megamozg-tyumen",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/megamozg-tyumen",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "megamozg-ekaterinburg",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/megamozg-ekaterinburg",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/megamozg-ekaterinburg",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "megamozg-perm",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/megamozg-perm",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/megamozg-perm",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "megamozg-izhevsk",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/megamozg-izhevsk",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/megamozg-izhevsk",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "megamozg-kazan",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/megamozg-kazan",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/megamozg-kazan",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "megamozg-nizhniy-novgorod",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/megamozg-nizhniy-novgorod",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/megamozg-nizhniy-novgorod",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "megamozg-vladimir",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/megamozg-vladimir",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/megamozg-vladimir",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "megamozg-penza",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/megamozg-penza",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/megamozg-penza",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "megamozg-samara",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/megamozg-samara",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/megamozg-samara",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "megamozg-tula",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/megamozg-tula",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/megamozg-tula",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "megamozg-yaroslavl",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/megamozg-yaroslavl",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/megamozg-yaroslavl",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "call-me-karizma-17-aprelya-novosibirsk",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/call-me-karizma-17-aprelya-novosibirsk",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/call-me-karizma-17-aprelya-novosibirsk",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "call-me-karizma-10-aprelya-krasnodar",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/call-me-karizma-10-aprelya-krasnodar",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/call-me-karizma-10-aprelya-krasnodar",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "call-me-karizma-25-aprelya-samara",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/call-me-karizma-25-aprelya-samara",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/call-me-karizma-25-aprelya-samara",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "call-me-karizma-9-aprelya-rostov-na-donu",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/call-me-karizma-9-aprelya-rostov-na-donu",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/call-me-karizma-9-aprelya-rostov-na-donu",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "call-me-karizma-16-aprelya-ekaterinburg",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/call-me-karizma-16-aprelya-ekaterinburg",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/call-me-karizma-16-aprelya-ekaterinburg",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "call-me-karizma-23-aprelya-sankt-peterburg",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/call-me-karizma-23-aprelya-sankt-peterburg",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/call-me-karizma-23-aprelya-sankt-peterburg",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "call-me-karizma-2-aprelya-nizhnii-novgorod-nizhniy-novgorod",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/call-me-karizma-2-aprelya-nizhnii-novgorod-nizhniy-novgorod",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/call-me-karizma-2-aprelya-nizhnii-novgorod-nizhniy-novgorod",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "call-me-karizma-18-aprelya-krasnoyarsk",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/call-me-karizma-18-aprelya-krasnoyarsk",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/call-me-karizma-18-aprelya-krasnoyarsk",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "call-me-karizma-24-aprelya-moskva",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/call-me-karizma-24-aprelya-moskva",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/call-me-karizma-24-aprelya-moskva",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    },
+    {
+      "slug": "call-me-karizma-3-aprelya-kazan",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/call-me-karizma-3-aprelya-kazan",
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/call-me-karizma-3-aprelya-kazan",
+      "h1": true,
+      "practical": true,
+      "practicalList": true
+    }
+  ]
+}

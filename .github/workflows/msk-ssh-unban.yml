@@ -1,0 +1,55 @@
+name: MSK SSH unban owner IP
+
+on:
+  workflow_dispatch:
+    inputs:
+      owner_ip:
+        description: "Public IP to unban / allow"
+        required: true
+        default: "23.229.0.242"
+
+jobs:
+  unban:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Unban IP and inspect sshd/fail2ban
+        env:
+          MSK_SSH_HOST: ${{ secrets.MSK_SSH_HOST }}
+          MSK_SSH_USER: ${{ secrets.MSK_SSH_USER }}
+          MSK_SSH_KEY: ${{ secrets.MSK_SSH_KEY }}
+          OWNER_IP: ${{ inputs.owner_ip }}
+        run: |
+          set -euo pipefail
+          install -d -m 700 "$HOME/.ssh"
+          install -m 600 /dev/null "$HOME/.ssh/msk_key"
+          printf '%s\n' "$MSK_SSH_KEY" > "$HOME/.ssh/msk_key"
+          SSH=(ssh -i "$HOME/.ssh/msk_key" -o IdentitiesOnly=yes -o StrictHostKeyChecking=accept-new -o BatchMode=yes -o ConnectTimeout=20)
+
+          echo "=== fail2ban status ==="
+          "${SSH[@]}" "${MSK_SSH_USER}@${MSK_SSH_HOST}" "OWNER_IP=$(printf '%q' "$OWNER_IP") bash -s" <<'EOS'
+          set -euo pipefail
+          echo OWNER_IP=$OWNER_IP
+          if command -v fail2ban-client >/dev/null 2>&1; then
+            sudo -n fail2ban-client status || true
+            for jail in $(sudo -n fail2ban-client status 2>/dev/null | sed -n 's/.*Jail list:\s*//p' | tr ',' ' '); do
+              echo "--- jail $jail ---"
+              sudo -n fail2ban-client status "$jail" || true
+              sudo -n fail2ban-client set "$jail" unbanip "$OWNER_IP" && echo unbanned_$jail || echo not_banned_or_fail_$jail
+            done
+          else
+            echo "no fail2ban-client"
+          fi
+          echo "=== nft/ufw/iptables mention owner ip ==="
+          sudo -n iptables -S 2>/dev/null | grep -F "$OWNER_IP" || echo "iptables: no owner ip rules"
+          sudo -n ufw status 2>/dev/null | head -40 || true
+          echo "=== sshd PermitRoot / AllowUsers / Match ==="
+          sudo -n grep -E '^(PermitRootLogin|AllowUsers|AllowGroups|DenyUsers|PasswordAuthentication|PubkeyAuthentication|Match|AuthorizedKeysFile)' /etc/ssh/sshd_config /etc/ssh/sshd_config.d/* 2>/dev/null || true
+          echo "=== root authorized_keys (redacted key material) ==="
+          sudo -n sed -E 's/AAAAC3NzaC1lZDI1NTE5AAAA[^ ]+/REDACTED/g' /root/.ssh/authorized_keys | head -20
+          echo "=== deploy authorized_keys (redacted) ==="
+          sed -E 's/AAAAC3NzaC1lZDI1NTE5AAAA[^ ]+/REDACTED/g' ~/.ssh/authorized_keys | head -20
+          echo "=== auth log tail for owner ip ==="
+          sudo -n grep -F "$OWNER_IP" /var/log/auth.log 2>/dev/null | tail -40 || true
+          sudo -n journalctl -u ssh --since "2 hours ago" --no-pager 2>/dev/null | grep -F "$OWNER_IP" | tail -40 || true
+          EOS

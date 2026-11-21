@@ -1,0 +1,1044 @@
+{
+  "publicCacheInvalidated": true,
+  "cache": {
+    "ok": true,
+    "warm": "none",
+    "reason": "published 86 rewritten EventPages 2026-11-12"
+  },
+  "revalidated": 172,
+  "indexNowQueued": 86,
+  "results": [
+    {
+      "slug": "teatralno-cirkovoe-shou-v-gusinoozerske-gusinoozersk",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "teatralno-cirkovoe-shou-v-gusinoozerske-6ada03979a977941c0a9da91",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "spektakl-chudiki-krasnoyarsk",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "spektakl-chudiki-6ae80b938d7ec458987a5504",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "anastasiya-vysockaya-ladynsax-12-noyabrya-v-krasnoyarske-krasnoyarsk",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "tc-6a3cf15c4df65d6184422518-anastasiya-vysockaya-ladynsax-12-noyabrya-v-krasnoyarske",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "muzyka-kinoshedevrov-v-siyanii-tysyachi-svechei-kumertau",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "muzyka-kinoshedevrov-v-siyanii-tysyachi-svechei-6abe2d8f4b9306a37366937d",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "kraevedcheskii-chetverg-lektorii-s-glebom-aleksushinym-kak-my-ne-poleteli-iz-kuibysheva-na-lunu-i-m-samara",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "kraevedcheskii-chetverg-lektorii-s-glebom-aleksushinym-kak-my-ne-poleteli-iz-kuibysheva-na-lunu-i-m-6ae8b9c4072e0116d62a720e",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "garri-potter-v-siyanii-tysyachi-svechei-tolyatti",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "tc-6a4b98001456270104fed438-garri-potter-v-siyanii-tysyachi-svechei",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "artem-lalayan-yubilei-maestro-i-prezentaciya-alboma-dzhaz-s-armyanskim-akcentom-kvintet-moskva",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "artem-lalayan-yubilei-maestro-i-prezentaciya-alboma-dzhaz-s-armyanskim-akcentom-kvintet-6aca51f836494fa1de3e7e8e",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "dzhaz-kvartet-aleksandra-karbasova-s-programmoi-klassika-dzhaza-samara",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "dzhaz-kvartet-aleksandra-karbasova-s-programmoi-klassika-dzhaza-6aee353dc29ef41f67de15ec",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "put-raskolnikova-sankt-peterburg-2",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "put-raskolnikova-6ad245e7695c79074fbe9864",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "dans-ramblers-tribryut-the-beatles-moskva",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "dans-ramblers-tribryut-the-beatles-6ad852f628ac60404ac5d034",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "ispanskii-vecher-viva-ispaniya-spektakl-puteshestvie-versiya-flamenko-moskva",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "ispanskii-vecher-viva-ispaniya-spektakl-puteshestvie-versiya-flamenko-6ae31c29f055ddaf68ada89f",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "neoklassika-v-tance-muzyka-kotoraya-ozhivaet-avtorskii-koncert-kompozitora-igorya-dunkula-sankt-peterburg",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "neoklassika-v-tance-muzyka-kotoraya-ozhivaet-avtorskii-koncert-kompozitora-igorya-dunkula-6ae31764b6d8251d2b4297c3",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "belyi-ostrog-35-let-na-scene-moskva",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "belyi-ostrog-35-let-na-scene-6ac116eef5c456f76ea910f8",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "samye-znamenitye-dzhazovye-kompozicii-vseh-vremen-moskva-3",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "samye-znamenitye-dzhazovye-kompozicii-vseh-vremen-6ac35d0c731cfe712474041e",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "tvorcheskii-vecher-niny-garnet-kontrabas-v-zazerkale-moskva",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "tvorcheskii-vecher-niny-garnet-kontrabas-v-zazerkale-6ac4fc7f2c4d0850f3aadede",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "nordgroove-sankt-peterburg",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "nordgroove-6ab1b0bccc5f0a24bcdee138",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "kvartet-nikolaya-kulikova-moskva",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "kvartet-nikolaya-kulikova-6abfd2da9b7eae432519ca24",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "duet-roza-yakova-moskva",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "duet-roza-yakova-6acf288d6b4cacda3dafc6f2",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "hangmade-piano-duo-sankt-peterburg-banket-holl-aristokrat-12-noyabrya-2026-20-00-sankt-peterburg",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "hangmade-piano-duo-sankt-peterburg-banket-holl-aristokrat-12-noyabrya-2026-20-00-6ae334459e171c7d6fcfad55",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "hity-80-h-i-90-h-v-ispolnenii-dzhazovogo-orkestra-good-orchestra-moskva-2",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "hity-80-h-i-90-h-v-ispolnenii-dzhazovogo-orkestra-good-orchestra-6abb8768b6ad440920a919a7",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "sinx-i-sleep-dealer-v-sankt-peterburge-sankt-peterburg",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "sinx-i-sleep-dealer-v-sankt-peterburge-6abd4f0b638c8a0515e260b8",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "akterskaya-chitka-pesy-moloko-andreya-babaeva-moskva",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "akterskaya-chitka-pesy-moloko-andreya-babaeva-6ae735bff4ca973c76d5aef2",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "arfa-i-dzhaz-moskva",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "arfa-i-dzhaz-6ad212af8df3a355e9762e31",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "aleksandr-kashpurin-fortepiano-iskushenie-krasotoi-moskva",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "aleksandr-kashpurin-fortepiano-iskushenie-krasotoi-6a9dc4aae9a6bab77bd783c5",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "lisistrata-moskva",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "lisistrata-6aa13ad966c680c4bbbf7e6c",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "oruell-tango-staryh-gazet-sankt-peterburg",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "oruell-tango-staryh-gazet-6aceae3c59bb66609b2d12be",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "koncert-pyatnica-13-moskva",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "koncert-pyatnica-13-6a82d6a04fa4d971846ff4a5",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "tribute-to-alcide-yellow-nunez-moskva",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "tribute-to-alcide-yellow-nunez-6aa43794e4d866ddb6143b50",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "green-crow-13-11-moskva-glastonberry-moskva",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "green-crow-13-11-moskva-glastonberry-6abfa3b4ebe26de6f484488f",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "pyatnica-13-organ-v-planetarii-sankt-peterburg",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "pyatnica-13-organ-v-planetarii-6aa2c6cd932fbe5320ed2ca8",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "jazz-dance-orchestra-moskva",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "jazz-dance-orchestra-6ac684dad8c4989d9b2df5b4",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "aleksandr-pushkin-p-sni-zapadnyh-slavyan-sankt-peterburg",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "tc-6a47fd4e7118077fed12af72-aleksandr-pushkin-p-sni-zapadnyh-slavyan",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "friday-night-nesh-albert-moskva",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "friday-night-nesh-albert-6ac1110285a57df3f46ce580",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "azon-v-yaroslavle-13-noyabrya-2026g-prezentaciya-novogo-alboma-yaroslavl",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "tc-6a22eeb06f38bfaa2da7374d-azon-v-yaroslavle-13-noyabrya-2026g-prezentaciya-novogo-alboma",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "bogemnyi-art-branch-svetskie-lvicy-blesk-intrigi-i-sudby-rossiiskoi-elity-sankt-peterburg",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "bogemnyi-art-branch-svetskie-lvicy-blesk-intrigi-i-sudby-rossiiskoi-elity-6ad68f314908b0a8141219f0",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "koncert-gosudarstvennogo-ansamblya-pesni-i-plyaski-donskih-kazakov-im-a-kvasova-tihoreck",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "koncert-gosudarstvennogo-ansamblya-pesni-i-plyaski-donskih-kazakov-im-a-kvasova-6ac4a37208908e200479178f",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "veneciya-epohi-vivaldi-organ-golos-skripka-pri-svechah-ulyanovsk",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "veneciya-epohi-vivaldi-organ-golos-skripka-pri-svechah-6aadc5edc70944166bbeaa4a",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "13-11-ruki-vverh-i-zveri-12-atm-podolsk",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "13-11-ruki-vverh-i-zveri-12-atm-podolsk-6ad1466cc6be8367db2c21dc",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "spektakl-v-kvartire-istoriya-odnoi-devochki-ekaterinburg",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "spektakl-v-kvartire-istoriya-odnoi-devochki-6ad8d4b22f459f49470f8081",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "master-klass-po-rospisi-dekora-iz-gipsa-perm-2",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "master-klass-po-rospisi-dekora-iz-gipsa-6ae1aa617f974a1db4b08947",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "led-tver",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "led-6a876467bc206392fe167521",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "cirk-buduschego-za-granyu-vozmozhnogo-tazovskiy",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "cirk-buduschego-za-granyu-vozmozhnogo-6abe02c91b579fe33c1727cd",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "noch-v-muzee-nizhniy-novgorod",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "noch-v-muzee-6aeda4b67cfff8f24e9b097d",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "koncert-dmitriya-kolduna-dubna-moskovskaya-oblast",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "koncert-dmitriya-kolduna-6a8ee852787064113d7f2e83",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "cirk-salyut-emocii-karymskoe",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "cirk-salyut-emocii-karymskoe-6ae2cb9dcd4b081104e386f6",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "kvartirnik-s-olegom-sudakovym-kvartirnik-deli-laundzh-omsk",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "kvartirnik-s-olegom-sudakovym-kvartirnik-deli-laundzh-6ac611b5b797cd4ec4cd22dc",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "sveta-bolshoi-solnyi-koncert-ryazan",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "sveta-bolshoi-solnyi-koncert-6a0a246239a27964e5bc2267",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "koncert-zvezdy-80-90h-gruppa-karolina-bogorodsk",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "koncert-zvezdy-80-90h-gruppa-karolina-6a74b35ef29fb21ddf2f1592",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "koncert-inny-valter-v-yaroslavle-13-noyabrya-2026-yaroslavl",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "koncert-inny-valter-v-yaroslavle-13-noyabrya-2026-6ae9b777688b8c8562b9f535",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "ekskursiya-v-osobnyak-v-morozova-v-podsosenskom-pereulke-moskva-3",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "ekskursiya-v-osobnyak-v-morozova-v-podsosenskom-pereulke-6ad3b6075825519313d89f0b",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "yubileinyi-vecher-niny-arcibashevoi-rasskazy-russkih-pisatelei-moskva",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "yubileinyi-vecher-niny-arcibashevoi-rasskazy-russkih-pisatelei-6af06eb60a1e8f4077ff47a5",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "koncert-v-stile-disco-80-90-h-na-teplohode-rio-4-moskva",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "koncert-v-stile-disco-80-90-h-na-teplohode-rio-4-1536",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "vechernyaya-obzornaya-ekskursiya-ogni-stolicy",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "vechernyaya-obzornaya-ekskursiya-ogni-stolicy-738",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "lay-far-dance-orchestra-moskva",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "lay-far-dance-orchestra-6adb73dd6692cc0be4a170bf",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "tvorcheskii-master-klass-po-izgotovleniyu-svechi-v-banke-i-aromasashe-perm-2",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "tvorcheskii-master-klass-po-izgotovleniyu-svechi-v-banke-i-aromasashe-6ae1a7e125308047c3ac1d7a",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "nigativ-v-stavropole-13-11-stavropol",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "nigativ-v-stavropole-13-11-69e6a48284232dab92180b8b",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "rvi-meha-orkestr-avtorskii-koncert-novosibirsk",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "rvi-meha-orkestr-avtorskii-koncert-6ae9a76d22e875bc8efc9814",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "somewhere-music-session-kamerun-zambiya-rossiya-moskva",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "somewhere-music-session-kamerun-zambiya-rossiya-6ace2d2a9f533e11d7402b61",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "andrei-zhuravlev-dinozavry-monstry-evolyucii-kak-oni-stali-pticami-moskva",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "andrei-zhuravlev-dinozavry-monstry-evolyucii-kak-oni-stali-pticami-6ac3bc3c056bf87388e68af0",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "moonshine-moskva",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "moonshine-6abfd20993cb2cde5099110c",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "doktor-agranovskii-i-de-blues-spinners-moskva",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "doktor-agranovskii-i-de-blues-spinners-6aad85d20a7b33074c4193c0",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "peppi-6-sankt-peterburg",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "peppi-6-6adb2d9e5f4a44d0302d12dd",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "doslushaesh-li-do-konca-sankt-peterburg",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "doslushaesh-li-do-konca-6ab0f9aaf61085e1ee79db37",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "semeinyi-spektakl-ai-da-terem-teremok-ot-gosudarstvennoi-filarmonii-sankt-peterburga-dlya-detei-sankt-peterburg",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "semeinyi-spektakl-ai-da-terem-teremok-ot-gosudarstvennoi-filarmonii-sankt-peterburga-dlya-detei-6a9950334176598bfcb12304",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "tataro-bashkirskaya-chak-chak-diskoteka-s-aidarom-galimovym-orenburg",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "tataro-bashkirskaya-chak-chak-diskoteka-s-aidarom-galimovym-6ab7a518ca3f3c0d2c245bc7",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "neboreka-se-meri-imeet-znachenie-smolensk",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "neboreka-se-meri-imeet-znachenie-6ac84c139754e8b2527c6453",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "aleksei-solovev-stendap-koncert-13-noyabrya-19-00-sankt-peterburg",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "aleksei-solovev-stendap-koncert-13-noyabrya-19-00-6acacd207f85553a85729a9c",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "neoklassicheskii-koncert-yulii-kockoi-ekaterinburg",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "tc-6a47bc1b11d524a3df8c7e83-neoklassicheskii-koncert-yulii-kockoi",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "pyatnica-trinadcatoe-liquefaction-modzho-kadzhun-surgut",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "pyatnica-trinadcatoe-liquefaction-modzho-kadzhun-6ad9db3536baadb5ccf1f274",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "leanje-13-noyabrya-novosibirsk",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "leanje-13-noyabrya-novosibirsk-6ac8ec27dcec16f80d62df39",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "uglystephan-solnyi-koncert-13-noyabrya-ulyanovsk",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "uglystephan-solnyi-koncert-13-noyabrya-6ab27a7c8c4028702d3ddcc7",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "abilities-2-unlimited-korolev",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "abilities-2-unlimited-6a9ec809c81ee1cf1bc84568",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "simfoniya-roka-akt-pervyi-volzhsk",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "simfoniya-roka-akt-pervyi-6abe4f638e2a1ee5f42ebcc1",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "solnyi-stendap-koncert-vani-usovicha-tambov",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "tc-69fddcddd46ef3197d397afd-solnyi-stendap-koncert-vani-usovicha",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "semya-bodzhgua-solnyi-koncert-domodedovo",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "semya-bodzhgua-solnyi-koncert-6aa7b5c01a1b209e1621e04f",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "volshebnye-miry-miyadzaki-muzykalnoe-shou-s-multimediinym-videoryadom-moskva",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "volshebnye-miry-miyadzaki-muzykalnoe-shou-s-multimediinym-videoryadom-6a621e47676f2b62cc6f85f7",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "doktor-chehov-moskva",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "doktor-chehov-6ad0eaa24b7ed8df48b513b7",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "inkognito-vologda",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "inkognito-vologda-6a7dc9ec4144e09224cced96",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "nurminskii-barnaul-13-noyabrya-hairy-lemon-barnaul",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "tc-6a4cf26411aa5c64d3c36f98-nurminskii-barnaul-13-noyabrya-hairy-lemon",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "igor-potov-i-tainaya-laboratoriya-lyubimaya-saga-v-memnoi-ozvuchke-kaliningrad",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "igor-potov-i-tainaya-laboratoriya-lyubimaya-saga-v-memnoi-ozvuchke-6ae5b3f90a95115075085d3f",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "pavel-pikovskii-v-voronezhe-13-11-2026-voronezh",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "pavel-pikovskii-v-voronezhe-13-11-2026-6a79b3b3edcf5e7687f3d504",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "russkii-teatr-ot-shutovskih-plyasok-do-rezhisserov-serebryanogo-veka-i-avangarda-sankt-peterburg",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "russkii-teatr-ot-shutovskih-plyasok-do-rezhisserov-serebryanogo-veka-i-avangarda-6ad3b15756819c023e6c847a",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "helvegen-prezentaciya-novogo-alboma-sankt-peterburg",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "helvegen-prezentaciya-novogo-alboma-69ce823069d25036357a0839",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "kak-serega-marshrutku-zhdal-penza",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "kak-serega-marshrutku-zhdal-6aafe2bdaea2ee01469c8fa7",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "ekskursiya-v-centralnuyu-pushkinskuyu-biblioteku-istoriya-biblioteki-i-starinnogo-osobnyaka-moskva",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "ekskursiya-v-centralnuyu-pushkinskuyu-biblioteku-istoriya-biblioteki-i-starinnogo-osobnyaka-6aca5a724e29bc260a400189",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    },
+    {
+      "slug": "ekskursiya-v-palaty-zinovevyh-yusupovyh-moskva",
+      "kind": "eventpage",
+      "indexNowQueued": true,
+      "ok": true
+    },
+    {
+      "slug": "ekskursiya-v-palaty-zinovevyh-yusupovyh-6ac78f070ee13023a5fb0325",
+      "kind": "legacy-refresh-only",
+      "indexNowQueued": false,
+      "ok": true
+    }
+  ]
+}

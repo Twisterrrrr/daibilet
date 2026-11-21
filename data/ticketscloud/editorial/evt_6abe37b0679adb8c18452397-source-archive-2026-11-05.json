@@ -1,0 +1,88 @@
+{
+  "eventId": "evt_6abe37b0679adb8c18452397",
+  "eventTitle": "Найк Борзов \"Большой Новогодний концерт\"",
+  "eventPageId": "b58d977e-c9d2-4e1c-b0ba-2a1105f7153c",
+  "eventPageSlug": "naik-borzov-bolshoi-novogodnii-koncert-ekaterinburg",
+  "archiveStatus": "UNUSED_ORIGINAL_SOURCE",
+  "retrievedAt": "2026-11-05",
+  "sourceSnapshot": {
+    "id": "evt_6abe37b0679adb8c18452397",
+    "kind": "SINGLE",
+    "slug": "наик-борзов-большои-новогоднии-концерт-6abe37b0679adb8c18452397",
+    "seoH1": null,
+    "title": "Найк Борзов \"Большой Новогодний концерт\"",
+    "sources": [
+      {
+        "code": "TICKETSCLOUD",
+        "name": "Ticketscloud",
+        "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6abe37b0679adb8c18452397",
+        "externalId": "6abe37b0679adb8c18452397",
+        "metaExternalId": null
+      }
+    ],
+    "venueId": "venue_5e0f618ecfb1be2535dd1dea",
+    "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net/production/image/2026-10/6abe3f1055cca182804254cf.jpg",
+    "seoTitle": null,
+    "cityTitle": "Екатеринбург",
+    "venueTitle": "Концерт-холл \"Свобода\"",
+    "description": null,
+    "isIndexable": true,
+    "purchaseFlow": "EXTERNAL",
+    "venueAddress": "ул. Черкасская, 12",
+    "canonicalPath": null,
+    "primaryCityId": "city_1486209",
+    "supplierTitle": null,
+    "managementMode": "SOURCE_MANAGED",
+    "seoDescription": null,
+    "shortDescription": null
+  },
+  "originalDescription": null,
+  "previousEventOverride": "«Найк Борзов \"Большой Новогодний концерт\"» в Екатеринбурге.\n\n## Практическая информация\n\n- Место - Концерт-холл \"Свобода\", Екатеринбург\n- Адрес - ул. Черкасская, 12\n- Продолжительность - около 150 минут\n- Возрастное ограничение - 16+\n- Билеты - от 2 500 ₽\n\nБилеты продаются онлайн. Оплата на сайте, электронный билет приходит на почту.",
+  "activeSessions": [
+    {
+      "startsAt": "2027-01-02T14:00:00",
+      "endsAt": "2027-01-02T16:30:00",
+      "priceFromRub": 2500
+    }
+  ],
+  "activeOffers": [
+    {
+      "title": "VIР балкон, 2 уровень",
+      "priceRub": 6000
+    },
+    {
+      "title": "VIР балкон, 2 уровень",
+      "priceRub": 7000
+    },
+    {
+      "title": "VIР балкон, 2 уровень",
+      "priceRub": 6500
+    },
+    {
+      "title": "VIР балкон, 2 уровень",
+      "priceRub": 5000
+    },
+    {
+      "title": "VIР балкон, 3 уровень",
+      "priceRub": 6000
+    },
+    {
+      "title": "VIР балкон, 4 уровень",
+      "priceRub": 5500
+    },
+    {
+      "title": "VIР балкон, 5 уровень",
+      "priceRub": 5000
+    },
+    {
+      "title": "Танцпол",
+      "priceRub": 2500
+    },
+    {
+      "title": "Фан-зона (ранний вход)",
+      "priceRub": 3000
+    }
+  ],
+  "originalEffectiveChars": 336,
+  "rewriteMainChars": 917
+}

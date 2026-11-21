@@ -2,16 +2,36 @@
 .env
 .env.*
 !.env.example
+# Secret files dropped by hand - never commit
+*токен*
+*token*
+*.pem
+*.p12
 
 # Dependencies
 node_modules/
 **/node_modules/
+
+# Archived legacy Vite images; only textual provenance stays in Git.
+apps/public/public/images/**/*.jpg
+apps/public/public/images/**/*.jpeg
+apps/public/public/images/**/*.png
+apps/public/public/images/**/*.webp
+apps/public/public/images/**/*.gif
+apps/public/public/images/**/*.svg
 
 # Build output
 dist/
 **/dist/
 .vite/
 **/.vite/
+apps/web/public/images/**
+!apps/web/public/images/venues/
+apps/web/public/images/venues/**
+!apps/web/public/images/venues/ulyanovsk/
+apps/web/public/images/venues/ulyanovsk/**
+!apps/web/public/images/venues/ulyanovsk/*-generated.png
+!apps/web/public/images/venues/ulyanovsk/*-commons.jpg
 
 # Generated code
 packages/db/src/generated/
@@ -29,6 +49,14 @@ data/*.log
 .agents/
 .codex-screenshots/
 
+# One-off agent/deploy scratch (smoke scripts, patches) — never commit
+.deploy-tmp/
+tmp-*/
+tmp-*.json
+tmp-*.txt
+scripts/tmp-*
+scripts/analyze-seed-thin.*
+
 # Generated supplier snapshots and local SQL dumps
 data/ticketscloud/*.json
 data/db/*.sql
@@ -38,3 +66,28 @@ data/db/*.sql
 Thumbs.db
 .idea/
 .vscode/
+__pycache__/
+*.pyc
+
+# Runtime disk caches (INC.504.4 catalog DTO snapshot)
+var/cache/
+var/deploy-shadow/
+
+# Prod-only runtime and one-off agent scratch (lives on the MSK worktree, never in the repo)
+secrets/
+var/
+tmp/
+backups/
+data/backups/
+.pnpm-store/
+
+# Agent/tool one-off scripts, experimental drafts and backups
+tmp-*.mts
+tmp-*.ts
+*-tmp.ts
+scripts/.tmp-*
+scripts/_*
+packages/db/_*
+docs/drafts/_*
+*.bak-*
+*.bak.*

@@ -1,7 +1,5 @@
 import { createHash, timingSafeEqual } from 'node:crypto';
 import type { IncomingMessage } from 'node:http';
-import type { BackendEnv } from './env.js';
-import { resolveAdminEmail, resolveAdminPasswordHash } from './env.js';
 
 export interface AdminAuthConfig {
   email: string;
@@ -11,13 +9,27 @@ export interface AdminAuthConfig {
   requireAuth: boolean;
 }
 
-export function createAdminAuthConfig(env: BackendEnv): AdminAuthConfig {
+type AdminAuthEnv = {
+  NODE_ENV?: string | undefined;
+  DAIBILET_REQUIRE_ADMIN_AUTH?: string | undefined;
+  ADMIN_EMAIL?: string | undefined;
+  ADMIN_USER?: string | undefined;
+  ADMIN_PASSWORD?: string | undefined;
+  ADMIN_PASSWORD_SHA256?: string | undefined;
+  ADMIN_PASSWORD_HASH?: string | undefined;
+  ADMIN_AUTH_REALM: string;
+};
+
+export function createAdminAuthConfig(env: AdminAuthEnv): AdminAuthConfig {
   return {
-    email: resolveAdminEmail(env),
+    email: env.ADMIN_EMAIL || env.ADMIN_USER || '',
     password: env.ADMIN_PASSWORD || '',
-    passwordHash: resolveAdminPasswordHash(env),
+    passwordHash: env.ADMIN_PASSWORD_SHA256 || env.ADMIN_PASSWORD_HASH || '',
     realm: env.ADMIN_AUTH_REALM,
-    requireAuth: env.NODE_ENV === 'production' || env.DAIBILET_REQUIRE_ADMIN_AUTH === '1',
+    // Fail closed by default. This mirrored the web middleware rule: deriving it
+    // from NODE_ENV meant a restart with NODE_ENV=development silently opened
+    // /api/admin - orders and buyer data. Only an explicit opt-out disables it.
+    requireAuth: env.DAIBILET_REQUIRE_ADMIN_AUTH !== '0',
   };
 }
 
@@ -72,4 +84,3 @@ export function safeEqualString(actual: string, expected: string): boolean {
   const expectedDigest = createHash('sha256').update(String(expected)).digest();
   return timingSafeEqual(actualDigest, expectedDigest);
 }
-

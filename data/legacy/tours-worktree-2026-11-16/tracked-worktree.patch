@@ -1,0 +1,1541 @@
+diff --git a/.env.example b/.env.example
+index e77fca2f4..3656e9656 100644
+--- a/.env.example
++++ b/.env.example
+@@ -29,6 +29,15 @@ TICKETSCLOUD_WIDGET_TOKEN=
+ TICKETSCLOUD_GRPC_ENDPOINT=simple.ticketscloud.com:443
+ TICKETSCLOUD_WIDGET_BASE_URL=https://ticketscloud.org/v1/widgets/common
+ 
++# Notifications for paid Ticketscloud orders (the order sync sends the email)
++TC_ORDER_NOTIFICATION_TO=info@daibilet.ru
++SMTP_HOST=
++SMTP_PORT=587
++SMTP_SECURE=false
++SMTP_USER=
++SMTP_PASS=
++SMTP_FROM=
++
+ # Teplohod: каталог по белому IP, токен не нужен. На проде — https://api.teplohod.info/v1
+ # Локально без allowlist — fixture-bridge: npm run tep:fixture-bridge и TEP_API_URL ниже
+ TEP_API_URL=http://127.0.0.1:8787/v1
+diff --git a/apps/admin/src/pages/EventsPage.tsx b/apps/admin/src/pages/EventsPage.tsx
+index f3a46da3f..3e7fd69eb 100644
+--- a/apps/admin/src/pages/EventsPage.tsx
++++ b/apps/admin/src/pages/EventsPage.tsx
+@@ -3,6 +3,7 @@ import { useSearchParams } from 'react-router-dom';
+ import { AlertTriangle, ArrowRight, CheckCircle2, ExternalLink, EyeOff, Image, Loader2, Save, Search, X } from 'lucide-react';
+ 
+ import { DataTableShell, FilterBar, InfoNote, PageHeader, QuickFilterBar, SourceBadge, StatusBadge } from '@/components/admin/primitives';
++import { PdpEditor } from '@/components/PdpEditor';
+ import { Badge } from '@/components/ui/badge';
+ import { Button } from '@/components/ui/button';
+ import { Input } from '@/components/ui/input';
+@@ -888,6 +889,7 @@ function EventDetailSheet(props: {
+             {tab === 'schedule' ? <ScheduleTab event={event} detail={detail} isLoading={isDetailLoading} /> : null}
+             {tab === 'sales' ? <SalesTab event={event} detail={detail} isLoading={isDetailLoading} /> : null}
+             {tab === 'content' ? <ContentTab event={event} isSaving={isSavingOverride} saveError={saveError} onSave={onSaveOverride} /> : null}
++            {tab === 'content' ? <PdpEditor entity="events" entityId={event.id} /> : null}
+             {tab === 'media' ? <MediaTab event={event} isSaving={isSavingOverride} saveError={saveError} onSave={onSaveOverride} /> : null}
+             {tab === 'seo' ? <SeoTab event={event} isSaving={isSavingOverride} saveError={saveError} onSave={onSaveOverride} /> : null}
+             {tab === 'source' ? <SourceTab event={event} problems={problems} /> : null}
+diff --git a/apps/admin/src/pages/VenuesPage.tsx b/apps/admin/src/pages/VenuesPage.tsx
+index 6b05d6feb..824336623 100644
+--- a/apps/admin/src/pages/VenuesPage.tsx
++++ b/apps/admin/src/pages/VenuesPage.tsx
+@@ -2,6 +2,7 @@ import * as React from 'react';
+ import { Building2, Globe2, Image, Loader2, MapPin, Save, Search, Ticket } from 'lucide-react';
+ 
+ import { DataTableShell, PageHeader, StatusBadge } from '@/components/admin/primitives';
++import { PdpEditor } from '@/components/PdpEditor';
+ import { Badge } from '@/components/ui/badge';
+ import { Button } from '@/components/ui/button';
+ import { Card } from '@/components/ui/card';
+@@ -466,6 +467,7 @@ function VenueSheet(props: {
+                       {!detail.events.length ? <div className="py-6 text-sm text-muted-foreground">Событий пока нет.</div> : null}
+                     </div>
+                   </section>
++                  <PdpEditor entity="venues" entityId={detail.id} />
+                 </div>
+ 
+                 <div className="space-y-4">
+diff --git a/apps/backend/package.json b/apps/backend/package.json
+index b4bd885d1..6f3fd8b1a 100644
+--- a/apps/backend/package.json
++++ b/apps/backend/package.json
+@@ -11,7 +11,7 @@
+     "start:ts": "node dist/server-entry.js",
+     "dev:ts": "tsx src/server-entry.ts",
+     "typecheck": "tsc --noEmit",
+-    "test:ts": "tsx --test src/admin-dashboard.dto.test.ts src/admin-event-change-requests.dto.test.ts src/admin-event-change-requests-handler.test.ts src/admin-sources.dto.test.ts src/event-change-request-applier.test.ts src/event-change-request-payload.test.ts src/event-change-request-review.test.ts src/event-change-request-state.test.ts src/landing-rules.test.ts src/public-catalog.mapper.test.ts src/public-home.dto.test.ts src/public-home-handler.test.ts src/public-warmup.test.ts",
++    "test:ts": "tsx --test src/admin-dashboard.dto.test.ts src/admin-event-change-requests.dto.test.ts src/admin-event-change-requests-handler.test.ts src/admin-sources.dto.test.ts src/event-change-request-applier.test.ts src/event-change-request-payload.test.ts src/event-change-request-review.test.ts src/event-change-request-state.test.ts src/landing-rules.test.ts src/pdp-documents.test.js src/public-catalog.mapper.test.ts src/public-home.dto.test.ts src/public-home-handler.test.ts src/public-warmup.test.ts",
+     "test:integration": "tsx --test src/admin-dashboard.integration.test.ts src/admin-sources.integration.test.ts",
+     "catalog:parity": "tsx scripts/public-catalog-parity.ts",
+     "event:parity": "tsx scripts/public-event-parity.ts",
+@@ -28,7 +28,8 @@
+     "@prisma/adapter-pg": "catalog:",
+     "@prisma/client": "catalog:",
+     "pg": "catalog:",
+-    "zod": "^4.4.3"
++    "zod": "^4.4.3",
++    "nodemailer": "^7.0.13"
+   },
+   "devDependencies": {
+     "@daibilet/config": "workspace:*",
+diff --git a/apps/backend/src/dto.js b/apps/backend/src/dto.js
+index 000f86535..8c323a9a8 100644
+--- a/apps/backend/src/dto.js
++++ b/apps/backend/src/dto.js
+@@ -4125,6 +4125,7 @@ function normalizeVenuePayload(payload) {
+     normalized.pageStatus = value && allowed.has(value) ? value : null;
+   }
+ 
++
+   return normalized;
+ }
+ 
+diff --git a/apps/backend/src/public-city.dto.ts b/apps/backend/src/public-city.dto.ts
+index a3c4ae95b..1334f0ea0 100644
+--- a/apps/backend/src/public-city.dto.ts
++++ b/apps/backend/src/public-city.dto.ts
+@@ -91,11 +91,17 @@ export async function buildPublicCityDto(
+   if (!firstSession) return null;
+   const destination = destinationFromSession(firstSession);
+   const pageSessions = matchedSessions.slice(0, 160);
+-  const [venues, cityRecord] = await Promise.all([
++  const [venues, cityRecord, placeRows] = await Promise.all([
+     publicVenuesForSessions(pageSessions, 24),
+     destination.type === 'city' && firstSession.cityId
+       ? prisma.city.findUnique({ where: { id: firstSession.cityId } })
+       : Promise.resolve(null),
++    destination.type === 'city'
++      ? prisma.venue.findMany({
++        where: { city: { title: destination.name }, isTouristPlace: true, pageStatus: 'PUBLISHED' },
++        include: { city: true }, orderBy: [{ isMainPlace: 'desc' }, { title: 'asc' }], take: 80,
++      })
++      : Promise.resolve([]),
+   ]);
+   const categories = countBy(pageSessions.map((event) => event.category).filter(Boolean));
+   const prices = pageSessions
+@@ -123,6 +129,15 @@ export async function buildPublicCityDto(
+     },
+     sessions: pageSessions,
+     venues,
++    places: placeRows.map((place) => ({
++      id: place.id, slug: place.slug, name: place.title, title: place.title,
++      city: place.city?.title || destination.name, address: place.address,
++      latitude: place.latitude, longitude: place.longitude,
++      type: place.placeType.toLowerCase(), isMainPlace: place.isMainPlace, hubTags: place.hubTags,
++      subtype: place.placeSubtype,
++      description: place.description, shortDescription: place.shortDescription,
++      heroImageUrl: place.heroImageUrl, events: 0, categories: {},
++    })),
+     landings: buildPublicLandings(pageSessions).filter((landing) => landing.events > 0),
+     articles: [],
+     stats: {
+diff --git a/apps/backend/src/public-venue-handler.ts b/apps/backend/src/public-venue-handler.ts
+index 85aa4e513..8ed524dbc 100644
+--- a/apps/backend/src/public-venue-handler.ts
++++ b/apps/backend/src/public-venue-handler.ts
+@@ -5,6 +5,7 @@ import type { TypedRouteHandler } from './validated-handler.js';
+ 
+ export interface PublicVenueHandlerDependencies {
+   enabled: boolean;
++  placesEnabled?: boolean;
+   buildVenues: (forceRefresh?: boolean) => Promise<PublicVenuesDto>;
+   buildVenue: (slugOrId: string, forceRefresh?: boolean) => Promise<PublicVenuePageDto | null>;
+ }
+@@ -13,13 +14,15 @@ export function createPublicVenueRouteHandler(
+   deps: PublicVenueHandlerDependencies,
+ ): TypedRouteHandler {
+   return async (context: RouteContext) => {
+-    if (!deps.enabled || context.method !== 'GET') return false;
++    if (context.method !== 'GET') return false;
++    const isPlacesRoute = context.pathname === '/api/public/places' || context.pathname.startsWith('/api/public/places/');
++    if (isPlacesRoute ? !deps.placesEnabled : !deps.enabled) return false;
+     const forceRefresh = context.searchParams.get('refresh') === '1';
+-    if (context.pathname === '/api/public/venues') {
++    if (context.pathname === '/api/public/venues' || context.pathname === '/api/public/places') {
+       sendJson(context.response, await deps.buildVenues(forceRefresh));
+       return true;
+     }
+-    const match = matchPath(context.pathname, /^\/api\/public\/venues\/([^/]+)$/);
++    const match = matchPath(context.pathname, /^\/api\/public\/(?:venues|places)\/([^/]+)$/);
+     if (!match?.[0]) return false;
+     sendJson(context.response, await deps.buildVenue(match[0], forceRefresh));
+     return true;
+diff --git a/apps/backend/src/public-venue.dto.ts b/apps/backend/src/public-venue.dto.ts
+index 05fcf25df..0159dd81f 100644
+--- a/apps/backend/src/public-venue.dto.ts
++++ b/apps/backend/src/public-venue.dto.ts
+@@ -1,7 +1,8 @@
+-import { prisma } from '@daibilet/db';
++import { prisma, type PlaceType } from '@daibilet/db';
+ import { getPublicCatalogSessions } from './public-catalog.dto.js';
+ import type {
+   PublicSessionDto,
++  PublicPdpDocumentDto,
+   PublicVenueDto,
+   PublicVenuePageDto,
+   PublicVenuesDto,
+@@ -33,12 +34,13 @@ export async function buildPublicVenuesDto(forceRefresh = false): Promise<Public
+   const build = getPublicCatalogSessions(forceRefresh).then(async (sessions) => {
+     const eventCounts = countSessionsByVenue(sessions);
+     const venueIds = [...eventCounts.keys()];
+-    const venues = venueIds.length
+-      ? await prisma.venue.findMany({
+-        where: { id: { in: venueIds }, pageStatus: { not: 'HIDDEN' } },
+-        include: { city: true },
+-      })
+-      : [];
++    const venues = await prisma.venue.findMany({
++      where: { OR: [
++        { id: { in: venueIds }, kind: { notIn: ['MEETING_POINT', 'ONLINE'] } },
++        { isTouristPlace: true, pageStatus: 'PUBLISHED' },
++      ], pageStatus: { not: 'HIDDEN' } },
++      include: { city: true },
++    });
+     const rows = venues
+       .map((venue) => mapVenue(venue, eventCounts.get(venue.id) || 0, {}))
+       .sort((left, right) => right.events - left.events || left.name.localeCompare(right.name, 'ru'));
+@@ -65,24 +67,50 @@ export async function buildPublicVenueDto(
+ 
+   const venue = await prisma.venue.findFirst({
+     where: { OR: [{ slug: venueSlugOrId }, { id: venueSlugOrId }] },
+-    include: { city: true },
++    include: { city: true, parentPlace: { select: { slug: true, title: true } }, pdpDocument: true },
+   });
+-  if (!venue || venue.pageStatus === 'HIDDEN') {
++  if (!venue || venue.pageStatus === 'HIDDEN' || (venue.poiSourceKey && venue.pageStatus !== 'PUBLISHED') ||
++    (!venue.isTouristPlace && ['MEETING_POINT', 'ONLINE'].includes(venue.kind))) {
+     pageCache.set(cacheKey, { expiresAt: Date.now() + PUBLIC_VENUE_CACHE_MS, payload: null });
+     return null;
+   }
+ 
+   const catalogSessions = await getPublicCatalogSessions(forceRefresh);
+-  const sessions = catalogSessions.filter((session) => session.venueId === venue.id).slice(0, 120);
++  const childRows = await prisma.venue.findMany({ where: { parentPlaceId: venue.id }, select: { id: true } });
++  const venueIds = new Set([venue.id, ...childRows.map((row) => row.id)]);
++  const attachedSessions = catalogSessions.filter((session) => session.venueId && venueIds.has(session.venueId)).slice(0, 120);
++  const relatedVenues = await publicRelatedVenues(
++    venue.id, venue.city?.title || null, catalogSessions, 6,
++    venue.pdpDocument?.status === 'READY' ? venue.placeType : null,
++  );
++  const departureRows = venue.pageTemplate === 'PIER_DEPARTURES'
++    ? await prisma.tripDeparture.findMany({
++      where: { departurePlaceId: venue.id, verified: true, session: { isActive: true, startsAt: { gte: new Date() } } },
++      include: { session: true, arrivalPlace: { select: { title: true } } },
++      orderBy: { session: { startsAt: 'asc' } }, take: 100,
++    }) : [];
++  const departures = departureRows.filter((row) => row.departsAt || row.session.startsAt).map((row) => ({
++    sessionId: row.sessionId,
++    departsAt: (row.departsAt || row.session.startsAt)!.toISOString(),
++    arrivalPlaceName: row.arrivalPlace?.title || null,
++  }));
++  const verifiedSessionIds = new Set(departures.map((row) => row.sessionId));
++  const sessions = venue.pageTemplate === 'PIER_DEPARTURES'
++    ? catalogSessions.filter((session) => verifiedSessionIds.has(session.id)).slice(0, 120)
++    : attachedSessions;
+   const categories = countBy(sessions.map((event) => event.category).filter(Boolean));
+   const prices = sessions
+     .map((session) => session.priceFrom)
+     .filter((price): price is number => Number.isFinite(price) && Number(price) >= MIN_DISPLAY_PRICE_RUB);
+-  const relatedVenues = await publicRelatedVenues(venue.id, venue.city?.title || null, catalogSessions, 6);
+   const payload: PublicVenuePageDto = {
+     generatedAt: new Date().toISOString(),
+     venue: mapVenue(venue, sessions.length, categories, false),
++    pdp: venue.pdpDocument?.status === 'READY' ? {
++      variant: venue.pdpDocument.variant,
++      content: venue.pdpDocument.content as unknown as PublicPdpDocumentDto['content'],
++    } : null,
+     sessions,
++    departures,
+     relatedVenues,
+     stats: {
+       events: sessions.length,
+@@ -99,9 +127,19 @@ async function publicRelatedVenues(
+   city: string | null,
+   catalogSessions: PublicSessionDto[],
+   limit: number,
++  placeType: PlaceType | null = null,
+ ): Promise<PublicVenueDto[]> {
+   if (!city) return [];
+   const eventCounts = countSessionsByVenue(catalogSessions);
++  if (placeType) {
++    const venues = await prisma.venue.findMany({
++      where: { id: { not: venueId }, city: { title: city }, placeType, pageStatus: 'PUBLISHED', isTouristPlace: true },
++      include: { city: true },
++      orderBy: [{ isMainPlace: 'desc' }, { title: 'asc' }],
++      take: limit,
++    });
++    return venues.map((venue) => mapVenue(venue, eventCounts.get(venue.id) || 0, {}, true));
++  }
+   const venueIds = [...new Set(
+     catalogSessions
+       .filter((session) => session.venueId && session.venueId !== venueId && session.city === city)
+@@ -141,6 +179,13 @@ function mapVenue(
+     latitude: number | null;
+     longitude: number | null;
+     kind: string;
++    placeType: string;
++    placeSubtype: string | null;
++    pageTemplate: string;
++    placeRoles: string[];
++    isMainPlace: boolean;
++    hubTags: string[];
++    parentPlace?: { slug: string; title: string } | null;
+     pageStatus: string;
+     city: { title: string } | null;
+   },
+@@ -157,7 +202,14 @@ function mapVenue(
+     address: venue.address,
+     latitude: venue.latitude,
+     longitude: venue.longitude,
+-    type: venue.kind.toLowerCase(),
++    type: venue.placeType.toLowerCase(),
++    subtype: venue.placeSubtype,
++    pageTemplate: venue.pageTemplate.toLowerCase() as 'default' | 'pier_departures',
++    roles: venue.placeRoles,
++    isMainPlace: venue.isMainPlace,
++    hubTags: venue.hubTags,
++    parentPlaceSlug: venue.parentPlace?.slug || null,
++    parentPlaceName: venue.parentPlace?.title || null,
+     events,
+     categories,
+   };
+@@ -172,10 +224,10 @@ function mapVenue(
+     shortDescription: venue.shortDescription,
+     heroImageUrl: venue.heroImageUrl,
+     seoH1: venue.seoH1 || venue.title,
+-    seoTitle: venue.seoTitle || `${venue.title}: события и билеты | Дайбилет`,
++    seoTitle: venue.seoTitle || `${venue.title}: как посетить и что посмотреть | Дайбилет`,
+     seoDescription: venue.seoDescription ||
+-      `${venue.title}${cityLabel}: афиша событий, ближайшие даты, цены и билеты.`,
+-    canonicalPath: venue.canonicalPath || `/venues/${venue.slug}`,
++      `${venue.title}${cityLabel}: описание места, адрес, карта и актуальные события.`,
++    canonicalPath: venue.canonicalPath || `/places/${venue.slug}`,
+     isIndexable: venue.isIndexable,
+   };
+ }
+diff --git a/apps/backend/src/server-entry.ts b/apps/backend/src/server-entry.ts
+index 45a11fbdf..fede6a162 100644
+--- a/apps/backend/src/server-entry.ts
++++ b/apps/backend/src/server-entry.ts
+@@ -103,6 +103,7 @@ const server = startServer({
+       }),
+       createPublicVenueRouteHandler({
+         enabled: publicFlags.venue,
++        placesEnabled: true,
+         buildVenues: buildPublicVenuesDto,
+         buildVenue: buildPublicVenueDto,
+       }),
+diff --git a/apps/backend/src/server.js b/apps/backend/src/server.js
+index 241ffc56a..ed61836a8 100644
+--- a/apps/backend/src/server.js
++++ b/apps/backend/src/server.js
+@@ -6,6 +6,7 @@ import { readFileSync } from 'node:fs';
+ import path from 'node:path';
+ import { fileURLToPath, pathToFileURL } from 'node:url';
+ import { createDb } from './db.js';
++import { PDP_VARIANTS, readPdpDocument, savePdpDocument } from './pdp-documents.js';
+ import {
+   buildAdminDashboard,
+   buildAdminBuyersList,
+@@ -426,6 +427,23 @@ export async function handleRequest(request, response) {
+       return;
+     }
+ 
++    if (route === 'GET /api/admin/pdp/variants') {
++      sendJson(response, PDP_VARIANTS);
++      return;
++    }
++
++    const pdpMatch = url.pathname.match(/^\/api\/admin\/pdp\/(venues|events)\/([^/]+)$/);
++    if (pdpMatch && (request.method === 'GET' || request.method === 'PUT')) {
++      const entity = pdpMatch[1];
++      const id = decodeURIComponent(pdpMatch[2]);
++      const result = request.method === 'GET'
++        ? await readPdpDocument(db, entity, id)
++        : await savePdpDocument(db, entity, id, await readJsonBody(request));
++      if (request.method === 'PUT') invalidatePublicCaches('pdp document update');
++      sendJson(response, result);
++      return;
++    }
++
+     if (route === 'GET /api/admin/taxonomy') {
+       sendJson(response, await buildAdminTaxonomy(db));
+       return;
+diff --git a/apps/public/src/App.tsx b/apps/public/src/App.tsx
+index 5e5ecf066..5cb0f290f 100644
+--- a/apps/public/src/App.tsx
++++ b/apps/public/src/App.tsx
+@@ -56,7 +56,7 @@ const categoryMeta = [
+ export function App({ dataVersion = 0, routePath, routeSearch = '' }: AppProps) {
+   const pathname = normalizeRoutePath(routePath ?? getBrowserPathname());
+   if (pathname === '/cities') return <CitiesCatalogPage />;
+-  if (pathname === '/venues') return <VenuesCatalogPage />;
++  if (pathname === '/places' || pathname === '/venues') return <VenuesCatalogPage />;
+   if (pathname === '/podborki') return <LandingsCatalogPage />;
+   if (pathname === '/my-orders') return <BuyerOrdersPage />;
+   if (pathname === '/login') return <LoginPage routeSearch={routeSearch} />;
+@@ -70,7 +70,7 @@ export function App({ dataVersion = 0, routePath, routeSearch = '' }: AppProps)
+   if (pathname === '/legal') return <StaticInfoPage kind="legal" />;
+   if (pathname === '/offer') return <StaticInfoPage kind="offer" />;
+ 
+-  const venuePageMatch = pathname.match(/^\/venues\/([^/]+)$/);
++  const venuePageMatch = pathname.match(/^\/(?:places|venues)\/([^/]+)$/);
+   if (venuePageMatch) return <VenuePage slug={decodeURIComponent(venuePageMatch[1])} />;
+ 
+   const cityPageMatch = pathname.match(/^\/cities\/([^/]+)$/);
+diff --git a/apps/public/src/components/CatalogPage.tsx b/apps/public/src/components/CatalogPage.tsx
+index 51bf73dd8..ddfb67ee6 100644
+--- a/apps/public/src/components/CatalogPage.tsx
++++ b/apps/public/src/components/CatalogPage.tsx
+@@ -622,8 +622,8 @@ function CatalogTable({ sessions }: { sessions: PublicSession[] }) {
+                 ) : null}
+               </td>
+               <td className="max-w-[240px] px-4 py-3 align-top text-slate-600">
+-                {session.venueSlug ? (
+-                  <a href={`/venues/${session.venueSlug}`} className="hover:text-primary-700">
++                {session.venueSlug && !['MEETING_POINT', 'ONLINE'].includes(session.venueKind) ? (
++                  <a href={`/places/${session.venueSlug}`} className="hover:text-primary-700">
+                     {session.venue}
+                   </a>
+                 ) : (
+diff --git a/apps/public/src/components/CityPage.tsx b/apps/public/src/components/CityPage.tsx
+index 42a2de4fe..6a634837d 100644
+--- a/apps/public/src/components/CityPage.tsx
++++ b/apps/public/src/components/CityPage.tsx
+@@ -163,7 +163,7 @@ export function CityPage({ slug }: { slug: string }) {
+               </div>
+             </section>
+ 
+-            <MustSeeSection city={city} guide={guide} categories={categories} venues={payload.venues} articles={articleSlots.sights} sessions={payload.sessions} />
++            <MustSeeSection city={city} places={payload.places || []} articles={articleSlots.sights} sessions={payload.sessions} />
+             <PracticeSection city={city} stats={payload.stats} categories={categories} articles={articleSlots.practice} sessions={payload.sessions} />
+ 
+             <section id="more" className="scroll-mt-24 bg-white py-10">
+@@ -398,21 +398,17 @@ function PopularDirections({ city, landings, categories }: { city: PublicCity; l
+ 
+ function MustSeeSection({
+   city,
+-  guide,
+-  categories,
+-  venues,
++  places,
+   articles,
+   sessions,
+ }: {
+   city: PublicCity;
+-  guide: CityInfoEntry | null;
+-  categories: Array<[string, number]>;
+-  venues: PublicVenue[];
++  places: PublicVenue[];
+   articles: PublicArticle[];
+   sessions: PublicSession[];
+ }) {
+-  const places = guide?.mustSee.length ? guide.mustSee : buildFallbackMustSee(city, categories, venues);
+-  if (!places.length) return null;
++  const mainPlaces = places.filter((place) => place.isMainPlace);
++  if (!mainPlaces.length) return null;
+   const cityIn = cityInPrepositional(city);
+ 
+   return (
+@@ -422,18 +418,24 @@ function MustSeeSection({
+         Главные точки и сценарии, с которых удобно начать знакомство с городом. Ниже можно перейти к билетам, расписанию и площадкам.
+       </p>
+       <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+-        {places.slice(0, 6).map((place, index) => (
+-          <div key={`${place.name}:${index}`} className="flex gap-4 rounded-lg bg-white p-5 shadow-[0_10px_28px_rgba(15,23,42,0.06)] transition hover:shadow-[0_16px_34px_rgba(15,23,42,0.1)]">
+-            <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-primary-100 text-lg font-bold text-primary-600">
+-              {index + 1}
+-            </div>
+-            <div>
+-              <h3 className="font-semibold text-slate-950">{place.name}</h3>
+-              <p className="mt-1 text-sm leading-6 text-slate-500">{place.desc}</p>
++        {mainPlaces.slice(0, 6).map((place, index) => (
++          <a key={place.id} href={`/places/${place.slug || place.id}`} className="overflow-hidden rounded-lg bg-white shadow-[0_10px_28px_rgba(15,23,42,0.06)] transition hover:shadow-[0_16px_34px_rgba(15,23,42,0.1)]">
++            {place.heroImageUrl ? (
++              <img src={place.heroImageUrl} alt={place.name} loading="lazy" className="h-44 w-full object-cover" />
++            ) : null}
++            <div className="flex gap-4 p-5">
++              <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-primary-100 text-lg font-bold text-primary-600">
++                {index + 1}
++              </div>
++              <div>
++                <h3 className="font-semibold text-slate-950">{place.name}</h3>
++                <p className="mt-1 line-clamp-3 text-sm leading-6 text-slate-500">{place.shortDescription || place.description}</p>
++              </div>
+             </div>
+-          </div>
++          </a>
+         ))}
+       </div>
++      {places.length > 6 ? <a href={`/places?city=${encodeURIComponent(city.name)}`} className="mt-5 inline-flex text-sm font-semibold text-primary-700 hover:text-primary-800">Все места города <ArrowRight className="ml-1 h-4 w-4" /></a> : null}
+       <EditorialArticleRail title="Гиды по местам" articles={articles} sessions={sessions} className="mt-6" />
+     </section>
+   );
+@@ -486,7 +488,7 @@ function VenueHighlights({ city, venues }: { city: PublicCity; venues: PublicVen
+       </div>
+       <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+         {venues.slice(0, 6).map((venue) => (
+-          <a key={venue.id} href={`/venues/${venue.slug || venue.id}`} className="rounded-lg bg-white p-4 shadow-[0_10px_28px_rgba(15,23,42,0.06)] transition hover:bg-primary-50/60 hover:shadow-[0_16px_34px_rgba(15,23,42,0.1)]">
++          <a key={venue.id} href={`/places/${venue.slug || venue.id}`} className="rounded-lg bg-white p-4 shadow-[0_10px_28px_rgba(15,23,42,0.06)] transition hover:bg-primary-50/60 hover:shadow-[0_16px_34px_rgba(15,23,42,0.1)]">
+             <div className="font-semibold text-slate-950">{venue.name}</div>
+             <div className="mt-2 flex items-center gap-1 text-sm text-slate-500">
+               <MapPin className="h-4 w-4" />
+@@ -858,7 +860,7 @@ function CityEventsTable({ sessions }: { sessions: PublicSession[] }) {
+                 <div className="mt-1 text-xs text-slate-500">{session.tags.slice(0, 2).join(' · ')}</div>
+               </td>
+               <td className="max-w-[240px] px-4 py-3 text-slate-600">
+-                {session.venueSlug ? <a className="font-medium text-primary-600 hover:text-primary-700" href={`/venues/${session.venueSlug}`}>{session.venue}</a> : session.venue}
++                {session.venueSlug && !['MEETING_POINT', 'ONLINE'].includes(session.venueKind) ? <a className="font-medium text-primary-600 hover:text-primary-700" href={`/places/${session.venueSlug}`}>{session.venue}</a> : session.venue}
+               </td>
+               <td className="px-4 py-3 text-slate-600">{session.category}</td>
+               <td className="whitespace-nowrap px-4 py-3 font-semibold text-slate-950">{formatMoney(session.priceFrom)}</td>
+diff --git a/apps/public/src/components/Footer.tsx b/apps/public/src/components/Footer.tsx
+index 738d81f2b..360e6e04f 100644
+--- a/apps/public/src/components/Footer.tsx
++++ b/apps/public/src/components/Footer.tsx
+@@ -19,7 +19,7 @@ const companyLinks = [
+   { label: 'О сервисе', href: '/about' },
+   { label: 'Подборки', href: '/podborki' },
+   { label: 'Города', href: '/cities' },
+-  { label: 'Площадки', href: '/venues' },
++  { label: 'Места', href: '/places' },
+   { label: 'Проверить заказ', href: '/my-orders' },
+   { label: 'Помощь', href: '/help' },
+ ];
+diff --git a/apps/public/src/components/Header.tsx b/apps/public/src/components/Header.tsx
+index 3f2b4ace2..6964cafee 100644
+--- a/apps/public/src/components/Header.tsx
++++ b/apps/public/src/components/Header.tsx
+@@ -9,7 +9,7 @@ const navigation = [
+   { label: 'Каталог', href: '/events' },
+   { label: 'Подборки', href: '/podborki' },
+   { label: 'Города', href: '/cities' },
+-  { label: 'Площадки', href: '/venues' },
++  { label: 'Места', href: '/places' },
+ ];
+ 
+ type HeaderProps = {
+diff --git a/apps/public/src/components/LandingPage.tsx b/apps/public/src/components/LandingPage.tsx
+index b7803cbb9..92479f902 100644
+--- a/apps/public/src/components/LandingPage.tsx
++++ b/apps/public/src/components/LandingPage.tsx
+@@ -2935,7 +2935,7 @@ function LandingEventsTable({ groups }: { groups: EventGroup[] }) {
+                 {group.representative.citySlug ? <a href={`/cities/${group.representative.citySlug}`} className="font-medium text-slate-700 hover:text-primary-700">{group.city}</a> : group.city}
+               </td>
+               <td className="max-w-[240px] px-4 py-3 align-top text-slate-600">
+-                {group.representative.venueSlug ? <a href={`/venues/${group.representative.venueSlug}`} className="hover:text-primary-700">{group.venue}</a> : group.venue}
++                {group.representative.venueSlug && !['MEETING_POINT', 'ONLINE'].includes(group.representative.venueKind) ? <a href={`/places/${group.representative.venueSlug}`} className="hover:text-primary-700">{group.venue}</a> : group.venue}
+               </td>
+               <td className="px-4 py-3 align-top font-semibold text-slate-950">{formatMoney(group.priceFrom)}</td>
+               <td className="px-4 py-3 align-top text-slate-600">{group.vacant ?? '-'}</td>
+diff --git a/apps/public/src/components/VenuePage.tsx b/apps/public/src/components/VenuePage.tsx
+index 73f84e677..685b3cf38 100644
+--- a/apps/public/src/components/VenuePage.tsx
++++ b/apps/public/src/components/VenuePage.tsx
+@@ -41,7 +41,7 @@ export function VenuePage({ slug }: VenuePageProps) {
+   React.useEffect(() => {
+     const controller = new AbortController();
+     setIsLoading(true);
+-    fetch(`${API_BASE_URL}/api/public/venues/${encodeURIComponent(slug)}`, {
++    fetch(`${API_BASE_URL}/api/public/places/${encodeURIComponent(slug)}`, {
+       cache: 'no-store',
+       signal: controller.signal,
+     })
+@@ -100,14 +100,24 @@ export function VenuePage({ slug }: VenuePageProps) {
+ 
+         {venue && payload ? (
+           <>
+-            <VenueHero venue={venue} stats={payload.stats} />
+-            <VenueHubSections venue={venue} stats={payload.stats} sessions={payload.sessions} relatedVenues={payload.relatedVenues} />
+-
+-            <section id="venue-program" className="container-page grid gap-6 py-8 lg:grid-cols-[minmax(0,1fr)_320px]">
++            <VenueHero venue={venue} stats={payload.stats} pdp={payload.pdp} sessionsCount={payload.sessions.length} />
++            {payload.pdp ? <VenueEditorial pdp={payload.pdp} relatedVenues={payload.relatedVenues} /> :
++              <VenueHubSections venue={venue} stats={payload.stats} sessions={payload.sessions} relatedVenues={payload.relatedVenues} />}
++            {venue.pageTemplate === 'pier_departures' ? <section className="container-page py-8">
++              <h2 className="text-2xl font-bold text-slate-950">Ближайшие отправления</h2>
++              {payload.departures?.length ? <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
++                {payload.departures.map((departure) => <div key={`${departure.sessionId}-${departure.departsAt}`} className="rounded-xl border border-slate-200 p-4">
++                  <div className="font-semibold">{new Date(departure.departsAt).toLocaleString('ru-RU', { dateStyle: 'medium', timeStyle: 'short' })}</div>
++                  {departure.arrivalPlaceName ? <div className="mt-1 text-sm text-slate-600">Прибытие: {departure.arrivalPlaceName}</div> : null}
++                </div>)}
++              </div> : <p className="mt-3 text-sm text-slate-600">Подтверждённых отправлений на ближайшие даты нет.</p>}
++            </section> : null}
++
++            {payload.sessions.length > 0 ? <section id="venue-program" className="container-page grid gap-6 py-8 lg:grid-cols-[minmax(0,1fr)_320px]">
+               <div>
+                 <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+                   <div>
+-                    <h2 className="text-2xl font-bold tracking-tight text-slate-950">Расписание и билеты</h2>
++                    <h2 className="text-2xl font-bold tracking-tight text-slate-950">{venue.pageTemplate === 'pier_departures' ? 'Экскурсии с этого причала' : 'Расписание и билеты'}</h2>
+                     <p className="mt-1 text-sm leading-6 text-slate-600">Сначала показываем сегодня, завтра или ближайшую доступную дату; одинаковые сеансы сгруппированы по событию.</p>
+                   </div>
+                   <div className="inline-flex overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+@@ -144,7 +154,7 @@ export function VenuePage({ slug }: VenuePageProps) {
+                   <dl className="mt-4 grid gap-3 text-sm">
+                     <InfoRow label="Город" value={venue.city} />
+                     <InfoRow label="Адрес" value={venueStreetLabel(venue)} />
+-                    <InfoRow label="Тип" value={kindLabel(venue.type)} />
++                    <InfoRow label="Тип" value={subtypeLabel(venue.subtype) || kindLabel(venue.type)} />
+                     <InfoRow label="Событий" value={formatNumber(payload.stats.events)} />
+                     <InfoRow label="Цена" value={formatMoney(payload.stats.priceFrom)} />
+                   </dl>
+@@ -161,7 +171,7 @@ export function VenuePage({ slug }: VenuePageProps) {
+                     <h3 className="text-sm font-semibold text-slate-950">Похожие места</h3>
+                     <div className="mt-3 grid gap-3">
+                       {payload.relatedVenues.map((related) => (
+-                        <a key={related.id} href={`/venues/${related.slug || related.id}`} className="rounded-lg bg-slate-50 p-3 transition hover:bg-primary-50/70">
++                        <a key={related.id} href={`/places/${related.slug || related.id}`} className="rounded-lg bg-slate-50 p-3 transition hover:bg-primary-50/70">
+                           <div className="text-sm font-semibold text-slate-950">{related.name}</div>
+                           <div className="mt-1 text-xs text-slate-500">{formatNumber(related.events)} событий</div>
+                         </a>
+@@ -170,7 +180,7 @@ export function VenuePage({ slug }: VenuePageProps) {
+                   </section>
+                 ) : null}
+               </aside>
+-            </section>
++            </section> : null}
+           </>
+         ) : null}
+       </main>
+@@ -179,47 +189,90 @@ export function VenuePage({ slug }: VenuePageProps) {
+   );
+ }
+ 
+-function VenueHero({ venue, stats }: { venue: PublicVenue; stats: PublicVenuePage['stats'] }) {
++function VenueHero({ venue, stats, pdp, sessionsCount }: { venue: PublicVenue; stats: PublicVenuePage['stats']; pdp?: PublicVenuePage['pdp']; sessionsCount: number }) {
+   const title = venue.seoH1 || venue.title || venue.name;
+   const description =
+-    venue.shortDescription ||
++    pdp?.content.summary || venue.shortDescription ||
+     venue.description ||
+     `${venue.name}: события, экскурсии и ближайшие сеансы в городе ${venue.city}.`;
++  const conversion = pdp?.content.conversion;
++  const conversionHref = conversion?.externalUrl && /^https?:\/\//i.test(conversion.externalUrl)
++    ? conversion.externalUrl
++    : sessionsCount > 0 ? '#venue-program' : null;
++  const showConversion = Boolean(conversion && conversion.primaryAction !== 'none' && conversionHref);
++  const conversionLabel = conversion?.label || (conversion?.primaryAction === 'buy_ticket' ? 'Купить билет' : 'Смотреть события');
+ 
+   return (
+     <section className="border-b border-slate-200 bg-slate-950 text-white">
+-      <div className="container-page grid gap-8 py-8 lg:grid-cols-[minmax(0,1fr)_380px] lg:items-end lg:py-12">
++      <div className={`container-page grid gap-8 py-8 lg:items-end lg:py-12 ${venue.heroImageUrl ? 'lg:grid-cols-[minmax(0,1fr)_380px]' : ''}`}>
+         <div>
+-          <button type="button" onClick={() => navigateHome('venues')} className="mb-5 inline-flex items-center gap-2 text-sm font-semibold text-white/70 hover:text-white">
++          <a href="/places" className="mb-5 inline-flex items-center gap-2 text-sm font-semibold text-white/70 hover:text-white">
+             <ArrowLeft className="h-4 w-4" />
+             Все места
+-          </button>
++          </a>
+           <div className="mb-4 flex flex-wrap gap-2">
+             <span className="rounded-full bg-white/10 px-3 py-1 text-xs font-semibold text-white/85">{kindLabel(venue.type)}</span>
++            {venue.isMainPlace ? <span className="rounded-full bg-white/10 px-3 py-1 text-xs font-semibold text-white/85">Главные места</span> : null}
++            {venue.hubTags?.includes('gastro') ? <span className="rounded-full bg-white/10 px-3 py-1 text-xs font-semibold text-white/85">Гастро</span> : null}
+             <span className="rounded-full bg-white/10 px-3 py-1 text-xs font-semibold text-white/85">{venue.city}</span>
+           </div>
++          {venue.parentPlaceSlug ? <a href={`/places/${venue.parentPlaceSlug}`} className="text-sm text-white/75 hover:text-white">В составе: {venue.parentPlaceName}</a> : null}
+           <h1 className="max-w-4xl text-4xl font-bold tracking-tight sm:text-5xl">{title}</h1>
+           <p className="mt-4 max-w-3xl text-base leading-7 text-white/72">{description}</p>
+           <div className="mt-6 flex flex-wrap gap-3">
+-            <StatChip icon={<CalendarDays className="h-4 w-4" />} label={`${formatNumber(stats.events)} событий`} />
+-            <StatChip icon={<Ticket className="h-4 w-4" />} label={formatMoney(stats.priceFrom)} />
++            {stats.events > 0 ? <StatChip icon={<CalendarDays className="h-4 w-4" />} label={`${formatNumber(stats.events)} событий`} /> : null}
++            {stats.priceFrom ? <StatChip icon={<Ticket className="h-4 w-4" />} label={formatMoney(stats.priceFrom)} /> : null}
+             <StatChip icon={<MapPin className="h-4 w-4" />} label={venueStreetLabel(venue)} />
+           </div>
++          {showConversion ? <a href={conversionHref!} target={conversionHref!.startsWith('http') ? '_blank' : undefined} rel={conversionHref!.startsWith('http') ? 'noopener noreferrer' : undefined} className="mt-6 inline-flex items-center gap-2 rounded-lg bg-primary-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-primary-700">
++            <Ticket className="h-4 w-4" />{conversionLabel}
++          </a> : null}
+         </div>
+-        <div className="aspect-[4/3] overflow-hidden rounded-xl border border-white/10 bg-white/10">
+-          {venue.heroImageUrl ? (
+-            <img src={venue.heroImageUrl} alt="" className="h-full w-full object-cover" />
+-          ) : (
+-            <div className="flex h-full items-center justify-center bg-[radial-gradient(circle_at_top,_rgba(255,255,255,0.22),_rgba(255,255,255,0.04))] text-sm text-white/62">
+-              {venue.name}
+-            </div>
+-          )}
+-        </div>
++        {venue.heroImageUrl ? <div className="aspect-[4/3] overflow-hidden rounded-xl border border-white/10 bg-white/10">
++          <img src={venue.heroImageUrl} alt={`Вид на ${venue.name}`} className="h-full w-full object-cover" />
++        </div> : null}
+       </div>
+     </section>
+   );
+ }
+ 
++function VenueEditorial({ pdp, relatedVenues }: { pdp: NonNullable<PublicVenuePage['pdp']>; relatedVenues: PublicVenue[] }) {
++  const { facts, sections, sources, gallery } = pdp.content;
++  const visibleSections = sections.filter((section) => section.body || section.items.length);
++  return <div className="container-page space-y-10 py-10">
++    {gallery.length ? <section aria-label="Фотографии места" className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
++      {gallery.map((photo, index) => <figure key={`${photo.url}-${index}`} className="overflow-hidden rounded-xl bg-slate-50">
++        <img src={photo.url} alt={photo.alt} loading="lazy" className="aspect-[4/3] w-full object-cover" />
++        {photo.caption || photo.credit ? <figcaption className="p-3 text-xs text-slate-600">{photo.caption}{photo.credit ? ` · ${photo.credit}` : ''}</figcaption> : null}
++      </figure>)}
++    </section> : null}
++    {facts.length ? <section><h2 className="mb-4 text-2xl font-bold">Важные факты</h2><dl className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
++      {facts.map((fact, index) => <div key={`${fact.label}-${index}`} className="rounded-xl bg-slate-50 p-4">
++        <dt className="text-xs font-medium text-slate-500">{fact.label}</dt><dd className="mt-1 text-sm font-semibold text-slate-950">{fact.value}</dd>
++        {safeEditorialHref(fact.sourceUrl) ? <a href={fact.sourceUrl} target="_blank" rel="noopener noreferrer" className="mt-2 inline-block text-xs text-primary-700">Источник ↗</a> : null}
++      </div>)}
++    </dl></section> : null}
++    {visibleSections.map((section) => <section key={section.id} className="border-t border-slate-100 pt-8">
++      <h2 className="text-2xl font-bold text-slate-950">{section.title || section.kind}</h2>
++      {section.body ? <p className="mt-4 max-w-4xl whitespace-pre-line text-base leading-7 text-slate-700">{section.body}</p> : null}
++      {section.items.length ? <div className="mt-5 grid gap-4 md:grid-cols-2 lg:grid-cols-3">{section.items.map((item, index) => <article key={`${item.title}-${index}`} className="overflow-hidden rounded-xl border border-slate-200 p-4">
++        {safeEditorialHref(item.imageUrl) ? <img src={item.imageUrl} alt="" loading="lazy" className="mb-4 aspect-[4/3] w-full rounded-lg object-cover" /> : null}
++        <h3 className="font-semibold text-slate-950">{item.title}</h3>
++        {item.meta ? <p className="mt-1 text-xs text-slate-500">{item.meta}</p> : null}
++        {item.description ? <p className="mt-2 whitespace-pre-line text-sm leading-6 text-slate-600">{item.description}</p> : null}
++        {item.details.length ? <dl className="mt-3 space-y-1 text-xs text-slate-600">{item.details.map((detail, detailIndex) => <div key={detailIndex}><dt className="inline font-semibold">{detail.label}: </dt><dd className="inline">{detail.value}</dd></div>)}</dl> : null}
++        {safeEditorialHref(item.linkUrl) ? <a href={item.linkUrl} target="_blank" rel="noopener noreferrer" className="mt-3 inline-block text-sm font-semibold text-primary-700">Подробнее ↗</a> : null}
++      </article>)}</div> : null}
++    </section>)}
++    {sources.length ? <section className="border-t border-slate-100 pt-8"><h2 className="text-xl font-bold">Источники</h2><ul className="mt-3 space-y-2 text-sm">{sources.map((source, index) => <li key={`${source.url}-${index}`}>{safeEditorialHref(source.url) ? <a href={source.url} target="_blank" rel="noopener noreferrer" className="text-primary-700 hover:underline">{source.title} ↗</a> : source.title}{source.checkedAt ? <span className="ml-2 text-xs text-slate-500">проверено {source.checkedAt}</span> : null}</li>)}</ul></section> : null}
++    {relatedVenues.length ? <section className="border-t border-slate-100 pt-8"><h2 className="text-xl font-bold">Похожие места</h2><div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">{relatedVenues.map((related) => <a key={related.id} href={`/places/${related.slug || related.id}`} className="rounded-lg bg-slate-50 p-4 font-semibold hover:bg-primary-50">{related.name}</a>)}</div></section> : null}
++  </div>;
++}
++
++function safeEditorialHref(value?: string | null): boolean {
++  return Boolean(value && /^https?:\/\//i.test(value));
++}
++
+ function VenueHubSections({
+   venue,
+   stats,
+@@ -251,15 +304,15 @@ function VenueHubSections({
+             </p>
+           </div>
+           <div className="grid gap-3 rounded-xl bg-slate-50 p-4">
+-            <HubFact label="Тип" value={kindLabel(venue.type)} />
++            <HubFact label="Тип" value={subtypeLabel(venue.subtype) || kindLabel(venue.type)} />
+             <HubFact label="Локация" value={venue.city} />
+-            <HubFact label="В программе" value={`${formatNumber(stats.events)} событий`} />
++            {stats.events > 0 ? <HubFact label="В программе" value={`${formatNumber(stats.events)} событий`} /> : null}
+           </div>
+         </section>
+ 
+         <section className="grid gap-4 md:grid-cols-3">
+           <InfoCard title="О месте" text={venue.shortDescription || venue.description || `${venue.name} — место в ${venue.city}. Здесь собраны ближайшие события, доступные сеансы и ссылки на покупку у билетного оператора.`} />
+-          <InfoCard title="Как выбрать" text={categories.length ? `Сначала выберите направление: ${categories.slice(0, 3).map(([name]) => name).join(', ')}. Затем сравните дату, цену и остаток мест в таблице.` : 'Выберите ближайший сеанс в расписании и перейдите к покупке через виджет билетной системы.'} />
++          {stats.events > 0 ? <InfoCard title="Афиша" text={categories.length ? `Доступные направления: ${categories.slice(0, 3).map(([name]) => name).join(', ')}. Ниже можно выбрать дату и событие.` : 'Ниже показаны ближайшие события и билеты.'} /> : null}
+           <InfoCard title="Как посетить" text={streetAddress ? `Адрес: ${streetAddress}. ${hasMap ? 'Можно открыть точку на карте и построить маршрут.' : 'Координаты пока не указаны, адрес лучше проверить перед посещением.'}` : 'Адрес пока уточняется поставщиком. Перед покупкой проверьте детали в карточке события.'} />
+         </section>
+ 
+@@ -294,7 +347,7 @@ function VenueHubSections({
+           </section>
+         ) : null}
+ 
+-        <section className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_320px]">
++        {stats.events > 0 ? <section className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_320px]">
+           <div className="rounded-xl bg-white p-5 shadow-[0_10px_28px_rgba(15,23,42,0.06)]">
+             <h2 className="text-2xl font-bold text-slate-950">Вопросы перед посещением</h2>
+             <div className="mt-4 grid gap-2">
+@@ -308,7 +361,7 @@ function VenueHubSections({
+               <h2 className="text-lg font-bold text-slate-950">Похожие места</h2>
+               <div className="mt-3 grid gap-3">
+                 {relatedVenues.slice(0, 4).map((related) => (
+-                  <a key={related.id} href={`/venues/${related.slug || related.id}`} className="rounded-lg bg-slate-50 p-3 transition hover:bg-primary-50/70">
++                  <a key={related.id} href={`/places/${related.slug || related.id}`} className="rounded-lg bg-slate-50 p-3 transition hover:bg-primary-50/70">
+                     <div className="text-sm font-semibold text-slate-950">{related.name}</div>
+                     <div className="mt-1 text-xs text-slate-500">{formatNumber(related.events)} событий</div>
+                   </a>
+@@ -316,7 +369,7 @@ function VenueHubSections({
+               </div>
+             </div>
+           ) : null}
+-        </section>
++        </section> : null}
+       </div>
+     </div>
+   );
+@@ -611,6 +664,9 @@ function venueStreetLabel(venue: PublicVenue): string {
+ function kindLabel(kind?: string | null) {
+   const normalized = String(kind || 'other').toLowerCase();
+   const labels: Record<string, string> = {
++    architecture: 'Архитектура', monument: 'Памятник', museum: 'Музей', religion: 'Религия',
++    nature: 'Природа', urban: 'Городское пространство', theatre: 'Театр', entertainment: 'Развлечения',
++    food: 'Еда', transport: 'Транспорт',
+     venue: 'Место',
+     museum_art_space: 'Музей / арт',
+     theater: 'Театр',
+@@ -627,6 +683,19 @@ function kindLabel(kind?: string | null) {
+   return labels[normalized] || labels.other;
+ }
+ 
++function subtypeLabel(subtype?: string | null): string | null {
++  const labels: Record<string, string> = {
++    waterfall: 'Водопад', cave: 'Пещера', mountain: 'Гора и хребет', lake: 'Озеро',
++    river: 'Река', beach: 'Пляж', forest: 'Лес', hot_spring: 'Термальный источник',
++    island: 'Остров', cape: 'Мыс', reserve: 'Заповедник', park: 'Парк и сад',
++    natural_site: 'Природная достопримечательность', pier: 'Причал',
++    railway_station: 'Железнодорожный вокзал', river_terminal: 'Речной или морской вокзал',
++    station: 'Вокзал и станция', funicular: 'Фуникулёр и канатная дорога',
++    railway: 'Железная дорога', lighthouse: 'Маяк', transport_site: 'Транспортный объект',
++  };
++  return subtype ? labels[subtype] || null : null;
++}
++
+ function navigateHome(section: string) {
+   if (section === 'top') {
+     window.location.href = '/';
+diff --git a/apps/public/src/components/VenuesCatalogPage.tsx b/apps/public/src/components/VenuesCatalogPage.tsx
+index 0618696d4..53224fa8c 100644
+--- a/apps/public/src/components/VenuesCatalogPage.tsx
++++ b/apps/public/src/components/VenuesCatalogPage.tsx
+@@ -6,27 +6,28 @@ import { Header } from '@/components/Header';
+ import { API_BASE_URL } from '@/lib/api-base';
+ import type { PublicVenue } from '@/types';
+ 
+-type SortMode = 'events' | 'asc' | 'desc';
++type SortMode = 'featured' | 'events' | 'asc' | 'desc';
+ 
+ export function VenuesCatalogPage() {
+   const [venues, setVenues] = React.useState<PublicVenue[]>([]);
+   const [query, setQuery] = React.useState('');
+-  const [city, setCity] = React.useState('all');
++  const [city, setCity] = React.useState(() => new URLSearchParams(window.location.search).get('city') || 'all');
+   const [kind, setKind] = React.useState('all');
+-  const [sortMode, setSortMode] = React.useState<SortMode>('events');
++  const [subtype, setSubtype] = React.useState('all');
++  const [sortMode, setSortMode] = React.useState<SortMode>('featured');
+   const [visible, setVisible] = React.useState(48);
+   const [isLoading, setIsLoading] = React.useState(true);
+   const [error, setError] = React.useState<string | null>(null);
+ 
+   React.useEffect(() => {
+-    document.title = 'Площадки России: афиша и билеты | Дайбилет';
+-    upsertMeta('description', 'Театры, музеи, концертные залы, причалы и другие площадки. Афиша, ближайшие события, цены и билеты.');
++    document.title = 'Места России: достопримечательности и афиша | Дайбилет';
++    upsertMeta('description', 'Музеи, парки, архитектура, городские пространства и площадки событий. Места и афиша в одном каталоге.');
+   }, []);
+ 
+   React.useEffect(() => {
+     const controller = new AbortController();
+     const timeout = window.setTimeout(() => controller.abort(), 15000);
+-    fetch(`${API_BASE_URL}/api/public/venues`, { cache: 'no-store', signal: controller.signal })
++    fetch(`${API_BASE_URL}/api/public/places`, { cache: 'no-store', signal: controller.signal })
+       .then(async (response) => {
+         if (!response.ok) throw new Error(`HTTP ${response.status}`);
+         return (await response.json()) as { venues?: PublicVenue[] };
+@@ -50,11 +51,13 @@ export function VenuesCatalogPage() {
+ 
+   const cities = React.useMemo(() => uniqueSorted(venues.map((venue) => venue.city).filter((value) => value !== 'Не указан')), [venues]);
+   const kinds = React.useMemo(() => uniqueSorted(venues.map((venue) => venue.type)), [venues]);
++  const subtypes = React.useMemo(() => uniqueSorted(venues.filter((venue) => kind === 'all' || venue.type === kind).map((venue) => venue.subtype || '').filter(Boolean)), [venues, kind]);
+   const filtered = React.useMemo(() => {
+     const normalized = query.trim().toLowerCase();
+     const rows = venues.filter((venue) => {
+       if (city !== 'all' && venue.city !== city) return false;
+       if (kind !== 'all' && venue.type !== kind) return false;
++      if (subtype !== 'all' && venue.subtype !== subtype) return false;
+       if (!normalized) return true;
+       return [venue.name, venue.city, venue.address, kindLabel(venue.type)]
+         .filter(Boolean)
+@@ -63,13 +66,14 @@ export function VenuesCatalogPage() {
+         .includes(normalized);
+     });
+     return [...rows].sort((left, right) => {
++      if (sortMode === 'featured') return Number(Boolean(right.isMainPlace)) - Number(Boolean(left.isMainPlace)) || right.events - left.events || left.name.localeCompare(right.name, 'ru');
+       if (sortMode === 'events') return right.events - left.events || left.name.localeCompare(right.name, 'ru');
+       const comparison = left.name.localeCompare(right.name, 'ru');
+       return sortMode === 'asc' ? comparison : -comparison;
+     });
+-  }, [city, kind, query, sortMode, venues]);
++  }, [city, kind, subtype, query, sortMode, venues]);
+ 
+-  React.useEffect(() => setVisible(48), [city, kind, query, sortMode]);
++  React.useEffect(() => setVisible(48), [city, kind, subtype, query, sortMode]);
+ 
+   const goSection = (section: string) => {
+     if (section === 'top') window.location.href = '/';
+@@ -87,9 +91,9 @@ export function VenuesCatalogPage() {
+           <div className="container-page py-10 sm:py-12">
+             <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+               <div>
+-                <h1 className="text-3xl font-bold text-slate-950">Площадки</h1>
++                <h1 className="text-3xl font-bold text-slate-950">Места</h1>
+                 <p className="mt-2 max-w-3xl text-base leading-7 text-slate-600">
+-                  Театры, музеи, концертные залы, причалы и места встреч с актуальной афишей.
++                  Достопримечательности, музеи, парки, еда и площадки с актуальной афишей.
+                 </p>
+               </div>
+               <div className="text-sm text-slate-500">{formatVenues(filtered.length)}</div>
+@@ -98,7 +102,7 @@ export function VenuesCatalogPage() {
+         </section>
+ 
+         <section className="sticky top-16 z-30 border-b border-slate-200 bg-white/95 backdrop-blur">
+-          <div className="container-page grid gap-3 py-4 lg:grid-cols-[minmax(260px,1fr)_220px_220px_auto]">
++          <div className="container-page grid gap-3 py-4 lg:grid-cols-[minmax(260px,1fr)_170px_170px_180px_auto]">
+             <label className="flex h-11 min-w-0 items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 focus-within:border-primary-400">
+               <Search className="h-4 w-4 shrink-0 text-slate-400" />
+               <input value={query} onChange={(event) => setQuery(event.target.value)} className="min-w-0 flex-1 border-0 bg-transparent text-sm outline-none" placeholder="Название, адрес или город" />
+@@ -107,11 +111,16 @@ export function VenuesCatalogPage() {
+               <option value="all">Все города</option>
+               {cities.map((value) => <option key={value} value={value}>{value}</option>)}
+             </select>
+-            <select value={kind} onChange={(event) => setKind(event.target.value)} className="h-11 rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-700">
++            <select value={kind} onChange={(event) => { setKind(event.target.value); setSubtype('all'); }} className="h-11 rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-700">
+               <option value="all">Все типы</option>
+               {kinds.map((value) => <option key={value} value={value}>{kindLabel(value)}</option>)}
+             </select>
++            <select value={subtype} onChange={(event) => setSubtype(event.target.value)} disabled={!subtypes.length} className="h-11 rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-700 disabled:opacity-50">
++              <option value="all">Все подтипы</option>
++              {subtypes.map((value) => <option key={value} value={value}>{subtypeLabel(value)}</option>)}
++            </select>
+             <div className="inline-flex h-11 rounded-lg border border-slate-200 bg-white p-0.5">
++              <SortButton active={sortMode === 'featured'} label="Главные" onClick={() => setSortMode('featured')} icon={<Building2 className="h-4 w-4" />} />
+               <SortButton active={sortMode === 'events'} label="По событиям" onClick={() => setSortMode('events')} icon={<CalendarDays className="h-4 w-4" />} />
+               <SortButton active={sortMode === 'asc'} label="А-Я" onClick={() => setSortMode('asc')} icon={<ArrowDownAZ className="h-4 w-4" />} />
+               <SortButton active={sortMode === 'desc'} label="Я-А" onClick={() => setSortMode('desc')} icon={<ArrowUpAZ className="h-4 w-4" />} />
+@@ -120,24 +129,24 @@ export function VenuesCatalogPage() {
+         </section>
+ 
+         <section className="container-page py-8">
+-          {isLoading ? <div className="py-20 text-center text-slate-500">Загружаем площадки...</div> : null}
+-          {!isLoading && error ? <div className="py-20 text-center text-rose-600">Не удалось загрузить площадки: {error}</div> : null}
+-          {!isLoading && !error && !filtered.length ? <div className="py-20 text-center text-slate-500">Площадки не найдены</div> : null}
++          {isLoading ? <div className="py-20 text-center text-slate-500">Загружаем места...</div> : null}
++          {!isLoading && error ? <div className="py-20 text-center text-rose-600">Не удалось загрузить места: {error}</div> : null}
++          {!isLoading && !error && !filtered.length ? <div className="py-20 text-center text-slate-500">Места не найдены</div> : null}
+ 
+           {filtered.length ? (
+             <div className="grid gap-px overflow-hidden rounded-lg border border-slate-200 bg-slate-200 sm:grid-cols-2 xl:grid-cols-3">
+               {filtered.slice(0, visible).map((venue) => (
+-                <a key={venue.id} href={`/venues/${venue.slug || venue.id}`} className="group flex min-h-44 flex-col bg-white p-5 transition-colors hover:bg-primary-50/40">
++                <a key={venue.id} href={`/places/${venue.slug || venue.id}`} className="group flex min-h-44 flex-col bg-white p-5 transition-colors hover:bg-primary-50/40">
+                   <div className="flex items-start justify-between gap-4">
+                     <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-slate-100 text-slate-500 group-hover:bg-primary-100 group-hover:text-primary-700">
+                       <Building2 className="h-5 w-5" />
+                     </div>
+-                    <span className="text-sm font-semibold text-primary-700">{formatEvents(venue.events)}</span>
++                    <span className="text-sm font-semibold text-primary-700">{venue.isMainPlace ? 'Главные места' : venue.events ? formatEvents(venue.events) : kindLabel(venue.type)}</span>
+                   </div>
+                   <h2 className="mt-4 line-clamp-2 text-lg font-semibold text-slate-950">{venue.name}</h2>
+                   <div className="mt-auto pt-4 text-sm text-slate-500">
+                     <div className="flex items-center gap-2"><MapPin className="h-4 w-4 shrink-0" /><span className="truncate">{venue.city}</span></div>
+-                    <div className="mt-1.5 truncate text-xs text-slate-400">{venue.address || kindLabel(venue.type)}</div>
++                    <div className="mt-1.5 truncate text-xs text-slate-400">{subtypeLabel(venue.subtype) || kindLabel(venue.type)} · {venue.address || 'Адрес уточняется'}</div>
+                   </div>
+                 </a>
+               ))}
+@@ -170,13 +179,25 @@ function uniqueSorted(values: string[]): string[] {
+ 
+ function kindLabel(value: string): string {
+   const labels: Record<string, string> = {
+-    venue: 'Площадка', museum_art_space: 'Музей и арт-пространство', theater: 'Театр', concert_hall: 'Концертный зал',
+-    club_bar_restaurant: 'Клуб, бар или ресторан', pier: 'Причал', meeting_point: 'Место встречи',
+-    outdoor_location: 'Открытая локация', sport_activity_space: 'Спортивная площадка', attraction: 'Достопримечательность', online: 'Онлайн', other: 'Другое',
++    architecture: 'Архитектура', monument: 'Памятник', museum: 'Музей', religion: 'Религия',
++    nature: 'Природа', urban: 'Городское пространство', theatre: 'Театр', entertainment: 'Развлечения',
++    food: 'Еда', transport: 'Транспорт', venue: 'Площадка', other: 'Другое',
+   };
+   return labels[value] || 'Площадка';
+ }
+ 
++function subtypeLabel(value?: string | null): string | null {
++  const labels: Record<string, string> = {
++    waterfall: 'Водопад', cave: 'Пещера', mountain: 'Гора и хребет', lake: 'Озеро',
++    river: 'Река', beach: 'Пляж', forest: 'Лес', hot_spring: 'Термальный источник',
++    island: 'Остров', cape: 'Мыс', reserve: 'Заповедник', park: 'Парк и сад',
++    natural_site: 'Природное место', pier: 'Причал', railway_station: 'Железнодорожный вокзал',
++    river_terminal: 'Речной или морской вокзал', station: 'Станция', funicular: 'Фуникулёр',
++    railway: 'Железная дорога', lighthouse: 'Маяк', transport_site: 'Транспортный объект',
++  };
++  return value ? labels[value] || value : null;
++}
++
+ function formatEvents(value: number): string {
+   const mod10 = value % 10;
+   const mod100 = value % 100;
+@@ -189,10 +210,10 @@ function formatEvents(value: number): string {
+ function formatVenues(value: number): string {
+   const mod10 = value % 10;
+   const mod100 = value % 100;
+-  if (mod100 >= 11 && mod100 <= 19) return `${value} площадок`;
+-  if (mod10 === 1) return `${value} площадка`;
+-  if (mod10 >= 2 && mod10 <= 4) return `${value} площадки`;
+-  return `${value} площадок`;
++  if (mod100 >= 11 && mod100 <= 19) return `${value} мест`;
++  if (mod10 === 1) return `${value} место`;
++  if (mod10 >= 2 && mod10 <= 4) return `${value} места`;
++  return `${value} мест`;
+ }
+ 
+ function upsertMeta(name: string, content: string) {
+diff --git a/apps/public/src/server/public-hubs.ts b/apps/public/src/server/public-hubs.ts
+index 05f3df2af..5b2f41944 100644
+--- a/apps/public/src/server/public-hubs.ts
++++ b/apps/public/src/server/public-hubs.ts
+@@ -139,7 +139,7 @@ export async function buildNextPublicCityPage(slugOrId: string, forceRefresh = f
+ 
+   const sessions = matched.slice(0, CITY_PAGE_LIMIT);
+   const destination = destinationFromSession(sessions[0]);
+-  const [venues, cityRecord, articles] = await Promise.all([
++  const [venues, cityRecord, articles, placeRows] = await Promise.all([
+     venuesForSessions(sessions, CITY_VENUE_LIMIT),
+     destination.type === 'city' && sessions[0].cityId
+       ? prisma.city.findUnique({
+@@ -154,6 +154,12 @@ export async function buildNextPublicCityPage(slugOrId: string, forceRefresh = f
+       })
+       : Promise.resolve(null),
+     publicArticlesForCityHub(CITY_ARTICLE_LIMIT),
++    destination.type === 'city'
++      ? prisma.venue.findMany({
++        where: { city: { title: destination.name }, isTouristPlace: true, pageStatus: 'PUBLISHED' },
++        select: venueSelect, orderBy: [{ isMainPlace: 'desc' }, { title: 'asc' }], take: 80,
++      })
++      : Promise.resolve([]),
+   ]);
+   const categories = countBy(sessions.map((session) => session.category).filter(Boolean));
+   const prices = displayPrices(sessions.map((session) => session.priceFrom));
+@@ -179,6 +185,7 @@ export async function buildNextPublicCityPage(slugOrId: string, forceRefresh = f
+     },
+     sessions,
+     venues,
++    places: placeRows.map((place) => mapVenue(place, [], { compact: true })),
+     landings: buildLandingCards(sessions).filter((landing) => landing.events > 0),
+     articles,
+     stats: {
+@@ -200,12 +207,13 @@ export async function buildNextPublicVenues(forceRefresh = false): Promise<Publi
+   const build = getNextPublicCatalogSessions(forceRefresh).then(async (sessions) => {
+     const sessionsByVenue = bucketSessionsByVenue(sessions);
+     const venueIds = [...sessionsByVenue.keys()];
+-    const venueRows = venueIds.length
+-      ? await prisma.venue.findMany({
+-        where: { id: { in: venueIds }, pageStatus: { not: 'HIDDEN' } },
+-        select: venueSelect,
+-      })
+-      : [];
++    const venueRows = await prisma.venue.findMany({
++      where: { OR: [
++        { id: { in: venueIds }, kind: { notIn: ['MEETING_POINT', 'ONLINE'] } },
++        { isTouristPlace: true, pageStatus: 'PUBLISHED' },
++      ], pageStatus: { not: 'HIDDEN' } },
++      select: venueSelect,
++    });
+     const venues = venueRows
+       .map((venue) => mapVenue(venue, sessionsByVenue.get(venue.id) || [], { compact: true }))
+       .sort((left, right) => right.events - left.events || left.name.localeCompare(right.name, 'ru'));
+@@ -237,13 +245,16 @@ export async function buildNextPublicVenuePage(slugOrId: string, forceRefresh =
+     where: { OR: [{ slug: requested }, { id: requested }] },
+     select: venueSelect,
+   });
+-  if (!venue || String(venue.pageStatus) === 'HIDDEN') {
++  if (!venue || String(venue.pageStatus) === 'HIDDEN' || (venue.poiSourceKey && String(venue.pageStatus) !== 'PUBLISHED') ||
++    (!venue.isTouristPlace && ['MEETING_POINT', 'ONLINE'].includes(String(venue.kind)))) {
+     venuePageCache.set(cacheKey, { expiresAt: Date.now() + CACHE_MS, payload: null });
+     return null;
+   }
+ 
+   const catalogSessions = await getNextPublicCatalogSessions(forceRefresh);
+-  const sessions = catalogSessions.filter((session) => session.venueId === venue.id).slice(0, VENUE_PAGE_LIMIT);
++  const childRows = await prisma.venue.findMany({ where: { parentPlaceId: venue.id }, select: { id: true } });
++  const venueIds = new Set([venue.id, ...childRows.map((row) => row.id)]);
++  const sessions = catalogSessions.filter((session) => session.venueId && venueIds.has(session.venueId)).slice(0, VENUE_PAGE_LIMIT);
+   const categories = countBy(sessions.map((session) => session.category).filter(Boolean));
+   const prices = displayPrices(sessions.map((session) => session.priceFrom));
+   const payload: PublicVenuePageDto = {
+@@ -514,7 +525,14 @@ const venueSelect = {
+   latitude: true,
+   longitude: true,
+   kind: true,
++  placeType: true,
++  placeSubtype: true,
++  isMainPlace: true,
++  isTouristPlace: true,
++  hubTags: true,
++  parentPlace: { select: { slug: true, title: true } },
+   pageStatus: true,
++  poiSourceKey: true,
+   city: { select: { title: true } },
+ } as const;
+ 
+@@ -534,7 +552,14 @@ type VenueRecord = {
+   latitude: number | null;
+   longitude: number | null;
+   kind: unknown;
++  placeType: unknown;
++  placeSubtype: string | null;
++  isMainPlace: boolean;
++  isTouristPlace: boolean;
++  hubTags: string[];
++  parentPlace: { slug: string; title: string } | null;
+   pageStatus: unknown;
++  poiSourceKey: string | null;
+   city: { title: string } | null;
+ };
+ 
+@@ -553,7 +578,12 @@ function mapVenue(
+     address: venue.address,
+     latitude: venue.latitude,
+     longitude: venue.longitude,
+-    type: String(venue.kind || 'OTHER').toLowerCase(),
++    type: String(venue.placeType || 'VENUE').toLowerCase(),
++    subtype: venue.placeSubtype,
++    isMainPlace: venue.isMainPlace,
++    hubTags: venue.hubTags,
++    parentPlaceSlug: venue.parentPlace?.slug || null,
++    parentPlaceName: venue.parentPlace?.title || null,
+     events: sessions.length,
+     categories,
+   };
+@@ -567,9 +597,9 @@ function mapVenue(
+     shortDescription: venue.shortDescription,
+     heroImageUrl: venue.heroImageUrl,
+     seoH1: venue.seoH1 || venue.title,
+-    seoTitle: venue.seoTitle || `${venue.title}: события и билеты | Дайбилет`,
+-    seoDescription: venue.seoDescription || `${venue.title}${cityLabel}: афиша событий, ближайшие даты, цены и билеты.`,
+-    canonicalPath: venue.canonicalPath || `/venues/${venue.slug}`,
++    seoTitle: venue.seoTitle || `${venue.title}: как посетить и что посмотреть | Дайбилет`,
++    seoDescription: venue.seoDescription || `${venue.title}${cityLabel}: описание места, адрес, карта и актуальные события.`,
++    canonicalPath: venue.canonicalPath || `/places/${venue.slug}`,
+     isIndexable: venue.isIndexable,
+   };
+ }
+diff --git a/apps/public/src/server/public-seo.ts b/apps/public/src/server/public-seo.ts
+index 46aae107e..0c6400473 100644
+--- a/apps/public/src/server/public-seo.ts
++++ b/apps/public/src/server/public-seo.ts
+@@ -70,7 +70,7 @@ export async function resolveStructuredData(path: string): Promise<Record<string
+       ];
+     }
+ 
+-    if (section === 'venues' && slug) {
++    if ((section === 'places' || section === 'venues') && slug) {
+       const venue = await prisma.venue.findFirst({
+         where: { slug },
+         select: { title: true, shortDescription: true, description: true, address: true, heroImageUrl: true },
+@@ -140,7 +140,7 @@ async function resolveRouteProfile(path: string): Promise<RouteProfile> {
+       }
+     }
+ 
+-    if (section === 'venues' && slug) {
++    if ((section === 'places' || section === 'venues') && slug) {
+       const venue = await prisma.venue.findFirst({
+         where: { slug },
+         select: {
+@@ -159,9 +159,9 @@ async function resolveRouteProfile(path: string): Promise<RouteProfile> {
+       if (venue) {
+         const seo = await findSeoMeta('VENUE', venue.id);
+         return {
+-          title: seo?.title || venue.seoTitle || `${venue.title}: события и билеты`,
+-          description: excerpt(seo?.description || venue.seoDescription || venue.shortDescription || venue.description || `Афиша площадки ${venue.title}, события и билеты.`),
+-          canonicalPath: seo?.canonicalUrl || venue.canonicalPath || `/venues/${venue.slug}`,
++          title: seo?.title || venue.seoTitle || `${venue.title}: информация о месте`,
++          description: excerpt(seo?.description || venue.seoDescription || venue.shortDescription || venue.description || `Описание и адрес места ${venue.title}.`),
++          canonicalPath: seo?.canonicalUrl || venue.canonicalPath || `/places/${venue.slug}`,
+           robots: seo?.robots || (venue.isIndexable ? 'index,follow' : 'noindex,follow'),
+           imageUrl: seo?.ogImageUrl || venue.heroImageUrl,
+         };
+@@ -275,11 +275,11 @@ function staticRouteProfile(section?: string): RouteProfile {
+       canonicalPath: '/cities',
+     };
+   }
+-  if (section === 'venues') {
++  if (section === 'places' || section === 'venues') {
+     return {
+-      title: 'Площадки России',
+-      description: 'Страницы площадок с афишей, событиями, адресами и полезной информацией для посетителей.',
+-      canonicalPath: '/venues',
++      title: 'Места России',
++      description: 'Достопримечательности, музеи, парки и площадки событий с описаниями и адресами.',
++      canonicalPath: '/places',
+     };
+   }
+   if (section === 'landings' || section === 'podborki') {
+diff --git a/apps/public/src/server/sitemap.ts b/apps/public/src/server/sitemap.ts
+index 5e59b633d..5a58ab1bb 100644
+--- a/apps/public/src/server/sitemap.ts
++++ b/apps/public/src/server/sitemap.ts
+@@ -55,7 +55,7 @@ function staticEntries(): SitemapEntry[] {
+     { loc: absoluteUrl('/'), changefreq: 'hourly', priority: '1.0' },
+     { loc: absoluteUrl('/events'), changefreq: 'hourly', priority: '0.9' },
+     { loc: absoluteUrl('/cities'), changefreq: 'daily', priority: '0.8' },
+-    { loc: absoluteUrl('/venues'), changefreq: 'daily', priority: '0.8' },
++    { loc: absoluteUrl('/places'), changefreq: 'daily', priority: '0.8' },
+     { loc: absoluteUrl('/podborki'), changefreq: 'daily', priority: '0.7' },
+     { loc: absoluteUrl('/help'), changefreq: 'monthly', priority: '0.4' },
+     { loc: absoluteUrl('/about'), changefreq: 'monthly', priority: '0.4' },
+@@ -103,15 +103,18 @@ async function venueEntries(): Promise<SitemapEntry[]> {
+   const venues = await prisma.venue.findMany({
+     where: {
+       isIndexable: true,
+-      pageStatus: { not: 'HIDDEN' },
+-      events: { some: { status: { not: 'HIDDEN' }, isIndexable: true } },
++      pageStatus: 'PUBLISHED',
++      OR: [
++        { isTouristPlace: true },
++        { kind: { notIn: ['MEETING_POINT', 'ONLINE'] }, events: { some: { status: { not: 'HIDDEN' }, isIndexable: true } } },
++      ],
+     },
+     select: { slug: true, updatedAt: true },
+     orderBy: { updatedAt: 'desc' },
+     take: 10000,
+   });
+   return venues.map((venue) => ({
+-    loc: absoluteUrl(`/venues/${venue.slug}`),
++    loc: absoluteUrl(`/places/${venue.slug}`),
+     lastmod: venue.updatedAt.toISOString(),
+     changefreq: 'weekly',
+     priority: '0.6',
+diff --git a/apps/public/src/types.ts b/apps/public/src/types.ts
+index b5e9c420d..9dfb0853c 100644
+--- a/apps/public/src/types.ts
++++ b/apps/public/src/types.ts
+@@ -125,6 +125,13 @@ export type PublicVenue = {
+   latitude?: number | null;
+   longitude?: number | null;
+   type: string;
++  subtype?: string | null;
++  pageTemplate?: 'default' | 'pier_departures';
++  roles?: string[];
++  isMainPlace?: boolean;
++  hubTags?: string[];
++  parentPlaceSlug?: string | null;
++  parentPlaceName?: string | null;
+   pageStatus?: string | null;
+   description?: string | null;
+   shortDescription?: string | null;
+@@ -141,7 +148,22 @@ export type PublicVenue = {
+ export type PublicVenuePage = {
+   generatedAt: string;
+   venue: PublicVenue;
++  pdp?: {
++    variant: string;
++    content: {
++      summary: string;
++      conversion?: { mode: string; primaryAction: string; label: string; targetEventId: string; externalUrl: string };
++      gallery: Array<{ url: string; alt: string; caption: string; credit: string }>;
++      facts: Array<{ label: string; value: string; sourceUrl: string; verifiedAt: string }>;
++      sections: Array<{ id: string; kind: string; title: string; body: string; items: Array<{
++        title: string; description: string; imageUrl: string; linkUrl: string; meta: string; sourceUrl: string;
++        details: Array<{ label: string; value: string }>;
++      }> }>;
++      sources: Array<{ title: string; url: string; checkedAt: string }>;
++    };
++  } | null;
+   sessions: PublicSession[];
++  departures?: Array<{ sessionId: string; departsAt: string; arrivalPlaceName?: string | null }>;
+   relatedVenues: PublicVenue[];
+   stats: {
+     events: number;
+@@ -170,6 +192,7 @@ export type PublicCityPage = {
+   city: PublicCity;
+   sessions: PublicSession[];
+   venues: PublicVenue[];
++  places?: PublicVenue[];
+   landings: PublicLanding[];
+   articles?: PublicArticle[];
+   stats: {
+diff --git a/deploy/env.production.example b/deploy/env.production.example
+index 3635ff680..f415b1f3a 100644
+--- a/deploy/env.production.example
++++ b/deploy/env.production.example
+@@ -33,6 +33,15 @@ TICKETSCLOUD_WIDGET_TOKEN=
+ TICKETSCLOUD_GRPC_ENDPOINT=simple.ticketscloud.com:443
+ TICKETSCLOUD_WIDGET_BASE_URL=https://ticketscloud.org/v1/widgets/common
+ 
++# Sends a notification for each newly discovered paid Ticketscloud order.
++TC_ORDER_NOTIFICATION_TO=info@daibilet.ru
++SMTP_HOST=
++SMTP_PORT=587
++SMTP_SECURE=false
++SMTP_USER=
++SMTP_PASS=
++SMTP_FROM=
++
+ TEP_API_URL=https://api.teplohod.info/v1
+ TEP_WIDGET_ID=14208
+ TEP_WIDGET_BASE_URL=https://teplohod.info
+diff --git a/docs/README.md b/docs/README.md
+index 5e8ace117..36a90bcd4 100644
+--- a/docs/README.md
++++ b/docs/README.md
+@@ -5,6 +5,7 @@
+ ## Быстрый вход
+ 
+ - [Текущий статус](current-state.md) - где мы сейчас, что готово, что остается до запуска.
++- [Production: сеть и диск](production-network-and-disk-diagnostics.md) - диагностика маршрута SSH, доступности сайта и безопасная очистка диска.
+ - [Журнал решений](decision-log.md) - почему выбрали именно такой путь.
+ - [MVP specification](mvp-spec.md) - исходные границы продукта.
+ - [QA и деплой перед первыми продажами](launch-qa-and-deploy.md) - smoke, deploy, критерии запуска.
+diff --git a/packages/contracts/src/public.ts b/packages/contracts/src/public.ts
+index 6e912da6d..ef9c6a1ff 100644
+--- a/packages/contracts/src/public.ts
++++ b/packages/contracts/src/public.ts
+@@ -132,6 +132,13 @@ export interface PublicVenueDto extends SeoFields {
+   latitude?: number | null;
+   longitude?: number | null;
+   type: string;
++  subtype?: string | null;
++  pageTemplate?: 'default' | 'pier_departures';
++  roles?: string[];
++  isMainPlace?: boolean;
++  hubTags?: string[];
++  parentPlaceSlug?: string | null;
++  parentPlaceName?: string | null;
+   pageStatus?: string | null;
+   description?: string | null;
+   shortDescription?: string | null;
+@@ -235,6 +242,7 @@ export interface PublicCityPageDto extends ApiEnvelope {
+   city: PublicCityDto;
+   sessions: PublicSessionDto[];
+   venues: PublicVenueDto[];
++  places?: PublicVenueDto[];
+   landings: PublicLandingDto[];
+   articles?: PublicArticleDto[];
+   stats: {
+@@ -247,7 +255,9 @@ export interface PublicCityPageDto extends ApiEnvelope {
+ 
+ export interface PublicVenuePageDto extends ApiEnvelope {
+   venue: PublicVenueDto;
++  pdp?: PublicPdpDocumentDto | null;
+   sessions: PublicSessionDto[];
++  departures?: Array<{ sessionId: string; departsAt: string; arrivalPlaceName?: string | null }>;
+   relatedVenues: PublicVenueDto[];
+   stats: {
+     events: number;
+@@ -256,6 +266,21 @@ export interface PublicVenuePageDto extends ApiEnvelope {
+   };
+ }
+ 
++export interface PublicPdpDocumentDto {
++  variant: string;
++  content: {
++    summary: string;
++    conversion?: { mode: string; primaryAction: string; label: string; targetEventId: string; externalUrl: string };
++    gallery: Array<{ url: string; alt: string; caption: string; credit: string }>;
++    facts: Array<{ label: string; value: string; sourceUrl: string; verifiedAt: string }>;
++    sections: Array<{ id: string; kind: string; title: string; body: string; items: Array<{
++      title: string; description: string; imageUrl: string; linkUrl: string; meta: string; sourceUrl: string;
++      details: Array<{ label: string; value: string }>;
++    }> }>;
++    sources: Array<{ title: string; url: string; checkedAt: string }>;
++  };
++}
++
+ export interface PublicVenuesDto extends ApiEnvelope {
+   total: number;
+   venues: PublicVenueDto[];
+diff --git a/packages/db/prisma/schema.prisma b/packages/db/prisma/schema.prisma
+index e2e040b81..b1f3b3ffb 100644
+--- a/packages/db/prisma/schema.prisma
++++ b/packages/db/prisma/schema.prisma
+@@ -49,6 +49,26 @@ enum VenuePageStatus {
+   HIDDEN
+ }
+ 
++enum PlaceType {
++  ARCHITECTURE
++  MONUMENT
++  MUSEUM
++  RELIGION
++  NATURE
++  URBAN
++  THEATRE
++  ENTERTAINMENT
++  FOOD
++  VENUE
++  OTHER
++  TRANSPORT
++}
++
++enum PlacePageTemplate {
++  DEFAULT
++  PIER_DEPARTURES
++}
++
+ enum LandingType {
+   CITY
+   MULTI_CITY
+@@ -579,6 +599,7 @@ model Event {
+   externalReviews ExternalReview[]
+   reviewRequests  ReviewRequest[]
+   override        EventOverride?
++  pdpDocument     PdpDocument? @relation("EventPdpDocument")
+ 
+   @@index([status])
+   @@index([purchaseFlow])
+@@ -645,6 +666,7 @@ model EventSession {
+   providerLinks ProviderLink[]
+   checkoutItems CheckoutItem[]
+   tripPlanItems TripPlanItem[]
++  tripDepartures TripDeparture[]
+ 
+   @@index([eventId, startsAt])
+   @@index([startsAt])
+@@ -652,6 +674,27 @@ model EventSession {
+   @@index([externalId])
+ }
+ 
++model TripDeparture {
++  id               String    @id @default(cuid())
++  sessionId        String
++  departurePlaceId String
++  arrivalPlaceId   String?
++  departsAt        DateTime?
++  arrivesAt        DateTime?
++  sourceCode       SourceCode?
++  verified         Boolean   @default(false)
++  createdAt        DateTime  @default(now())
++  updatedAt        DateTime  @updatedAt
++
++  session        EventSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
++  departurePlace Venue        @relation("TripDeparturePlace", fields: [departurePlaceId], references: [id])
++  arrivalPlace   Venue?       @relation("TripArrivalPlace", fields: [arrivalPlaceId], references: [id])
++
++  @@unique([sessionId, departurePlaceId])
++  @@index([departurePlaceId, departsAt])
++  @@index([arrivalPlaceId])
++}
++
+ model EventOffer {
+   id            String     @id @default(cuid())
+   eventId       String
+@@ -807,11 +850,24 @@ model Venue {
+   latitude         Float?
+   longitude        Float?
+   kind             VenueKind       @default(OTHER)
++  placeType        PlaceType       @default(VENUE)
++  placeSubtype     String?
++  pageTemplate     PlacePageTemplate @default(DEFAULT)
++  placeRoles       String[]        @default([])
++  poiSourceKey     String?         @unique
++  isMainPlace      Boolean         @default(false)
++  isTouristPlace   Boolean         @default(false)
++  hubTags          String[]        @default([])
++  parentPlaceId    String?
+   pageStatus       VenuePageStatus @default(NONE)
+   createdAt        DateTime        @default(now())
+   updatedAt        DateTime        @updatedAt
+ 
+   city            City?            @relation(fields: [cityId], references: [id])
++  parentPlace     Venue?           @relation("PlaceHierarchy", fields: [parentPlaceId], references: [id])
++  childPlaces     Venue[]          @relation("PlaceHierarchy")
++  tripDepartures  TripDeparture[]  @relation("TripDeparturePlace")
++  tripArrivals    TripDeparture[]  @relation("TripArrivalPlace")
+   events          Event[]
+   aliases         VenueAlias[]
+   providerLinks   ProviderLink[]
+@@ -819,6 +875,24 @@ model Venue {
+   tripPlanItems   TripPlanItem[]
+   reviews         Review[]
+   externalReviews ExternalReview[]
++  pdpDocument     PdpDocument? @relation("VenuePdpDocument")
++}
++
++model PdpDocument {
++  id          String   @id @default(cuid())
++  venueId     String?  @unique
++  eventId     String?  @unique
++  variant     String
++  status      String   @default("DRAFT")
++  content     Json
++  version     Int      @default(1)
++  createdAt   DateTime @default(now())
++  updatedAt   DateTime @updatedAt
++
++  venue Venue? @relation("VenuePdpDocument", fields: [venueId], references: [id], onDelete: Cascade)
++  event Event? @relation("EventPdpDocument", fields: [eventId], references: [id], onDelete: Cascade)
++
++  @@index([variant, status])
+ }
+ 
+ model VenueAlias {
+diff --git a/pnpm-lock.yaml b/pnpm-lock.yaml
+index 74f1827a9..d5a0a6c77 100644
+--- a/pnpm-lock.yaml
++++ b/pnpm-lock.yaml
+@@ -117,6 +117,9 @@ importers:
+       '@prisma/client':
+         specifier: 'catalog:'
+         version: 7.8.0(prisma@7.8.0(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(typescript@6.0.3))(typescript@6.0.3)
++      nodemailer:
++        specifier: ^7.0.13
++        version: 7.0.13
+       pg:
+         specifier: 'catalog:'
+         version: 8.22.0
+@@ -2156,6 +2159,10 @@ packages:
+     resolution: {integrity: sha512-J6l92tKHX6w8Jy5nO1Vuc01NoIiRGi/d6qBKVxh+IQ8Cr3b6HbVNfKiF8ZpFKufTwpwxMmce2W3iQZ861ZRyTg==}
+     engines: {node: '>=18'}
+ 
++  nodemailer@7.0.13:
++    resolution: {integrity: sha512-PNDFSJdP+KFgdsG3ZzMXCgquO7I6McjY2vlqILjtJd0hy8wEvtugS9xKRF2NWlPNGxvLCXlTNIae4serI7dinw==}
++    engines: {node: '>=6.0.0'}
++
+   normalize-path@3.0.0:
+     resolution: {integrity: sha512-6eZs5Ls3WtCisHWp9S2GUy8dqkpGi4BVSz3GaqiE6ezub0512ESztXUwUB6C6IKbQkY2Pnb/mD4WYojCRwcwLA==}
+     engines: {node: '>=0.10.0'}
+@@ -4311,6 +4318,8 @@ snapshots:
+ 
+   node-releases@2.0.50: {}
+ 
++  nodemailer@7.0.13: {}
++
+   normalize-path@3.0.0: {}
+ 
+   object-assign@4.1.1: {}
+diff --git a/scripts/tc-sync-orders.js b/scripts/tc-sync-orders.js
+index d892d65cd..649b24cd1 100644
+--- a/scripts/tc-sync-orders.js
++++ b/scripts/tc-sync-orders.js
+@@ -2,6 +2,7 @@ const fs = require("fs");
+ const path = require("path");
+ const crypto = require("crypto");
+ const { createRequire } = require("module");
++const { sendPurchaseNotification, isPaidOrder } = require("./lib/tc-order-email");
+ 
+ const rootDir = path.resolve(__dirname, "..");
+ loadRootEnv(rootDir);
+@@ -112,6 +113,8 @@ async function persistOrders(orders, refs, syncId, startedAt, options) {
+     linkedTickets: 0,
+     withoutTickets: 0,
+     withoutEventLink: 0,
++    notificationsSent: 0,
++    notificationErrors: 0,
+     statuses: {},
+     request: publicRequestSummary(options),
+     startedAt: startedAt.toISOString(),
+@@ -131,6 +134,11 @@ async function persistOrders(orders, refs, syncId, startedAt, options) {
+       if (!linked.eventId) stats.withoutEventLink += 1;
+ 
+       const snapshot = buildBuyerSnapshot(order, refs);
++      const wasNotified = await client.query(
++        'select "buyerSnapshot" from "ExternalOrder" where "sourceId" = $1 and "externalOrderId" = $2 limit 1',
++        [SOURCE_ID, externalOrderId],
++      );
++      const alreadyNotified = wasNotified.rows[0]?.buyerSnapshot?.ticketscloudNotificationSentAt != null;
+       const orderDbId = await upsertExternalOrder(client, {
+         externalOrderId,
+         status,
+@@ -138,6 +146,23 @@ async function persistOrders(orders, refs, syncId, startedAt, options) {
+         buyerSnapshot: snapshot,
+       });
+ 
++      if (isPaidOrder(order) && !alreadyNotified) {
++        const notification = await sendPurchaseNotification({ order, snapshot, refs, externalOrderId });
++        if (notification.sent) {
++          snapshot.ticketscloudNotificationSentAt = new Date().toISOString();
++          await client.query(
++            'update "ExternalOrder" set "buyerSnapshot" = $2::jsonb where id = $1',
++            [orderDbId, JSON.stringify(snapshot)],
++          );
++          stats.notificationsSent += 1;
++        } else if (notification.skipped) {
++          stats.notificationsSkipped = (stats.notificationsSkipped || 0) + 1;
++        } else {
++          stats.notificationErrors += 1;
++          console.error(`Purchase notification failed for order ${externalOrderId}: ${notification.error}`);
++        }
++      }
++
+       await upsertRawOrder(client, externalOrderId, order, refs);
+       await client.query('delete from "ExternalTicket" where "externalOrderId" = $1 and coalesce(origin, $2) = $2', [orderDbId, "source"]);
+ 

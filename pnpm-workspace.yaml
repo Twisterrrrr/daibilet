@@ -1,0 +1,15 @@
+packages:
+  - apps/*
+  # Frozen Vite public app: source-only legacy, not a workspace package.
+  - '!apps/public'
+  - packages/*
+
+engineStrict: true
+
+allowBuilds:
+  '@prisma/engines': true
+  esbuild: true
+  prisma: true
+  protobufjs: true
+  sharp: true
+  unrs-resolver: true

@@ -29,7 +29,7 @@ export function buildBridgesProductJsonLd(params: {
       bestRating: '5',
       worstRating: '1',
     },
-    review: BRIDGES_LANDING.reviews.map((review) => ({
+    review: BRIDGES_LANDING.reviews.map((review: { author: string; stars: number; text: string }) => ({
       '@type': 'Review',
       author: { '@type': 'Person', name: review.author },
       reviewRating: {

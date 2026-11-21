@@ -1,0 +1,5 @@
+SHELL=/bin/bash
+PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+
+# MSK catalog Postgres — daily custom pg_dump (04:35 UTC).
+35 4 * * * root APP_DIR=/opt/daibilet /opt/daibilet/deploy/cron/postgres-backup.sh >> /var/log/daibilet/postgres-backup.log 2>&1

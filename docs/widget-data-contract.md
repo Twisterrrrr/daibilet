@@ -58,7 +58,7 @@
 |------|-------------|------------|
 | `widgetProvider` | да | `"TEPLOHOD"` |
 | `widgetPayload.tepEventId` | да | числовой ID (`826`) |
-| `widgetPayload.tepWidgetId` | да | ID виджета (default `14208`) |
+| `widgetPayload.tepWidgetId` | да | ID виджета (default `14460`) |
 | `purchaseUrl` | да | `https://teplohod.info/event/{id}` |
 | `purchaseReady` | да | `true` |
 
@@ -66,7 +66,7 @@
 
 | Env | Назначение |
 |-----|------------|
-| `VITE_TEP_WIDGET_ID` | `data-id` на embed (default `14208`) |
+| `VITE_TEP_WIDGET_ID` | `data-id` на embed (default `14460`) |
 | `data-event-id` | = `tepEventId` |
 
 ### Backend

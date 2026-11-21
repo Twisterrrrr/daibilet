@@ -1,0 +1,30 @@
+{
+  "eventId": "evt_6ad84740cbc043d0d9046c57",
+  "eventTitle": "Ислам Итляшев - 15 января в Рязани",
+  "eventPageId": "f0ec11c5-a304-45d2-871c-5b5e6b236833",
+  "eventPageSlug": "islam-itlyashev-15-yanvarya-v-ryazani-ryazan",
+  "archiveStatus": "UNUSED_ORIGINAL_SOURCE",
+  "retrievedAt": "2026-11-05",
+  "originalDescription": null,
+  "previousEventOverride": "",
+  "previousEventPageContent": {
+    "sections": []
+  },
+  "verifiedCurrentData": {
+    "city": "Рязань",
+    "venue": "ДК РГАТУ",
+    "address": "улица Костычева, 1",
+    "sessions": [
+      {
+        "start": "2027-01-15T16:00:00",
+        "end": "2027-01-15T17:30:00",
+        "price": 2500
+      }
+    ],
+    "activeOfferCount": "7",
+    "priceFromRub": 2500,
+    "ageLimit": "0"
+  },
+  "mainTextChars": 962,
+  "previousEffectiveChars": 0
+}

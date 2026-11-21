@@ -1,0 +1,49 @@
+{
+  "eventId": "evt_6a6cc51a21e59b88c87b5346",
+  "eventPageId": "2645091d-1c68-4878-b79d-e8e7a4a3b731",
+  "eventPageSlug": "neverlove-moskva",
+  "archiveStatus": "UNUSED_ORIGINAL_SOURCE",
+  "retrievedAt": "2026-11-05",
+  "sourceSnapshot": {
+    "id": "evt_6a6cc51a21e59b88c87b5346",
+    "kind": "SINGLE",
+    "slug": "neverlove-6a6cc51a21e59b88c87b5346",
+    "seoH1": null,
+    "title": "NEVERLOVE",
+    "sources": [
+      {
+        "code": "TICKETSCLOUD",
+        "name": "Ticketscloud",
+        "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6a6cc51a21e59b88c87b5346",
+        "externalId": "6a6cc51a21e59b88c87b5346",
+        "metaExternalId": null
+      }
+    ],
+    "venueId": "venue_63985a2fcae029a4d9184fee",
+    "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net/production/image/2026-07/6a6cc51ab08a50e87b911b83.jpg",
+    "seoTitle": null,
+    "cityTitle": "Москва",
+    "venueTitle": "BASE",
+    "description": null,
+    "isIndexable": true,
+    "purchaseFlow": "EXTERNAL",
+    "venueAddress": "ул. Орджоникидзе, 11с1",
+    "canonicalPath": null,
+    "primaryCityId": "city_524901",
+    "supplierTitle": null,
+    "managementMode": "SOURCE_MANAGED",
+    "seoDescription": null,
+    "shortDescription": null
+  },
+  "originalDescription": null,
+  "previousEventOverride": "«NEVERLOVE» - альтернативный концерт на площадке «BASE» в Москве.\n\n## Практическая информация\n\n- Место - «BASE», Москва\n- Адрес - ул. Орджоникидзе, 11с1\n- Продолжительность - около 240 минут\n- Возрастное ограничение - 16+\n- Билеты - от 1 800 ₽\n\nБилеты продаются онлайн. Оплата на сайте, электронный билет приходит на почту.",
+  "activeSessions": [
+    {
+      "start": "2026-12-12T16:00:00",
+      "end": "2026-12-12T20:00:00",
+      "price": 1800
+    }
+  ],
+  "mainChars": 673,
+  "previousEffectiveChars": 324
+}

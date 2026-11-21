@@ -1,0 +1,228 @@
+{
+  "capturedAt": "2026-11-10T04:27:41.833Z",
+  "purpose": "Pre-rewrite production snapshot; source text archived, rewrite will be active EventPage editorial content.",
+  "items": {
+    "evt_tep_1537": {
+      "eventId": "evt_tep_1537",
+      "eventPageId": "d9ae76b9-0582-4281-bc9b-412b48ebbb14",
+      "slug": "novogodnii-koncert-dlya-detei-novogodnyaya-elka-moskva",
+      "sourceDescription": null,
+      "legacyOverrideDescription": "Детская новогодняя программа проходит на панорамном теплоходе River Palace. Формат объединяет концерт с ёлкой, речную прогулку и размещение гостей за отдельными столиками.\n\n## Особенности\nТрехчасовая программа на теплоходе\n- Новогодний концерт и ёлка для детей\n- Панорамный отапливаемый салон\n- Ледовый класс судна\n- Места за столиками разной вместимости\n- Тарифы с праздничным обедом и без питания.\n\n## Как выбрать билет\n\nТарифы различаются расположением и вместимостью столика. Питание включено только в билеты, где прямо указан новогодний обед; остальные варианты дают место за выбранным столиком без заявленного меню.\n\n## Перед отправлением\n\nПосадка проходит у Национального центра «Россия» на Краснопресненской набережной. Свой алкоголь и животных на борт приносить нельзя; возрастные условия и правила сопровождения детей нужно проверить перед покупкой.\n\n## Практическая информация\n\n- Место - Национальный центр «Россия», Москва\n- Адрес - Краснопресненская наб., 14, Москва, Россия, 123100\n- Продолжительность - около 180 минут\n- Билеты - от 4 000 ₽\n\nБилеты продаются онлайн. Оплата на сайте, электронный билет приходит на почту.",
+      "eventPageBefore": {
+        "content": {
+          "sections": []
+        },
+        "status": "DRAFT",
+        "isIndexable": false,
+        "publishedAt": null,
+        "title": "Новогодний концерт для детей, новогодняя ёлка",
+        "summary": null,
+        "seoH1": "Новогодний концерт для детей, новогодняя ёлка",
+        "seoTitle": "Новогодний концерт для детей, новогодняя ёлка | Дайбилет",
+        "seoDescription": null,
+        "canonicalPath": null
+      },
+      "eventPageRoutes": [
+        {
+          "path": "/events/novogodnii-koncert-dlya-detei-novogodnyaya-elka-moskva",
+          "kind": "CANDIDATE",
+          "source": "event-page-draft"
+        }
+      ],
+      "eventPageRevision": {
+        "version": 1,
+        "count": 1
+      },
+      "events": [
+        {
+          "id": "5881d0af-2a41-4e83-97d5-c23cb0ff7c68",
+          "eventId": "evt_tep_1537",
+          "position": 0,
+          "role": "PRIMARY",
+          "sourceSnapshot": {
+            "id": "evt_tep_1537",
+            "kind": "RECURRING",
+            "slug": "новогоднии-концерт-для-детеи-новогодняя-елка-1537",
+            "seoH1": null,
+            "title": "Новогодний концерт для детей, новогодняя ёлка",
+            "sources": [
+              {
+                "code": "TEPLOHOD",
+                "name": "Teplohod.info",
+                "externalId": "1537",
+                "metaExternalId": null
+              }
+            ],
+            "venueId": "venue_tep_1",
+            "imageUrl": "https://cdn.teplohod.info/images/cache/Events/Event1537/19ebbab0a8-1.png",
+            "seoTitle": null,
+            "cityTitle": "Москва",
+            "venueTitle": "Национальный центр «Россия»",
+            "description": null,
+            "isIndexable": true,
+            "purchaseFlow": "EXTERNAL",
+            "venueAddress": "Краснопресненская наб., 14, Москва, Россия, 123100",
+            "canonicalPath": null,
+            "primaryCityId": "city_tep_1",
+            "supplierTitle": null,
+            "managementMode": "SOURCE_MANAGED",
+            "seoDescription": null,
+            "shortDescription": "Детский новогодний концерт с ёлкой на панорамном теплоходе River Palace и вариантами билетов с праздничным обедом."
+          },
+          "createdAt": "2026-11-03T19:35:16.634Z",
+          "eventTitle": "Новогодний концерт для детей, новогодняя ёлка",
+          "eventSlug": "новогоднии-концерт-для-детеи-новогодняя-елка-1537",
+          "eventKind": "RECURRING",
+          "primaryCityId": "city_tep_1",
+          "cityTitle": "Москва",
+          "venueId": "venue_tep_1",
+          "venueTitle": "Национальный центр «Россия»",
+          "venueAddress": "Краснопресненская наб., 14, Москва, Россия, 123100",
+          "supplierTitle": null,
+          "sources": [
+            {
+              "code": "TEPLOHOD",
+              "name": "Teplohod.info",
+              "externalId": "1537",
+              "metaExternalId": null,
+              "sourceUrlRedacted": true
+            }
+          ]
+        }
+      ],
+      "currentEventFacts": {
+        "ageLimit": null,
+        "venue": "Национальный центр «Россия»",
+        "address": "Краснопресненская наб., 14, Москва, Россия, 123100",
+        "offerMin": 4000,
+        "activeOffers": 7,
+        "futureSessionStarts": [
+          "2026-12-06 08:00:00",
+          "2026-12-12 09:00:00",
+          "2026-12-13 08:00:00",
+          "2026-12-19 08:00:00",
+          "2026-12-20 09:00:00",
+          "2026-12-27 09:00:00",
+          "2026-12-30 08:00:00",
+          "2027-01-03 08:00:00",
+          "2027-01-04 08:00:00",
+          "2027-01-05 08:00:00"
+        ]
+      }
+    },
+    "evt_tep_1541": {
+      "eventId": "evt_tep_1541",
+      "eventPageId": "e1222fbc-5433-4ce2-95c7-1614a42a60c5",
+      "slug": "novogodnii-goluboi-ogonek-koncert-na-korable-moskva",
+      "sourceDescription": null,
+      "legacyOverrideDescription": "«Новогодний голубой огонек» проходит как концерт с живой музыкой на панорамном теплоходе River Palace. Гости размещаются за отдельными столиками и могут выбрать билет с праздничным меню или без питания.\n\n## Особенности\nТрехчасовой концерт на теплоходе\n- Живая музыка\n- Панорамный отапливаемый салон\n- Ледовый класс судна\n- Столики на два, четыре или десять человек\n- Тарифы с новогодним меню и без питания.\n\n## Как выбрать билет\n\nКатегории отличаются вместимостью и расположением столика, а также составом питания. Меню включено только в соответствующие тарифы; для остальных билетов на борту работает ресторан-бар.\n\n## Перед отправлением\n\nПосадка проходит у Национального центра «Россия» на Краснопресненской набережной. Свои продукты, алкоголь и животных приносить нельзя.\n\n## Практическая информация\n\n- Место - Национальный центр «Россия», Москва\n- Адрес - Краснопресненская наб., 14, Москва, Россия, 123100\n- Продолжительность - около 180 минут\n- Билеты - от 6 900 ₽\n\nБилеты продаются онлайн. Оплата на сайте, электронный билет приходит на почту.",
+      "eventPageBefore": {
+        "content": {
+          "sections": []
+        },
+        "status": "DRAFT",
+        "isIndexable": false,
+        "publishedAt": null,
+        "title": "Новогодний голубой огонек, концерт на корабле",
+        "summary": null,
+        "seoH1": "Новогодний голубой огонек, концерт на корабле",
+        "seoTitle": "Новогодний голубой огонек, концерт на корабле | Дайбилет",
+        "seoDescription": null,
+        "canonicalPath": null
+      },
+      "eventPageRoutes": [
+        {
+          "path": "/events/novogodnii-goluboi-ogonek-koncert-na-korable-moskva",
+          "kind": "CANDIDATE",
+          "source": "event-page-draft"
+        }
+      ],
+      "eventPageRevision": {
+        "version": 1,
+        "count": 1
+      },
+      "events": [
+        {
+          "id": "63ab99b2-e7fb-43c6-a7f4-e6b5db4b2f03",
+          "eventId": "evt_tep_1541",
+          "position": 0,
+          "role": "PRIMARY",
+          "sourceSnapshot": {
+            "id": "evt_tep_1541",
+            "kind": "RECURRING",
+            "slug": "новогоднии-голубои-огонек-концерт-на-корабле-1541",
+            "seoH1": null,
+            "title": "Новогодний голубой огонек, концерт на корабле",
+            "sources": [
+              {
+                "code": "TEPLOHOD",
+                "name": "Teplohod.info",
+                "externalId": "1541",
+                "metaExternalId": null
+              }
+            ],
+            "venueId": "venue_tep_1",
+            "imageUrl": "https://cdn.teplohod.info/images/cache/Events/Event1541/320475e712-1.jpg",
+            "seoTitle": null,
+            "cityTitle": "Москва",
+            "venueTitle": "Национальный центр «Россия»",
+            "description": null,
+            "isIndexable": true,
+            "purchaseFlow": "EXTERNAL",
+            "venueAddress": "Краснопресненская наб., 14, Москва, Россия, 123100",
+            "canonicalPath": null,
+            "primaryCityId": "city_tep_1",
+            "supplierTitle": null,
+            "managementMode": "SOURCE_MANAGED",
+            "seoDescription": null,
+            "shortDescription": "Новогодний концерт с живой музыкой на панорамном теплоходе River Palace и билетами с ужином или без питания."
+          },
+          "createdAt": "2026-11-03T19:35:16.551Z",
+          "eventTitle": "Новогодний голубой огонек, концерт на корабле",
+          "eventSlug": "новогоднии-голубои-огонек-концерт-на-корабле-1541",
+          "eventKind": "RECURRING",
+          "primaryCityId": "city_tep_1",
+          "cityTitle": "Москва",
+          "venueId": "venue_tep_1",
+          "venueTitle": "Национальный центр «Россия»",
+          "venueAddress": "Краснопресненская наб., 14, Москва, Россия, 123100",
+          "supplierTitle": null,
+          "sources": [
+            {
+              "code": "TEPLOHOD",
+              "name": "Teplohod.info",
+              "externalId": "1541",
+              "metaExternalId": null,
+              "sourceUrlRedacted": true
+            }
+          ]
+        }
+      ],
+      "currentEventFacts": {
+        "ageLimit": null,
+        "venue": "Национальный центр «Россия»",
+        "address": "Краснопресненская наб., 14, Москва, Россия, 123100",
+        "offerMin": 6900,
+        "activeOffers": 12,
+        "futureSessionStarts": [
+          "2026-12-10 16:00:00",
+          "2026-12-11 12:00:00",
+          "2026-12-11 16:00:00",
+          "2026-12-12 12:00:00",
+          "2026-12-13 16:00:00",
+          "2026-12-16 12:00:00",
+          "2026-12-16 16:00:00",
+          "2026-12-19 12:00:00",
+          "2026-12-19 16:00:00",
+          "2026-12-20 12:00:00",
+          "2026-12-21 12:00:00",
+          "2026-12-21 16:00:00",
+          "2026-12-27 12:00:00",
+          "2026-12-30 12:00:00",
+          "2026-12-30 16:00:00",
+          "2027-01-02 16:00:00"
+        ]
+      }
+    }
+  }
+}\n
