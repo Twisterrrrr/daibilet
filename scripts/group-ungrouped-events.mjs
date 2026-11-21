@@ -84,10 +84,12 @@ async function main() {
       const key = `${row.meta_external_id}\u0000${row.city_id ?? ''}`;
       let family = families.get(key);
       if (!family) {
-        family = { parent: row.meta_external_id, city: row.city_title ?? null, cityId: row.city_id ?? null, slots: 0, titles: new Set(), venues: new Set() };
+        family = { parent: row.meta_external_id, city: row.city_title ?? null, cityId: row.city_id ?? null, slots: 0, titles: new Set(), venues: new Set(), title: null, venueTitle: null };
         families.set(key, family);
       }
       family.slots += 1;
+      if (!family.title) family.title = row.title;
+      if (!family.venueTitle) family.venueTitle = row.venue_title ?? null;
       const normalized = normalizeEventPageProductTitle(row.title);
       if (normalized) family.titles.add(normalized);
       if (row.venue_id) family.venues.add(row.venue_id);
@@ -109,6 +111,8 @@ async function main() {
       detail.push({
         parent: family.parent,
         city: family.city,
+        title: family.title,
+        venue: family.venueTitle,
         slots: family.slots,
         titleVariants,
         venueVariants,
