@@ -1,7 +1,12 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { extractEventUrls, identityFromEventPath } from './build-event-redirect-map.mjs';
+import { extractDaibiletPaths, extractEventUrls, identityFromEventPath } from './build-event-redirect-map.mjs';
+
+test('extractDaibiletPaths returns all daibilet.ru paths, not just /events/', () => {
+  const tsv = 'URL\tclicks\nhttps://daibilet.ru/events/foo\t3\nhttps://daibilet.ru/venues/bar\t1\n';
+  assert.deepEqual(extractDaibiletPaths(tsv), ['/events/foo', '/venues/bar']);
+});
 
 test('extractEventUrls keeps only /events/ rows and dedups', () => {
   const csv = [

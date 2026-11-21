@@ -32,8 +32,8 @@ function loadRootEnv(projectRoot) {
   }
 }
 
-/** Parse a GSC CSV/TSV dump into /events/ URLs (header and non-event rows dropped). */
-export function extractEventUrls(text) {
+/** Parse a GSC CSV/TSV dump into all daibilet.ru paths (deduped; header + non-URL rows dropped). */
+export function extractDaibiletPaths(text) {
   const out = new Set();
   for (const line of text.split(/\r?\n/)) {
     const t = line.trim();
@@ -41,12 +41,14 @@ export function extractEventUrls(text) {
     const first = t.includes('\t') ? t.split('\t')[0] : t.split(',')[0];
     const url = first.replace(/^"|"$/g, '').trim();
     if (!url.startsWith('http')) continue;
-    try {
-      const pathname = new URL(url).pathname;
-      if (pathname.startsWith('/events/')) out.add(pathname);
-    } catch { /* skip malformed */ }
+    try { out.add(new URL(url).pathname); } catch { /* skip malformed */ }
   }
   return [...out];
+}
+
+/** Subset of extractDaibiletPaths limited to /events/ rows (the redirect-map scope). */
+export function extractEventUrls(text) {
+  return extractDaibiletPaths(text).filter((p) => p.startsWith('/events/'));
 }
 
 /** Stable identity + source kind from an /events/ path (id-based, not slug). */
@@ -85,9 +87,11 @@ async function main() {
     process.exit(2);
   }
 
-  const paths = extractEventUrls(await readFile(args.gsc, 'utf8'));
+  const allPaths = extractDaibiletPaths(await readFile(args.gsc, 'utf8'));
+  const paths = allPaths.filter((p) => p.startsWith('/events/'));
+  const nonEventPaths = allPaths.filter((p) => !p.startsWith('/events/'));
   if (!paths.length) { console.error('No /events/ URLs found'); process.exit(2); }
-  console.log(`GSC event URLs: ${paths.length}`);
+  console.log(`GSC URLs: ${allPaths.length} total, ${paths.length} events, ${nonEventPaths.length} non-events`);
 
   const ids = paths.map(identityFromEventPath);
   const internalIds = [...new Set(ids.map((i) => i.internalId).filter(Boolean))];
@@ -149,6 +153,7 @@ async function main() {
     const errors = validateEventRedirectMap(map);
     const summary = {
       inputUrls: paths.length,
+      nonEventCount: nonEventPaths.length,
       matched301: map.entries.filter((e) => e.status === 301).length,
       matched410: map.entries.filter((e) => e.status === 410).length,
       keptLiveFallback: kept.length,
@@ -168,6 +173,7 @@ async function main() {
     console.log(JSON.stringify({ ...summary, preview: map.entries.slice(0, 5) }, null, 2));
     if (!apply) console.warn(`Dry-run: no write. Re-run with --apply to write ${outputPath}.`);
     if (unmatched.length) console.warn(`Unmatched (no catalog row, NOT redirected): ${unmatched.slice(0, 10).join(', ')}${unmatched.length > 10 ? ' …' : ''}`);
+    if (nonEventPaths.length) console.warn(`Non-event URLS (venues/locations/cities/places - separate workstream): ${nonEventPaths.slice(0, 10).join(', ')}${nonEventPaths.length > 10 ? ' …' : ''}`);
   } finally {
     await pool.end();
   }
