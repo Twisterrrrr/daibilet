@@ -34,6 +34,18 @@ test('home page remains shared ISR and does not vary server output by request co
   assert.match(content, /const ssrCitySlug = null/);
 });
 
+test('city hub soft-unavailable returns a soft 200 (no dynamic-rendering APIs on ISR)', () => {
+  const source = fs.readFileSync(path.join(WEB_ROOT, 'app/cities/[slug]/page.tsx'), 'utf8');
+  assert.match(source, /export const revalidate\s*=\s*300/);
+  assert.match(source, /kind === 'unavailable'/);
+  assert.match(source, /CityUnavailablePage/);
+  assert.equal(
+    /await\s+connection\s*\(|\b(?:noStore|unstable_noStore)\s*\(/.test(source),
+    false,
+    'city hub unavailable path must not call await connection()/noStore() — DYNAMIC_SERVER_USAGE becomes HTTP 500 on ISR',
+  );
+});
+
 test('event PDP cache: ISR fetch + miss-throw, not bare no-store', () => {
   const source = fs.readFileSync(path.join(WEB_ROOT, 'src/server/cached-event-data.ts'), 'utf8');
   assert.match(source, /revalidateSeconds:\s*EVENT_PAGE_REVALIDATE/);

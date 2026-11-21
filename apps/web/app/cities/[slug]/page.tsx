@@ -1,5 +1,4 @@
 import type { Metadata } from 'next';
-import { connection } from 'next/server';
 import { Suspense } from 'react';
 
 import { CityPageView } from '@/components/CityPageView.client';
@@ -226,8 +225,11 @@ export default async function CityPage({ params }: PageProps) {
     safeNotFound();
   }
   if (loaded.kind === 'unavailable') {
-    // A cold API timeout must not cache this empty 200 page for the route's 300s ISR window.
-    await connection();
+    // A cold API timeout must render the soft "temporarily unavailable" 200, never a 500.
+    // Do NOT opt this branch into dynamic rendering (connection / noStore): on an ISR route
+    // (revalidate=300) those throw DYNAMIC_SERVER_USAGE, which Next surfaces as HTTP 500
+    // (see safe-not-found.ts). The 200 may live up to `revalidate` in the ISR cache -
+    // accepted over a hard 500.
     return <CityUnavailablePage slug={decodedSlug} />;
   }
 
