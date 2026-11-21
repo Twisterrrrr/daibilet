@@ -237,6 +237,12 @@ async function main() {
 
     const pageSlugById = await resolveEventPageSlugsForEventIds([...byId.keys()], pool);
 
+    // Events linked to ANY EventPage (draft or published) are group members: their
+    // legacy URL will 301 once the page publishes, so never 410 them prematurely.
+    const anyPageLinked = new Set();
+    const pageLinks = await pool.query(`SELECT DISTINCT link."eventId" AS "eventId" FROM "EventPageEvent" link`);
+    for (const row of pageLinks.rows) anyPageLinked.add(row.eventId);
+
     const entriesBySource = new Map();
     const unmatched = [];
     const kept = [];
@@ -247,7 +253,9 @@ async function main() {
       const sourcePath = rec.pathname;
       const canonical = pageSlugById.get(row.eventId);
       if (!canonical) {
-        if (Number(row.futureSessionCount) === 0) {
+        if (anyPageLinked.has(row.eventId)) {
+          kept.push({ slug: idn.slug, reason: 'linked to an EventPage (not yet published)' });
+        } else if (Number(row.futureSessionCount) === 0) {
           entriesBySource.set(sourcePath, { sourcePath, eventId: row.eventId, kind: 'past_slot', status: 410, targetPath: null });
         } else {
           kept.push({ slug: idn.slug, reason: 'no canonical EventPage, has future sessions' });
