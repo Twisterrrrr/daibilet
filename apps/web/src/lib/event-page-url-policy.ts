@@ -30,15 +30,16 @@ export function resolveEventPageUrlPolicy(input: {
   const ended = input.availability === 'ENDED' || input.availability === 'NO_UPCOMING';
 
   return {
-    canonicalPath: stablePath || input.eventCanonicalPath || input.fallbackPath,
+    // A slot/alias folded into a published EventPage is kept (not lost) but de-indexed:
+    // noindex, with a SELF canonical. It must NOT cross-canonical to the EventPage,
+    // because noindex + cross-canonical confuses Google ("канонические версии не совпадают").
+    canonicalPath: isLegacyAlias
+      ? `/events/${encodeURIComponent(input.requestedSlug)}`
+      : (stablePath || input.eventCanonicalPath || input.fallbackPath),
     hasPublishedStablePage: Boolean(stableSlug),
     isLegacyAlias,
-    // A legacy/alias page must NOT emit noindex alongside a cross-canonical:
-    // noindex + canonical together confuses Google and produces the GSC
-    // "canonical version does not match" bucket. The canonical alone
-    // consolidates the alias into the stable page; noindex stays only for pages
-    // without a published canonical (draft / ended / explicit non-indexable).
     noindex:
+      isLegacyAlias ||
       Boolean(input.eventPageRoute?.published && !input.eventPageRoute.isIndexable) ||
       hasUnpublishedCandidate ||
       (!stableSlug && ended),
