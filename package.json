@@ -54,6 +54,7 @@
     "tc:import-provider-metadata": "node scripts/tc-import-provider-metadata.js",
     "tc:archive-past-sessions": "node scripts/archive-past-tc-sessions.js",
     "events:audit-past": "node scripts/audit-past-events.js",
+    "map:event-redirects": "node apps/web/node_modules/tsx/dist/cli.mjs scripts/build-event-redirect-map.mjs",
     "event:rewrite:audit": "node scripts/event-rewrite-audit.js",
     "event:descriptions:reformat": "node apps/web/node_modules/tsx/dist/cli.mjs scripts/format-current-event-descriptions.js",
     "tc:sync": "node scripts/tc-sync.js",
