@@ -58,7 +58,13 @@ linked_parent_city AS (
   JOIN tc_identity ti ON ti."eventId" = e.id
 )
 SELECT u.id, u.title, u.city_id, u.venue_id, v.title AS venue_title,
-       ti.meta_external_id, c.title AS city_title
+       ti.meta_external_id, c.title AS city_title,
+       CASE
+         WHEN lower(trim(coalesce(u.title,''))) ~* 'тест|test' THEN 'test'
+         WHEN u.city_id = 'city_498817' AND u.venue_id = 'venue_683e8e0935b8fc7a60f565d3'
+           AND lower(trim(coalesce(u.title,''))) ~ '^комбо[[:space:]]+[1-7][[:space:]]*$' THEN 'hp_combo'
+         ELSE NULL
+       END AS excluded_reason
 FROM ungrouped u
 JOIN tc_identity ti ON ti."eventId" = u.id
 LEFT JOIN "Venue" v ON v.id = u.venue_id
@@ -79,8 +85,16 @@ async function main() {
     const result = await pool.query(SQL);
     const rows = result.rows;
 
-    const families = new Map();
+    const excluded = { test: 0, hp_combo: 0 };
+    const candidates = [];
     for (const row of rows) {
+      if (row.excluded_reason === 'test') { excluded.test += 1; continue; }
+      if (row.excluded_reason === 'hp_combo') { excluded.hp_combo += 1; continue; }
+      candidates.push(row);
+    }
+
+    const families = new Map();
+    for (const row of candidates) {
       const key = `${row.meta_external_id}\u0000${row.city_id ?? ''}`;
       let family = families.get(key);
       if (!family) {
@@ -124,8 +138,11 @@ async function main() {
 
     process.stdout.write(
       `${JSON.stringify({
+        totalUngroupedEvents: rows.length,
+        excludedTestEvents: excluded.test,
+        excludedHpComboEvents: excluded.hp_combo,
+        candidateEvents: candidates.length,
         families: families.size,
-        events: rows.length,
         unambiguousFamilies,
         ambiguousFamilies,
         newProductsEstimate,
