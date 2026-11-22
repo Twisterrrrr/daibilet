@@ -57,7 +57,8 @@ const EMPTY_FEED = mapVenueCatalogFeedPage({
 
 type VenueDtoLoad =
   | { kind: 'ok'; payload: PublicVenuePageDto }
-  | { kind: 'miss' };
+  | { kind: 'miss' }
+  | { kind: 'transient' };
 
 /**
  * Prefer cached DTO only. Miss → safeNotFound without any bare `cache:'no-store'`
@@ -69,9 +70,9 @@ const loadVenueDto = cache(async (slug: string): Promise<VenueDtoLoad> => {
   const key = resolvePlaceSlugAlias(String(slug || '').trim());
   if (!key) return { kind: 'miss' };
 
-  const cached = await getCachedPublicVenueDto(key);
-  if (cached?.venue) return { kind: 'ok', payload: cached };
-  return { kind: 'miss' };
+  const result = await getCachedPublicVenueDto(key);
+  if (result.kind === 'ok') return { kind: 'ok', payload: result.payload };
+  return result.kind === 'transient' ? { kind: 'transient' } : { kind: 'miss' };
 });
 
 function resolveVenueRouteFamily(venue: PublicVenuePageDto['venue']): 'location' | 'institution' {
@@ -111,6 +112,22 @@ export async function generateVenueListMetadata(
   };
 }
 
+function VenueUnavailablePage({ slug }: { slug: string }) {
+  return (
+    <SiteLayout>
+      <main className="container-page py-16">
+        <h1 className="font-display text-2xl font-bold text-slate-900 sm:text-3xl">
+          Площадка временно недоступна
+        </h1>
+        <p className="mt-3 max-w-xl text-sm leading-relaxed text-slate-600 sm:text-base">
+          Не удалось загрузить карточку. Обновите страницу через минуту.
+        </p>
+        <p className="mt-2 text-xs text-slate-400">{slug}</p>
+      </main>
+    </SiteLayout>
+  );
+}
+
 export async function generateVenueDetailMetadata(slug: string): Promise<Metadata> {
   let decoded = slug;
   try {
@@ -120,6 +137,12 @@ export async function generateVenueDetailMetadata(slug: string): Promise<Metadat
   }
   const loaded = await loadVenueDto(decoded);
   if (loaded.kind === 'miss') safeNotFound();
+  if (loaded.kind === 'transient') {
+    return {
+      title: pageTitle('Площадка временно недоступна'),
+      robots: { index: false, follow: false },
+    };
+  }
   try {
     const payload = loaded.payload;
     const venue = applyVenueEditorialOverlay(payload.venue);
@@ -225,6 +248,9 @@ export async function VenueDetailPage({
   // no-store fetch + notFound() on ISR → static-to-dynamic HTTP 500.
   const loaded = await loadVenueDto(decodedSlug);
   if (loaded.kind === 'miss') safeNotFound();
+  if (loaded.kind === 'transient') {
+    return <VenueUnavailablePage slug={decodedSlug} />;
+  }
 
   let payload = loaded.payload;
   const family = resolveVenueRouteFamily(payload.venue);
