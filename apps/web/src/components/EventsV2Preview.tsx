@@ -76,10 +76,10 @@ export function EventsV2Preview({ catalog, landings = [], articles = [] }: Props
                 <h1>Афиша Санкт-Петербурга</h1>
                 <p className="page-head__meta"><strong>{catalog?.total ?? items.length}</strong> событий · выбор редакции</p>
               </div>
-            </div>
-            <div className="search-compact">
-              <span className="search-compact__icon"><Search className="h-4 w-4" aria-hidden /></span>
-              <input type="text" placeholder="Событие, площадка или артист" />
+              <div className="search-compact">
+                <span className="search-compact__icon"><Search className="h-4 w-4" aria-hidden /></span>
+                <input type="text" placeholder="Событие, площадка или артист" />
+              </div>
             </div>
           </div>
 
