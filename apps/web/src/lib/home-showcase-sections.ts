@@ -33,6 +33,9 @@ export function isComboSessionTitle(title: string | null | undefined): boolean {
 
 export const HOME_SHOWCASE_LIMIT = 8;
 export const HOME_POPULAR_LIMIT = 6;
+/** Home rails (editors pick / popular / nearest) should not surface events
+ *  farther than ~1 month ahead - distant dates dilute the editorial feed. */
+export const HOME_RAIL_MAX_DAYS = 30;
 
 /** Soft mix so «Мероприятия» / museums are not drowned by excursion clones. */
 const EDITORS_CATEGORY_CYCLE = [
@@ -193,6 +196,7 @@ function sessionCoverKeys(event: PublicSession, state: HomePickState): string[] 
 function canTakeSession(event: PublicSession, state: HomePickState): boolean {
   if (!sessionHasCoverImage(event)) return false;
   if (isHomeRailTabooSession(event)) return false;
+  if (!isWithinNextDays(event, HOME_RAIL_MAX_DAYS)) return false;
   const dedupeKey = sessionDedupeKey(event);
   const familyKey = sessionFamilyKey(event);
   if (state.seenIds.has(event.id) || state.seenTitles.has(dedupeKey) || state.seenFamilies.has(familyKey)) {
