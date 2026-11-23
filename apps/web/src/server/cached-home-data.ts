@@ -58,11 +58,13 @@ export const getHomeDestinations = unstable_cache(
 
 function homeCatalogSearchParams(citySlug?: string | null) {
   const city = String(citySlug || '').trim();
-  // 40 is enough for editors + now-tabs + popular after cover dedupe; sections are
-  // built on the server so the client island no longer carries the full pool.
+  // Nearest-month pool (max page size), NOT top-popular: `sort=popular` was dominated
+  // by high-session-count categories (excursions/museums), starving the editors+popular
+  // rails of concerts/theatre/etc. Builders still apply taboos + cover dedupe + category
+  // diversity, so a broader time-ordered pool yields the intended varied feed.
   return city
-    ? { limit: 40, sort: 'popular' as const, city }
-    : { limit: 40, sort: 'popular' as const };
+    ? { limit: 200, sort: 'time' as const, city }
+    : { limit: 200, sort: 'time' as const };
 }
 
 export const getHomeCatalog = unstable_cache(
