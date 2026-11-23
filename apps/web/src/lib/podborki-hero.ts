@@ -10,8 +10,9 @@ export const PODBORKI_HERO_TRENDING = 'HERO_TRENDING' as const;
 /**
  * Season / city pins beat DB HERO_FEATURED and national defaults.
  * Moscow City Day must win over river-cruises / museums when present and in season.
+ * New Year is pinned first in «Сезонное» across all cities during its window.
  */
-export const PODBORKI_SEASON_FEATURED_SLUGS = ['moscow-city-day'] as const;
+export const PODBORKI_SEASON_FEATURED_SLUGS = ['moscow-city-day', 'new-year'] as const;
 
 /** Seed / fallback featured slugs (synced with migration 20260724020000). */
 export const PODBORKI_FEATURED_SLUGS = ['river-cruises', 'bridges-night'] as const;

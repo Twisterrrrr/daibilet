@@ -7,6 +7,7 @@ import {
   resolveLandingEventWindow,
 } from '@/lib/landing-event-windows';
 import { filterSessionsByCity, filterSessionsByGenre, resolveLandingCityName } from '@/lib/landing-city';
+import { isLandingOffSeason } from '@/lib/landing-season';
 import { resolveSessionTimeZoneForSession } from '@/lib/datetime';
 import { fetchPublicApiJson } from '@/server/public-api-client';
 
@@ -67,7 +68,12 @@ export function finalizeLandingPayload(
   const cityName = resolveLandingCityName(citySlug);
   let sessions = filterSessionsByCity(payload.sessions, cityName, citySlug);
   sessions = filterSessionsByGenre(sessions, genre);
-  sessions = filterSessionsByLandingEventWindow(sessions, slug);
+  // When the holiday is off-season (e.g. 8 March in November), don't collapse the
+  // page to 0 by filtering to a distant holiday window - show upcoming events
+  // instead so the city landing stays useful.
+  if (!isLandingOffSeason(slug)) {
+    sessions = filterSessionsByLandingEventWindow(sessions, slug);
+  }
   const { priceFrom, priceTo } = resolveSessionPriceRange(sessions);
   // SSR grid is capped (48). Keep API uncapped matchCount when finalize did not drop rows
   // (national page, or city already scoped in buildPublicLandingPage*).

@@ -15,11 +15,11 @@ import {
 import { getLandingSeo } from '@/lib/seo/get-landing-seo';
 import { sanitizeEventHtml } from '@/lib/event-description-format';
 import { buildCollectionPageJsonLd } from '@/lib/structured-data';
-import {
-  getCachedDestinations,
+import { getCachedDestinations,
   getCachedLandingsCatalog,
   getCachedPodborkiMeta,
 } from '@/server/cached-public-surfaces';
+import { isLandingOffSeason } from '@/lib/landing-season';
 import { findSeoOverride } from '@/server/seo-override';
 
 export type PodborkiCatalogSurfaceSeo = {
@@ -139,7 +139,9 @@ export async function PodborkiCatalogSurface({
       ? metaResult.value
       : { layoutBySlug: {}, categoryBySlug: {}, categories: PODBORKI_CATEGORIES };
 
-  const items: PodborkiCatalogItem[] = (catalog.items ?? []).map((item) => ({
+  const items: PodborkiCatalogItem[] = (catalog.items ?? [])
+    .filter((item) => !isLandingOffSeason(item.slug))
+    .map((item) => ({
     slug: item.slug,
     title: item.title,
     subtitle: item.subtitle,

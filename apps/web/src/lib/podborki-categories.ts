@@ -59,7 +59,7 @@ export const LANDING_SLUG_TO_CATEGORY: Record<string, PodborkiCategorySlug> = {
 };
 
 /** Pin to the front of a sense-block (and boost that block when present). */
-export const PODBORKI_PIN_FIRST_SLUGS = ['moscow-city-day'] as const;
+export const PODBORKI_PIN_FIRST_SLUGS = ['moscow-city-day', 'new-year'] as const;
 
 const PODBORKI_PIN_FIRST = new Set<string>(PODBORKI_PIN_FIRST_SLUGS);
 
