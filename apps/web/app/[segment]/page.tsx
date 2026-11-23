@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { buildLandingMetadata, LandingRoutePage } from '@/server/landing-route-page';
-import { listLandingStaticParamsOne } from '@/lib/landing-routes';
+import { listIndexableLandingSegments } from '@/lib/sitemap-data';
 import { isCityFirstLegacyRouteSlug } from '@/lib/city-first-route-slugs';
 import { cityLookupSlug, isCityFirstUrlMode } from '@/lib/routes';
 import CityPage, { generateMetadata as generateCityMetadata } from '../cities/[slug]/page';
@@ -12,7 +12,10 @@ type PageProps = {
 };
 
 export async function generateStaticParams() {
-  return listLandingStaticParamsOne();
+  const segments = await listIndexableLandingSegments();
+  return segments
+    .filter((seg): seg is { segment: string } => !seg.segment2)
+    .map(({ segment }) => ({ segment }));
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {

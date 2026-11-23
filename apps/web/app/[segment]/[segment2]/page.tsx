@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 
 import { buildLandingMetadata, LandingRoutePage } from '@/server/landing-route-page';
-import { listLandingStaticParamsTwo } from '@/lib/landing-routes';
+import { listIndexableLandingSegments } from '@/lib/sitemap-data';
 
 export const revalidate = 3600;
 
@@ -10,7 +10,10 @@ type PageProps = {
 };
 
 export async function generateStaticParams() {
-  return listLandingStaticParamsTwo();
+  const segments = await listIndexableLandingSegments();
+  return segments
+    .filter((seg): seg is { segment: string; segment2: string } => Boolean(seg.segment2))
+    .map(({ segment, segment2 }) => ({ segment, segment2 }));
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {

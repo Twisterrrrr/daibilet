@@ -543,7 +543,7 @@ export async function buildVenuesSitemapEntries(): Promise<SitemapEntry[]> {
   return verifiedEntries;
 }
 
-export async function buildLandingsSitemapEntries(): Promise<SitemapEntry[]> {
+export async function listIndexableLandingPaths(): Promise<string[]> {
   const paths = new Set<string>();
   const cities = listingSitemapCitySlugs();
 
@@ -617,7 +617,28 @@ export async function buildLandingsSitemapEntries(): Promise<SitemapEntry[]> {
     }
   }
 
-  return [...paths].map((path) => entry(path.replace(/\/$/, '') || '/', 'weekly', 0.65));
+  return [...paths].map((path) => path.replace(/\/$/, '') || '/');
+}
+
+export async function buildLandingsSitemapEntries(): Promise<SitemapEntry[]> {
+  return (await listIndexableLandingPaths()).map((path) => entry(path, 'weekly', 0.65));
+}
+
+/**
+ * SSG segments for non-thin landings (>=6 offers). Thin landings are intentionally
+ * not prebuilt: their pages stay on demand via dynamicParams + ISR.
+ */
+export type LandingSsgSegments = { segment: string; segment2?: string };
+
+export async function listIndexableLandingSegments(): Promise<LandingSsgSegments[]> {
+  const paths = await listIndexableLandingPaths();
+  return paths
+    .map((path) => {
+      const parts = path.split('/').filter(Boolean);
+      if (parts.length >= 2) return { segment: parts[0], segment2: parts[1] };
+      return { segment: parts[0] || '' };
+    })
+    .filter((seg) => Boolean(seg.segment));
 }
 
 export async function buildBlogSitemapEntries(): Promise<SitemapEntry[]> {
