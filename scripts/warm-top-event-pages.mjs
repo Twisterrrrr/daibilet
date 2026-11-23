@@ -87,29 +87,48 @@ async function listSlugs(limit) {
   await client.connect();
   try {
     const { rows } = await client.query(
-      `SELECT ep.slug
-       FROM "EventPage" ep
-       WHERE ep.status = 'READY'
-         AND ep."isIndexable" = true
-         AND ep."publishedAt" IS NOT NULL
-         AND ep.slug IS NOT NULL
-         AND ep.slug <> ''
-         AND EXISTS (
-           SELECT 1 FROM "EventPageEvent" epe WHERE epe."eventPageId" = ep.id
-         )
-       ORDER BY
-         CASE
-           WHEN (ep.title ILIKE '%новогод%'
-              OR ep.title ILIKE '%новый год%'
-              OR ep.title ILIKE '%рождеств%'
-              OR ep.title ILIKE '%ёлк%'
-              OR ep.title ILIKE '%елк%'
-              OR ep.title ILIKE '%дед мороз%'
-              OR ep.title ILIKE '%снегурочк%') THEN 0
-           ELSE 1
-         END ASC,
-         ep."publishedAt" DESC,
-         ep.slug ASC
+      `SELECT u.slug
+       FROM (
+         -- canonical EventPages (rewrites), seasonal first
+         SELECT ep.slug AS slug, 0 AS src,
+                CASE WHEN (ep.title ILIKE '%новогод%'
+                        OR ep.title ILIKE '%новый год%'
+                        OR ep.title ILIKE '%рождеств%'
+                        OR ep.title ILIKE '%ёлк%'
+                        OR ep.title ILIKE '%елк%'
+                        OR ep.title ILIKE '%дед мороз%'
+                        OR ep.title ILIKE '%снегурочк%') THEN 0 ELSE 1 END AS seasonal,
+                ep."publishedAt" AS ts
+         FROM "EventPage" ep
+         WHERE ep.status = 'READY'
+           AND ep."isIndexable" = true
+           AND ep."publishedAt" IS NOT NULL
+           AND ep.slug IS NOT NULL
+           AND ep.slug <> ''
+           AND EXISTS (SELECT 1 FROM "EventPageEvent" epe WHERE epe."eventPageId" = ep.id)
+
+         UNION ALL
+
+         -- legacy indexable events without a rewrite (self-canonical /events/{slug})
+         SELECT e.slug AS slug, 1 AS src, 1 AS seasonal, e."updatedAt" AS ts
+         FROM "Event" e
+         WHERE e.status IN ('READY', 'PUBLISHED')
+           AND e."isIndexable" = true
+           AND e.slug IS NOT NULL
+           AND e.slug <> ''
+           AND NOT EXISTS (SELECT 1 FROM "EventPageEvent" epe WHERE epe."eventId" = e.id)
+           AND (
+             EXISTS (
+               SELECT 1 FROM "EventSession" s
+               WHERE s."eventId" = e.id
+                 AND s."isActive" = true
+                 AND s."cancelledAt" IS NULL
+                 AND (s."startsAt" IS NULL OR s."startsAt" >= NOW() OR s."endsAt" >= NOW())
+             )
+             OR NOT EXISTS (SELECT 1 FROM "EventSession" s2 WHERE s2."eventId" = e.id)
+           )
+       ) u
+       ORDER BY u.seasonal ASC, u.src ASC, u.ts DESC, u.slug ASC
        LIMIT $1`,
       [limit],
     );
