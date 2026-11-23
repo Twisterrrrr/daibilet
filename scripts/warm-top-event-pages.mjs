@@ -87,23 +87,29 @@ async function listSlugs(limit) {
   await client.connect();
   try {
     const { rows } = await client.query(
-      `SELECT e.slug
-       FROM "Event" e
-       WHERE e.status IN ('READY', 'PUBLISHED')
-         AND e."isIndexable" = true
-         AND e.slug IS NOT NULL
-         AND e.slug <> ''
-         AND (
-           EXISTS (
-             SELECT 1 FROM "EventSession" s
-             WHERE s."eventId" = e.id
-               AND s."isActive" = true
-               AND s."cancelledAt" IS NULL
-               AND (s."startsAt" IS NULL OR s."startsAt" >= NOW() OR s."endsAt" >= NOW())
-           )
-           OR NOT EXISTS (SELECT 1 FROM "EventSession" s2 WHERE s2."eventId" = e.id)
+      `SELECT ep.slug
+       FROM "EventPage" ep
+       WHERE ep.status = 'READY'
+         AND ep."isIndexable" = true
+         AND ep."publishedAt" IS NOT NULL
+         AND ep.slug IS NOT NULL
+         AND ep.slug <> ''
+         AND EXISTS (
+           SELECT 1 FROM "EventPageEvent" epe WHERE epe."eventPageId" = ep.id
          )
-       ORDER BY e."updatedAt" DESC
+       ORDER BY
+         CASE
+           WHEN (ep.title ILIKE '%новогод%'
+              OR ep.title ILIKE '%новый год%'
+              OR ep.title ILIKE '%рождеств%'
+              OR ep.title ILIKE '%ёлк%'
+              OR ep.title ILIKE '%елк%'
+              OR ep.title ILIKE '%дед мороз%'
+              OR ep.title ILIKE '%снегурочк%') THEN 0
+           ELSE 1
+         END ASC,
+         ep."publishedAt" DESC,
+         ep.slug ASC
        LIMIT $1`,
       [limit],
     );
