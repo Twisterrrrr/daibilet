@@ -39,6 +39,7 @@ import {
 import { resolveVenueExperienceProfile } from '@/lib/venue-experience-profile';
 import { filterVenuePageSessionsByCity } from '@/lib/venue-page-sessions';
 import { venueTemplate } from '@/lib/venue-kind-mapping';
+import { getSessionDateParts, resolveSessionTimeZoneForSession } from '@/lib/datetime';
 
 const PLAYBILL_WEEKDAY_SHORT = ['вс', 'пн', 'вт', 'ср', 'чт', 'пт', 'сб'] as const;
 
@@ -513,8 +514,10 @@ function VenuePlaybillRow({ entry }: { entry: VenuePlaybillEntry }) {
 function playbillSessionDate(session: PublicSessionDto): Date | null {
   const raw = session.startsAt;
   if (!raw) return null;
-  const date = new Date(raw);
-  return Number.isFinite(date.getTime()) ? date : null;
+  const parts = getSessionDateParts(raw, resolveSessionTimeZoneForSession(session));
+  if (!parts) return null;
+  // Rebuild at viewer-local midnight so getDate/getDay below preserve the event's calendar date.
+  return new Date(parts.year, parts.month - 1, parts.day);
 }
 
 function playbillWhenParts(

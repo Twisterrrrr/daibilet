@@ -7,6 +7,7 @@ import {
   pickRepresentativeSession,
 } from '@/lib/event-purchase';
 import type { PublicSessionDto } from '@daibilet/contracts/public';
+import { getSessionDateParts, resolveSessionTimeZoneForSession, SITE_TIME_ZONE } from '@/lib/datetime';
 
 /**
  * Venue playbill rows = catalog sessions on the page, not TC upcomingSlots siblings.
@@ -51,10 +52,9 @@ export type VenueEventGroup = {
 const WEEKDAY_SHORT = ['вс', 'пн', 'вт', 'ср', 'чт', 'пт', 'сб'] as const;
 
 export function buildVenueDateOptions(sessions: PublicSessionDto[]) {
-  const today = startOfDay(new Date());
-  const tomorrow = addDays(today, 1);
-  const todayKey = dateKey(today);
-  const tomorrowKey = dateKey(tomorrow);
+  const timeZone = sessions[0] ? resolveSessionTimeZoneForSession(sessions[0]) : SITE_TIME_ZONE;
+  const todayKey = dateKey(getSessionDateParts(new Date().toISOString(), timeZone)) || '';
+  const tomorrowKey = addCalendarDays(todayKey, 1);
   const keys = sessions
     .flatMap((session) => expandSessionPurchaseVariants(session))
     .map((session) => sessionDateKey(session))
@@ -403,27 +403,20 @@ function applyDateFilterToGroup(group: VenueEventGroup, targetDate: string | nul
   };
 }
 
-function sessionDateKey(session: Pick<PublicSessionDto, 'startsAt'>) {
-  const date = new Date(session.startsAt || '');
-  if (!Number.isFinite(date.getTime())) return null;
-  return dateKey(startOfDay(date));
+function sessionDateKey(session: PublicSessionDto) {
+  return dateKey(getSessionDateParts(session.startsAt, resolveSessionTimeZoneForSession(session)));
 }
 
-function dateKey(date: Date) {
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const day = String(date.getDate()).padStart(2, '0');
-  return `${year}-${month}-${day}`;
+function dateKey(parts: { year: number; month: number; day: number } | null) {
+  if (!parts) return null;
+  return `${parts.year}-${String(parts.month).padStart(2, '0')}-${String(parts.day).padStart(2, '0')}`;
 }
 
-function startOfDay(date: Date) {
-  return new Date(date.getFullYear(), date.getMonth(), date.getDate());
-}
-
-function addDays(date: Date, days: number) {
-  const next = new Date(date);
-  next.setDate(next.getDate() + days);
-  return next;
+function addCalendarDays(key: string | null, days: number) {
+  if (!key) return '';
+  const [year, month, day] = key.split('-').map(Number);
+  const date = new Date(Date.UTC(year!, month! - 1, day! + days));
+  return `${date.getUTCFullYear()}-${String(date.getUTCMonth() + 1).padStart(2, '0')}-${String(date.getUTCDate()).padStart(2, '0')}`;
 }
 
 function normalizeKey(value: string) {
