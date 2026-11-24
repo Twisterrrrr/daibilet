@@ -6,7 +6,9 @@ import { SiteLayout } from '@/components/SiteLayout';
 import { getSeasonalLanding } from '@/data/seasonal-landings';
 import '@/lib/env';
 import type { LandingProfileKind } from '@/lib/landing-copy';
+import { hasSeoListingEditorial } from '@/data/seo-listing-texts';
 import { resolveLandingCityName } from '@/lib/landing-city';
+import { resolveCityCases } from '@/lib/city-declension';
 import {
   canonicalLandingSlug,
   isBridgesNightLandingSlug,
@@ -35,6 +37,7 @@ import { fetchLandingPageDto, finalizeLandingPayload } from '@/server/landing-pa
 import { loadThinRelatedCardSessions } from '@/server/landing-thin-related';
 import { findSeoOverride } from '@/server/seo-override';
 import { NewYearLandingPage } from '../../app/new-year-ux-preview/landing-page';
+import { loadNewYearLandingData } from '../../app/new-year-ux-preview/new-year-landing-data';
 
 export const revalidate = 3600;
 
@@ -56,6 +59,41 @@ export async function buildLandingMetadata(pathname: string): Promise<Metadata> 
   if (!route) notFound();
 
   const slug = canonicalLandingSlug(route.landingSlug);
+  if (slug === 'new-year') {
+    const resolved = await loadNewYearLandingData(route.citySlug || null);
+    if (!resolved) notFound();
+    const geoName = resolved.geo.city || resolved.geo.region;
+    const seo = resolveLandingSeo({
+      slug,
+      profile: 'seasonal',
+      landingTitle: 'Новогодние мероприятия',
+      cityName: geoName,
+      stats: { events: resolved.data.total, priceFrom: resolved.data.priceFrom },
+    });
+    const title = geoName
+      ? `Новый год 2027 в ${resolveCityCases(geoName).prepositional}: афиша и билеты | Дайбилет`
+      : 'Новый год 2027 в России: афиша мероприятий и билеты | Дайбилет';
+    const canonical = landingCategoryHref(slug, route.citySlug);
+    const indexable = isLandingRouteIndexable({
+      landingSlug: slug,
+      citySlugForSeo: route.citySlug || null,
+      offers: resolved.data.total,
+      hasEditorialSeoText: Boolean(route.citySlug && hasSeoListingEditorial(slug, route.citySlug)),
+    });
+    const description = seo.description;
+    return {
+      title: { absolute: title },
+      description,
+      alternates: { canonical },
+      robots: robotsForListingIndexability(indexable),
+      ...buildShareMetadata({
+        title,
+        description,
+        path: canonical,
+        image: resolveLandingCardImage(slug),
+      }),
+    };
+  }
   const seoCitySlug =
     route.citySlug || resolveLandingBoundCitySlug(slug) || null;
   const payload = await fetchLandingPageDto(slug, route.citySlug, { revalidateSeconds: 3600 });
@@ -165,6 +203,7 @@ export async function LandingRoutePage({ pathname }: { pathname: string }) {
   if (slug === 'new-year') {
     const newYearPage = await NewYearLandingPage({ geoSlug: route.citySlug || null });
     if (newYearPage) return newYearPage;
+    notFound();
   }
   const seoCitySlug =
     route.citySlug || resolveLandingBoundCitySlug(slug) || null;

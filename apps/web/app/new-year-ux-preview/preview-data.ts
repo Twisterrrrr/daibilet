@@ -2,6 +2,8 @@ import { unstable_cache } from 'next/cache';
 import { fetchPublicApiJson } from '@/server/public-api-client';
 import { resolveSessionTimeZone } from '@/lib/city-timezone';
 import { parseSessionStartsAt } from '@/lib/datetime';
+import { getNewYearPreviewPage, sortNewYearPreviewEvents } from '@/lib/new-year-preview-order';
+import { isExcludedFromNewYearLanding } from '@/lib/new-year-preview-relevance';
 import cityRouting from '../../../../data/geo/city-routing.ru.json';
 import regionHubs from '../../../../data/geo/region-hubs.ru.json';
 import { resolvePreviewFormat } from './preview-format';
@@ -319,7 +321,7 @@ function slotsForDate(event: PreviewEvent, date: string): PreviewSlot[] {
       const weekday = new Date(`${day}T00:00:00Z`).getUTCDay();
       return weekday === 0 || weekday === 6;
     }
-    return true;
+    return false;
   });
 }
 
@@ -366,7 +368,7 @@ export async function buildNewYearPreviewData(filters: PreviewFilters = {}) {
   const rawEvents = snapshot.events;
   const sourceTotal = snapshot.total;
 
-  const grouped = groupEvents(rawEvents);
+  const grouped = groupEvents(rawEvents.filter((event) => !isExcludedFromNewYearLanding(event)));
   const query = String(filters.q || '').trim().toLocaleLowerCase('ru');
   const dateFilter = filters.date || 'all';
   const priceFilter = filters.price || 'all';
@@ -418,9 +420,7 @@ export async function buildNewYearPreviewData(filters: PreviewFilters = {}) {
     ...event,
     upcomingSlots,
   }));
-  if (filters.sort === 'price') filtered.sort((a, b) => (a.priceFrom ?? Number.MAX_SAFE_INTEGER) - (b.priceFrom ?? Number.MAX_SAFE_INTEGER));
-  else if (filters.sort === 'price-desc') filtered.sort((a, b) => (b.priceFrom ?? -1) - (a.priceFrom ?? -1));
-  else filtered.sort((a, b) => new Date(a.upcomingSlots?.[0]?.startsAt || 0).getTime() - new Date(b.upcomingSlots?.[0]?.startsAt || 0).getTime());
+  const sorted = sortNewYearPreviewEvents(filtered, filters.sort === 'price' || filters.sort === 'price-desc' ? filters.sort : 'date');
 
   const dateValues = ['all', 'dec24to31', 'dec31', 'jan1', 'jan1to14', 'weekend', 'holidays'];
   const priceValues = ['all', 'free', 'under1000', 'under2000', 'over2000', 'over5000', 'over10000'];
@@ -471,15 +471,11 @@ export async function buildNewYearPreviewData(filters: PreviewFilters = {}) {
     lowStock: lowStockCount,
   };
 
-  const offset = Math.max(0, Number(filters.offset) || 0);
-  const prices = filtered.map((event) => event.priceFrom).filter((value): value is number => typeof value === 'number' && value > 0);
+  const page = getNewYearPreviewPage(sorted, sorted.length, Number(filters.offset) || 0, PAGE_SIZE);
+  const prices = sorted.map((event) => event.priceFrom).filter((value): value is number => typeof value === 'number' && value > 0);
   return {
-    items: filtered.slice(offset, offset + PAGE_SIZE),
-    total: filtered.length,
+    ...page,
     sourceTotal,
-    offset,
-    limit: PAGE_SIZE,
-    hasMore: offset + PAGE_SIZE < filtered.length,
     generatedAt: snapshot.generatedAt,
     priceFrom: prices.length ? Math.min(...prices) : null,
     facets,

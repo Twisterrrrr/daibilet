@@ -30,6 +30,7 @@ import { getCachedDestinations } from '@/server/cached-public-surfaces';
 import { fetchPublicApiJson } from '@/server/public-api-client';
 import { parseCatalogPageQuery } from '@/server/catalog-query';
 import { finalizeLandingPayload, fetchLandingPageDto } from '@/server/landing-page';
+import { loadNewYearLandingData } from '../../app/new-year-ux-preview/new-year-landing-data';
 
 export const SITEMAP_CHUNKS = [
   'static',
@@ -548,6 +549,17 @@ export async function buildLandingsSitemapEntries(): Promise<SitemapEntry[]> {
   const cities = listingSitemapCitySlugs();
 
   for (const slug of Object.keys(LANDING_CATEGORY_PATH_BY_SLUG)) {
+    if (slug === 'new-year') {
+      try {
+        const resolved = await loadNewYearLandingData();
+        if (resolved && isLandingRouteIndexable({ landingSlug: slug, offers: resolved.data.total })) {
+          paths.add(landingCategoryHref(slug));
+        }
+      } catch {
+        // Leave the New Year URL out until its live event selection is verifiable.
+      }
+      continue;
+    }
     // City-bound landing routes are checked below using their default city's
     // exact payload, just like the page metadata request.
     if (

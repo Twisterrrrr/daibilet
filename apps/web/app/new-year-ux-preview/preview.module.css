@@ -379,6 +379,124 @@
   .drawer, .drawerPanel { animation: none; }
 }
 
+/* New Year landing: compact integrated navigation and city-first exploration. */
+.page { font-family: var(--font-manrope), var(--font-inter), system-ui, sans-serif; }
+.bandContent { padding: 30px 20px 34px; }
+.bandFestive { min-height: 0; align-items: stretch; padding: 0; }
+.bandFestive .title { width: min(100%, 920px); max-width: 920px; margin-bottom: 12px; }
+.bandFestive .lead { width: min(100%, 840px); margin-bottom: 16px; font-size: 16px; line-height: 1.55; }
+.bandFestive .bandMeta { width: 100%; margin-bottom: 0; }
+.heroTopline { display: flex; align-items: center; gap: 24px; margin-bottom: 18px; }
+.heroLogo { display: inline-flex; min-height: 34px; align-items: center; padding: 4px 10px; border-radius: 7px; background: var(--brand-yellow); color: #111827; font-family: var(--font-inter), system-ui, sans-serif; font-size: 16px; font-weight: 850; letter-spacing: -.055em; line-height: 1; }
+.heroLogo:hover { background: #ffe04a; color: #111827; }
+.heroDesktopNav { display: flex; align-items: center; gap: 5px; margin-left: auto; }
+.heroDesktopNav a { padding: 7px 11px; border-radius: 7px; color: rgb(255 255 255 / 82%); font-size: 13px; font-weight: 600; }
+.heroDesktopNav a:hover, .heroDesktopNav a[aria-current="page"] { background: rgb(255 255 255 / 12%); color: #fff; }
+.heroMobileMenu { display: none; position: relative; margin-left: auto; }
+.heroMobileMenu summary { display: grid; width: 38px; height: 38px; place-items: center; border: 1px solid rgb(255 255 255 / 24%); border-radius: 8px; color: #fff; cursor: pointer; list-style: none; }
+.heroMobileMenu summary::-webkit-details-marker { display: none; }
+.heroMobileMenu summary span, .heroMobileMenu summary span::before, .heroMobileMenu summary span::after { display: block; width: 17px; height: 2px; border-radius: 2px; background: currentColor; content: ''; }
+.heroMobileMenu summary span { position: relative; }
+.heroMobileMenu summary span::before, .heroMobileMenu summary span::after { position: absolute; left: 0; }
+.heroMobileMenu summary span::before { top: -6px; }
+.heroMobileMenu summary span::after { top: 6px; }
+.heroMobileMenu nav { position: absolute; z-index: 8; top: calc(100% + 8px); right: 0; display: grid; width: 210px; padding: 6px; border: 1px solid rgb(255 255 255 / 16%); border-radius: 10px; background: #0c1c3b; box-shadow: 0 12px 30px rgb(0 0 0 / 24%); }
+.heroMobileMenu nav a { padding: 10px 11px; border-radius: 6px; color: #fff; font-size: 14px; }
+.heroMobileMenu nav a:hover { background: rgb(255 255 255 / 12%); }
+.bandCrumbs { margin-bottom: 13px; font-size: 12px; }
+.heroCities { position: relative; width: 100%; margin-top: 17px; }
+.heroCitiesLabel { display: block; margin-bottom: 7px; color: rgb(255 255 255 / 65%); font-size: 11px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; }
+.heroCityList { display: flex; align-items: center; flex-wrap: wrap; gap: 7px; }
+.heroCityChip { display: inline-flex; min-height: 32px; align-items: center; gap: 7px; padding: 0 12px; border: 1px solid rgb(255 255 255 / 27%); border-radius: 999px; background: rgb(255 255 255 / 8%); color: #fff; font-size: 13px; font-weight: 550; white-space: nowrap; }
+.heroCityChip:hover, .heroCityChipActive { border-color: var(--brand-yellow); background: var(--brand-yellow); color: #111827; }
+.heroCityChip b { color: currentColor; font-size: 11px; font-weight: 700; opacity: .68; }
+.heroMoreButton { border-style: dashed; background: transparent; cursor: pointer; }
+.heroCitiesPanel { max-width: 760px; margin-top: 10px; padding: 12px; border: 1px solid rgb(255 255 255 / 18%); border-radius: 12px; background: rgb(5 17 43 / 78%); }
+.heroCitySearch { display: block; margin-bottom: 10px; }
+.heroCitySearch input { width: 100%; height: 36px; padding: 0 11px; border: 1px solid rgb(255 255 255 / 23%); border-radius: 7px; outline: none; background: rgb(255 255 255 / 9%); color: #fff; font: inherit; font-size: 13px; }
+.heroCitySearch input::placeholder { color: rgb(255 255 255 / 58%); }
+.heroCitySearch input:focus { border-color: var(--brand-yellow); }
+.heroCityNoResults { padding: 5px 2px; color: rgb(255 255 255 / 72%); font-size: 13px; }
+.filters { position: sticky; top: 0; }
+.desktopDropdowns { display: flex; align-items: center; gap: 8px; padding-bottom: 11px; overflow-x: auto; }
+.desktopFilterField { flex: 0 0 auto; }
+.desktopFilterField select, .dateDropdownWrap, .dateDropdownWrap select { height: 36px; }
+.desktopFilterField select, .dateDropdownWrap select { width: 100%; padding: 0 30px 0 11px; border: 1px solid var(--line); border-radius: 8px; background-color: #fff; color: var(--ink2); font: inherit; font-size: 13px; }
+.desktopFilterField select:focus, .dateDropdownWrap select:focus { border-color: var(--accent); outline: 2px solid var(--accent-soft); }
+.desktopFilterField:nth-child(1) { width: 190px; }
+.desktopFilterField:nth-child(2) { width: 158px; }
+.desktopFilterField:nth-child(3) { width: 145px; }
+.desktopFilterField:nth-child(4) { width: 170px; }
+.desktopDropdowns .desktopFilterField:first-child select,
+.desktopDropdowns .desktopFilterField:nth-last-child(2) select,
+.desktopDropdowns .desktopFilterField:last-child select { width: 100%; }
+.dateDropdownWrap { width: 100%; }
+.tableHeader { display: grid; grid-template-columns: 74px minmax(230px, 1.35fr) minmax(140px, 1fr) 120px 95px 96px; align-items: center; gap: 12px; padding: 9px 12px; border: 1px solid var(--line); border-bottom: 0; border-radius: 12px 12px 0 0; background: #fafbfc; color: var(--muted); font-size: 11px; font-weight: 700; }
+.list { border-radius: 0 0 12px 12px; }
+.row { grid-template-columns: 74px minmax(230px, 1.35fr) minmax(140px, 1fr) 120px 95px 96px; }
+.rowVenueColumn { overflow: hidden; color: var(--muted); font-size: 13px; text-overflow: ellipsis; white-space: nowrap; }
+.rowVenueInline { display: none; }
+.rowTitle { display: -webkit-box; overflow: hidden; white-space: normal; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
+.row:hover .rowTitle { color: var(--accent-dark); }
+.buyButton { border-radius: 8px !important; }
+
+@media (min-width: 640px) and (max-width: 1023px) {
+  .bandContent { padding-top: 28px; padding-bottom: 30px; }
+  .bandFestive .title { font-size: clamp(32px, 4vw, 38px); }
+  .heroCityList { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 2px; scrollbar-width: none; }
+  .heroCityList::-webkit-scrollbar { display: none; }
+  .desktopDropdowns { gap: 6px; }
+  .desktopFilterField:nth-child(1) { width: 175px; }
+  .desktopFilterField:nth-child(2) { width: 145px; }
+  .desktopFilterField:nth-child(3) { width: 130px; }
+  .desktopFilterField:nth-child(4) { width: 150px; }
+  .tableHeader, .row { grid-template-columns: 64px minmax(190px, 1.3fr) minmax(100px, .8fr) 100px 75px 80px; gap: 8px; }
+  .tableHeader { font-size: 10px; }
+  .row { padding-right: 9px; padding-left: 9px; }
+  .buyButton { padding-right: 10px !important; padding-left: 10px !important; }
+}
+
+@media (max-width: 899px) {
+  .desktopDropdowns { display: flex; }
+  .tableHeader { display: none; }
+  .row { grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: 'date price' 'main main' 'seats action'; gap: 5px 10px; }
+  .rowVenueColumn { display: none; }
+  .rowVenueInline { display: inline; }
+}
+
+@media (max-width: 639px) {
+  .bandContent { padding: 18px 14px 24px; }
+  .bandFestive { min-height: 0; }
+  .heroTopline { gap: 12px; margin-bottom: 13px; }
+  .heroLogo { min-height: 32px; padding: 4px 9px; font-size: 15px; }
+  .heroDesktopNav { display: none; }
+  .heroMobileMenu { display: block; margin-left: 0; }
+  .bandCrumbs { margin-bottom: 15px; font-size: 11.5px; }
+  .bandFestive .title { width: 100%; max-width: 100%; margin-bottom: 10px; font-size: clamp(27px, 7.3vw, 32px); line-height: 1.12; }
+  .bandFestive .lead { width: 100%; margin-bottom: 13px; font-size: 14px; line-height: 1.48; }
+  .bandFestive .bandMeta { gap: 8px; font-size: 12px; }
+  .heroCities { margin-top: 14px; }
+  .heroCityList { flex-wrap: nowrap; overflow-x: auto; padding: 0 1px 3px; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+  .heroCityList::-webkit-scrollbar { display: none; }
+  .heroCityChip { min-height: 31px; padding: 0 10px; font-size: 12px; }
+  .heroCitiesPanel .heroCityList { flex-wrap: wrap; max-height: 220px; overflow-y: auto; }
+  .filters { position: relative; }
+  .desktopDropdowns { display: none; }
+  .mobileDropdowns { display: grid; grid-template-columns: minmax(0, 1fr); gap: 8px; padding: 10px 0 2px; }
+  .mobileFilterField { grid-template-columns: 100px minmax(0, 1fr); }
+  .mobileFilterField select, .mobileFilterField .dateDropdownWrap select { min-height: 38px; height: 38px; border: 1px solid var(--line); border-radius: 8px; background-color: #fff; }
+  .mobileFilterField .dateDropdownWrap { display: block; }
+  .tableHeader { display: none; }
+  .row { min-height: 0; grid-template-columns: minmax(0, 1fr) minmax(86px, max-content); grid-template-areas: 'date price' 'main main' 'seats action'; gap: 3px 8px; padding: 10px; border-radius: 0; }
+  .rowTitle { font-size: 15px; -webkit-line-clamp: 3; }
+  .rowVenueColumn { display: none; }
+  .rowVenueInline { display: inline; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .snowflakeFall, .snowflake { animation: none !important; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .page *, .page *::before, .page *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; }
 }

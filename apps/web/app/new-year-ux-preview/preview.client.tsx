@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { CheckoutModalButton } from '@/components/CheckoutModal.client';
@@ -14,6 +14,7 @@ import { resolveSessionTimeZone } from '@/lib/city-timezone';
 import { parseSessionStartsAt } from '@/lib/datetime';
 import { PLURAL_EVENT_FORMS, pluralRu } from '@/lib/format';
 import { citySlug as cityToSlug } from '@/lib/routes';
+import { appendUniqueNewYearPreviewEvents } from '@/lib/new-year-preview-order';
 import { landingCategoryHref, normalizeKnownCitySlug } from '@/lib/landing-routes';
 import { resolveSeoListingText, splitSeoListingParagraphs } from '@/data/seo-listing-texts';
 import type { PreviewEvent } from './preview-data';
@@ -24,7 +25,7 @@ import styles from './preview.module.css';
 type DateFilter = 'all' | 'dec24to31' | 'dec31' | 'jan1' | 'jan1to14' | 'weekend' | 'holidays' | 'custom';
 type PriceFilter = 'all' | 'free' | 'under1000' | 'under2000' | 'over2000' | 'over5000' | 'over10000';
 type PreviewFilters = { city: string; region: string; date: DateFilter; customDate: string; price: PriceFilter; format: string; q: string; sort: 'date' | 'price' | 'price-desc'; lowStock: boolean };
-type Facet = { name?: string; value?: string; count: number; region?: string; filterable?: boolean };
+type Facet = { name?: string; value?: string; count: number; region?: string; filterable?: boolean; geoKind?: 'city' | 'region' };
 const FIRST_SEASON_DATE = '2026-12-01';
 const PLURAL_SESSION_FORMS = ['сеанс', 'сеанса', 'сеансов'] as const;
 type PreviewData = {
@@ -32,6 +33,7 @@ type PreviewData = {
   total: number;
   sourceTotal: number;
   offset: number;
+  nextOffset: number;
   limit: number;
   hasMore: boolean;
   generatedAt: string | null;
@@ -328,47 +330,79 @@ export function NewYearUxPreview({
   errorMessage: string | null;
 }) {
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const festive = searchParams.get('festive') !== '0';
+  const [festive, setFestive] = useState(true);
   const [data, setData] = useState<PreviewData | null>(initialData);
   const [loadedFilterQuery, setLoadedFilterQuery] = useState(() =>
     initialCity || initialRegion
       ? serializeFilters({ city: initialCity || 'Вся Россия', region: initialRegion || '', date: 'all', customDate: '', price: 'all', format: 'Все форматы', q: '', sort: 'date', lowStock: false })
       : '',
   );
-  const [region, setRegion] = useState(() => initialRegion || searchParams.get('region') || '');
-  const [city, setCity] = useState(() => initialCity || searchParams.get('city') || 'Вся Россия');
-  const [customDate, setCustomDate] = useState(() => isCustomDate(searchParams.get('date')) ? searchParams.get('date')! : '');
-  const [date, setDate] = useState<DateFilter>(() => {
-    const value = searchParams.get('date');
-    if (DATE_OPTIONS.some((item) => item.value === value)) return value as DateFilter;
-    return isCustomDate(value) ? 'custom' : 'all';
-  });
-  const [price, setPrice] = useState<PriceFilter>(() => {
-    const value = searchParams.get('price');
-    return PRICE_OPTIONS.some((item) => item.value === value) ? value as PriceFilter : 'all';
-  });
-  const [format, setFormat] = useState(() => searchParams.get('format') || 'Все форматы');
-  const [query, setQuery] = useState(() => searchParams.get('q') || '');
-  const [sort, setSort] = useState<PreviewFilters['sort']>(() => {
-    const value = searchParams.get('sort');
-    return value === 'price' || value === 'price-desc' ? value : 'date';
-  });
-  const [lowStock, setLowStock] = useState(() => searchParams.get('lowStock') === '1');
+  const [region, setRegion] = useState(() => initialRegion || '');
+  const [city, setCity] = useState(() => initialCity || 'Вся Россия');
+  const [customDate, setCustomDate] = useState('');
+  const [date, setDate] = useState<DateFilter>('all');
+  const [price, setPrice] = useState<PriceFilter>('all');
+  const [format, setFormat] = useState('Все форматы');
+  const [query, setQuery] = useState('');
+  const [sort, setSort] = useState<PreviewFilters['sort']>('date');
+  const [lowStock, setLowStock] = useState(false);
   const [compact, setCompact] = useState(false);
   const [citiesExpanded, setCitiesExpanded] = useState(false);
+  const [citySearch, setCitySearch] = useState('');
+  const heroFeaturedCitiesRef = useRef<HTMLDivElement>(null);
+  const heroMoreButtonRef = useRef<HTMLButtonElement>(null);
   const [filtersExpanded, setFiltersExpanded] = useState(false);
   const [copiedLink, setCopiedLink] = useState(false);
   const [loading, setLoading] = useState(false);
   const [loadingMore, setLoadingMore] = useState(false);
   const [loadError, setLoadError] = useState<string | null>(null);
+  const [loadMoreError, setLoadMoreError] = useState<string | null>(null);
+  const [retryToken, setRetryToken] = useState(0);
   const [selectedEvent, setSelectedEvent] = useState<PreviewEvent | null>(null);
-  const firstFilterEffect = useRef(true);
   const firstUrlSync = useRef(true);
+  const filterRequestId = useRef(0);
+  const loadMoreController = useRef<AbortController | null>(null);
+  const loadMoreRequestId = useRef(0);
 
   const filters = useMemo<PreviewFilters>(() => ({ city, region, date, customDate, price, format, q: query, sort, lowStock }), [city, region, date, customDate, price, format, query, sort, lowStock]);
   const filterQuery = useMemo(() => serializeFilters(filters), [filters]);
   const pageData = loadedFilterQuery === filterQuery ? data : null;
+
+  useEffect(() => {
+    const url = new URL(window.location.href);
+    const isLandingUrl = isCanonicalNewYearPath(url.pathname);
+    if (!isLandingUrl) {
+      setCity(url.searchParams.get('city') || 'Вся Россия');
+      setRegion(url.searchParams.get('region') || '');
+    }
+    setFestive(url.searchParams.get('festive') !== '0');
+    const nextDate = url.searchParams.get('date') || 'all';
+    setDate(DATE_OPTIONS.some((item) => item.value === nextDate) ? nextDate as DateFilter : isCustomDate(nextDate) ? 'custom' : 'all');
+    setCustomDate(isCustomDate(nextDate) ? nextDate : '');
+    const nextPrice = url.searchParams.get('price') || 'all';
+    setPrice(PRICE_OPTIONS.some((item) => item.value === nextPrice) ? nextPrice as PriceFilter : 'all');
+    setFormat(url.searchParams.get('format') || 'Все форматы');
+    setQuery(url.searchParams.get('q') || '');
+    const nextSort = url.searchParams.get('sort');
+    setSort(nextSort === 'price' || nextSort === 'price-desc' ? nextSort : 'date');
+    setLowStock(url.searchParams.get('lowStock') === '1');
+  }, []);
+
+  useEffect(() => {
+    if (citiesExpanded && heroFeaturedCitiesRef.current) heroFeaturedCitiesRef.current.scrollLeft = 0;
+  }, [citiesExpanded]);
+
+  useEffect(() => {
+    if (!citiesExpanded) return;
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key !== 'Escape') return;
+      setCitiesExpanded(false);
+      setCitySearch('');
+      heroMoreButtonRef.current?.focus();
+    };
+    window.addEventListener('keydown', closeOnEscape);
+    return () => window.removeEventListener('keydown', closeOnEscape);
+  }, [citiesExpanded]);
 
   useEffect(() => {
     if (!initialCity && !initialRegion) return;
@@ -379,27 +413,36 @@ export function NewYearUxPreview({
   }, [initialCity, initialRegion, initialData]);
 
   useEffect(() => {
-    if (firstFilterEffect.current) {
-      firstFilterEffect.current = false;
-      if (filterQuery === loadedFilterQuery || !filterQuery) return;
+    if (filterQuery === loadedFilterQuery) {
+      setLoading(false);
+      setLoadError(null);
+      return;
     }
     const controller = new AbortController();
+    const requestId = ++filterRequestId.current;
+    loadMoreController.current?.abort();
+    loadMoreController.current = null;
+    loadMoreRequestId.current++;
+    setLoadingMore(false);
+    setLoadMoreError(null);
     setLoading(true);
     setLoadError(null);
     const timer = setTimeout(async () => {
       try {
         const response = await fetch(`/api/new-year-ux-preview${filterQuery ? `?${filterQuery}` : ''}`, { signal: controller.signal, cache: 'no-store' });
         if (!response.ok) throw new Error('preview request failed');
-        setData(await response.json() as PreviewData);
+        const next = await response.json() as PreviewData;
+        if (controller.signal.aborted || requestId !== filterRequestId.current) return;
+        setData(next);
         setLoadedFilterQuery(filterQuery);
       } catch (error) {
-        if (!(error instanceof DOMException && error.name === 'AbortError')) setLoadError('Не удалось обновить выборку. Попробуйте ещё раз.');
+        if (!controller.signal.aborted && requestId === filterRequestId.current && !(error instanceof DOMException && error.name === 'AbortError')) setLoadError('Не удалось обновить выборку. Попробуйте ещё раз.');
       } finally {
-        if (!controller.signal.aborted) setLoading(false);
+        if (!controller.signal.aborted && requestId === filterRequestId.current) setLoading(false);
       }
     }, query ? 180 : 0);
     return () => { clearTimeout(timer); controller.abort(); };
-  }, [filterQuery, query, loadedFilterQuery]);
+  }, [filterQuery, query, loadedFilterQuery, retryToken]);
 
   useEffect(() => {
     if (!selectedEvent) return;
@@ -440,6 +483,7 @@ export function NewYearUxPreview({
       setCity(geo.city);
       setRegion(geo.region);
       const nextDate = url.searchParams.get('date') || 'all';
+      setFestive(url.searchParams.get('festive') !== '0');
       setDate(DATE_OPTIONS.some((item) => item.value === nextDate) ? nextDate as DateFilter : isCustomDate(nextDate) ? 'custom' : 'all');
       setCustomDate(isCustomDate(nextDate) ? nextDate : '');
       const nextPrice = url.searchParams.get('price') || 'all';
@@ -455,22 +499,35 @@ export function NewYearUxPreview({
   }, [data?.facets]);
 
   const loadMore = useCallback(async () => {
-    if (!data?.hasMore || loadingMore || loading) return;
+    if (!pageData?.hasMore || loadingMore || loading) return;
+    const controller = new AbortController();
+    const requestId = ++loadMoreRequestId.current;
+    loadMoreController.current?.abort();
+    loadMoreController.current = controller;
     setLoadingMore(true);
-    setLoadError(null);
+    setLoadMoreError(null);
     try {
       const params = new URLSearchParams(filterQuery);
-      params.set('offset', String(data.items.length));
-      const response = await fetch(`/api/new-year-ux-preview?${params.toString()}`, { cache: 'no-store' });
+      params.set('offset', String(pageData.nextOffset ?? pageData.items.length));
+      const response = await fetch(`/api/new-year-ux-preview?${params.toString()}`, { cache: 'no-store', signal: controller.signal });
       if (!response.ok) throw new Error('pagination request failed');
       const next = await response.json() as PreviewData;
-      setData((current) => current ? { ...next, items: [...current.items, ...next.items] } : next);
-    } catch {
-      setLoadError('Не удалось загрузить следующие события. Нажмите «Показать ещё».');
+      if (controller.signal.aborted || requestId !== loadMoreRequestId.current || loadedFilterQuery !== filterQuery) return;
+      setData((current) => {
+        if (!current || loadedFilterQuery !== filterQuery) return current;
+        return { ...next, items: appendUniqueNewYearPreviewEvents(current.items, next.items) };
+      });
+    } catch (error) {
+      if (!controller.signal.aborted && requestId === loadMoreRequestId.current && !(error instanceof DOMException && error.name === 'AbortError')) {
+        setLoadMoreError('Не удалось загрузить следующие события. Повторите попытку.');
+      }
     } finally {
-      setLoadingMore(false);
+      if (requestId === loadMoreRequestId.current) {
+        setLoadingMore(false);
+        loadMoreController.current = null;
+      }
     }
-  }, [data, filterQuery, loading, loadingMore]);
+  }, [pageData, filterQuery, loadedFilterQuery, loading, loadingMore]);
 
   const cities = data?.facets.cities || [];
   const regions = data?.facets.regions || [];
@@ -481,10 +538,33 @@ export function NewYearUxPreview({
   const orderedCities = [cities.find((item) => item.name === 'Вся Россия'), ...allCityOptions]
     .filter((item, index, list) => item && list.findIndex((candidate) => candidate?.name === item.name) === index) as Facet[];
   const geoOptions = [
-    ...orderedCities,
-    ...regions.map((item) => ({ ...item, region: item.name })),
-  ];
-  const visibleCityChips = citiesExpanded ? geoOptions : geoOptions.slice(0, 8);
+    ...orderedCities.map((item) => ({ ...item, geoKind: 'city' as const })),
+    ...regions.map((item) => ({ ...item, region: item.name, geoKind: 'region' as const })),
+  ].filter((item) => Boolean(item.name) && item.count > 0);
+  const currentGeoOption = geoOptions.find((item) => item.name === (region || city)) || (region
+    ? regions.find((item) => item.name === region)
+    : cities.find((item) => item.name === city)) || undefined;
+  const normalizedCurrentGeoOption = currentGeoOption && !currentGeoOption.geoKind
+    ? { ...currentGeoOption, geoKind: region ? 'region' as const : 'city' as const }
+    : currentGeoOption;
+  const allGeoOption = geoOptions.find((item) => item.name === 'Вся Россия');
+  const featuredPriority = !region && city === 'Вся Россия'
+    ? ['Москва', 'Санкт-Петербург', 'Казань', 'Калининград']
+    : [];
+  const preferredCityOptions: Facet[] = featuredPriority.flatMap((name) => {
+    const option = geoOptions.find((item) => item.name === name);
+    return option ? [option] : [];
+  });
+  const featuredGeoOptions: Facet[] = [
+    ...(normalizedCurrentGeoOption && normalizedCurrentGeoOption.name !== 'Вся Россия' ? [normalizedCurrentGeoOption] : []),
+    ...(allGeoOption ? [allGeoOption] : []),
+    ...preferredCityOptions,
+    ...geoOptions.filter((item) => item.name !== 'Вся Россия' && item.name !== normalizedCurrentGeoOption?.name),
+  ].filter((item, index, list) => list.findIndex((candidate) => candidate.name === item.name) === index).slice(0, 5);
+  const hiddenGeoOptions = geoOptions.filter((item) => !featuredGeoOptions.includes(item));
+  const searchedGeoOptions = citySearch.trim()
+    ? geoOptions.filter((item) => item.name?.toLocaleLowerCase('ru').includes(citySearch.trim().toLocaleLowerCase('ru')))
+    : hiddenGeoOptions;
   const currentDateLabel = date === 'custom' && customDate ? formatCustomDate(customDate) : DATE_OPTIONS.find((item) => item.value === date)?.label;
   const currentPriceLabel = PRICE_OPTIONS.find((item) => item.value === price)?.label;
   const hasFilters = Boolean((city !== 'Вся Россия' || region) || query.trim() || date !== 'all' || price !== 'all' || format !== 'Все форматы' || lowStock);
@@ -542,6 +622,32 @@ export function NewYearUxPreview({
     setRegion(nextRegion);
     setCity('Вся Россия');
   };
+  const renderGeoChip = (item: Facet) => {
+    if (!item.name) return null;
+    const isRegion = item.geoKind === 'region';
+    const selected = isRegion
+      ? region === item.name
+      : item.name === 'Вся Россия'
+        ? city === 'Вся Россия' && !region
+        : city === item.name;
+    const className = `${styles.heroCityChip} ${selected ? styles.heroCityChipActive : ''}`;
+    const label = <>{item.name}<b>{item.count}</b></>;
+    if (selected) return <span key={`${isRegion ? 'region' : 'city'}:${item.name}`} className={className} aria-current="page">{label}</span>;
+    const href = isRegion ? publicGeoPath('Вся Россия', item.name) : item.name === 'Вся Россия' ? publicGeoPath('Вся Россия', '') : publicGeoPath(item.name, '');
+    return <Link
+      key={`${isRegion ? 'region' : 'city'}:${item.name}`}
+      href={href}
+      className={className}
+      onClick={(event) => {
+        event.preventDefault();
+        setCitiesExpanded(false);
+        setCitySearch('');
+        if (isRegion) selectRegion(item.name!);
+        else if (item.name === 'Вся Россия') selectAllGeography();
+        else selectCity(item.name!);
+      }}
+    >{label}</Link>;
+  };
   const generatedLabel = pageData?.generatedAt ? new Intl.DateTimeFormat('ru-RU', { dateStyle: 'short', timeStyle: 'short', timeZone: 'Europe/Moscow' }).format(new Date(pageData.generatedAt)) : 'не указано';
 
   const setDateFilter = (value: DateFilter) => {
@@ -553,7 +659,23 @@ export function NewYearUxPreview({
     setCustomDate(value);
     setDate('custom');
   };
-  const resetFilters = () => { navigateGeo('Вся Россия', ''); setCity('Вся Россия'); setRegion(''); setQuery(''); setDateFilter('all'); setPrice('all'); setFormat('Все форматы'); setLowStock(false); setSort('date'); setCompact(false); };
+  const resetFilters = () => {
+    const current = new URL(window.location.href);
+    if (isCanonicalNewYearPath(current.pathname)) {
+      for (const key of ['city', 'region', 'date', 'price', 'format', 'q', 'sort', 'lowStock']) current.searchParams.delete(key);
+      current.pathname = publicGeoPath('Вся Россия', '');
+      router.push(`${current.pathname}${current.search}${current.hash}`, { scroll: false });
+    }
+    setCity('Вся Россия');
+    setRegion('');
+    setQuery('');
+    setDateFilter('all');
+    setPrice('all');
+    setFormat('Все форматы');
+    setLowStock(false);
+    setSort('date');
+    setCompact(false);
+  };
   const copyFiltersLink = async () => {
     const url = new URL(window.location.href);
     for (const key of ['city', 'region', 'date', 'price', 'format', 'q', 'sort', 'lowStock']) url.searchParams.delete(key);
@@ -580,6 +702,26 @@ export function NewYearUxPreview({
             <div className={styles.snowflakes}>{Array.from({ length: 12 }, (_, index) => <span key={index} className={styles.snowflakeFall}><svg viewBox="0 0 48 48" className={styles.snowflake}><g fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.7"><path d="M24 3v42M21 8l3 3 3-3M21 40l3-3 3 3M5.8 13.5l36.4 21M9 12.8l.7 4.2 4.2-.7M34.1 31.7l4.2-.7-.7 4.2M5.8 34.5l36.4-21M9 35.2l.7-4.2 4.2.7M34.1 16.3l4.2.7-.7-4.2" /></g></svg></span>)}</div>
           </div> : null}
           <div className={`${styles.wrap} ${styles.bandContent}`}>
+          <div className={styles.heroTopline}>
+            <details className={styles.heroMobileMenu}>
+              <summary aria-label="Открыть меню"><span aria-hidden="true" /></summary>
+              <nav aria-label="Основная навигация">
+                <Link href="/events">Афиша</Link>
+                <Link href="/cities">Город</Link>
+                <Link href="/podborki">Подборки</Link>
+                <Link href="/blog">Блог</Link>
+                <Link href="/my-day">Мой день</Link>
+                <Link href="/help">Помощь и FAQ</Link>
+              </nav>
+            </details>
+            <Link href="/" className={styles.heroLogo} aria-label="Дайбилет, главная">дайбилет</Link>
+            <nav className={styles.heroDesktopNav} aria-label="Основная навигация">
+              <Link href="/events">Афиша</Link>
+              <Link href="/cities">Город</Link>
+              <Link href="/podborki" aria-current="page">Подборки</Link>
+              <Link href="/blog">Блог</Link>
+            </nav>
+          </div>
           <nav aria-label="Хлебные крошки" className={styles.bandCrumbs}>
             <Link href="/">Главная</Link><span>/</span><Link href="/podborki">Подборки</Link><span>/</span><Link href="/novyj-god">Новый год</Link>{region || city !== 'Вся Россия' ? <><span>/</span><span className={styles.bandCrumbCurrent}>{region || city}</span></> : null}
           </nav>
@@ -591,11 +733,28 @@ export function NewYearUxPreview({
             {city === 'Вся Россия' ? <span>{Math.max(0, cities.filter((item) => item.name !== 'Вся Россия' && item.count > 0).length)} городов с событиями</span> : null}
             <span>{data?.priceFrom != null ? `от ${new Intl.NumberFormat('ru-RU').format(data.priceFrom)} ₽` : 'Цена уточняется'}</span>
           </div>
-          <div className={styles.presets} aria-label="Быстрый выбор">
-            <button type="button" className={`${styles.preset} ${date === 'dec31' ? styles.presetActive : ''}`} onClick={() => setDateFilter(date === 'dec31' ? 'all' : 'dec31')}>31 декабря</button>
-            <button type="button" className={`${styles.preset} ${date === 'jan1' ? styles.presetActive : ''}`} onClick={() => setDateFilter(date === 'jan1' ? 'all' : 'jan1')}>1 января</button>
-            <button type="button" className={`${styles.preset} ${date === 'jan1to14' ? styles.presetActive : ''}`} onClick={() => setDateFilter(date === 'jan1to14' ? 'all' : 'jan1to14')}>1–14 января</button>
-            <button type="button" className={`${styles.preset} ${date === 'weekend' ? styles.presetActive : ''}`} onClick={() => setDateFilter(date === 'weekend' ? 'all' : 'weekend')}>Выходные</button>
+          <div className={styles.heroCities} aria-label="Выбрать город или регион">
+            <span className={styles.heroCitiesLabel}>Города</span>
+            <div className={styles.heroCityList} ref={heroFeaturedCitiesRef}>
+              {featuredGeoOptions.map(renderGeoChip)}
+              {hiddenGeoOptions.length ? <button
+                type="button"
+                ref={heroMoreButtonRef}
+                className={`${styles.heroCityChip} ${styles.heroMoreButton}`}
+                aria-expanded={citiesExpanded}
+                aria-controls="new-year-more-cities"
+                onClick={() => { setCitiesExpanded((value) => !value); setCitySearch(''); }}
+              >{citiesExpanded ? 'Свернуть ↑' : `Ещё города · ${hiddenGeoOptions.length}`}</button> : null}
+            </div>
+            {citiesExpanded ? <div className={styles.heroCitiesPanel} id="new-year-more-cities" role="region" aria-label="Все города и регионы">
+              <label className={styles.heroCitySearch}>
+                <span className="sr-only">Поиск города или региона</span>
+                <input type="search" value={citySearch} onChange={(event) => setCitySearch(event.target.value)} placeholder="Найти город или регион" />
+              </label>
+              <div className={styles.heroCityList}>
+                {searchedGeoOptions.length ? searchedGeoOptions.map(renderGeoChip) : <span className={styles.heroCityNoResults}>Ничего не найдено</span>}
+              </div>
+            </div> : null}
           </div>
           </div>
         </section>
@@ -626,36 +785,19 @@ export function NewYearUxPreview({
               <button type="button" className={styles.linkButton} onClick={() => void copyFiltersLink()} aria-label="Скопировать ссылку на выбранные фильтры">{copiedLink ? 'Ссылка скопирована' : 'Скопировать и поделиться'}</button>
             </div>
             <div className={styles.desktopDropdowns} aria-label="Фильтры мероприятий">
-              <label className={styles.desktopFilterField}>
-                <span className="sr-only">Город или регион</span>
-                <select aria-label="Город или регион" value={region ? `region:${region}` : `city:${city}`} onChange={(event) => {
-                  const [kind, ...parts] = event.target.value.split(':');
-                  const value = parts.join(':');
-                  if (kind === 'region') selectRegion(value);
-                  else selectCity(value);
-                }}>
-                  <option value="city:Вся Россия">Все города · {cities.find((item) => item.name === 'Вся Россия')?.count || 0}</option>
-                  <optgroup label="Города">
-                    {orderedCities.filter((item): item is Facet & { name: string } => Boolean(item.name) && item.name !== 'Вся Россия').map((item) => <option key={`desktop-city:${item.name}`} value={`city:${item.name}`} disabled={item.count === 0 && city !== item.name}>{item.name} · {item.count}</option>)}
-                  </optgroup>
-                  <optgroup label="Области и края">
-                    {regions.map((item) => <option key={`desktop-region:${item.name}`} value={`region:${item.name}`} disabled={item.count === 0 && region !== item.name}>{item.name} · {item.count}</option>)}
-                  </optgroup>
-                </select>
-              </label>
               <div className={styles.desktopFilterField}>
                 <DateFilterDropdown date={date} customDate={customDate} facets={data?.facets.dates} onDateChange={setDateFilter} onCustomDateChange={setCustomDateFilter} />
               </div>
               <label className={styles.desktopFilterField}>
-                <span className="sr-only">Цена</span>
-                <select aria-label="Цена" value={price} onChange={(event) => setPrice(event.target.value as PriceFilter)}>
-                  {PRICE_OPTIONS.map((item) => <option key={`desktop-price:${item.value}`} value={item.value}>{item.label} · {getFacetCount(data?.facets.prices, item.value)}</option>)}
-                </select>
-              </label>
-              <label className={styles.desktopFilterField}>
                 <span className="sr-only">Формат</span>
                 <select aria-label="Формат" value={format} onChange={(event) => setFormat(event.target.value)}>
                   {formats.map((item) => { const value = item.name || 'Все форматы'; return <option key={`desktop-format:${value}`} value={value}>{value} · {item.count}</option>; })}
+                </select>
+              </label>
+              <label className={styles.desktopFilterField}>
+                <span className="sr-only">Цена</span>
+                <select aria-label="Цена" value={price} onChange={(event) => setPrice(event.target.value as PriceFilter)}>
+                  {PRICE_OPTIONS.map((item) => <option key={`desktop-price:${item.value}`} value={item.value}>{item.label} · {getFacetCount(data?.facets.prices, item.value)}</option>)}
                 </select>
               </label>
               <label className={styles.desktopFilterField}>
@@ -668,31 +810,8 @@ export function NewYearUxPreview({
             </div>
             <div className={styles.mobileDropdowns}>
               <label className={styles.mobileFilterField}>
-                <span>Город или регион</span>
-                <select value={region ? `region:${region}` : `city:${city}`} onChange={(event) => {
-                  const [kind, ...parts] = event.target.value.split(':');
-                  const value = parts.join(':');
-                  if (kind === 'region') selectRegion(value);
-                  else selectCity(value);
-                }}>
-                  <option value="city:Вся Россия">Вся Россия · {cities.find((item) => item.name === 'Вся Россия')?.count || 0}</option>
-                  <optgroup label="Города">
-                    {orderedCities.filter((item): item is Facet & { name: string } => Boolean(item.name) && item.name !== 'Вся Россия').map((item) => <option key={`city:${item.name}`} value={`city:${item.name}`} disabled={item.count === 0 && city !== item.name}>{item.name} · {item.count}</option>)}
-                  </optgroup>
-                  <optgroup label="Области и края">
-                    {regions.map((item) => <option key={`region:${item.name}`} value={`region:${item.name}`} disabled={item.count === 0 && region !== item.name}>{item.name} · {item.count}</option>)}
-                  </optgroup>
-                </select>
-              </label>
-              <label className={styles.mobileFilterField}>
                 <span>Дата</span>
                 <DateFilterDropdown date={date} customDate={customDate} facets={data?.facets.dates} onDateChange={setDateFilter} onCustomDateChange={setCustomDateFilter} />
-              </label>
-              <label className={styles.mobileFilterField}>
-                <span>Цена</span>
-                <select value={price} onChange={(event) => setPrice(event.target.value as PriceFilter)}>
-                  {PRICE_OPTIONS.map((item) => { const count = getFacetCount(data?.facets.prices, item.value); return <option key={item.value} value={item.value} disabled={count === 0 && price !== item.value}>{item.label} · {count}</option>; })}
-                </select>
               </label>
               <label className={styles.mobileFilterField}>
                 <span>Формат</span>
@@ -701,40 +820,18 @@ export function NewYearUxPreview({
                 </select>
               </label>
               <label className={styles.mobileFilterField}>
-                <span>Наличие</span>
+                <span>Цена</span>
+                <select value={price} onChange={(event) => setPrice(event.target.value as PriceFilter)}>
+                  {PRICE_OPTIONS.map((item) => { const count = getFacetCount(data?.facets.prices, item.value); return <option key={item.value} value={item.value} disabled={count === 0 && price !== item.value}>{item.label} · {count}</option>; })}
+                </select>
+              </label>
+              <label className={styles.mobileFilterField}>
+                <span>Наличие мест</span>
                 <select value={lowStock ? 'low' : 'any'} onChange={(event) => setLowStock(event.target.value === 'low')}>
                   <option value="any">Наличие мест</option>
                   <option value="low" disabled={!data?.facets.lowStock && !lowStock}>Мало мест · {data?.facets.lowStock || 0}</option>
                 </select>
               </label>
-            </div>
-            <div className={styles.chipRows}>
-              <div className={styles.chipRow} aria-label="Фильтр по городам и регионам">
-                {visibleCityChips.map((item) => {
-                  const isRegion = Boolean(item.region);
-                  const selected = isRegion ? region === item.name : item.name === 'Вся Россия' ? city === 'Вся Россия' && !region : city === item.name;
-                  const onSelect = isRegion
-                    ? () => item.name && selectRegion(item.name)
-                    : item.name === 'Вся Россия'
-                      ? selectAllGeography
-                      : () => item.name && selectCity(item.name);
-                  return <button key={`${isRegion ? 'region' : 'city'}:${item.name}`} type="button" className={`${styles.chip} ${item.name === 'Вся Россия' ? styles.chipPrimary : ''} ${selected ? styles.chipActive : ''} ${item.count === 0 ? styles.chipDisabled : ''}`} onClick={onSelect} aria-pressed={selected} disabled={item.count === 0 && !selected}>{item.name}<b className={styles.chipCount}>{item.count}</b></button>;
-                })}
-                {geoOptions.length > 8 ? <button type="button" className={`${styles.chip} ${styles.moreChip}`} onClick={() => setCitiesExpanded(!citiesExpanded)}>{citiesExpanded ? 'свернуть ↑' : `ещё ${geoOptions.length - 8} ↓`}</button> : null}
-              </div>
-              <div className={styles.chipRow} aria-label="Фильтр по дате">
-                {DATE_OPTIONS.map((item) => { const count = getFacetCount(data?.facets.dates, item.value); return <button key={item.value} type="button" className={`${styles.chip} ${item.value === 'all' ? styles.chipPrimary : ''} ${date === item.value ? styles.chipActive : ''} ${count === 0 && item.value !== 'all' ? styles.chipDisabled : ''}`} onClick={() => setDateFilter(item.value)} aria-pressed={date === item.value}>{item.label}<b className={styles.chipCount}>{count}</b></button>; })}
-                <DatePickerChip date={date} customDate={customDate} onChange={setCustomDateFilter} />
-              </div>
-              <div className={styles.chipRow} aria-label="Фильтр по цене">
-                {PRICE_OPTIONS.map((item) => { const count = getFacetCount(data?.facets.prices, item.value); return <button key={item.value} type="button" className={`${styles.chip} ${item.value === 'all' ? styles.chipPrimary : ''} ${price === item.value ? styles.chipActive : ''} ${count === 0 && item.value !== 'all' ? styles.chipDisabled : ''}`} onClick={() => setPrice(item.value)} aria-pressed={price === item.value}>{item.label}<b className={styles.chipCount}>{count}</b></button>; })}
-              </div>
-              <div className={styles.chipRow} aria-label="Фильтр по формату">
-                {formats.map((item) => { const value = item.name || 'Все форматы'; return <button key={value} type="button" className={`${styles.chip} ${value === 'Все форматы' ? styles.chipPrimary : ''} ${format === value ? styles.chipActive : ''} ${item.count === 0 && value !== 'Все форматы' ? styles.chipDisabled : ''}`} onClick={() => setFormat(value)} aria-pressed={format === value}>{value}<b className={styles.chipCount}>{item.count}</b></button>; })}
-              </div>
-              <div className={styles.chipRow} aria-label="Фильтр по наличию мест">
-                <button type="button" className={`${styles.chip} ${lowStock ? styles.chipActive : ''} ${data?.facets.lowStock === 0 ? styles.chipDisabled : ''}`} onClick={() => setLowStock(!lowStock)} aria-pressed={lowStock} disabled={!data?.facets.lowStock && !lowStock}>Мало мест<b className={styles.chipCount}>{data?.facets.lowStock || 0}</b></button>
-              </div>
             </div>
           </div>
         </section>
@@ -742,7 +839,7 @@ export function NewYearUxPreview({
         <div className={styles.content}>
         <div className={styles.wrap}>
           <div className={styles.toolbar}>
-            <div className={styles.count}>{loading ? 'Обновляем выборку…' : <>Найдено <strong>{data?.total || 0}</strong> событий (показано <strong>{data?.items.length || 0}</strong>)</>}</div>
+            <div className={styles.count}>{loading && !pageData ? 'Обновляем выборку…' : loadError || errorMessage ? 'Выборка не обновлена' : <>Найдено <strong>{pageData?.total || 0}</strong> событий (показано <strong>{pageData?.items.length || 0}</strong>)</>}</div>
             {hasFilters ? <button type="button" className={styles.reset} onClick={resetFilters}>Сбросить фильтры</button> : null}
           </div>
 
@@ -751,11 +848,13 @@ export function NewYearUxPreview({
             <span className={styles.activeCity}>{city === 'Вся Россия' ? 'Все города' : city}</span>
           </div> : null}
 
-          {errorMessage || loadError ? <div role="status" className={styles.empty}><div className={styles.emptyTitle}>Не удалось обновить список</div><div className={styles.emptyText}>{loadError || errorMessage}</div></div> : null}
-          {data?.items.length ? <div className={styles.list} aria-busy={loading || loadingMore}>
-            {data.items.map((event) => {
+          {errorMessage ? <div role="alert" className={styles.empty}><div className={styles.emptyTitle}>Не удалось загрузить новогоднюю афишу</div><div className={styles.emptyText}>{errorMessage}</div><button type="button" className={styles.reset} onClick={() => window.location.reload()}>Попробовать снова</button></div> : null}
+          {loadError ? <div role="alert" className={styles.empty}><div className={styles.emptyTitle}>Не удалось обновить список</div><div className={styles.emptyText}>Для выбранных фильтров не загрузились свежие результаты. Предыдущие карточки скрыты, чтобы не показывать события из другой выборки.</div><button type="button" className={styles.reset} onClick={() => { setLoadError(null); setRetryToken((value) => value + 1); }}>Повторить</button></div> : null}
+          {pageData?.items.length ? <>
+          <div className={styles.tableHeader} aria-hidden="true"><span>Дата и время</span><span>Мероприятие</span><span>Площадка</span><span>Цена</span><span>Наличие мест</span><span /></div>
+          <div className={styles.list} aria-busy={loading || loadingMore}>
+            {pageData.items.map((event) => {
               const slot = event.upcomingSlots?.[0];
-              const href = event.eventPageSlug || event.slug;
               const priceLabel = typeof event.priceFrom === 'number' ? event.priceFrom === 0 ? 'Бесплатно' : `от ${new Intl.NumberFormat('ru-RU').format(event.priceFrom)} ₽` : 'Цена уточняется';
               const slots = event.upcomingSlots || [];
               const timeZone = resolveSessionTimeZone(event);
@@ -771,19 +870,21 @@ export function NewYearUxPreview({
                 <div className={styles.rowDate}>{slotDate ? <><strong>{slotDate.day}</strong>{slotDate.rest ? <small>{slotDate.rest}</small> : null}{slotDate.time ? <small>{slotDate.time}</small> : null}<span className={styles.rowDateCompact}>{slotDate.compact}{slotDate.time ? <> <span aria-hidden="true">·</span> <time dateTime={slot?.startsAt || undefined}>{slotDate.time}</time></> : null}</span></> : 'Дата уточняется'}</div>
                 <div className={styles.rowMain}>
                   <div className={styles.rowTitle} title={event.title}>{event.title}</div>
-                  <div className={styles.rowMeta}>{city === 'Вся Россия' && event.city ? <span className={styles.rowCity}>{event.city}</span> : null}{city !== 'Вся Россия' && event.city ? <span className={styles.rowCityMobile}>{event.city}</span> : null}{eventBadges(event).map((badge) => <span key={badge.id} className={`${styles.tag} ${badge.className}`}>{badge.label}</span>)}<span className={styles.rowVenue}>{event.venue || 'Площадка уточняется'}</span></div>
+                  <div className={styles.rowMeta}>{city === 'Вся Россия' && event.city ? <span className={styles.rowCity}>{event.city}</span> : null}{city !== 'Вся Россия' && event.city ? <span className={styles.rowCityMobile}>{event.city}</span> : null}{eventBadges(event).map((badge) => <span key={badge.id} className={`${styles.tag} ${badge.className}`}>{badge.label}</span>)}<span className={`${styles.rowVenue} ${styles.rowVenueInline}`}>{event.venue || 'Площадка уточняется'}</span></div>
                   {slots.length > 1 ? <details className={styles.schedule}><summary><span className={styles.scheduleDesktopLabel}>Расписание · </span><span className={styles.scheduleCompactLabel}>{slots.length} {pluralRu(slots.length, PLURAL_SESSION_FORMS)}</span></summary><ul className={styles.scheduleList}>{slots.map((item, index) => { const itemUrls = previewSlotPurchaseUrls(event, item); return <li className={styles.scheduleItem} key={item.id || `${event.id}:${item.startsAt}:${index}`}><span>{formatSlot(item, timeZone)}</span>{itemUrls.map((itemUrl, urlIndex) => <PreviewPurchaseButton key={`${itemUrl}:${urlIndex}`} event={{ ...event, widgetUrl: null, purchaseUrl: itemUrl, upcomingSlots: [{ ...item, purchaseUrl: itemUrl, purchaseUrls: undefined }] }} className={styles.scheduleBuy} label={itemUrls.length > 1 ? `Билет на сеанс ${urlIndex + 1}` : 'Билет на этот сеанс'} />)}</li>; })}</ul></details> : null}
                 </div>
+                <div className={styles.rowVenueColumn}>{event.venue || 'Площадка не указана'}</div>
                 <div className={styles.rowPrice}>{priceLabel}{typeof event.priceFrom === 'number' && event.priceFrom === 0 ? <small className={styles.freePrice}>вход свободный</small> : <small>за билет</small>}</div>
                 <div className={`${styles.rowSeats} ${typeof event.vacant === 'number' && event.vacant <= 8 ? styles.rowSeatsLow : ''}`}>{typeof event.vacant === 'number' ? `${event.vacant} мест` : ''}</div>
                 <div className={styles.rowAction}><PreviewPurchaseButton event={event} className={styles.buyButton} /></div>
               </article>;
             })}
-          </div> : <div className={styles.empty}><div className={styles.emptyTitle}>Под фильтры ничего не подошло</div><div className={styles.emptyText}>Сбросьте часть условий или выберите другой город.</div></div>}
+          </div></> : loading && !errorMessage && !loadError ? <div className={styles.empty}><div className={styles.emptyTitle}>Обновляем список</div><div className={styles.emptyText}>Применяем выбранные фильтры.</div></div> : !errorMessage && !loadError ? <div className={styles.empty}><div className={styles.emptyTitle}>Под фильтры ничего не подошло</div><div className={styles.emptyText}>Сбросьте часть условий или выберите другой город.</div></div> : null}
 
-          {data?.hasMore ? <div className={styles.moreArea}>
-            <button type="button" className={styles.moreButton} onClick={() => void loadMore()} disabled={loadingMore || loading}>{loadingMore ? 'Загружаем…' : `Показать ещё ${Math.min(data.limit, data.total - data.items.length)}`}</button>
+          {pageData?.hasMore ? <div className={styles.moreArea}>
+            <button type="button" className={styles.moreButton} onClick={() => void loadMore()} disabled={loadingMore || loading}>{loadingMore ? 'Загружаем…' : `Показать ещё ${Math.min(pageData.limit, pageData.total - pageData.items.length)}`}</button>
           </div> : null}
+          {loadMoreError ? <div role="alert" className={styles.empty}><div className={styles.emptyTitle}>Следующая часть списка не загрузилась</div><div className={styles.emptyText}>{loadMoreError}</div><button type="button" className={styles.reset} onClick={() => void loadMore()} disabled={loadingMore}>Повторить</button></div> : null}
           {loadingMore ? <p className={styles.loading} role="status">Загружаем следующие мероприятия…</p> : null}
         </div>
         </div>
