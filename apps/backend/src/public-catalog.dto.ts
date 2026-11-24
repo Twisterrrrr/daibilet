@@ -872,23 +872,25 @@ async function loadPublicCatalogRows(): Promise<PublicCatalogRow[]> {
             lower(regexp_replace(trim(coalesce(city, '')), '\\s+', ' ', 'g')),
             lower(regexp_replace(trim(coalesce(venue, '')), '\\s+', ' ', 'g'))
           )
-          -- COUNT returns 0 when links have no metaExternalId; only conflicting IDs stay isolated.
-          when "tcMetaCount" > 1 then concat_ws('|', 'tc-unresolved', id)
           when nullif(trim("tcMetaExternalId"), '') is not null and "tcMetaCount" = 1 then concat_ws(
             '|',
             'tc-meta',
             trim("tcMetaExternalId"),
             coalesce("cityId"::text, lower(regexp_replace(trim(coalesce(city, '')), '\\s+', ' ', 'g')))
           )
+          -- Ambiguous/missing TC meta IDs can still be safely grouped by provider and exact venue context.
+          when nullif(trim(coalesce("sourceLabel", '')), '') is null then concat_ws('|', 'unknown-source', id)
           else concat_ws(
             '|',
+            'provider-title-location',
             lower(regexp_replace(trim(coalesce("sourceLabel", '')), '\\s+', ' ', 'g')),
             lower(regexp_replace(trim(coalesce(
               nullif(trim(${raw(CATALOG_GROUP_TITLE_SQL)}), ''),
               trim(coalesce(venue, ''))
             )), '\\s+', ' ', 'g')),
             lower(regexp_replace(trim(coalesce(city, '')), '\\s+', ' ', 'g')),
-            lower(regexp_replace(trim(coalesce(venue, '')), '\\s+', ' ', 'g'))
+            lower(regexp_replace(trim(coalesce(venue, '')), '\\s+', ' ', 'g')),
+            lower(regexp_replace(trim(coalesce("venueAddress", '')), '\\s+', ' ', 'g'))
           )
         end as "groupKey"
       from normalized

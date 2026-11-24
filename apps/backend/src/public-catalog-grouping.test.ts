@@ -68,19 +68,18 @@ test('regroupMappedPublicCatalogSessions merges slots by groupKey', () => {
   assert.deepEqual(merged.groupEventIds, ['a', 'b']);
 });
 
-test('catalog SQL isolates conflicting TC meta IDs but falls back when metadata is absent', () => {
+test('catalog SQL groups ambiguous TC meta records by provider, title and venue context', () => {
   const catalogSql = readFileSync(new URL('./public-catalog.dto.ts', import.meta.url), 'utf8');
-  const ambiguousMetaBranch = catalogSql.indexOf('when "tcMetaCount" > 1 then');
   const resolvedMetaBranch = catalogSql.indexOf(
     'when nullif(trim("tcMetaExternalId"), \'\') is not null and "tcMetaCount" = 1 then',
   );
   const fallbackBranch = catalogSql.indexOf('end as "groupKey"', resolvedMetaBranch);
 
-  assert.notEqual(ambiguousMetaBranch, -1);
-  assert.ok(ambiguousMetaBranch < resolvedMetaBranch);
   assert.notEqual(resolvedMetaBranch, -1);
   assert.ok(fallbackBranch > resolvedMetaBranch);
-  assert.doesNotMatch(catalogSql, /when "tcMetaCount" is not null then concat_ws\('\|', 'tc-unresolved', id\)/);
+  assert.doesNotMatch(catalogSql, /when "tcMetaCount" > 1 then concat_ws\('\|', 'tc-unresolved', id\)/);
+  assert.match(catalogSql, /'provider-title-location'/);
+  assert.match(catalogSql, /lower\(regexp_replace\(trim\(coalesce\("venueAddress", ''\)\)/);
 });
 
 test('dedupeCrossSourceCatalogSessions leaves non-widget sessions untouched', () => {
