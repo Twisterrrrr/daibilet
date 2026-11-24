@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 import test from 'node:test';
 import {
   dedupeCrossSourceCatalogSessions,
@@ -65,6 +66,21 @@ test('regroupMappedPublicCatalogSessions merges slots by groupKey', () => {
   const merged = grouped[0];
   assert.ok(merged);
   assert.deepEqual(merged.groupEventIds, ['a', 'b']);
+});
+
+test('catalog SQL isolates conflicting TC meta IDs but falls back when metadata is absent', () => {
+  const catalogSql = readFileSync(new URL('./public-catalog.dto.ts', import.meta.url), 'utf8');
+  const ambiguousMetaBranch = catalogSql.indexOf('when "tcMetaCount" > 1 then');
+  const resolvedMetaBranch = catalogSql.indexOf(
+    'when nullif(trim("tcMetaExternalId"), \'\') is not null and "tcMetaCount" = 1 then',
+  );
+  const fallbackBranch = catalogSql.indexOf('end as "groupKey"', resolvedMetaBranch);
+
+  assert.notEqual(ambiguousMetaBranch, -1);
+  assert.ok(ambiguousMetaBranch < resolvedMetaBranch);
+  assert.notEqual(resolvedMetaBranch, -1);
+  assert.ok(fallbackBranch > resolvedMetaBranch);
+  assert.doesNotMatch(catalogSql, /when "tcMetaCount" is not null then concat_ws\('\|', 'tc-unresolved', id\)/);
 });
 
 test('dedupeCrossSourceCatalogSessions leaves non-widget sessions untouched', () => {

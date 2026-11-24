@@ -872,13 +872,14 @@ async function loadPublicCatalogRows(): Promise<PublicCatalogRow[]> {
             lower(regexp_replace(trim(coalesce(city, '')), '\\s+', ' ', 'g')),
             lower(regexp_replace(trim(coalesce(venue, '')), '\\s+', ' ', 'g'))
           )
-          when nullif(trim("tcMetaExternalId"), '') is not null then concat_ws(
+          -- COUNT returns 0 when links have no metaExternalId; only conflicting IDs stay isolated.
+          when "tcMetaCount" > 1 then concat_ws('|', 'tc-unresolved', id)
+          when nullif(trim("tcMetaExternalId"), '') is not null and "tcMetaCount" = 1 then concat_ws(
             '|',
             'tc-meta',
             trim("tcMetaExternalId"),
             coalesce("cityId"::text, lower(regexp_replace(trim(coalesce(city, '')), '\\s+', ' ', 'g')))
           )
-          when "tcMetaCount" is not null then concat_ws('|', 'tc-unresolved', id)
           else concat_ws(
             '|',
             lower(regexp_replace(trim(coalesce("sourceLabel", '')), '\\s+', ' ', 'g')),
