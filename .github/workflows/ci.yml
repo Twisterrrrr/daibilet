@@ -109,6 +109,10 @@ jobs:
         run: pnpm web:typecheck
 
       - name: Next web build
+        env:
+          # This CI job intentionally has no backend service. Only the New Year
+          # SSG route may use an empty build fixture; production deploy remains strict.
+          DAIBILET_CI_ALLOW_EMPTY_NEW_YEAR: "1"
         run: pnpm web:build
 
       - name: Admin production build

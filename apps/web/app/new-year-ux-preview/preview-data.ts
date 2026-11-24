@@ -1,5 +1,5 @@
 import { unstable_cache } from 'next/cache';
-import { fetchPublicApiJson } from '@/server/public-api-client';
+import { fetchPublicApiJson, isProductionBuildPhase } from '@/server/public-api-client';
 import { resolveSessionTimeZone } from '@/lib/city-timezone';
 import { parseSessionStartsAt } from '@/lib/datetime';
 import { getNewYearPreviewPage, sortNewYearPreviewEvents } from '@/lib/new-year-preview-order';
@@ -108,6 +108,12 @@ const NEW_YEAR_CITY_REGION_OVERRIDES: Record<string, string> = {
   Рязань: 'Рязанская область',
   Смоленск: 'Смоленская область',
   Сочи: 'Краснодарский край',
+};
+
+const EMPTY_CATALOG_SNAPSHOT: PreviewCatalogSnapshot = {
+  events: [],
+  total: 0,
+  generatedAt: null,
 };
 
 function cityRegion(city?: string | null): string | null {
@@ -345,16 +351,24 @@ function lowStock(event: PreviewEvent): boolean {
   return typeof event.vacant === 'number' && event.vacant > 0 && event.vacant <= 8;
 }
 
-async function fetchCatalogPage(offset: number): Promise<EventsResponse> {
-  return fetchPublicApiJson<EventsResponse>('/api/public/events', {
+async function fetchCatalogPage(offset: number): Promise<EventsResponse | null> {
+  const allowCiBuildFallback =
+    process.env.DAIBILET_CI_ALLOW_EMPTY_NEW_YEAR === '1' && isProductionBuildPhase();
+
+  return fetchPublicApiJson<EventsResponse | null>('/api/public/events', {
     searchParams: { landing: 'new-year', limit: 200, offset },
     timeoutMs: 60_000,
     revalidateSeconds: 300,
+    // The generic CI build has no API process. In that build only, render an
+    // empty fixture so the route and component still compile. Production deploy
+    // builds keep this strict and must read the live catalog through the tunnel.
+    notFoundAsNull: allowCiBuildFallback,
   });
 }
 
 const fetchCatalogSnapshot = unstable_cache(async (): Promise<PreviewCatalogSnapshot> => {
   const first = await fetchCatalogPage(0);
+  if (!first) return EMPTY_CATALOG_SNAPSHOT;
   const events = first.items || [];
   const total = Number(first.total) || events.length;
   const pageSize = Number(first.limit) || 200;
@@ -363,7 +377,8 @@ const fetchCatalogSnapshot = unstable_cache(async (): Promise<PreviewCatalogSnap
     (_, index) => (index + 1) * pageSize,
   );
   const remainingPages = await Promise.all(offsets.map((offset) => fetchCatalogPage(offset)));
-  events.push(...remainingPages.flatMap((page) => page.items || []));
+  if (remainingPages.some((page) => !page)) return EMPTY_CATALOG_SNAPSHOT;
+  events.push(...remainingPages.flatMap((page) => page?.items || []));
   return { events, total, generatedAt: first.generatedAt || null };
 }, ['new-year-preview-catalog-v1'], { revalidate: 300, tags: ['new-year-preview-catalog'] });
 
