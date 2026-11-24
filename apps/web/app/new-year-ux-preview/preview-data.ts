@@ -157,6 +157,7 @@ function seasonalSlots(event: PreviewEvent): PreviewSlot[] {
     ...slot,
     id: slot.id || slot.eventId || `${event.id}:${slot.startsAt || ''}`,
     timeZone: slot.timeZone || eventTimeZone,
+    vacant: slot.vacant ?? event.vacant ?? null,
     purchaseUrl: slot.purchaseUrl || (sourceSlots.length === 1 || slot.startsAt === event.startsAt ? eventPurchaseUrl : null),
   }));
   if (event.startsAt && !slots.some((slot) => slot.startsAt === event.startsAt)) {
@@ -170,7 +171,7 @@ function seasonalSlots(event: PreviewEvent): PreviewSlot[] {
   }
   return slots.filter((slot) => {
     const day = slotDayKey(slot, eventTimeZone);
-    return Boolean(day && day >= FIRST_SEASON_DATE && day <= LAST_SEASON_DATE);
+    return Boolean(day && day >= FIRST_SEASON_DATE && day <= LAST_SEASON_DATE && slot.vacant !== 0);
   });
 }
 
@@ -273,16 +274,18 @@ function groupEvents(events: PreviewEvent[]): PreviewEvent[] {
           slot.purchaseUrl,
           ...(slot.purchaseUrls || []),
         ].filter((url): url is string => Boolean(url)))];
+        const knownVacant = [existing.vacant, slot.vacant].filter((value): value is number => typeof value === 'number');
         slots.set(slotKey, {
           ...existing,
           purchaseUrl: existing.purchaseUrl || slot.purchaseUrl || purchaseUrls[0],
           purchaseUrls: purchaseUrls.length > 1 ? purchaseUrls : undefined,
+          vacant: knownVacant.length ? Math.max(...knownVacant) : null,
         });
       }
     }
     const prices = rows.map((row) => Number(row.priceFrom)).filter((price) => Number.isFinite(price) && price >= 0);
-    const vacant = rows.map((row) => row.vacant).filter((value): value is number => typeof value === 'number');
     const upcomingSlots = [...slots.values()].sort((a, b) => new Date(a.startsAt || 0).getTime() - new Date(b.startsAt || 0).getTime());
+    const vacant = upcomingSlots.map((slot) => slot.vacant).filter((value): value is number => typeof value === 'number');
     const baseGroupKey = identity ? `program:${first.id}` : first.groupKey || first.id;
     return {
       ...first,

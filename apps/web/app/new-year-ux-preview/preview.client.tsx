@@ -13,7 +13,7 @@ import { trackSelectTickets } from '@/lib/catalog-analytics';
 import { resolveCityCases } from '@/lib/city-declension';
 import { resolveSessionTimeZone } from '@/lib/city-timezone';
 import { parseSessionStartsAt } from '@/lib/datetime';
-import { PLURAL_EVENT_FORMS, pluralRu } from '@/lib/format';
+import { pluralRu } from '@/lib/format';
 import { citySlug as cityToSlug } from '@/lib/routes';
 import { appendUniqueNewYearPreviewEvents } from '@/lib/new-year-preview-order';
 import { landingCategoryHref, normalizeKnownCitySlug } from '@/lib/landing-routes';
@@ -28,6 +28,7 @@ type PriceFilter = 'all' | 'free' | 'under1000' | 'under2000' | 'over2000' | 'ov
 type PreviewFilters = { city: string; region: string; date: DateFilter; customDate: string; price: PriceFilter; format: string; q: string; sort: 'date' | 'price' | 'price-desc'; lowStock: boolean };
 type Facet = { name?: string; value?: string; count: number; region?: string; filterable?: boolean; geoKind?: 'city' | 'region' };
 const FIRST_SEASON_DATE = '2026-12-01';
+const NEW_YEAR_EVENT_FORMS = ['мероприятие', 'мероприятия', 'мероприятий'] as const;
 const PLURAL_SESSION_FORMS = ['сеанс', 'сеанса', 'сеансов'] as const;
 type PreviewData = {
   items: PreviewEvent[];
@@ -348,13 +349,15 @@ export function NewYearUxPreview({
   const [lowStock, setLowStock] = useState(false);
   const [viewMode, setViewMode] = useState<'list' | 'cards'>('list');
   const [citiesExpanded, setCitiesExpanded] = useState(false);
-  const [citySearch, setCitySearch] = useState('');
-  const heroFeaturedCitiesRef = useRef<HTMLDivElement>(null);
+  const [heroVisibleGeoCount, setHeroVisibleGeoCount] = useState(5);
+  const heroCitiesRef = useRef<HTMLDivElement>(null);
+  const heroGeoMeasureRef = useRef<HTMLDivElement>(null);
   const heroMoreButtonRef = useRef<HTMLButtonElement>(null);
   const [filtersExpanded, setFiltersExpanded] = useState(false);
   const [copiedLink, setCopiedLink] = useState(false);
   const [loading, setLoading] = useState(false);
   const [loadingMore, setLoadingMore] = useState(false);
+  const [mobileAutoLoad, setMobileAutoLoad] = useState(false);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [loadMoreError, setLoadMoreError] = useState<string | null>(null);
   const [retryToken, setRetryToken] = useState(0);
@@ -363,6 +366,7 @@ export function NewYearUxPreview({
   const filterRequestId = useRef(0);
   const loadMoreController = useRef<AbortController | null>(null);
   const loadMoreRequestId = useRef(0);
+  const loadMoreSentinelRef = useRef<HTMLDivElement>(null);
 
   const filters = useMemo<PreviewFilters>(() => ({ city, region, date, customDate, price, format, q: query, sort, lowStock }), [city, region, date, customDate, price, format, query, sort, lowStock]);
   const filterQuery = useMemo(() => serializeFilters(filters), [filters]);
@@ -389,15 +393,10 @@ export function NewYearUxPreview({
   }, []);
 
   useEffect(() => {
-    if (citiesExpanded && heroFeaturedCitiesRef.current) heroFeaturedCitiesRef.current.scrollLeft = 0;
-  }, [citiesExpanded]);
-
-  useEffect(() => {
     if (!citiesExpanded) return;
     const closeOnEscape = (event: KeyboardEvent) => {
       if (event.key !== 'Escape') return;
       setCitiesExpanded(false);
-      setCitySearch('');
       heroMoreButtonRef.current?.focus();
     };
     window.addEventListener('keydown', closeOnEscape);
@@ -529,6 +528,25 @@ export function NewYearUxPreview({
     }
   }, [pageData, filterQuery, loadedFilterQuery, loading, loadingMore]);
 
+  useEffect(() => {
+    const media = window.matchMedia('(max-width: 639px)');
+    const updateMobileAutoLoad = () => setMobileAutoLoad(media.matches && 'IntersectionObserver' in window);
+    updateMobileAutoLoad();
+    media.addEventListener('change', updateMobileAutoLoad);
+    return () => media.removeEventListener('change', updateMobileAutoLoad);
+  }, []);
+
+  useEffect(() => {
+    const sentinel = loadMoreSentinelRef.current;
+    if (!mobileAutoLoad || !sentinel || !pageData?.hasMore || loading || loadingMore || loadMoreError) return;
+
+    const observer = new IntersectionObserver((entries) => {
+      if (entries.some((entry) => entry.isIntersecting)) void loadMore();
+    }, { rootMargin: '1000px 0px' });
+    observer.observe(sentinel);
+    return () => observer.disconnect();
+  }, [mobileAutoLoad, pageData?.hasMore, loading, loadingMore, loadMoreError, loadMore]);
+
   const cities = data?.facets.cities || [];
   const regions = data?.facets.regions || [];
   const formats = pageData?.facets.formats || [];
@@ -555,16 +573,52 @@ export function NewYearUxPreview({
     const option = geoOptions.find((item) => item.name === name);
     return option ? [option] : [];
   });
-  const featuredGeoOptions: Facet[] = [
+  const orderedGeoOptions: Facet[] = [
     ...(normalizedCurrentGeoOption && normalizedCurrentGeoOption.name !== 'Вся Россия' ? [normalizedCurrentGeoOption] : []),
     ...(allGeoOption ? [allGeoOption] : []),
     ...preferredCityOptions,
     ...geoOptions.filter((item) => item.name !== 'Вся Россия' && item.name !== normalizedCurrentGeoOption?.name),
-  ].filter((item, index, list) => list.findIndex((candidate) => candidate.name === item.name) === index).slice(0, 5);
-  const hiddenGeoOptions = geoOptions.filter((item) => !featuredGeoOptions.includes(item));
-  const searchedGeoOptions = citySearch.trim()
-    ? geoOptions.filter((item) => item.name?.toLocaleLowerCase('ru').includes(citySearch.trim().toLocaleLowerCase('ru')))
-    : hiddenGeoOptions;
+  ].filter((item, index, list) => list.findIndex((candidate) => candidate.name === item.name) === index);
+  const featuredGeoOptions = orderedGeoOptions.slice(0, heroVisibleGeoCount);
+  const hiddenGeoOptions = orderedGeoOptions.slice(heroVisibleGeoCount);
+  useEffect(() => {
+    const container = heroCitiesRef.current;
+    const measure = heroGeoMeasureRef.current;
+    if (!container || !measure || citiesExpanded) return;
+    const fitInTwoRows = () => {
+      const availableWidth = container.clientWidth;
+      const chips = Array.from(measure.children).slice(0, orderedGeoOptions.length) as HTMLElement[];
+      const more = measure.children[orderedGeoOptions.length] as HTMLElement | undefined;
+      const gap = Number.parseFloat(getComputedStyle(measure).columnGap) || 0;
+      const rowsFor = (count: number, withMore: boolean) => {
+        const widths = chips.slice(0, count).map((item) => item.getBoundingClientRect().width);
+        if (withMore && more) widths.push(more.getBoundingClientRect().width);
+        let rows = 1;
+        let rowWidth = 0;
+        for (const width of widths) {
+          if (rowWidth && rowWidth + gap + width > availableWidth) {
+            rows++;
+            rowWidth = width;
+          } else {
+            rowWidth += (rowWidth ? gap : 0) + width;
+          }
+        }
+        return rows;
+      };
+      let visible = orderedGeoOptions.length;
+      if (rowsFor(visible, false) > 2) {
+        visible = 0;
+        for (let count = orderedGeoOptions.length - 1; count >= 0; count--) {
+          if (rowsFor(count, true) <= 2) { visible = count; break; }
+        }
+      }
+      setHeroVisibleGeoCount((current) => current === visible ? current : visible);
+    };
+    fitInTwoRows();
+    const observer = new ResizeObserver(fitInTwoRows);
+    observer.observe(container);
+    return () => observer.disconnect();
+  }, [orderedGeoOptions.map((item) => `${item.name}:${item.count}`).join('|'), citiesExpanded]);
   const currentDateLabel = date === 'custom' && customDate ? formatCustomDate(customDate) : DATE_OPTIONS.find((item) => item.value === date)?.label;
   const currentPriceLabel = PRICE_OPTIONS.find((item) => item.value === price)?.label;
   const hasFilters = Boolean((city !== 'Вся Россия' || region) || query.trim() || date !== 'all' || price !== 'all' || format !== 'Все форматы' || lowStock);
@@ -584,7 +638,7 @@ export function NewYearUxPreview({
   const liveCityFormats = formats.filter((item) => item.name && item.name !== 'Все форматы' && item.count > 0).sort((a, b) => b.count - a.count).slice(0, 5);
   const liveCityHighlights = (pageData?.items || []).slice(0, 3).map((event) => event.title).filter(Boolean);
   const dynamicCityParagraph = pageData && city !== 'Вся Россия' && !cityGuide && pageData.total > 0
-    ? `В новогодней афише ${city} сейчас ${pageData.total} ${pluralRu(pageData.total, PLURAL_EVENT_FORMS)}. В каталоге представлены форматы: ${liveCityFormats.length ? liveCityFormats.map((item) => `${item.name!.toLocaleLowerCase('ru')} (${item.count})`).join(', ') : 'праздничные программы'}.${liveCityHighlights.length ? ` Среди ближайших вариантов: ${liveCityHighlights.map((title) => `«${title}»`).join('; ')}.` : ''}`
+    ? `В новогодней афише ${city} сейчас ${pageData.total} ${pluralRu(pageData.total, NEW_YEAR_EVENT_FORMS)}. В каталоге представлены форматы: ${liveCityFormats.length ? liveCityFormats.map((item) => `${item.name!.toLocaleLowerCase('ru')} (${item.count})`).join(', ') : 'праздничные программы'}.${liveCityHighlights.length ? ` Среди ближайших вариантов: ${liveCityHighlights.map((title) => `«${title}»`).join('; ')}.` : ''}`
     : null;
   const seoContentHeading = cityGuide?.heading || (region && city === 'Вся Россия' ? `Новогодние события: ${region}` : city === 'Вся Россия' ? NEW_YEAR_NATIONAL_GUIDE.heading : cityEditorial?.heading || `Новогодняя афиша ${placeLabel}`) || 'Новогодние мероприятия';
   const seoContentParagraphs = cityGuide
@@ -631,7 +685,7 @@ export function NewYearUxPreview({
         ? city === 'Вся Россия' && !region
         : city === item.name;
     const className = `${styles.heroCityChip} ${selected ? styles.heroCityChipActive : ''}`;
-    const label = <>{item.name}<b>{item.count}</b></>;
+    const label = <><span className={styles.heroCityName}>{item.name}</span><b className={styles.heroCityCount}>{item.count}</b></>;
     if (selected) return <span key={`${isRegion ? 'region' : 'city'}:${item.name}`} className={className} aria-current="page">{label}</span>;
     const href = isRegion ? publicGeoPath('Вся Россия', item.name) : item.name === 'Вся Россия' ? publicGeoPath('Вся Россия', '') : publicGeoPath(item.name, '');
     return <Link
@@ -641,7 +695,6 @@ export function NewYearUxPreview({
       onClick={(event) => {
         event.preventDefault();
         setCitiesExpanded(false);
-        setCitySearch('');
         if (isRegion) selectRegion(item.name!);
         else if (item.name === 'Вся Россия') selectAllGeography();
         else selectCity(item.name!);
@@ -702,10 +755,15 @@ export function NewYearUxPreview({
             <div className={styles.snowflakes}>{Array.from({ length: 12 }, (_, index) => <span key={index} className={styles.snowflakeFall}><svg viewBox="0 0 48 48" className={styles.snowflake}><g fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.7"><path d="M24 3v42M21 8l3 3 3-3M21 40l3-3 3 3M5.8 13.5l36.4 21M9 12.8l.7 4.2 4.2-.7M34.1 31.7l4.2-.7-.7 4.2M5.8 34.5l36.4-21M9 35.2l.7-4.2 4.2.7M34.1 16.3l4.2.7-.7-4.2" /></g></svg></span>)}</div>
           </div> : null}
           <div className={`${styles.wrap} ${styles.bandContent}`}>
-          <div className={styles.heroTopline}>
+          <nav aria-label="Хлебные крошки" className={styles.bandCrumbs}>
             <details className={styles.heroMobileMenu}>
               <summary aria-label="Открыть меню"><span aria-hidden="true" /></summary>
               <nav aria-label="Основная навигация">
+                <button type="button" onClick={(event) => {
+                  event.currentTarget.closest('details')?.removeAttribute('open');
+                  setFiltersExpanded(true);
+                  document.getElementById('new-year-filters')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }}>Фильтры</button>
                 <Link href="/events">Афиша</Link>
                 <Link href="/cities">Город</Link>
                 <Link href="/podborki">Подборки</Link>
@@ -714,59 +772,44 @@ export function NewYearUxPreview({
                 <Link href="/help">Помощь и FAQ</Link>
               </nav>
             </details>
-            <Link href="/" className={styles.heroLogo} aria-label="Дайбилет, главная">дайбилет</Link>
-            <nav className={styles.heroDesktopNav} aria-label="Основная навигация">
-              <Link href="/events">Афиша</Link>
-              <Link href="/cities">Город</Link>
-              <Link href="/podborki" aria-current="page">Подборки</Link>
-              <Link href="/blog">Блог</Link>
-            </nav>
-          </div>
-          <nav aria-label="Хлебные крошки" className={styles.bandCrumbs}>
-            <Link href="/">Главная</Link><span>/</span><Link href="/podborki">Подборки</Link><span>/</span><Link href="/novyj-god">Новый год</Link>{region || city !== 'Вся Россия' ? <><span>/</span><span className={styles.bandCrumbCurrent}>{region || city}</span></> : null}
+            <Link href="/" className={styles.heroLogo} aria-label="Дайбилет, главная">дай<span>билет</span></Link>
+            <span aria-hidden="true">/</span><Link href="/podborki">Подборки</Link><span aria-hidden="true">/</span>
+            {region || city !== 'Вся Россия' ? <><Link href="/novyj-god">Новый год</Link><span aria-hidden="true">/</span><span className={styles.bandCrumbCurrent}>{region || city}</span></> : <span className={styles.bandCrumbCurrent} aria-current="page">Новый год</span>}
           </nav>
           <h1 className={styles.title}>Новый год 2027 в {region ? resolveCityCases(region).prepositional || `регионе «${region}»` : cityPrepositional || 'России'}:<br className={styles.titleBreak} /> мероприятия, афиша и билеты</h1>
           <p className={`${styles.lead} ${styles.leadDesktop}`}>Новогодние праздники — отличный повод выбраться из дома, провести время с близкими или отправиться в небольшое путешествие. На этой странице собраны праздничные концерты, спектакли, детские ёлки, экскурсии и развлекательные программы в разных городах России. Выбирайте интересующие даты, сравнивайте мероприятия и находите подходящий вариант для всей семьи или компании друзей.</p>
           <p className={`${styles.lead} ${styles.leadMobile}`}>Новогодние концерты, спектакли, детские ёлки, экскурсии и праздничные программы по всей России. Выбирайте города, даты и подходящие мероприятия.</p>
           <div className={styles.bandMeta}>
-            <span><strong>{data?.total || 0}</strong> мероприятий</span>
-            {city === 'Вся Россия' ? (() => { const count = Math.max(0, cities.filter((item) => item.name !== 'Вся Россия' && item.count > 0).length); return <span>{count} {pluralRu(count, ['город', 'города', 'городов'])} с событиями</span>; })() : null}
+            <span><strong>{data?.total || 0}</strong> {pluralRu(data?.total || 0, NEW_YEAR_EVENT_FORMS)}</span>
+            {(() => { const count = Math.max(0, cities.filter((item) => item.name !== 'Вся Россия' && item.count > 0).length); return <span>{count} {pluralRu(count, ['город', 'города', 'городов'])} с событиями</span>; })()}
             <span>{data?.priceFrom != null ? `от ${new Intl.NumberFormat('ru-RU').format(data.priceFrom)} рублей` : 'Цена уточняется'}</span>
           </div>
-          <div className={styles.heroCities} aria-label="Выбрать город или регион">
-            <span className={styles.heroCitiesLabel}>Города</span>
-            <div className={styles.heroCityList} ref={heroFeaturedCitiesRef}>
-              {featuredGeoOptions.map(renderGeoChip)}
-              {hiddenGeoOptions.length ? <button
+          <div ref={heroCitiesRef} className={styles.heroCities} aria-label="Выбрать город или регион">
+            {featuredGeoOptions.map(renderGeoChip)}
+            {citiesExpanded ? hiddenGeoOptions.map(renderGeoChip) : null}
+            {hiddenGeoOptions.length ? <button
                 type="button"
                 ref={heroMoreButtonRef}
                 className={`${styles.heroCityChip} ${styles.heroMoreButton}`}
                 aria-expanded={citiesExpanded}
-                aria-controls="new-year-more-cities"
-                onClick={() => { setCitiesExpanded((value) => !value); setCitySearch(''); }}
-              >{citiesExpanded ? 'Свернуть ↑' : `Ещё города · ${hiddenGeoOptions.length}`}</button> : null}
+                onClick={() => setCitiesExpanded((value) => !value)}
+            >{citiesExpanded ? 'Свернуть ↑' : `Ещё ${hiddenGeoOptions.length} ↓`}</button> : null}
+            <div ref={heroGeoMeasureRef} className={styles.heroGeoMeasure} aria-hidden="true">
+              {orderedGeoOptions.map((item) => <span key={`measure:${item.geoKind}:${item.name}`} className={styles.heroCityChip}><span>{item.name}</span><b>{item.count}</b></span>)}
+              <span className={`${styles.heroCityChip} ${styles.heroMoreButton}`}>Ещё {orderedGeoOptions.length} ↓</span>
             </div>
-            {citiesExpanded ? <div className={styles.heroCitiesPanel} id="new-year-more-cities" role="region" aria-label="Все города и регионы">
-              <label className={styles.heroCitySearch}>
-                <span className="sr-only">Поиск города или региона</span>
-                <input type="search" value={citySearch} onChange={(event) => setCitySearch(event.target.value)} placeholder="Найти город или регион" />
-              </label>
-              <div className={styles.heroCityList}>
-                {searchedGeoOptions.length ? searchedGeoOptions.map(renderGeoChip) : <span className={styles.heroCityNoResults}>Ничего не найдено</span>}
-              </div>
-            </div> : null}
           </div>
           </div>
         </section>
 
       <div className={styles.wrap}>
         <div className={styles.layout}>
-        <section className={styles.filters} aria-label="Фильтры мероприятий">
+        <section id="new-year-filters" className={styles.filters} aria-label="Фильтры мероприятий">
           <button type="button" className={styles.mobileFilterToggle} aria-expanded={filtersExpanded} aria-controls="new-year-filter-controls" onClick={() => setFiltersExpanded(!filtersExpanded)}>
             <span>Фильтры{activeFilterCount ? <b className={styles.mobileFilterCount}>{activeFilterCount}</b> : null}</span>
             <span className={`${styles.mobileFilterChevron} ${filtersExpanded ? styles.mobileFilterChevronOpen : ''}`} aria-hidden="true" />
           </button>
-          <div id="new-year-filter-controls" className={`${styles.wrap} ${styles.filtersContent} ${filtersExpanded ? '' : styles.filtersContentCollapsed}`}>
+          <div id="new-year-filter-controls" className={`${styles.filtersContent} ${filtersExpanded ? '' : styles.filtersContentCollapsed}`}>
             <div className={styles.filterMain}>
               <label className={styles.search}>
                 <span className="sr-only">Поиск по названию, площадке или городу</span>
@@ -837,9 +880,8 @@ export function NewYearUxPreview({
         </section>
 
         <div className={styles.content}>
-        <div className={styles.wrap}>
           <div className={styles.toolbar}>
-            <div className={styles.count}>{loading && !pageData ? 'Обновляем выборку…' : loadError || errorMessage ? 'Выборка не обновлена' : <>Найдено <strong>{pageData?.total || 0}</strong> событий (показано <strong>{pageData?.items.length || 0}</strong>)</>}</div>
+            <div className={styles.count}>{loading && !pageData ? 'Обновляем выборку…' : loadError || errorMessage ? 'Выборка не обновлена' : <>Найдено <strong>{pageData?.total || 0}</strong> {pluralRu(pageData?.total || 0, NEW_YEAR_EVENT_FORMS)} (показано <strong>{pageData?.items.length || 0}</strong>)</>}</div>
             {hasFilters ? <button type="button" className={styles.reset} onClick={resetFilters}>Сбросить фильтры</button> : null}
           </div>
 
@@ -852,7 +894,7 @@ export function NewYearUxPreview({
           {loadError ? <div role="alert" className={styles.empty}><div className={styles.emptyTitle}>Не удалось обновить список</div><div className={styles.emptyText}>Для выбранных фильтров не загрузились свежие результаты. Предыдущие карточки скрыты, чтобы не показывать события из другой выборки.</div><button type="button" className={styles.reset} onClick={() => { setLoadError(null); setRetryToken((value) => value + 1); }}>Повторить</button></div> : null}
           {pageData?.items.length ? <>
           {viewMode === 'list' ? <div className={styles.tableHeader} aria-hidden="true"><span>Дата и время</span><span>Мероприятие</span><span>Площадка</span><span>Цена</span><span>Наличие мест</span><span /></div> : null}
-          <div className={`${styles.list} ${viewMode === 'cards' ? styles.cardsView : ''}`} aria-busy={loading || loadingMore}>
+          <div className={`${styles.list} ${viewMode === 'cards' ? styles.cardsView : ''} ${styles.mobileRows}`} aria-busy={loading || loadingMore}>
             {pageData.items.map((event) => {
               const slot = event.upcomingSlots?.[0];
               const priceLabel = typeof event.priceFrom === 'number' ? event.priceFrom === 0 ? 'Бесплатно' : `от ${new Intl.NumberFormat('ru-RU').format(event.priceFrom)} ₽` : 'Цена уточняется';
@@ -881,8 +923,9 @@ export function NewYearUxPreview({
             })}
           </div></> : loading && !errorMessage && !loadError ? <div className={styles.empty}><div className={styles.emptyTitle}>Обновляем список</div><div className={styles.emptyText}>Применяем выбранные фильтры.</div></div> : !errorMessage && !loadError ? <div className={styles.empty}><div className={styles.emptyTitle}>Под фильтры ничего не подошло</div><div className={styles.emptyText}>Сбросьте часть условий или выберите другой город.</div></div> : null}
 
-          {pageData?.hasMore ? <div className={styles.moreArea}>
+          {pageData?.hasMore ? <div className={`${styles.moreArea} ${mobileAutoLoad ? styles.mobileAutoLoad : ''}`}>
             <button type="button" className={styles.moreButton} onClick={() => void loadMore()} disabled={loadingMore || loading}>{loadingMore ? 'Загружаем…' : `Показать ещё ${Math.min(pageData.limit, pageData.total - pageData.items.length)}`}</button>
+            <div ref={loadMoreSentinelRef} className={styles.loadMoreSentinel} aria-hidden="true" />
           </div> : null}
           {loadMoreError ? <div role="alert" className={styles.empty}><div className={styles.emptyTitle}>Следующая часть списка не загрузилась</div><div className={styles.emptyText}>{loadMoreError}</div><button type="button" className={styles.reset} onClick={() => void loadMore()} disabled={loadingMore}>Повторить</button></div> : null}
           {loadingMore ? <p className={styles.loading} role="status">Загружаем следующие мероприятия…</p> : null}
@@ -968,7 +1011,6 @@ export function NewYearUxPreview({
           <span>Предпросмотр на данных каталога от {generatedLabel} · записей: {data?.sourceTotal || 0}</span>
           <span>В список входят новогодние программы с доступными сеансами начиная с 1 декабря 2026 года · праздничный период: 23 декабря - 14 января</span>
         </footer>
-      </div>
     </div>
   );
 }

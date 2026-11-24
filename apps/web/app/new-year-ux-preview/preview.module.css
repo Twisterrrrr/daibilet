@@ -198,6 +198,7 @@
 .moreArea { display: flex; justify-content: center; padding: 10px 0 18px; }
 .moreButton { min-height: 36px; padding: 0 14px; border: 1px solid var(--line); border-radius: 7px; background: white; color: var(--ink2); font: inherit; font-size: 13px; font-weight: 700; }
 .moreButton:hover { border-color: var(--accent); color: var(--accent); }
+.loadMoreSentinel { display: none; }
 .loading { color: var(--muted); font-size: 12px; }
 .guide { margin-top: 20px; margin-bottom: 20px; padding: 24px; border: 1px solid #e2e9e3; border-radius: 16px; background: #f5f8f4; }
 .guide h2 { margin: 0 0 12px; font-size: 25px; font-weight: 750; letter-spacing: -.02em; }
@@ -277,11 +278,13 @@
 }
 
 @media (max-width: 639px) {
+  .mobileAutoLoad .moreButton { display: none; }
+  .mobileAutoLoad .loadMoreSentinel { display: block; width: 100%; height: 1px; }
   .page { --content-max: 100%; }
   .wrap { padding-right: 14px; padding-left: 14px; }
-  .bandContent { padding-right: 20px; padding-left: 20px; }
-  .filters > .wrap { padding: 8px 14px 10px; }
-  .mobileFilterToggle { display: flex; align-items: center; gap: 10px; width: 100%; padding: 8px 14px; border: 0; border-bottom: 1px solid var(--line); background: #fff; color: var(--ink); font: inherit; text-align: left; }
+  .bandContent { padding-right: 14px; padding-left: 14px; }
+  .filtersContent { padding: 8px 0 10px; }
+  .mobileFilterToggle { display: flex; align-items: center; gap: 10px; width: 100%; padding: 8px 0; border: 0; border-bottom: 1px solid var(--line); background: #fff; color: var(--ink); font: inherit; text-align: left; }
   .mobileFilterToggle > span:first-child { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 700; white-space: nowrap; }
   .mobileFilterHint { flex: 1; overflow: hidden; color: var(--muted); font-size: 12px; text-overflow: ellipsis; white-space: nowrap; }
   .mobileFilterCount { display: inline-flex; min-width: 18px; height: 18px; align-items: center; justify-content: center; border-radius: 50%; background: var(--accent-soft); color: var(--accent-dark); font-size: 11px; }
@@ -347,10 +350,13 @@
   .buyButton { width: 82px; height: 40px !important; min-height: 40px !important; padding: 0 10px !important; border-radius: 9px !important; font-size: 13px !important; font-weight: 600 !important; }
 }
 
+@media (max-width: 767px) {
+  .titleBreak { display: none; }
+}
+
 @media (max-width: 479px) {
   .wrap { padding-right: 12px; padding-left: 12px; }
-  .bandContent { padding-right: 16px; padding-left: 16px; }
-  .filters > .wrap { padding: 8px 12px 10px; }
+  .bandContent { padding-right: 12px; padding-left: 12px; }
   .bandFestive { min-height: 0; padding-top: 28px; padding-bottom: 28px; }
   .bandFestive .title { width: 100%; max-width: 100%; font-size: clamp(30px, 8vw, 32px); }
   .bandFestive .lead, .bandFestive .bandMeta, .bandFestive .presets, .bandFestive .kicker { width: 100%; }
@@ -387,14 +393,11 @@
 .page .title { font-family: var(--font-unbounded), var(--font-inter), system-ui, sans-serif; font-weight: 700; letter-spacing: -.035em; }
 .bandFestive .lead { width: min(100%, 840px); margin-bottom: 16px; font-size: 16px; line-height: 1.55; }
 .bandFestive .bandMeta { width: 100%; margin-bottom: 0; }
-.heroTopline { display: flex; align-items: center; gap: 24px; margin-bottom: 18px; }
-.heroLogo { display: inline-flex; min-height: 34px; align-items: center; padding: 4px 10px; border-radius: 7px; background: var(--brand-yellow); color: #111827; font-family: var(--font-inter), system-ui, sans-serif; font-size: 16px; font-weight: 850; letter-spacing: -.055em; line-height: 1; }
-.heroLogo:hover { background: #ffe04a; color: #111827; }
-.heroDesktopNav { display: flex; align-items: center; gap: 5px; margin-left: auto; }
-.heroDesktopNav a { padding: 7px 11px; border-radius: 7px; color: rgb(255 255 255 / 82%); font-size: 13px; font-weight: 600; }
-.heroDesktopNav a:hover, .heroDesktopNav a[aria-current="page"] { background: rgb(255 255 255 / 12%); color: #fff; }
-.heroMobileMenu { display: none; position: relative; margin-left: auto; }
-.heroMobileMenu summary { display: grid; width: 38px; height: 38px; place-items: center; border: 1px solid rgb(255 255 255 / 24%); border-radius: 8px; color: #fff; cursor: pointer; list-style: none; }
+.heroLogo { color: #fff !important; font-family: var(--font-unbounded), var(--font-inter), system-ui, sans-serif; font-size: 14px; font-weight: 800; letter-spacing: -.02em; line-height: 1; opacity: .9; }
+.heroLogo:hover { color: #fff; opacity: 1; }
+.heroLogo span { color: var(--brand-yellow); }
+.heroMobileMenu { display: none; position: relative; flex: 0 0 auto; margin-left: 0; }
+.heroMobileMenu summary { display: grid; width: 24px; height: 28px; place-items: center; border: 0; border-radius: 0; background: transparent; color: #fff; cursor: pointer; list-style: none; }
 .heroMobileMenu summary::-webkit-details-marker { display: none; }
 .heroMobileMenu summary span, .heroMobileMenu summary span::before, .heroMobileMenu summary span::after { display: block; width: 17px; height: 2px; border-radius: 2px; background: currentColor; content: ''; }
 .heroMobileMenu summary span { position: relative; }
@@ -404,20 +407,18 @@
 .heroMobileMenu nav { position: absolute; z-index: 8; top: calc(100% + 8px); right: 0; display: grid; width: 210px; padding: 6px; border: 1px solid rgb(255 255 255 / 16%); border-radius: 10px; background: #0c1c3b; box-shadow: 0 12px 30px rgb(0 0 0 / 24%); }
 .heroMobileMenu nav a { padding: 10px 11px; border-radius: 6px; color: #fff; font-size: 14px; }
 .heroMobileMenu nav a:hover { background: rgb(255 255 255 / 12%); }
-.bandCrumbs { margin-bottom: 13px; font-size: 12px; }
-.heroCities { position: relative; width: 100%; margin-top: 17px; }
-.heroCitiesLabel { display: block; margin-bottom: 7px; color: rgb(255 255 255 / 65%); font-size: 11px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; }
-.heroCityList { display: flex; align-items: center; flex-wrap: wrap; gap: 7px; }
+.heroMobileMenu nav button { padding: 10px 11px; border: 0; border-radius: 6px; background: transparent; color: #fff; font: inherit; font-size: 14px; text-align: left; cursor: pointer; }
+.heroMobileMenu nav button:hover { background: rgb(255 255 255 / 12%); }
+.bandCrumbs { margin-bottom: 20px; font-size: 12px; }
+.filtersContent { min-width: 0; }
+.heroCities { position: relative; display: flex; width: 100%; align-items: center; flex-wrap: wrap; gap: 8px; margin-top: 17px; }
 .heroCityChip { display: inline-flex; min-height: 32px; align-items: center; gap: 7px; padding: 0 12px; border: 1px solid rgb(255 255 255 / 27%); border-radius: 999px; background: rgb(255 255 255 / 8%); color: #fff; font-size: 13px; font-weight: 550; white-space: nowrap; }
 .heroCityChip:hover, .heroCityChipActive { border-color: var(--brand-yellow); background: var(--brand-yellow); color: #111827; }
-.heroCityChip b { color: currentColor; font-size: 11px; font-weight: 700; opacity: .68; }
+.heroCityName { line-height: 1.1; }
+.heroCityCount { display: inline-flex; align-items: center; color: currentColor; font-size: 11px; font-weight: 700; line-height: 1; opacity: .68; }
 .heroMoreButton { border-style: dashed; background: transparent; cursor: pointer; }
-.heroCitiesPanel { max-width: 760px; margin-top: 10px; padding: 12px; border: 1px solid rgb(255 255 255 / 18%); border-radius: 12px; background: rgb(5 17 43 / 78%); }
-.heroCitySearch { display: block; margin-bottom: 10px; }
-.heroCitySearch input { width: 100%; height: 36px; padding: 0 11px; border: 1px solid rgb(255 255 255 / 23%); border-radius: 7px; outline: none; background: rgb(255 255 255 / 9%); color: #fff; font: inherit; font-size: 13px; }
-.heroCitySearch input::placeholder { color: rgb(255 255 255 / 58%); }
-.heroCitySearch input:focus { border-color: var(--brand-yellow); }
-.heroCityNoResults { padding: 5px 2px; color: rgb(255 255 255 / 72%); font-size: 13px; }
+.heroGeoMeasure { position: absolute; top: 0; left: -10000px; display: flex; width: 100%; align-items: center; flex-wrap: wrap; gap: 8px; visibility: hidden; pointer-events: none; }
+.heroGeoMeasure .heroCityChip { flex: 0 0 auto; }
 .filters { position: sticky; top: 0; }
 .desktopDropdowns { display: flex; align-items: center; gap: 8px; padding-bottom: 11px; overflow-x: auto; }
 .desktopFilterField { flex: 0 0 auto; }
@@ -442,9 +443,9 @@
 .buyButton { border-radius: 8px !important; }
 
 /* Match the supplied landing template while keeping the existing snow hero. */
-.bandFestive { width: min(calc(100% - 40px), var(--content-max)); margin: 0 auto; border-radius: 14px; }
-.snowPattern { left: 50%; width: min(calc(100% - 40px), var(--content-max)); border-radius: 14px; transform: translateX(-50%); }
-.bandFestive .title { width: min(100%, 920px); max-width: 920px; font-size: clamp(34px, 3.4vw, 42px); }
+.bandFestive { width: 100%; margin: 0; border-radius: 0; }
+.snowPattern { left: 0; width: 100%; border-radius: 0; transform: none; }
+.bandFestive .title { width: min(100%, 1120px); max-width: 1120px; margin-bottom: 16px; font-size: clamp(28px, 4vw, 42px); line-height: 1.1; letter-spacing: -.03em; }
 .bandFestive .lead { width: min(100%, 760px); max-width: 760px; margin-bottom: 20px; font-size: 16px; line-height: 1.6; }
 .filterMain { gap: 12px; padding: 12px 0 16px; }
 .segment button { padding: 7px 14px; }
@@ -473,8 +474,6 @@
 @media (min-width: 640px) and (max-width: 1023px) {
   .bandContent { padding-top: 28px; padding-bottom: 30px; }
   .bandFestive .title { font-size: clamp(32px, 4vw, 38px); }
-  .heroCityList { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 2px; scrollbar-width: none; }
-  .heroCityList::-webkit-scrollbar { display: none; }
   .desktopDropdowns { gap: 6px; }
   .desktopFilterField:nth-child(1) { width: 175px; }
   .desktopFilterField:nth-child(2) { width: 205px; }
@@ -499,19 +498,14 @@
 @media (max-width: 639px) {
   .bandContent { padding: 18px 14px 24px; }
   .bandFestive { min-height: 0; }
-  .heroTopline { gap: 12px; margin-bottom: 13px; }
-  .heroLogo { min-height: 32px; padding: 4px 9px; font-size: 15px; }
-  .heroDesktopNav { display: none; }
-  .heroMobileMenu { display: block; margin-left: 0; }
+  .heroLogo { font-size: 13px; }
+  .heroMobileMenu { display: block; }
   .bandCrumbs { margin-bottom: 15px; font-size: 11.5px; }
   .bandFestive .title { width: 100%; max-width: 100%; margin-bottom: 10px; font-size: clamp(27px, 7.3vw, 32px); line-height: 1.12; }
   .bandFestive .lead { width: 100%; margin-bottom: 13px; font-size: 14px; line-height: 1.48; }
   .bandFestive .bandMeta { gap: 8px; font-size: 12px; }
   .heroCities { margin-top: 14px; }
-  .heroCityList { flex-wrap: nowrap; overflow-x: auto; padding: 0 1px 3px; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
-  .heroCityList::-webkit-scrollbar { display: none; }
   .heroCityChip { min-height: 31px; padding: 0 10px; font-size: 12px; }
-  .heroCitiesPanel .heroCityList { flex-wrap: wrap; max-height: 220px; overflow-y: auto; }
   .filters { position: relative; }
   .desktopDropdowns { display: none; }
   .mobileDropdowns { display: grid; grid-template-columns: minmax(0, 1fr); gap: 8px; padding: 10px 0 2px; }
@@ -526,14 +520,67 @@
 }
 
 @media (max-width: 899px) {
-  .bandFestive { width: calc(100% - 24px); border-radius: 12px; }
-  .snowPattern { width: calc(100% - 24px); border-radius: 12px; }
+  .bandFestive { width: 100%; margin: 0; border-radius: 0; }
+  .bandContent { padding-right: 20px; padding-left: 20px; }
+  .snowPattern { width: 100%; border-radius: 0; }
   .cardsView { grid-template-columns: minmax(0, 1fr); gap: 8px; }
   .cardsView .row { min-height: 0; padding: 12px; border-radius: 12px; }
 }
 
+@media (max-width: 639px) {
+  .bandContent { padding-right: 14px; padding-left: 14px; }
+}
+
+@media (max-width: 479px) {
+  .bandContent { padding-right: 12px; padding-left: 12px; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .snowflakeFall, .snowflake { animation: none !important; }
+}
+
+@media (max-width: 899px) {
+  .filterMain { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 8px; padding: 10px 0; }
+  .search { grid-column: 1 / -1; min-width: 0; max-width: none; }
+  .segmentSort { grid-column: 1; justify-self: start; }
+  .segmentDensity { display: none; }
+  .linkButton { grid-column: 2; justify-self: end; }
+  .desktopDropdowns { display: none; }
+  .mobileDropdowns { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; padding: 10px 0; }
+  .mobileFilterField { display: grid; grid-template-columns: 76px minmax(0, 1fr); align-items: center; min-width: 0; gap: 6px; color: var(--muted); font-size: 11.5px; font-weight: 700; }
+  .mobileFilterField select { width: 100%; min-height: 38px; padding: 0 8px; overflow: hidden; border: 1px solid var(--line); border-radius: 8px; background: #fff; color: var(--ink); font: inherit; font-size: 13px; font-weight: 500; text-overflow: ellipsis; }
+  .mobileFilterField .dateDropdownWrap, .mobileFilterField .dateDropdownWrap select { width: 100%; min-width: 0; }
+  .mobileFilterField .dateDropdownWrap select { min-height: 38px; height: 38px; border: 1px solid var(--line); border-radius: 8px; background-color: #fff; }
+  .segmentDensity { display: none; }
+  .mobileRows { display: flex !important; flex-direction: column; gap: 0 !important; overflow: visible; margin-bottom: 24px; border: 0; border-radius: 0; background: #fff; }
+  .mobileRows .row { display: grid; min-height: 0; grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "date date" "main main" "price seats" "action action"; align-items: start; gap: 8px 12px; padding: 16px 0; border: 0; border-bottom: 1px solid var(--line); border-radius: 0; background: #fff; }
+  .mobileRows .row:hover { background: #fff; }
+  .mobileRows .rowMain { display: grid; grid-area: main; grid-template-columns: minmax(0, 1fr); grid-template-areas: "title" "meta" "schedule"; gap: 6px; min-width: 0; }
+  .mobileRows .rowDate { grid-area: date; align-self: center; overflow: visible; text-align: left; font-size: 13px; line-height: 1.3; }
+  .mobileRows .rowDate strong, .mobileRows .rowDate small { display: none; }
+  .mobileRows .rowDateCompact { display: inline-flex; align-items: baseline; gap: 7px; white-space: nowrap; }
+  .mobileRows .rowTitle { display: -webkit-box; grid-area: title; overflow: hidden; font-size: 16px; line-height: 1.3; text-overflow: ellipsis; white-space: normal; -webkit-box-orient: vertical; -webkit-line-clamp: 3; }
+  .mobileRows .rowMeta { display: flex; grid-area: meta; align-items: center; flex-wrap: wrap; gap: 6px 8px; min-width: 0; overflow: visible; margin-top: 0; font-size: 13px; line-height: 1.35; }
+  .mobileRows .rowMeta .tagHit { display: inline-flex; }
+  .mobileRows .rowMeta .tag { padding: 3px 8px; font-size: 10px; }
+  .mobileRows .rowMeta .rowVenueInline { display: block; flex: 0 0 100%; min-width: 0; overflow: hidden; color: var(--ink2); font-size: 13px; line-height: 1.35; text-overflow: ellipsis; }
+  .mobileRows .rowVenueColumn { display: none; }
+  .mobileRows .schedule { grid-area: schedule; margin-top: 0; font-size: 12px; }
+  .mobileRows .scheduleDesktopLabel { display: none; }
+  .mobileRows .scheduleCompactLabel { display: inline; }
+  .mobileRows .rowPrice { grid-area: price; align-self: center; text-align: left; font-size: 17px; font-weight: 800; }
+  .mobileRows .rowPrice small { display: block; }
+  .mobileRows .rowSeats { grid-area: seats; align-self: center; text-align: right; font-size: 13px; }
+  .mobileRows .rowAction { grid-area: action; width: 100%; margin-top: 2px; text-align: left; }
+  .mobileRows .buyButton { display: flex; width: 100% !important; height: 40px !important; min-height: 40px !important; padding: 0 14px !important; border-radius: 8px !important; font-size: 13px !important; }
+}
+
+@media (max-width: 639px) {
+  .filterMain { grid-template-columns: minmax(0, 1fr); }
+  .search, .segmentSort, .linkButton { grid-column: 1; justify-self: stretch; }
+  .segmentSort { justify-self: start; }
+  .mobileDropdowns { grid-template-columns: minmax(0, 1fr); }
+  .mobileFilterField { grid-template-columns: 100px minmax(0, 1fr); }
 }
 
 @media (prefers-reduced-motion: reduce) {
