@@ -38,7 +38,7 @@ export function isCandidateCityHub(input: {
   return Boolean(findCandidateHub(input));
 }
 
-/** One factual sentence for the candidate city hero; no other guide content is implied. */
+/** Short city-specific introductory copy for the candidate city hero. */
 export function candidateCityHubHeroBrief(input: {
   slug?: string | null;
   sourceSlug?: string | null;
