@@ -29,10 +29,12 @@ export async function SiteLayout({
   footerVariant = 'default',
   initialCity = null,
   chromeVariant = 'default',
+  hideHeader = false,
 }: {
   children: React.ReactNode;
   footerVariant?: 'default' | 'compact';
   chromeVariant?: 'default' | 'v2';
+  hideHeader?: boolean;
   /**
    * Cookie/SSR city from pages that are already dynamic (home).
    * Do NOT read the request cookie store here: SiteLayout is inlined into ISR hubs/PDPs
@@ -69,7 +71,7 @@ export async function SiteLayout({
       <SelectedCityProvider destinations={destinations} initialCity={resolvedInitialCity}>
         <div className="flex min-h-screen flex-col bg-background">
           <div className="print:hidden">
-            {chromeVariant === 'v2' ? <SiteHeaderV2 /> : <SiteHeader destinations={destinations} />}
+            {!hideHeader ? chromeVariant === 'v2' ? <SiteHeaderV2 /> : <SiteHeader destinations={destinations} /> : null}
           </div>
           <Suspense fallback={<SiteChromeSkeleton variant="page" omitHeader />}>
             <main className="flex-1">{children}</main>

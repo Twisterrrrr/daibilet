@@ -50,6 +50,9 @@ src/lib/og-image.test.ts
 src/lib/city-faq-ssr.test.tsx
 src/lib/city-suburbs-ssr.test.tsx
 src/lib/city-hub-lazy.test.ts
+src/lib/new-year-preview-order.test.ts
+src/lib/landing-region.test.ts
+src/lib/new-year-preview-relevance.test.ts
 src/lib/city-hub-registry.test.ts
 # Finance buyer DTO must preserve the separate issued ticket number.
 src/server/finance-checkout-client.test.ts

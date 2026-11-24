@@ -1,26 +1,35 @@
 import { buildNewYearPreviewData, type PreviewFilters } from '../../new-year-ux-preview/preview-data';
+import { InvalidNewYearPreviewQuery, parseNewYearPreviewQuery } from '@/lib/new-year-preview-query';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
 export async function GET(request: Request) {
   const params = new URL(request.url).searchParams;
-  const filters: PreviewFilters = {
-    city: params.get('city') || undefined,
-    region: params.get('region') || undefined,
-    date: params.get('date') || undefined,
-    price: params.get('price') || undefined,
-    format: params.get('format') || undefined,
-    q: params.get('q') || undefined,
-    sort: params.get('sort') || undefined,
-    lowStock: params.get('lowStock') === '1',
-    offset: Number(params.get('offset') || 0),
-  };
+  let filters: PreviewFilters;
+  try {
+    filters = parseNewYearPreviewQuery(params);
+  } catch (error) {
+    if (error instanceof InvalidNewYearPreviewQuery) {
+      return Response.json({ error: 'invalid_preview_query', detail: error.message }, { status: 400 });
+    }
+    return Response.json({ error: 'invalid_preview_query' }, { status: 400 });
+  }
   try {
     return Response.json(await buildNewYearPreviewData(filters), {
       headers: { 'Cache-Control': 'no-store' },
     });
-  } catch {
+  } catch (error) {
+    console.error('[new-year-ux-preview] catalog data request failed', {
+      city: filters.city,
+      region: filters.region,
+      date: filters.date,
+      price: filters.price,
+      format: filters.format,
+      sort: filters.sort,
+      offset: filters.offset,
+      error,
+    });
     return Response.json({ error: 'preview_data_unavailable' }, { status: 503 });
   }
 }
