@@ -45,6 +45,8 @@
 .bandContent { position: relative; z-index: 1; width: 100%; padding-right: 40px; padding-left: 50px; }
 .bandFestive { display: flex; min-height: 374px; align-items: center; width: 100%; margin: 0; padding: 76px 0; border-top: 1px solid #123c35; border-bottom: 1px solid #123c35; background: var(--newyear-gradient-hero); color: #fff; }
 .bandCrumbs { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin: 0 0 12px; color: rgb(242 246 255 / 70%); font-size: 13px; }
+.heroDesktopNav { display: flex; align-items: center; gap: 22px; margin-left: auto; white-space: nowrap; }
+.heroDesktopNav a:hover { color: #fff; }
 .titleBreak { display: initial; }
 .leadMobile { display: none; }
 .bandCrumbs a:hover { color: #fff; }
@@ -241,6 +243,7 @@
 .drawerScheduleTitle { margin-bottom: 6px; color: var(--muted2); font-size: 11.5px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
 .drawerSchedule { display: grid; gap: 0; margin: 0; padding: 0; list-style: none; }
 .drawerSchedule li { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 7px 12px; padding: 9px 0; border-bottom: 1px dashed var(--line); color: var(--ink2); font-size: 13px; }
+.drawerScheduleUnavailable { color: var(--muted2); font-size: 12px; }
 .drawerSchedule a, .eventPageLink { color: var(--accent-dark); font-size: 12px; font-weight: 650; text-decoration: underline; text-underline-offset: 2px; }
 .eventPageLink { display: inline-flex; margin-top: 14px; }
 .drawerFoot { display: flex; align-items: center; gap: 14px; padding: 12px 18px; border-top: 1px solid var(--line); background: #fff; }
@@ -410,6 +413,7 @@
 .heroMobileMenu nav button { padding: 10px 11px; border: 0; border-radius: 6px; background: transparent; color: #fff; font: inherit; font-size: 14px; text-align: left; cursor: pointer; }
 .heroMobileMenu nav button:hover { background: rgb(255 255 255 / 12%); }
 .bandCrumbs { margin-bottom: 20px; font-size: 12px; }
+.heroDesktopNav { gap: 16px; font-size: 12px; }
 .filtersContent { min-width: 0; }
 .heroCities { position: relative; display: flex; width: 100%; align-items: center; flex-wrap: wrap; gap: 8px; margin-top: 17px; }
 .heroCityChip { display: inline-flex; min-height: 32px; align-items: center; gap: 7px; padding: 0 12px; border: 1px solid rgb(255 255 255 / 27%); border-radius: 999px; background: rgb(255 255 255 / 8%); color: #fff; font-size: 13px; font-weight: 550; white-space: nowrap; }
@@ -500,6 +504,7 @@
   .bandFestive { min-height: 0; }
   .heroLogo { font-size: 13px; }
   .heroMobileMenu { display: block; }
+  .heroDesktopNav { display: none; }
   .bandCrumbs { margin-bottom: 15px; font-size: 11.5px; }
   .bandFestive .title { width: 100%; max-width: 100%; margin-bottom: 10px; font-size: clamp(27px, 7.3vw, 32px); line-height: 1.12; }
   .bandFestive .lead { width: 100%; margin-bottom: 13px; font-size: 14px; line-height: 1.48; }

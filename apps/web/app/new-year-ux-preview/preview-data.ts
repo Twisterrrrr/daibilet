@@ -256,6 +256,7 @@ function groupEvents(events: PreviewEvent[]): PreviewEvent[] {
     const first = rows[0]!;
     const pageSlugs = [...new Set(rows.map((row) => row.eventPageSlug).filter((slug): slug is string => Boolean(slug)))];
     const eventSlugs = [...new Set(rows.map((row) => row.slug).filter((slug): slug is string => Boolean(slug)))];
+    const widgetUrls = [...new Set(rows.map((row) => row.widgetUrl).filter((url): url is string => Boolean(url)))];
     const slots = new Map<string, PreviewSlot>();
     for (const row of rows) {
       for (const slot of getSlots(row)) {
@@ -295,7 +296,7 @@ function groupEvents(events: PreviewEvent[]): PreviewEvent[] {
       eventPageIndexableSlug: pageSlugs.length === 1 ? first.eventPageIndexableSlug : null,
       slug: eventSlugs.length === 1 ? eventSlugs[0] : null,
       purchaseUrl: upcomingSlots[0]?.purchaseUrl || null,
-      widgetUrl: null,
+      widgetUrl: widgetUrls.length === 1 ? widgetUrls[0] : null,
       sessionCount: upcomingSlots.length,
       subcategories: [...new Set(rows.flatMap((row) => row.subcategories || []))],
       tagLabels: [...new Set(rows.flatMap((row) => row.tagLabels || []))],
