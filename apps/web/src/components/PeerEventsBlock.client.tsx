@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { MapPin, Calendar, Ticket, ChevronDown } from 'lucide-react';
+import { resolveCityTimeZone } from '@/lib/city-timezone';
 import * as React from 'react';
 
 type PeerEvent = {
@@ -89,7 +90,7 @@ export function PeerEventsHeroSwitcher({ peers }: { peers: PeerEvent[] }) {
           <div className="space-y-1">
             {indexablePeers.map((peer) => {
               const href = `/events/${encodeURIComponent(peer.eventPageSlug!)}`;
-              const dateLabel = formatPeerDate(peer.startsAt, peer.timeZone);
+              const dateLabel = formatPeerDate(peer.startsAt, peer.timeZone || resolveCityTimeZone(peer.city));
               return (
                 <Link
                   key={`${peer.citySlug}:${peer.eventPageSlug || peer.id}`}

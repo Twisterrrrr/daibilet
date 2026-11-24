@@ -43,6 +43,7 @@ import { HeroImageWithBlur } from '@/components/HeroImageWithBlur.client';
 import { resolveEventHeroObjectPosition } from '@/lib/event-image-focus';
 import { venueHref } from '@/lib/routes';
 import { formatStreetAddress } from '@/lib/address';
+import { resolveCityTimeZone } from '@/lib/city-timezone';
 import { CheckoutModalButton } from '@/components/CheckoutModal.client';
 import { trackEventView, trackSelectTickets } from '@/lib/catalog-analytics';
 import {
@@ -267,6 +268,7 @@ export function EventBuyCard({ payload }: { payload: PublicEventPageDto }) {
             ) : (
               <SessionDayStrip
                 sessions={scheduleSessions}
+                eventTimeZone={resolveCityTimeZone(event.city)}
                 isTcWidget={isTcWidget && !isTepWidget}
                 tcEventId={tcEventId}
                 showSessionVenue={showSessionVenue}
@@ -342,11 +344,18 @@ export function EventBuyCard({ payload }: { payload: PublicEventPageDto }) {
   );
 }
 
-function sessionDayKey(session: EventSession): string {
+function sessionDayKey(session: EventSession, eventTimeZone: string): string {
   if (session.startsAt) {
     const date = new Date(session.startsAt);
     if (!Number.isNaN(date.getTime())) {
-      return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+      const parts = new Intl.DateTimeFormat('en-CA', {
+        timeZone: session.timeZone || eventTimeZone,
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+      }).formatToParts(date);
+      const value = Object.fromEntries(parts.map((part) => [part.type, part.value]));
+      return `${value.year}-${value.month}-${value.day}`;
     }
   }
   return String(session.dateLabel || session.id).trim() || session.id;
@@ -354,11 +363,13 @@ function sessionDayKey(session: EventSession): string {
 
 function SessionDayStrip({
   sessions,
+  eventTimeZone,
   isTcWidget,
   tcEventId,
   showSessionVenue,
 }: {
   sessions: EventSession[];
+  eventTimeZone: string;
   isTcWidget: boolean;
   tcEventId: string | null;
   showSessionVenue: boolean;
@@ -366,7 +377,7 @@ function SessionDayStrip({
   const days = React.useMemo(() => {
     const map = new Map<string, { key: string; label: string; sessions: EventSession[] }>();
     for (const session of sessions) {
-      const key = sessionDayKey(session);
+      const key = sessionDayKey(session, eventTimeZone);
       const existing = map.get(key);
       if (existing) {
         existing.sessions.push(session);
@@ -379,7 +390,7 @@ function SessionDayStrip({
       });
     }
     return [...map.values()];
-  }, [sessions]);
+  }, [eventTimeZone, sessions]);
 
   const defaultDayKey = React.useMemo(() => pickDefaultSessionDayKey(days), [days]);
   const [selectedDay, setSelectedDay] = React.useState(defaultDayKey);

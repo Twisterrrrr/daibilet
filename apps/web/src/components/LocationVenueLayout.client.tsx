@@ -39,6 +39,7 @@ import { normalizeVenueKind, resolveLocationVenueCopy, resolveVenueAboutHeading,
 import { venueKindLabel } from '@/lib/venue-kind-mapping';
 import { resolveVenueExperienceProfile } from '@/lib/venue-experience-profile';
 import { eventHref, venueHref } from '@/lib/routes';
+import { isSameSessionDay, resolveSessionTimeZoneForSession } from '@/lib/datetime';
 import type {
   PublicSessionDto,
   PublicVenueDto,
@@ -850,15 +851,11 @@ function LocationVenueSidebar({
 }
 
 function collectTodayTimeSlots(sessions: PublicSessionDto[]): string[] {
-  const today = new Date();
-  const key = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
   const slots = new Set<string>();
   for (const session of sessions.flatMap((item) => expandSessionPurchaseVariants(item))) {
     if (isSessionPurchaseBlocked(session)) continue;
-    const date = new Date(session.startsAt);
-    if (!Number.isFinite(date.getTime())) continue;
-    const sessionKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
-    if (sessionKey !== key) continue;
+    const timeZone = resolveSessionTimeZoneForSession(session);
+    if (!isSameSessionDay(session.startsAt, new Date(), timeZone)) continue;
     if (session.timeLabel) slots.add(session.timeLabel);
   }
   return [...slots].sort((a, b) => a.localeCompare(b, 'ru'));
