@@ -14,6 +14,7 @@ import {
 } from '@/lib/event-page-utils';
 import { trackSelectTickets } from '@/lib/catalog-analytics';
 import { normalizeTicketscloudPurchaseUrl } from '@/lib/external-provider-purchase';
+import { DEFAULT_CITY_TIME_ZONE } from '@/lib/city-timezone';
 import {
   beginPurchaseOpening,
   completePurchaseOpening,
@@ -412,7 +413,8 @@ function formatSessionLabels(session: {
   if (session.startsAt) {
     const d = new Date(session.startsAt);
     if (!Number.isNaN(d.getTime())) {
-      const timeZone = session.timeZone || undefined;
+      // Never let the viewer's device timezone change the event's displayed wall clock.
+      const timeZone = session.timeZone || DEFAULT_CITY_TIME_ZONE;
       return {
         weekday: d.toLocaleDateString('ru-RU', { weekday: 'short', timeZone }),
         date: d.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', timeZone }),
