@@ -101,8 +101,8 @@
 .desktopFilterField:nth-last-child(2) select { width: 170px; }
 .desktopFilterField:last-child select { width: 180px; }
 .filterMain { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; padding: 9px 0; }
-.search { position: relative; flex: 1; min-width: 180px; max-width: 380px; }
-.searchInput { width: 100%; height: 38px; padding: 0 30px; border: 1px solid var(--line); border-radius: 8px; background: var(--alt); color: var(--ink); font: inherit; font-size: 14px; }
+.search { position: relative; flex: 1 1 300px; min-width: 180px; max-width: none; }
+.searchInput { width: 100%; height: 44px; padding: 0 30px; border: 1px solid var(--line); border-radius: 10px; background: var(--alt); color: var(--ink); font: inherit; font-size: 14px; }
 .searchInput::placeholder { color: var(--muted2); }
 .searchInput:focus { outline: none; border-color: var(--accent); background: #fff; }
 .searchIcon { position: absolute; top: 50%; left: 10px; color: var(--muted2); transform: translateY(-50%); pointer-events: none; }
@@ -380,10 +380,11 @@
 }
 
 /* New Year landing: compact integrated navigation and city-first exploration. */
-.page { font-family: var(--font-manrope), var(--font-inter), system-ui, sans-serif; }
+.page { font-family: var(--font-inter), system-ui, sans-serif; }
 .bandContent { padding: 30px 20px 34px; }
 .bandFestive { min-height: 0; align-items: stretch; padding: 0; }
 .bandFestive .title { width: min(100%, 920px); max-width: 920px; margin-bottom: 12px; }
+.page .title { font-family: var(--font-unbounded), var(--font-inter), system-ui, sans-serif; font-weight: 700; letter-spacing: -.035em; }
 .bandFestive .lead { width: min(100%, 840px); margin-bottom: 16px; font-size: 16px; line-height: 1.55; }
 .bandFestive .bandMeta { width: 100%; margin-bottom: 0; }
 .heroTopline { display: flex; align-items: center; gap: 24px; margin-bottom: 18px; }
@@ -440,6 +441,35 @@
 .row:hover .rowTitle { color: var(--accent-dark); }
 .buyButton { border-radius: 8px !important; }
 
+/* Match the supplied landing template while keeping the existing snow hero. */
+.bandFestive { width: min(calc(100% - 40px), var(--content-max)); margin: 0 auto; border-radius: 14px; }
+.snowPattern { left: 50%; width: min(calc(100% - 40px), var(--content-max)); border-radius: 14px; transform: translateX(-50%); }
+.bandFestive .title { width: min(100%, 920px); max-width: 920px; font-size: clamp(34px, 3.4vw, 42px); }
+.bandFestive .lead { width: min(100%, 760px); max-width: 760px; margin-bottom: 20px; font-size: 16px; line-height: 1.6; }
+.filterMain { gap: 12px; padding: 12px 0 16px; }
+.segment button { padding: 7px 14px; }
+.desktopFilterField select, .dateDropdownWrap select { height: 38px; padding-right: 32px; padding-left: 14px; border-radius: 8px; }
+.list { overflow: hidden; margin-bottom: 24px; border: 0; border-radius: 0; background: #fff; }
+.tableHeader { grid-template-columns: 110px minmax(260px, 1fr) 160px 140px 100px 120px; gap: 18px; padding: 9px 0; border: 0; border-bottom: 1px solid var(--line); border-radius: 0; background: #fff; font-size: 12px; }
+.row { grid-template-columns: 110px minmax(260px, 1fr) 160px 140px 100px 120px; gap: 18px; padding: 18px 0; }
+.snowPattern { pointer-events: none; }
+.desktopFilterField:nth-child(1) { width: 210px; }
+.desktopFilterField:nth-child(2) { width: 225px; }
+.desktopFilterField:nth-child(3) { width: 185px; }
+.desktopFilterField:nth-child(4) { width: 195px; }
+.cardsView { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px; overflow: visible; margin-bottom: 24px; border: 0; background: transparent; }
+.cardsView .row { display: flex; min-width: 0; min-height: 228px; flex-direction: column; align-items: stretch; gap: 10px; padding: 16px; border: 1px solid var(--line); border-radius: 12px; background: #fff; }
+.cardsView .row:hover { border-color: #cbd8eb; background: #fff; box-shadow: 0 5px 18px rgb(15 17 23 / 6%); }
+.cardsView .rowDate { text-align: left; }
+.cardsView .rowMain { flex: 1 1 auto; }
+.cardsView .rowTitle { white-space: normal; }
+.cardsView .rowVenueColumn { display: none; }
+.cardsView .rowVenueInline { display: inline; }
+.cardsView .rowPrice { margin-top: auto; text-align: left; }
+.cardsView .rowSeats { text-align: left; }
+.cardsView .rowAction { margin-top: 2px; text-align: left; }
+.cardsView .buyButton { min-width: 112px; }
+
 @media (min-width: 640px) and (max-width: 1023px) {
   .bandContent { padding-top: 28px; padding-bottom: 30px; }
   .bandFestive .title { font-size: clamp(32px, 4vw, 38px); }
@@ -447,9 +477,9 @@
   .heroCityList::-webkit-scrollbar { display: none; }
   .desktopDropdowns { gap: 6px; }
   .desktopFilterField:nth-child(1) { width: 175px; }
-  .desktopFilterField:nth-child(2) { width: 145px; }
-  .desktopFilterField:nth-child(3) { width: 130px; }
-  .desktopFilterField:nth-child(4) { width: 150px; }
+  .desktopFilterField:nth-child(2) { width: 205px; }
+  .desktopFilterField:nth-child(3) { width: 160px; }
+  .desktopFilterField:nth-child(4) { width: 180px; }
   .tableHeader, .row { grid-template-columns: 64px minmax(190px, 1.3fr) minmax(100px, .8fr) 100px 75px 80px; gap: 8px; }
   .tableHeader { font-size: 10px; }
   .row { padding-right: 9px; padding-left: 9px; }
@@ -463,6 +493,8 @@
   .rowVenueColumn { display: none; }
   .rowVenueInline { display: inline; }
 }
+
+.guideTitle, .faqTitle { font-family: var(--font-unbounded), var(--font-inter), system-ui, sans-serif; }
 
 @media (max-width: 639px) {
   .bandContent { padding: 18px 14px 24px; }
@@ -491,6 +523,13 @@
   .rowTitle { font-size: 15px; -webkit-line-clamp: 3; }
   .rowVenueColumn { display: none; }
   .rowVenueInline { display: inline; }
+}
+
+@media (max-width: 899px) {
+  .bandFestive { width: calc(100% - 24px); border-radius: 12px; }
+  .snowPattern { width: calc(100% - 24px); border-radius: 12px; }
+  .cardsView { grid-template-columns: minmax(0, 1fr); gap: 8px; }
+  .cardsView .row { min-height: 0; padding: 12px; border-radius: 12px; }
 }
 
 @media (prefers-reduced-motion: reduce) {

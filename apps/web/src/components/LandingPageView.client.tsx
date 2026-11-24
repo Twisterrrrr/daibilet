@@ -3,6 +3,7 @@
 import * as React from 'react';
 import { Anchor, ArrowRight, Briefcase, Bus, Cake, CalendarDays, CheckCircle2, ChevronDown, Clock, Eye, Headphones, Heart, HelpCircle, Lightbulb, Mail, MapPin, Mic, Moon, Music, Search, Shield, Ship, Sparkles, Star, Sun, Tag, Ticket, TrendingUp, Users, UtensilsCrossed, Wallet } from 'lucide-react';
 
+import { fontInter, fontUnbounded } from '@/lib/fonts';
 import { EventCard } from '@/components/EventCard';
 import { useSelectedCityOptional } from '@/components/SelectedCityProvider.client';
 import { BridgesLandingGuide, BridgesShipChecklist } from '@/components/landing/BridgesLandingGuide.client';
@@ -1038,7 +1039,7 @@ export function LandingPageView({
   }
 
   return (
-    <div className={`min-h-screen bg-background text-foreground ${profile === 'bridges' ? 'bridges-landing pb-20 md:pb-0' : ''}`}>
+    <div className={`${fontInter.variable} ${fontUnbounded.variable} landing-font-system min-h-screen bg-background text-foreground ${profile === 'bridges' ? 'bridges-landing pb-20 md:pb-0' : ''}`}>
       
       <>
           {profile !== 'bridges' ? <LandingStickyHeader /> : null}
