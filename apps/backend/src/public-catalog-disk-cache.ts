@@ -147,17 +147,17 @@ export function writePublicCatalogDiskCache(snapshot: PublicCatalogDiskSnapshot)
     }
   }
 
-  const payload: PublicCatalogDiskSnapshot = {
-    ...snapshot,
-    version: snapshot.indexes ? 2 : snapshot.version || 1,
-    sessionsBytes: Buffer.byteLength(JSON.stringify(snapshot.sessions), 'utf8'),
-  };
+  const sessionsBytes = measureJsonArrayBytes(snapshot.sessions);
 
   // Atomic write: write tmp then rename so readers never see a partial JSON
   // (API Soft-SWR promote must not hit SyntaxError mid-write).
   const tmp = path.join(dir, `.${path.basename(filePath)}.${process.pid}.${Date.now()}.tmp`);
   try {
-    fs.writeFileSync(tmp, JSON.stringify(payload));
+    fs.writeFileSync(tmp, JSON.stringify({
+      ...snapshot,
+      version: snapshot.indexes ? 2 : snapshot.version || 1,
+      sessionsBytes,
+    }));
     fs.renameSync(tmp, filePath);
     return true;
   } catch (error) {
@@ -171,6 +171,17 @@ export function writePublicCatalogDiskCache(snapshot: PublicCatalogDiskSnapshot)
     );
     return false;
   }
+}
+
+function measureJsonArrayBytes(values: unknown[]): number {
+  // Count the same compact JSON array representation without allocating one
+  // extra string containing all sessions at once.
+  let bytes = 2; // []
+  for (let index = 0; index < values.length; index += 1) {
+    if (index > 0) bytes += 1; // comma
+    bytes += Buffer.byteLength(JSON.stringify(values[index]), 'utf8');
+  }
+  return bytes;
 }
 
 export function resolveCatalogRebuildMode(): 'inline' | 'child' | 'off' {

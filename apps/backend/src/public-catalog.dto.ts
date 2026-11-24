@@ -477,22 +477,30 @@ function scheduleInlineCatalogRebuild(reason: string): Promise<PublicSessionDto[
     try {
       const [rows, pinnedEventIds] = await Promise.all([loadPublicCatalogRows(), loadPinnedEventIds()]);
       const separateCityHubs = collectSeparateCityHubNames(rows);
-      // Yield between chunks so inline rebuild (API/cron child) does not monopolize the event loop.
+      // Map in bounded slices, then release raw SQL rows before index construction.
       const mapped: PublicSessionDto[] = [];
-      for (let i = 0; i < rows.length; i += PUBLIC_CATALOG_MAP_CHUNK) {
+      const memory = () => Math.round(process.memoryUsage().rss / 1024 / 1024);
+      const rowCount = rows.length;
+      const startedRssMiB = memory();
+      let lastChunkRssMiB = startedRssMiB;
+      for (let i = 0; i < rowCount; i += PUBLIC_CATALOG_MAP_CHUNK) {
         const chunk = rows.slice(i, i + PUBLIC_CATALOG_MAP_CHUNK);
         for (const row of chunk) {
           const session = mapGroupedPublicSession(row, pinnedEventIds, { separateCityHubs });
           if (session) mapped.push(session);
         }
-        if (i + PUBLIC_CATALOG_MAP_CHUNK < rows.length) {
-          await sleep(0);
-        }
+        if (i + PUBLIC_CATALOG_MAP_CHUNK < rowCount) await sleep(0);
+        lastChunkRssMiB = memory();
       }
+      rows.length = 0;
+      if (typeof global.gc === 'function') global.gc();
+      console.log(`Public catalog rebuild mapped rawRows=${rowCount} rssMiB=${memory()} startedRssMiB=${startedRssMiB} lastChunkRssMiB=${lastChunkRssMiB}`);
       // Do not hydrate all slots into the shared cache — that made every limit=50 cold build pay for thousands of slots.
       const sessions = filterCatalogSessions(
         dedupeCrossSourceCatalogSessions(regroupMappedPublicCatalogSessions(mapped)),
       );
+      mapped.length = 0;
+      const mapStageRssMiB = memory();
       await attachCatalogRatings(sessions);
       const sessionsWithEventPages = await attachUnambiguousEventPageSlugs(sessions);
       const now = Date.now();
@@ -511,6 +519,8 @@ function scheduleInlineCatalogRebuild(reason: string): Promise<PublicSessionDto[
           }`,
         );
       }
+      const indexRssMiB = memory();
+      console.log(`Public catalog rebuild indexed sessions=${sessions.length} rssMiB=${indexRssMiB} mapStageRssMiB=${mapStageRssMiB}`);
       adoptCatalogCache({
         expiresAt,
         staleUntil,
@@ -526,6 +536,8 @@ function scheduleInlineCatalogRebuild(reason: string): Promise<PublicSessionDto[
         sessions: sessionsWithEventPages,
         ...(indexes ? { indexes } : {}),
       });
+      if (typeof global.gc === 'function') global.gc();
+      console.log(`Public catalog rebuild complete sessions=${sessions.length} rssMiB=${memory()} elapsedMs=${Date.now() - startedAt}`);
       console.log(
         `Public catalog DTO cache rebuilt (${reason}): ${sessions.length} sessions in ${now - startedAt}ms indexes=${indexes ? 'v2' : 'none'}`,
       );

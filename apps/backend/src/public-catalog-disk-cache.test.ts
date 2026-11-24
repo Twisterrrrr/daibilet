@@ -101,6 +101,10 @@ test('writePublicCatalogDiskCache blocks empty sessions and keeps previous', () 
     const loaded = loadPublicCatalogDiskCache();
     assert.equal(loaded?.sessions?.length, 1);
     assert.equal(loaded?.sessions?.[0]?.id, 'a');
+    assert.equal(
+      loaded?.sessionsBytes,
+      Buffer.byteLength(JSON.stringify([{ id: 'a' }]), 'utf8'),
+    );
   } finally {
     restoreEnv('DAIBILET_PUBLIC_CATALOG_DISK_CACHE', prevEnv);
     fs.rmSync(dir, { recursive: true, force: true });
