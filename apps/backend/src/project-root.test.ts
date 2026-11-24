@@ -35,7 +35,12 @@ test('loadCityRoutingConfig returns standalone cities', () => {
   assert.equal((routing.cityToRegion || {})['Новокузнецк'], 'Кемеровская область');
   assert.equal((routing.cityToRegion || {})['Владикавказ'], undefined);
   assert.equal((routing.cityToRegion || {})['Ханты-Мансийск'], undefined);
-  assert.equal((routing.standaloneCities || []).includes('Махачкала'), false);
+  assert.ok((routing.standaloneCities || []).includes('Махачкала'));
+  assert.ok((routing.standaloneCities || []).includes('Якутск'));
+  assert.ok((routing.standaloneCities || []).includes('Петропавловск-Камчатский'));
+  assert.ok((routing.standaloneCities || []).includes('Салехард'));
+  assert.ok((routing.standaloneCities || []).includes('Анадырь'));
+  assert.ok((routing.standaloneCities || []).includes('Майкоп'));
   assert.equal((routing.standaloneCities || []).includes('Набережные Челны'), false);
 });
 
