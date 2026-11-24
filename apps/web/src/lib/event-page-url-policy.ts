@@ -2,6 +2,7 @@ type StableEventPageRoute = {
   slug: string;
   published: boolean;
   isIndexable: boolean;
+  historicalAlias?: boolean;
 } | null | undefined;
 
 type PublishedEventPage = {
@@ -24,21 +25,23 @@ export function resolveEventPageUrlPolicy(input: {
   const stableSlug = routeSlug || linkedSlug;
   const stablePath = stableSlug ? `/events/${encodeURIComponent(stableSlug)}` : '';
   const isLegacyAlias = Boolean(stableSlug && stableSlug !== input.requestedSlug);
+  const isLegacySlotAlias = isLegacyAlias && input.eventPageRoute?.historicalAlias !== true;
   const hasUnpublishedCandidate = Boolean(
     input.eventPageRoute && !input.eventPageRoute.published && input.eventPageRoute.slug === input.requestedSlug,
   );
   const ended = input.availability === 'ENDED' || input.availability === 'NO_UPCOMING';
 
   return {
-    canonicalPath: stablePath || input.eventCanonicalPath || input.fallbackPath,
+    canonicalPath: isLegacySlotAlias
+      ? input.eventCanonicalPath || input.fallbackPath
+      : stablePath || input.eventCanonicalPath || input.fallbackPath,
     hasPublishedStablePage: Boolean(stableSlug),
     isLegacyAlias,
-    // A legacy/alias page must NOT emit noindex alongside a cross-canonical:
-    // noindex + canonical together confuses Google and produces the GSC
-    // "canonical version does not match" bucket. The canonical alone
-    // consolidates the alias into the stable page; noindex stays only for pages
-    // without a published canonical (draft / ended / explicit non-indexable).
+    // Legacy event slots stay available to visitors but leave the index with a
+    // self-canonical. A historical EventPage path is a different case: it
+    // serves the stable page at the old path and canonicalizes to that page.
     noindex:
+      isLegacySlotAlias ||
       Boolean(input.eventPageRoute?.published && !input.eventPageRoute.isIndexable) ||
       hasUnpublishedCandidate ||
       (!stableSlug && ended),

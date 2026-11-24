@@ -1,0 +1,212 @@
+[
+  {
+    "batch": 2,
+    "sequence": 24,
+    "reason": "замена страницы с конфликтом названия спектакля и исходного описания",
+    "removed": {
+      "eventPageId": "d48af9da-6163-4a7f-bb11-0e1f0f308bd8",
+      "eventId": "evt_6a8d927bc1716b9b6bb4d44a",
+      "slug": "spyaschaya-krasavica-kovrov",
+      "pageTitle": "Спящая Красавица",
+      "reason": "замена страницы с конфликтом названия спектакля и исходного описания"
+    },
+    "replacement": {
+      "eventPageId": "6c3a2a6f-8f7f-4fd0-a29b-a09949bb02a9",
+      "eventId": "evt_6afed6f3d4264d17663f4f69",
+      "slug": "novogodnyaya-noch-v-zavarke-koncert-yasmi-moskva",
+      "pageTitle": "Новогодняя ночь в ЗАВАРКЕ: Концерт YASMI!",
+      "city": "Москва",
+      "nextSlot": "2026-12-31T19:00:00.000Z",
+      "sourceChars": 1345
+    }
+  },
+  {
+    "batch": 3,
+    "sequence": 26,
+    "reason": "замена события без будущего активного слота; выбрана рождественская программа с тремя показами",
+    "removed": {
+      "eventPageId": "c4cf62a7-c3d5-47e5-a1bf-41092cf70349",
+      "eventId": "evt_6ae9b6100ea3a7c785b73d41",
+      "slug": "aidahar-taina-drakonih-chasov-volgograd",
+      "pageTitle": "АЙДАХАР. ТАЙНА ДРАКОНЬИХ ЧАСОВ",
+      "reason": "замена события без будущего активного слота; выбрана рождественская программа с тремя показами"
+    },
+    "replacement": {
+      "eventPageId": "def8641d-a962-474f-bada-cf7dcbc09f6e",
+      "eventId": "evt_6ab4f4fc280a49e752f6ef16",
+      "slug": "koncert-rozhdestvenskie-vstrechi-s-ansamblem-pesni-i-plyaski-donskih-kazakov-rostov-na-donu",
+      "pageTitle": "Концерт \"Рождественские встречи с ансамблем песни и пляски Донских казаков\"",
+      "city": "Ростов-на-Дону",
+      "nextSlot": "2027-01-06T14:00:00.000Z",
+      "sourceChars": 1905
+    }
+  },
+  {
+    "batch": 4,
+    "sequence": 16,
+    "reason": "замена карточки с конфликтом названия и описания",
+    "removed": {
+      "eventPageId": "2a97750b-97d3-4211-8729-dcd97d0d829a",
+      "eventId": "evt_6af30e418a4803c036a20576",
+      "slug": "tribyut-batl-leningrad-vs-zveri-ot-barney-barfly-tver",
+      "pageTitle": "ТРИБЬЮТ-БАТЛ \"ЛЕНИНГРАД vs ЗВЕРИ\" от BARNEY BARFLY",
+      "reason": "замена карточки с конфликтом названия и описания"
+    },
+    "replacement": {
+      "eventPageId": "560dc568-1603-4b68-a129-643eac005390",
+      "eventId": "evt_tep_1576",
+      "slug": "novogodnii-ogonek-na-volnah-na-ledokolnom-teplohode-imperatrica-moskva",
+      "pageTitle": "\"Новогодний огонек на волнах\" на ледокольном теплоходе \"Императрица\"",
+      "city": "Москва",
+      "nextSlot": "2026-12-19T15:00:00.000Z",
+      "sourceChars": 5698
+    }
+  },
+  {
+    "batch": 4,
+    "sequence": 20,
+    "reason": "дубликат постановки «Всё дело в шляпе», переносится в B2#13; вместо дубля выбрана проверенная рождественская фолк-программа",
+    "removed": {
+      "eventPageId": "8afdc2d5-9c96-4ab3-bf6b-51cf9b053cc4",
+      "eventId": "evt_6af5f5282110d7937c1cc597",
+      "slug": "novogodnee-predstavlenie-vse-delo-v-shlyape-po-skazke-n-kurtog-prazdnik-pylelupov-moskva",
+      "pageTitle": "Новогоднее представление \"Все дело в шляпе\" по сказке Н.Куртог \"Праздник пылелупов\"",
+      "reason": "дубликат постановки «Всё дело в шляпе», переносится в B2#13; вместо дубля выбрана проверенная рождественская фолк-программа"
+    },
+    "replacement": {
+      "eventPageId": "237b7f74-ef57-4596-bc2a-21a38516248c",
+      "eventId": "evt_6afe1ce79f27b3b693f38c74",
+      "slug": "rozhdestvenskoe-chudo-folk-koncert-pri-svechah-moskva",
+      "pageTitle": "Рождественское чудо: Фолк-концерт при свечах",
+      "city": "Москва",
+      "nextSlot": "2027-01-07T17:00:00.000Z",
+      "sourceChars": 2184
+    }
+  },
+  {
+    "batch": 4,
+    "sequence": 30,
+    "reason": "повторный показ того же «Щелкунчика» в том же театре, переносится в B4#29",
+    "removed": {
+      "eventPageId": "d9e6e7f4-a60d-4a4e-8e5e-d0b9b8285b41",
+      "eventId": "evt_6b0202a45b223bd290ee4e1c",
+      "slug": "balet-schelkunchik-s-obzornoi-ekskursiei-po-dvorcu-nachalo-ekskursii-16-45-nachalo-baleta-18-00-sankt-peterburg-3",
+      "pageTitle": "Балет \"Щелкунчик\". С обзорной экскурсией по Дворцу (начало экскурсии 16:45, начало балета 18:00)",
+      "reason": "повторный показ того же «Щелкунчика» в том же театре, переносится в B4#29"
+    },
+    "replacement": {
+      "eventPageId": "da352105-6bea-41b6-8dcc-51e77db89967",
+      "eventId": "evt_6afe1e4b33ec963fa91d58e2",
+      "slug": "rozhdestvenskii-dzhaz-novogodnii-koncert-s-dzhazovoi-zvezdoi-gabriel-biggest-moskva",
+      "pageTitle": "\"Рождественский джаз\": Новогодний концерт с джазовой звездой Габриэль Биггест!",
+      "city": "Москва",
+      "nextSlot": "2027-01-04T17:30:00.000Z",
+      "sourceChars": 608
+    }
+  },
+  {
+    "batch": 5,
+    "sequence": 7,
+    "reason": "повтор Après-ski, даты объединяются в B5#1; вместо него выбрана новогодняя ночь в «Квартире с видом»",
+    "removed": {
+      "eventPageId": "80429e1c-2877-46d0-99ea-d72b648a17da",
+      "eventId": "evt_6afd5cf829fb4b4a496d6a58",
+      "slug": "apres-ski-moscow-party-moskva",
+      "pageTitle": "Après-ski Moscow Party",
+      "reason": "повтор Après-ski, даты объединяются в B5#1; вместо него выбрана новогодняя ночь в «Квартире с видом»"
+    },
+    "replacement": {
+      "eventPageId": "7f28ebee-428f-4c66-a47c-d29ec99ab230",
+      "eventId": "evt_6afeef90fa3d28f9c2b6ae58",
+      "slug": "novogodnii-kvartirnik-s-vidom-moskva",
+      "pageTitle": "НОВОГОДНИЙ КВАРТИРНИК С ВИДОМ!",
+      "city": "Москва",
+      "nextSlot": "2026-12-31T20:00:00.000Z",
+      "sourceChars": 2373
+    }
+  },
+  {
+    "batch": 5,
+    "sequence": 12,
+    "reason": "повтор корпоративной программы гостиницы «Космос», даты объединяются в B5#3",
+    "removed": {
+      "eventPageId": "e7bf3cdd-8cc9-4757-ac2a-5e2f2b3a2ffc",
+      "eventId": "evt_tep_1506",
+      "slug": "sbornyi-korporativ-24-dekabrya-2026-v-gostinice-kosmos",
+      "pageTitle": "Сборный корпоратив 24 декабря 2026 в гостинице «Космос»",
+      "reason": "повтор корпоративной программы гостиницы «Космос», даты объединяются в B5#3"
+    },
+    "replacement": {
+      "eventPageId": "c5732eec-d9c3-499a-9260-984bc4a8fc38",
+      "eventId": "evt_6aff23cde4288ecc72851cd5",
+      "slug": "nash-novogodnii-vecher-dlya-teh-kto-ne-hochet-byt-odin-i-iskrenne-hochet-otnoshenii-moskva",
+      "pageTitle": "Наш новогодний вечер для тех, кто не хочет быть один и искренне хочет отношений.",
+      "city": "Москва",
+      "nextSlot": "2026-12-31T18:00:00.000Z",
+      "sourceChars": 3405
+    }
+  },
+  {
+    "batch": 5,
+    "sequence": 16,
+    "reason": "повтор корпоративной программы гостиницы «Космос», даты объединяются в B5#3; вместо неё выбрана серия «Новогодняя опера» в Доме Шрёдера",
+    "removed": {
+      "eventPageId": "48f65585-89dc-4ab7-885e-95bbef985cda",
+      "eventId": "evt_tep_1052",
+      "slug": "sbornyi-korporativ-25-dekabrya-2026-v-gostinice-kosmos",
+      "pageTitle": "Сборный корпоратив 25 декабря 2026 в гостинице «Космос»",
+      "reason": "повтор корпоративной программы гостиницы «Космос», даты объединяются в B5#3; вместо неё выбрана серия «Новогодняя опера» в Доме Шрёдера"
+    },
+    "replacement": {
+      "eventPageId": "0778182d-b1a8-47e2-9aa5-2d02ecbf4ce7",
+      "eventId": "evt_6a9ab1c5248817cc9380e931",
+      "slug": "novogodnyaya-opera-prazdnichnyi-uzhin-koncert-za-stolikami-sankt-peterburg",
+      "pageTitle": "\"Новогодняя опера\" праздничный ужин-концерт за столиками",
+      "city": "Санкт-Петербург",
+      "nextSlot": "2026-12-31T16:00:00.000Z",
+      "sourceChars": 1805
+    }
+  },
+  {
+    "batch": 5,
+    "sequence": 18,
+    "reason": "повтор Après-ski Moscow Party, даты объединяются в B5#1",
+    "removed": {
+      "eventPageId": "4c5616bb-962e-4e02-9445-0b2bc1e2cf45",
+      "eventId": "evt_6afeb7c55d11eb76e92c90ad",
+      "slug": "kurshevel-apres-ski-party-moskva",
+      "pageTitle": "Куршевель Après-ski Party",
+      "reason": "повтор Après-ski Moscow Party, даты объединяются в B5#1"
+    },
+    "replacement": {
+      "eventPageId": "9afb6f2c-4aab-4eb8-8c17-b8f593329f19",
+      "eventId": "evt_6afdb8b888f8a9359c49f905",
+      "slug": "novogodnii-koncert-diskoteka-mix-80-90-h-na-teplohode-imperatrica-moskva",
+      "pageTitle": "Новогодний концерт \"Дискотека MIX 80-90-х \" на теплоходе Императрица",
+      "city": "Москва",
+      "nextSlot": "2026-12-26T15:00:00.000Z",
+      "sourceChars": 1196
+    }
+  },
+  {
+    "batch": 5,
+    "sequence": 20,
+    "reason": "повтор программы «Мадам Бум. Зимний шик» в Москве, даты объединяются в B4#27",
+    "removed": {
+      "eventPageId": "aeda250a-b235-4ef4-847a-27ebb58a9a3d",
+      "eventId": "evt_6afcb8e2819d5b2a2525a1c8",
+      "slug": "burlesk-kabare-shou-madam-bum-moskva-2",
+      "pageTitle": "Бурлеск кабаре шоу МАДАМ БУМ",
+      "reason": "повтор программы «Мадам Бум. Зимний шик» в Москве, даты объединяются в B4#27"
+    },
+    "replacement": {
+      "eventPageId": "fd366d02-5200-4418-a4ce-33d36723e7fa",
+      "eventId": "evt_6af6539c7b82e349f70c24dd",
+      "slug": "novogodnee-shou-ot-kabare-skazki-na-noch-moskva",
+      "pageTitle": "Новогоднее шоу от кабаре «Сказки на ночь»",
+      "city": "Москва",
+      "nextSlot": "2026-12-27T17:00:00.000Z",
+      "sourceChars": 2089
+    }
+  }
+]

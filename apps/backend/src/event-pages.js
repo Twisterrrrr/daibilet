@@ -653,19 +653,36 @@ async function readPublicEventPageRouteBySlugInternal(db, slug, visitedSlugs) {
  * supplies exact page IDs after editorial identity review; this method checks
  * city and venue consistency before moving anything.
  */
-export async function mergeAdminEventPages(db, targetPageId, rawSourcePageIds, rawMergeGroupKey, actorId = null) {
+export async function mergeAdminEventPages(db, targetPageId, rawSourcePageIds, rawMergeGroupKey, actorId = null, review = null) {
   const targetId = requiredText(targetPageId, 'targetPageId', 100);
   const mergeGroupKey = requiredText(rawMergeGroupKey, 'mergeGroupKey', 64).toLowerCase();
-  if (mergeGroupKey !== 'zooteatr-reptilii') throw new Error('Only the verified ZooTeatr reptile merge key is supported');
   if (!Array.isArray(rawSourcePageIds)) throw new Error('sourcePageIds must be an array');
   const sourceIds = [...new Set(rawSourcePageIds.map((id) => requiredText(id, 'sourcePageId', 100)))];
   if (!sourceIds.length || sourceIds.length > MAX_EVENT_PAGE_MERGE_SOURCES) {
     throw new Error(`sourcePageIds must contain 1-${MAX_EVENT_PAGE_MERGE_SOURCES} unique IDs`);
   }
   if (sourceIds.includes(targetId)) throw new Error('targetPageId cannot also be a source page');
+  const requestedIds = [targetId, ...sourceIds].sort();
+  const reviewPageIds = Array.isArray(review?.pageIds)
+    ? [...new Set(review.pageIds.map((id) => requiredText(id, 'review.pageId', 100)))].sort()
+    : [];
+  const reviewEventIds = Array.isArray(review?.eventIds)
+    ? [...new Set(review.eventIds.map((id) => requiredText(id, 'review.eventId', 120)))].sort()
+    : [];
+  const isExactReviewedMerge = review?.reviewed === true
+    && review?.targetPageId === targetId
+    && review?.mergeGroupKey === mergeGroupKey
+    && typeof review?.rationale === 'string'
+    && review.rationale.trim().length >= 20
+    && reviewPageIds.length === requestedIds.length
+    && reviewPageIds.every((id, index) => id === requestedIds[index])
+    && typeof review?.cityId === 'string'
+    && ['same-id', 'same-title', 'explicit-aliases'].includes(review?.venuePolicy?.type);
+  if (mergeGroupKey !== 'zooteatr-reptilii' && !isExactReviewedMerge) {
+    throw new Error('Non-Zoo EventPage merges require an exact reviewed page, event, city and venue manifest');
+  }
 
   return db.transaction(async ({ query }) => {
-    const requestedIds = [targetId, ...sourceIds].sort();
     const lockedPages = await query(`
       SELECT id, slug, title, summary, "heroImageUrl", content, "seoH1", "seoTitle", "seoDescription",
         "canonicalPath", status, "isIndexable", "publishedAt", "tourGroupId"
@@ -678,20 +695,62 @@ export async function mergeAdminEventPages(db, targetPageId, rawSourcePageIds, r
 
     const allLinks = await query(`
       SELECT link.id, link."eventPageId", link."eventId", link.position, link.role,
-        event.title AS "eventTitle", event."primaryCityId" AS "cityId", event."venueId"
+        event.title AS "eventTitle", event."primaryCityId" AS "cityId", city.title AS "cityTitle", event."venueId",
+        venue.title AS "venueTitle", venue.address AS "venueAddress"
       FROM "EventPageEvent" link
       JOIN "Event" event ON event.id = link."eventId"
+      LEFT JOIN "City" city ON city.id = event."primaryCityId"
+      LEFT JOIN "Venue" venue ON venue.id = event."venueId"
       WHERE link."eventPageId" = ANY($1::text[])
       ORDER BY link."eventPageId", link.position, link."createdAt"
       FOR UPDATE OF link
     `, [requestedIds]);
     if (!allLinks.rows.some((link) => link.eventPageId === targetId)) throw new Error('Target EventPage must already have at least one Event');
     const cityIds = new Set(allLinks.rows.map((link) => String(link.cityId || '')).filter(Boolean));
+    const normalizeCity = (value) => String(value || '').toLocaleLowerCase('ru').replace(/ё/gu, 'е').replace(/[^\p{L}\p{N}]+/gu, ' ').trim();
+    const cityNames = new Set(allLinks.rows.map((link) => normalizeCity(link.cityTitle)).filter(Boolean));
+    const reviewedCityName = normalizeCity(review?.cityName);
     const venueIds = new Set(allLinks.rows.map((link) => String(link.venueId || '')).filter(Boolean));
-    if (cityIds.size !== 1 || venueIds.size !== 1 || allLinks.rows.some((link) => !link.cityId || !link.venueId)) {
-      throw new Error('Merged EventPages must all belong to the same known city and venue');
+    const reviewedCityMatches = isExactReviewedMerge && cityNames.size === 1 && cityNames.has(reviewedCityName);
+    if ((cityIds.size !== 1 && !reviewedCityMatches) || venueIds.size !== 1 || allLinks.rows.some((link) => !link.cityId || !link.cityTitle || !link.venueId)) {
+      if (!isExactReviewedMerge || (cityIds.size !== 1 && !reviewedCityMatches) || allLinks.rows.some((link) => !link.cityId || !link.cityTitle || !link.venueId)) {
+        throw new Error('Merged EventPages must all belong to the same known city and venue');
+      }
     }
-    if (allLinks.rows.some((link) => !/^зоотеатр\s+рептилий(?=\s|$)/iu.test(String(link.eventTitle || '').trim()))) {
+    if (isExactReviewedMerge) {
+      if (!reviewedCityMatches || (cityIds.size === 1 && !cityIds.has(review.cityId))) throw new Error('Reviewed merge city no longer matches live Event links');
+      const actualEventIds = allLinks.rows.map((link) => String(link.eventId)).sort();
+      if (actualEventIds.length !== reviewEventIds.length || actualEventIds.some((id, index) => id !== reviewEventIds[index])) {
+        throw new Error('Reviewed merge Event IDs no longer match live EventPage links');
+      }
+      const actualVenueIds = [...venueIds].sort();
+      const expectedVenueIds = Array.isArray(review.venueIds) ? [...new Set(review.venueIds.map(String))].sort() : [];
+      if (!expectedVenueIds.length || actualVenueIds.length !== expectedVenueIds.length || actualVenueIds.some((id, index) => id !== expectedVenueIds[index])) {
+        throw new Error('Reviewed merge venue IDs no longer match the approved venue set');
+      }
+      const normalizeIdentity = (value) => String(value || '').toLocaleLowerCase('ru').replace(/ё/gu, 'е').replace(/[^\p{L}\p{N}]+/gu, '');
+      if (review.venuePolicy.type === 'same-id' && venueIds.size !== 1) throw new Error('Reviewed same-id venue group has multiple venue IDs');
+      if (review.venuePolicy.type === 'same-title') {
+        const expectedTitle = normalizeIdentity(review.venuePolicy.expectedTitle);
+        if (!expectedTitle || allLinks.rows.some((link) => normalizeIdentity(link.venueTitle) !== expectedTitle)) {
+          throw new Error('Reviewed venue title no longer matches the approved identity');
+        }
+      }
+      if (review.venuePolicy.type === 'explicit-aliases') {
+        const allowedNames = new Set((review.venuePolicy.allowedNames || []).map(normalizeIdentity));
+        const postalCode = String(review.venuePolicy.requiredPostalCode || '').trim();
+        if (!allowedNames.size || allLinks.rows.some((link) => !allowedNames.has(normalizeIdentity(link.venueTitle)))) {
+          throw new Error('Reviewed venue name is outside the approved alias list');
+        }
+        if (postalCode && allLinks.rows.some((link) => !String(link.venueAddress || '').includes(postalCode))) {
+          throw new Error('Reviewed venue address no longer matches the approved postal code');
+        }
+      }
+      if (lockedPages.rows.some((page) => page.status !== 'DRAFT' || page.isIndexable !== false || page.publishedAt != null)) {
+        throw new Error('Reviewed merge accepts only unpublished, non-indexable drafts');
+      }
+    }
+    if (mergeGroupKey === 'zooteatr-reptilii' && allLinks.rows.some((link) => !/^зоотеатр\s+рептилий(?=\s|$)/iu.test(String(link.eventTitle || '').trim()))) {
       throw new Error('This merge operation is restricted to confirmed ZooTeatr reptile listings');
     }
     const eventIds = allLinks.rows.map((link) => String(link.eventId));
