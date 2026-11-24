@@ -6,16 +6,25 @@
 
 ## Что изменено
 
-- `apps/backend/src/public-catalog.dto.ts`: map идёт порциями по 80 строк с yield
-  event loop; после преобразования raw SQL rows освобождаются до построения
-  индексов. В лог добавлены RSS после освобождения строк, после построения
-  индексов и полный elapsed time. Это замеры в контрольных точках, не системный
-  максимум; значения в MiB округлены.
+- `apps/backend/src/public-catalog.dto.ts`: raw SQL row освобождается сразу после
+  map; между порциями до 500 строк вызывается GC. В лог пишутся `rss`, `maxRSS`,
+  `heapUsed`, `external`, `arrayBuffers` и этапы SQL/map/grouping/ratings/
+  EventPage/indexes/cache write.
+- `apps/backend/src/public-catalog.mapper.ts`: форматтеры ICU для даты, времени,
+  time bucket и slot dedupe переиспользуются по часовому поясу. Раньше новые
+  `Intl.DateTimeFormat` создавались на каждый слот.
+- `deploy/cron/rebuild-public-catalog-dto.sh`: rebuild worker стартует с
+  `--expose-gc`, чтобы пакетная сборка мусора реально работала.
+- `scripts/rebuild-public-catalog-dto-cache.mjs`: в конце больше не парсит весь
+  записанный кэш вторично. Версия читается из 128-байтового header, размер -
+  через `stat`.
 - `apps/backend/src/public-catalog-disk-cache.ts`: `sessionsBytes` считается
-  по одному объекту за раз без дополнительной JSON-строки всего массива.
+  по одному объекту за раз. Записывается `sessionsCount`, а legacy-кэш
+  проверяется ограниченным потоковым сканированием `sessions`, без повторного
+  разбора полного JSON.
 
-Форма snapshot, версия, атомарная запись, anomaly guard и семантика каталога не
-менялись.
+Версия snapshot и атомарность записи сохранены. Anomaly guard сохраняется:
+новые файлы используют `sessionsCount`, старые проверяются потоковым счётчиком.
 
 ## Пример ресурсной экономии
 
@@ -40,6 +49,25 @@ MSK.
 пропорционально размер JSON и объявлять экономию 3 GiB: большая часть RSS может
 приходиться на драйвер БД, Postgres client buffers, объекты слотов, DTO и индексы.
 
+## Production-профиль до второго патча
+
+В `/var/log/daibilet/catalog-dto-rebuild.log` после первой диагностической
+выкладки видны такие точки:
+
+| Этап | RSS |
+|---|---:|
+| SQL вернул 5 042 строки, начало map | 286-323 MiB |
+| mapper завершился | 2 272 MiB в успешном прогоне; 3 072 MiB в прогоне, истёкшем по timeout |
+| grouping завершён | около 2 272 MiB |
+| indexes завершены | 2 322 MiB |
+| rebuild до CLI summary | 2 446 MiB |
+
+Успешный повтор обработал 5 042 сессии за 41.7 с. Более ранний run дошёл до
+3 072 MiB после mapper, затем истёк по timeout без обновления кэша. Значит,
+основной наблюдаемый скачок происходит при map строк, а SQL-result сам по себе
+не объясняет гигабайты. Новые лог-точки нужны, чтобы увидеть, насколько
+снизился пик после кэширования ICU formatters и освобождения строк.
+
 ## Что измерять на MSK
 
 Сначала снять baseline на одном ручном прогоне текущего worker: elapsed, RSS до
@@ -58,7 +86,11 @@ writer и добавляет измеримость; критерии памят
 - `pnpm db:generate` с локальным фиктивным `DATABASE_URL` (Prisma Client
   generation; соединения с БД не было).
 - `pnpm --filter @daibilet/backend typecheck` - passed.
-- disk-cache, catalog mapper и grouping tests - 27 passed.
+- disk-cache, catalog mapper и grouping tests - 28 passed.
+- полный `pnpm backend:test:ts` - 295 passed, 2 failed: оба требуют PostgreSQL
+  на `127.0.0.1:5437`, которого нет в локальном окружении.
 - `git diff --check` - passed.
 
-Прод не запускался и не менялся.
+Production smoke после этого патча - ближайший timer-run; отдельный ручной
+rebuild не запускать параллельно с timer. Сверить `MemoryPeak`, `maxRSS`, RSS по этапам,
+количество сессий, `hasIndexes` и cache mtime. Swap лимит остаётся 1 GiB.

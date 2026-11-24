@@ -12,6 +12,7 @@
  *   DATABASE_URL / .env as usual
  *   Pair API with DAIBILET_CATALOG_REBUILD_MODE=off
  */
+import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -31,14 +32,26 @@ async function main() {
   const { getPublicCatalogSessions, clearPublicCatalogDtoCache } = await import(
     '../apps/backend/src/public-catalog.dto.ts'
   );
-  const { loadPublicCatalogDiskCache, resolvePublicCatalogDiskCachePath } = await import(
+  const { resolvePublicCatalogDiskCachePath } = await import(
     '../apps/backend/src/public-catalog-disk-cache.ts'
   );
 
   clearPublicCatalogDtoCache();
   const sessions = await getPublicCatalogSessions(true, { hydrateSlots: false });
   const diskPath = resolvePublicCatalogDiskCachePath();
-  const disk = loadPublicCatalogDiskCache();
+  const fd = fs.openSync(diskPath, 'r');
+  let header;
+  try {
+    const buffer = Buffer.alloc(128);
+    const bytesRead = fs.readSync(fd, buffer, 0, buffer.length, 0);
+    header = buffer.toString('utf8', 0, bytesRead);
+  } finally {
+    fs.closeSync(fd);
+  }
+  const diskVersion = Number(header.match(/"version"\s*:\s*(\d+)/)?.[1] || 0) || null;
+  const diskBytes = fs.statSync(diskPath).size;
+  const memory = process.memoryUsage();
+  const maxRss = process.resourceUsage().maxRSS;
   console.log(
     JSON.stringify({
       ok: true,
@@ -46,8 +59,13 @@ async function main() {
       sessions: sessions.length,
       elapsedMs: Date.now() - startedAt,
       diskCache: diskPath,
-      diskVersion: disk?.version ?? null,
-      hasIndexes: Boolean(disk?.indexes),
+      diskVersion,
+      hasIndexes: diskVersion === 2,
+      diskBytes,
+      rssMiB: Math.round(memory.rss / 1024 / 1024),
+      peakRssMiB: Math.round(process.platform === 'win32' ? maxRss / (1024 * 1024) : maxRss / 1024),
+      heapUsedMiB: Math.round(memory.heapUsed / 1024 / 1024),
+      externalMiB: Math.round(memory.external / 1024 / 1024),
     }),
   );
 }

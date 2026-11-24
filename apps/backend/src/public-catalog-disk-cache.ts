@@ -26,6 +26,8 @@ export interface PublicCatalogDiskSnapshot {
   staleUntil: number;
   sessions: PublicSessionDto[];
   indexes?: PublicCatalogDiskIndexes;
+  /** Fast anomaly guard; present on snapshots written by current workers. */
+  sessionsCount?: number;
   /** Byte length of previous good write (anomaly guard). */
   sessionsBytes?: number;
 }
@@ -136,12 +138,12 @@ export function writePublicCatalogDiskCache(snapshot: PublicCatalogDiskSnapshot)
     return false;
   }
 
-  const prev = loadPublicCatalogDiskCache();
-  if (prev?.sessions?.length) {
-    const ratio = snapshot.sessions.length / prev.sessions.length;
+  const previousSessionsCount = readPublicCatalogSessionsCount(filePath);
+  if (previousSessionsCount > 0) {
+    const ratio = snapshot.sessions.length / previousSessionsCount;
     if (ratio < 0.5) {
       console.error(
-        `CRITICAL P1: Public catalog disk write blocked - anomaly size ${snapshot.sessions.length} vs prev ${prev.sessions.length} (keeping previous cache)`,
+        `CRITICAL P1: Public catalog disk write blocked - anomaly size ${snapshot.sessions.length} vs prev ${previousSessionsCount} (keeping previous cache)`,
       );
       return false;
     }
@@ -154,8 +156,13 @@ export function writePublicCatalogDiskCache(snapshot: PublicCatalogDiskSnapshot)
   const tmp = path.join(dir, `.${path.basename(filePath)}.${process.pid}.${Date.now()}.tmp`);
   try {
     fs.writeFileSync(tmp, JSON.stringify({
-      ...snapshot,
       version: snapshot.indexes ? 2 : snapshot.version || 1,
+      builtAt: snapshot.builtAt,
+      expiresAt: snapshot.expiresAt,
+      staleUntil: snapshot.staleUntil,
+      sessionsCount: snapshot.sessions.length,
+      sessions: snapshot.sessions,
+      ...(snapshot.indexes ? { indexes: snapshot.indexes } : {}),
       sessionsBytes,
     }));
     fs.renameSync(tmp, filePath);
@@ -170,6 +177,73 @@ export function writePublicCatalogDiskCache(snapshot: PublicCatalogDiskSnapshot)
       `Public catalog disk cache write failed: ${error instanceof Error ? error.message : String(error)}`,
     );
     return false;
+  }
+}
+
+function readPublicCatalogSessionsCount(filePath: string): number {
+  let fd: number;
+  try {
+    fd = fs.openSync(filePath, 'r');
+  } catch (error) {
+    if (error && typeof error === 'object' && 'code' in error && error.code === 'ENOENT') return 0;
+    throw error;
+  }
+
+  try {
+    const headerBuffer = Buffer.alloc(1024);
+    const headerBytes = fs.readSync(fd, headerBuffer, 0, headerBuffer.length, 0);
+    const header = headerBuffer.toString('utf8', 0, headerBytes);
+    const countMatch = header.match(/"sessionsCount"\s*:\s*(\d+)/);
+    if (countMatch) return Number(countMatch[1]) || 0;
+
+    // Legacy snapshot: count only top-level session objects with a small buffer.
+    // Never parse the whole 20-30MB cache alongside the in-memory DTO tree.
+    const sessionsArray = /"sessions"\s*:\s*\[/.exec(header);
+    if (!sessionsArray) return 0;
+    let position = sessionsArray.index + sessionsArray[0].length;
+    let arrayDepth = 1;
+    let objectDepth = 0;
+    let inString = false;
+    let escaped = false;
+    let count = 0;
+    let complete = false;
+    const chunk = Buffer.alloc(64 * 1024);
+
+    while (!complete) {
+      const bytesRead = fs.readSync(fd, chunk, 0, chunk.length, position);
+      if (bytesRead <= 0) return 0;
+      position += bytesRead;
+      for (let index = 0; index < bytesRead; index += 1) {
+        const byte = chunk[index]!;
+        if (inString) {
+          if (escaped) escaped = false;
+          else if (byte === 0x5c) escaped = true;
+          else if (byte === 0x22) inString = false;
+          continue;
+        }
+        if (byte === 0x22) {
+          inString = true;
+          continue;
+        }
+        if (byte === 0x7b) {
+          if (arrayDepth === 1 && objectDepth === 0) count += 1;
+          objectDepth += 1;
+        } else if (byte === 0x7d) {
+          objectDepth -= 1;
+        } else if (byte === 0x5b) {
+          arrayDepth += 1;
+        } else if (byte === 0x5d) {
+          arrayDepth -= 1;
+          if (arrayDepth === 0) {
+            complete = true;
+            break;
+          }
+        }
+      }
+    }
+    return count;
+  } finally {
+    fs.closeSync(fd);
   }
 }
 

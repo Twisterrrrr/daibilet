@@ -586,35 +586,62 @@ function cleanDisplayName(value?: string | null): string {
   return String(value || '').replace(/\s+/g, ' ').trim();
 }
 
+type CatalogTimeFormatters = {
+  dateLabel: Intl.DateTimeFormat;
+  timeLabel: Intl.DateTimeFormat;
+  hour: Intl.DateTimeFormat;
+  slotDay: Intl.DateTimeFormat;
+};
+
+const catalogTimeFormatters = new Map<string, CatalogTimeFormatters>();
+
+function getCatalogTimeFormatters(timeZone: string): CatalogTimeFormatters {
+  const cached = catalogTimeFormatters.get(timeZone);
+  if (cached) return cached;
+  const formatters: CatalogTimeFormatters = {
+    dateLabel: new Intl.DateTimeFormat('ru-RU', {
+      day: 'numeric',
+      month: 'short',
+      weekday: 'short',
+      timeZone,
+    }),
+    timeLabel: new Intl.DateTimeFormat('ru-RU', {
+      hour: '2-digit',
+      minute: '2-digit',
+      timeZone,
+    }),
+    hour: new Intl.DateTimeFormat('en-GB', {
+      timeZone,
+      hour: 'numeric',
+      hour12: false,
+    }),
+    slotDay: new Intl.DateTimeFormat('en-CA', {
+      timeZone,
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+    }),
+  };
+  catalogTimeFormatters.set(timeZone, formatters);
+  return formatters;
+}
+
 function formatDate(value: string | Date, timeZone: string): string {
   const date = parseSessionStartsAt(value);
   if (!Number.isFinite(date.getTime())) return '';
-  return new Intl.DateTimeFormat('ru-RU', {
-    day: 'numeric',
-    month: 'short',
-    weekday: 'short',
-    timeZone,
-  }).format(date);
+  return getCatalogTimeFormatters(timeZone).dateLabel.format(date);
 }
 
 function formatTime(value: string | Date, timeZone: string): string {
   const date = parseSessionStartsAt(value);
   if (!Number.isFinite(date.getTime())) return '';
-  return new Intl.DateTimeFormat('ru-RU', {
-    hour: '2-digit',
-    minute: '2-digit',
-    timeZone,
-  }).format(date);
+  return getCatalogTimeFormatters(timeZone).timeLabel.format(date);
 }
 
 function timeBucket(value: string | Date, timeZone: string): TimeBucket {
   const date = parseSessionStartsAt(value);
   if (!Number.isFinite(date.getTime())) return 'day';
-  const hourPart = new Intl.DateTimeFormat('en-GB', {
-    timeZone,
-    hour: 'numeric',
-    hour12: false,
-  })
+  const hourPart = getCatalogTimeFormatters(timeZone).hour
     .formatToParts(date)
     .find((part) => part.type === 'hour');
   const hour = Number(hourPart?.value);
@@ -636,12 +663,7 @@ function toIsoString(value: string | Date): string {
 function catalogSlotClockKey(startsAt: string, timeZone: string): string {
   const date = parseSessionStartsAt(startsAt);
   if (!Number.isFinite(date.getTime())) return startsAt;
-  const day = new Intl.DateTimeFormat('en-CA', {
-    timeZone,
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-  }).format(date);
+  const day = getCatalogTimeFormatters(timeZone).slotDay.format(date);
   const time = formatTime(startsAt, timeZone);
   return `${day}|${time}`;
 }

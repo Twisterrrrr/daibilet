@@ -101,10 +101,49 @@ test('writePublicCatalogDiskCache blocks empty sessions and keeps previous', () 
     const loaded = loadPublicCatalogDiskCache();
     assert.equal(loaded?.sessions?.length, 1);
     assert.equal(loaded?.sessions?.[0]?.id, 'a');
+    assert.equal(loaded?.sessionsCount, 1);
     assert.equal(
       loaded?.sessionsBytes,
       Buffer.byteLength(JSON.stringify([{ id: 'a' }]), 'utf8'),
     );
+  } finally {
+    restoreEnv('DAIBILET_PUBLIC_CATALOG_DISK_CACHE', prevEnv);
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('legacy cache anomaly guard counts session objects without parsing nested JSON', () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'daibilet-catalog-legacy-'));
+  const filePath = path.join(dir, 'public-catalog-dto.json');
+  const prevEnv = process.env.DAIBILET_PUBLIC_CATALOG_DISK_CACHE;
+  try {
+    process.env.DAIBILET_PUBLIC_CATALOG_DISK_CACHE = filePath;
+    const legacy = {
+      version: 1,
+      builtAt: Date.now(),
+      expiresAt: Date.now() + 60_000,
+      staleUntil: Date.now() + 120_000,
+      sessions: [
+        { id: 'a', nested: { marker: 'brace } and bracket ] in string' } },
+        { id: 'b', nested: { items: [{ value: 'escaped \\" text' }] } },
+        { id: 'c' },
+        { id: 'd' },
+      ],
+    };
+    fs.writeFileSync(filePath, JSON.stringify(legacy));
+    const before = fs.readFileSync(filePath, 'utf8');
+
+    assert.equal(
+      writePublicCatalogDiskCache({
+        version: 1,
+        builtAt: Date.now(),
+        expiresAt: Date.now() + 60_000,
+        staleUntil: Date.now() + 120_000,
+        sessions: [{ id: 'only-one' } as never],
+      }),
+      false,
+    );
+    assert.equal(fs.readFileSync(filePath, 'utf8'), before);
   } finally {
     restoreEnv('DAIBILET_PUBLIC_CATALOG_DISK_CACHE', prevEnv);
     fs.rmSync(dir, { recursive: true, force: true });

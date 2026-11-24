@@ -26,6 +26,8 @@ fi
 export DAIBILET_CATALOG_REBUILD_MODE=inline
 unset DAIBILET_WEB_PORT || true
 unset NEXT_RUNTIME || true
+# The mapper drops raw rows in batches and explicitly collects between them.
+export NODE_OPTIONS="${NODE_OPTIONS:+${NODE_OPTIONS} }--expose-gc"
 
 exec 9>"$LOCK_FILE"
 if ! flock -n 9; then
