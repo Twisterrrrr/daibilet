@@ -16,6 +16,7 @@ import {
   indexabilityDecision,
   resolveRegionLiveTier,
 } from '@daibilet/contracts/common';
+import { isCandidateCityHub } from '@/lib/city-hub-candidate';
 
 /** Align with commercial listing gate (`MIN_LISTING_OFFERS_FOR_INDEX`). */
 export const MIN_CITY_EVENTS_FOR_INDEX = 6;
@@ -96,6 +97,13 @@ export function evaluateCityIndexability(input: {
 }): HubIndexDecision {
   if (input.isIndexable === false) {
     return { indexable: false, thin: true, reason: 'explicit_noindex' };
+  }
+
+  if (
+    input.isIndexable !== true &&
+    isCandidateCityHub({ slug: input.slug, sourceSlug: input.sourceSlug })
+  ) {
+    return { indexable: false, thin: true, reason: 'candidate_noindex' };
   }
 
   if (isStrongCitySlug(input.slug, input.sourceSlug)) {

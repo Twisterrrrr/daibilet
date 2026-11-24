@@ -508,3 +508,22 @@ otherwise.
 **Why:** The existing topic-first hierarchy scales across themes and cities while preserving URLs already exposed to search engines. Crawlers and users need ordinary links between the national page, city variants, city hubs, collections, and related articles.
 
 **Status:** Architecture locked; live URL/SEO audit is incomplete. The 17.11 snapshot confirmed 4 sitemap/noindex conflicts and left 60 robots rows unchecked; it does not contain the complete reported list of 13. Live page checks show a count mismatch for New Year (catalog index 490 in Moscow versus 0 events in the national landing HTML); the exact seasonal inventory and live sitemap remain unverified. See [landing URL architecture and audit](./landing-url-architecture-and-audit-2026-11-18.md). Do not change indexability thresholds, seasonal rules, routes, redirects, or sitemap membership until the URL-by-URL audit is complete.
+
+## 2026-11-24 — Six regional capitals as city-hub candidates
+
+**Decision:** Add Makhachkala, Yakutsk, Petropavlovsk-Kamchatsky, Salekhard,
+Anadyr, and Maykop to the standalone city registry and regional-center map so
+they can appear as city candidates in search and regional navigation. Until an
+editorial city hub is prepared, each gets only a short factual hero brief and
+remains `noindex, follow`. A reviewer can explicitly enable indexing after the
+hub is ready. Do not generate must-see places, routes, FAQ, or full destination
+copy as part of this candidate step. These administrative centers are not
+added to `cityToRegion`, which remains the map for regional satellite towns.
+
+**Why:** Regional capitals should be discoverable even when the rest of the
+city guide is not ready. Search visibility remains gated by editorial review,
+and satellite towns continue to roll into their regional collections.
+
+**Status:** Implemented in the city routing and regional-center data locally;
+hero briefs and candidate-only indexability are wired in web. Not committed,
+deployed, or verified against staging yet.

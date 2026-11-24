@@ -379,6 +379,73 @@
         "petrozavodsk"
       ],
       "tier": "B"
+    },
+    {
+      "regionName": "Республика Дагестан",
+      "regionSlug": "respublika-dagestan",
+      "centerCity": "Махачкала",
+      "centerSlugs": [
+        "mahachkala"
+      ],
+      "tier": "C",
+      "candidateHub": true,
+      "heroBrief": "Махачкала - административный центр Республики Дагестан. Смотрите городские события и выбирайте дату в афише."
+    },
+    {
+      "regionName": "Республика Саха (Якутия)",
+      "regionSlug": "respublika-saha-yakutiya",
+      "centerCity": "Якутск",
+      "centerSlugs": [
+        "yakutsk"
+      ],
+      "tier": "C",
+      "candidateHub": true,
+      "heroBrief": "Якутск - административный центр Республики Саха (Якутия). Смотрите городские события и выбирайте дату в афише."
+    },
+    {
+      "regionName": "Камчатский край",
+      "regionSlug": "kamchatskiy-kray",
+      "centerCity": "Петропавловск-Камчатский",
+      "centerSlugs": [
+        "petropavlovsk-kamchatskiy"
+      ],
+      "tier": "C",
+      "candidateHub": true,
+      "heroBrief": "Петропавловск-Камчатский - административный центр Камчатского края. Смотрите городские события и выбирайте дату в афише."
+    },
+    {
+      "regionName": "Ямало-Ненецкий автономный округ",
+      "regionSlug": "yamalo-nenetskiy-avtonomnyy-okrug",
+      "centerCity": "Салехард",
+      "centerSlugs": [
+        "salekhard"
+      ],
+      "tier": "C",
+      "candidateHub": true,
+      "heroBrief": "Салехард - административный центр Ямало-Ненецкого автономного округа. Смотрите городские события и выбирайте дату в афише."
+    },
+    {
+      "regionName": "Чукотский автономный округ",
+      "regionSlug": "chukotskiy-avtonomnyy-okrug",
+      "centerCity": "Анадырь",
+      "centerSlugs": [
+        "anadyr"
+      ],
+      "tier": "C",
+      "candidateHub": true,
+      "heroBrief": "Анадырь - административный центр Чукотского автономного округа. Смотрите городские события и выбирайте дату в афише."
+    },
+    {
+      "regionName": "Республика Адыгея",
+      "regionSlug": "respublika-adygeya",
+      "centerCity": "Майкоп",
+      "centerSlugs": [
+        "maykop",
+        "maikop"
+      ],
+      "tier": "C",
+      "candidateHub": true,
+      "heroBrief": "Майкоп - административный центр Республики Адыгея. Смотрите городские события и выбирайте дату в афише."
     }
   ]
 }
