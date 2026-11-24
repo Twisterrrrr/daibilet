@@ -30,7 +30,8 @@ import { getCachedDestinations } from '@/server/cached-public-surfaces';
 import { fetchPublicApiJson } from '@/server/public-api-client';
 import { parseCatalogPageQuery } from '@/server/catalog-query';
 import { finalizeLandingPayload, fetchLandingPageDto } from '@/server/landing-page';
-import { loadNewYearLandingData } from '../../app/new-year-ux-preview/new-year-landing-data';
+import { buildLandingSitemapV2Paths } from './landing-sitemap-v2';
+import { newYearLandingSitemapProvider } from './new-year-landing-sitemap-provider';
 
 export const SITEMAP_CHUNKS = [
   'static',
@@ -38,6 +39,7 @@ export const SITEMAP_CHUNKS = [
   'cities',
   'venues',
   'landings',
+  'landings-v2',
   'blog',
 ] as const;
 
@@ -550,14 +552,8 @@ export async function buildLandingsSitemapEntries(): Promise<SitemapEntry[]> {
 
   for (const slug of Object.keys(LANDING_CATEGORY_PATH_BY_SLUG)) {
     if (slug === 'new-year') {
-      try {
-        const resolved = await loadNewYearLandingData();
-        if (resolved && isLandingRouteIndexable({ landingSlug: slug, offers: resolved.data.total })) {
-          paths.add(landingCategoryHref(slug));
-        }
-      } catch {
-        // Leave the New Year URL out until its live event selection is verifiable.
-      }
+      // New Year is emitted by the dynamic v2 provider below. Keeping it out of
+      // this legacy chunk prevents duplicate URLs in the sitemap index.
       continue;
     }
     // City-bound landing routes are checked below using their default city's
@@ -671,6 +667,10 @@ export async function buildSitemapChunkEntries(chunk: SitemapChunk): Promise<Sit
     case 'landings':
       entries = await buildLandingsSitemapEntries();
       break;
+    case 'landings-v2':
+      entries = (await buildLandingSitemapV2Paths([newYearLandingSitemapProvider]))
+        .map((path) => entry(path, 'weekly', 0.65));
+      break;
     case 'blog':
       entries = await buildBlogSitemapEntries();
       break;
@@ -763,7 +763,7 @@ export function sitemapResponseHeaders(chunk: string): Record<string, string> {
   // advertised shared-cache freshness short; do not grant a day-long SWR window.
   const maxAge = chunk === 'events' || chunk === 'venues'
     ? 300
-    : chunk === 'cities' || chunk === 'landings'
+    : chunk === 'cities' || chunk === 'landings' || chunk === 'landings-v2'
       ? 900
       : 3600;
   return {

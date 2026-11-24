@@ -1,5 +1,13 @@
 # Decision Log — Daibilet
 
+## 2026-11-24 — Dynamic landing sitemap rollout
+
+**Decision:** Introduce an internal provider → shared indexability filter → canonical-path renderer for landing sitemap entries. Pilot it through `/sitemaps/landings-v2.xml` with New Year only; derive its city and region candidates from the live New Year catalogue facets and resolve counts through the same loader as the public page. Remove the New Year family from the legacy `landings.xml` while the pilot is active, so the sitemap index never lists duplicate URLs. Do not migrate other landing families until their provider and indexability rules are reviewed. After live verification, move the generator behind the existing `landings.xml` URL and retire the temporary `landings-v2.xml` endpoint.
+
+**Indexability:** Reuse `isLandingRouteIndexable`, including its offer-count, editorial and seasonal rules. A newly observed geo facet does not by itself make a page indexable; it must resolve to a public route and pass the same rule used by metadata.
+
+**Status:** Implemented locally; production verification is pending.
+
 ## 2026-11-17 — Tour-bus pickup places and metro geotag
 
 **Decision:** `TRANSPORT:tour_bus` means a specific pickup place for a sightseeing bus. It is not the vehicle, carrier, or a regular transit stop. The editor should request the exact address/orientation, and a connection to an event/session is added only when departure from that place is confirmed. The catalog group can be labelled «Туравтобусы»; the single candidate subtype is «Туравтобус».
