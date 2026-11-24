@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
+import { fontInter, fontUnbounded } from '@/lib/fonts';
 import { CheckoutModalButton } from '@/components/CheckoutModal.client';
 import { TcWidgetButton, normalizeTcPurchaseUrl } from '@/components/TcWidget.client';
 import { getTeplohodWidgetIdsFromSession, resolveTeplohodCheckoutUrl } from '@/components/TeplohodWidget.client';
@@ -58,7 +59,6 @@ function isCustomDate(value?: string | null): value is string {
 }
 const PRICE_OPTIONS: Array<{ value: PriceFilter; label: string }> = [
   { value: 'all', label: 'Любая цена' },
-  { value: 'free', label: 'Бесплатно' },
   { value: 'under1000', label: 'до 1 000 ₽' },
   { value: 'under2000', label: 'до 2 000 ₽' },
   { value: 'over2000', label: 'от 2 000 ₽' },
@@ -292,7 +292,7 @@ function DateFilterDropdown({
       onDateChange(value);
       if (value === 'custom') openPicker();
     }}>
-      {DATE_OPTIONS.map((item) => <option key={`dropdown-date:${item.value}`} value={item.value} disabled={getFacetCount(facets, item.value) === 0 && date !== item.value}>{item.label} · {getFacetCount(facets, item.value)}</option>)}
+      {DATE_OPTIONS.map((item) => <option key={`dropdown-date:${item.value}`} value={item.value} disabled={getFacetCount(facets, item.value) === 0 && date !== item.value}>{item.label}</option>)}
       <option value="custom">{customDate ? formatCustomDate(customDate) : 'Выбрать дату…'}</option>
     </select>
     <input ref={pickerRef} className={styles.datePickerInput} type="date" min={FIRST_SEASON_DATE} aria-label="Выбрать дату мероприятия" value={customDate} onChange={(event) => onCustomDateChange(event.target.value)} />
@@ -346,7 +346,7 @@ export function NewYearUxPreview({
   const [query, setQuery] = useState('');
   const [sort, setSort] = useState<PreviewFilters['sort']>('date');
   const [lowStock, setLowStock] = useState(false);
-  const [compact, setCompact] = useState(false);
+  const [viewMode, setViewMode] = useState<'list' | 'cards'>('list');
   const [citiesExpanded, setCitiesExpanded] = useState(false);
   const [citySearch, setCitySearch] = useState('');
   const heroFeaturedCitiesRef = useRef<HTMLDivElement>(null);
@@ -674,7 +674,7 @@ export function NewYearUxPreview({
     setFormat('Все форматы');
     setLowStock(false);
     setSort('date');
-    setCompact(false);
+    setViewMode('list');
   };
   const copyFiltersLink = async () => {
     const url = new URL(window.location.href);
@@ -696,7 +696,7 @@ export function NewYearUxPreview({
   };
 
   return (
-    <div className={`${styles.page} ${festive ? styles.festive : ''}`} data-newyear-preview>
+    <div className={`${styles.page} ${fontInter.variable} ${fontUnbounded.variable} ${festive ? styles.festive : ''}`} data-newyear-preview>
       <section className={`${styles.band} ${festive ? styles.bandFestive : ''}`}>
           {festive ? <div className={styles.snowPattern} aria-hidden="true">
             <div className={styles.snowflakes}>{Array.from({ length: 12 }, (_, index) => <span key={index} className={styles.snowflakeFall}><svg viewBox="0 0 48 48" className={styles.snowflake}><g fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.7"><path d="M24 3v42M21 8l3 3 3-3M21 40l3-3 3 3M5.8 13.5l36.4 21M9 12.8l.7 4.2 4.2-.7M34.1 31.7l4.2-.7-.7 4.2M5.8 34.5l36.4-21M9 35.2l.7-4.2 4.2.7M34.1 16.3l4.2.7-.7-4.2" /></g></svg></span>)}</div>
@@ -730,8 +730,8 @@ export function NewYearUxPreview({
           <p className={`${styles.lead} ${styles.leadMobile}`}>Новогодние концерты, спектакли, детские ёлки, экскурсии и праздничные программы по всей России. Выбирайте города, даты и подходящие мероприятия.</p>
           <div className={styles.bandMeta}>
             <span><strong>{data?.total || 0}</strong> мероприятий</span>
-            {city === 'Вся Россия' ? <span>{Math.max(0, cities.filter((item) => item.name !== 'Вся Россия' && item.count > 0).length)} городов с событиями</span> : null}
-            <span>{data?.priceFrom != null ? `от ${new Intl.NumberFormat('ru-RU').format(data.priceFrom)} ₽` : 'Цена уточняется'}</span>
+            {city === 'Вся Россия' ? (() => { const count = Math.max(0, cities.filter((item) => item.name !== 'Вся Россия' && item.count > 0).length); return <span>{count} {pluralRu(count, ['город', 'города', 'городов'])} с событиями</span>; })() : null}
+            <span>{data?.priceFrom != null ? `от ${new Intl.NumberFormat('ru-RU').format(data.priceFrom)} рублей` : 'Цена уточняется'}</span>
           </div>
           <div className={styles.heroCities} aria-label="Выбрать город или регион">
             <span className={styles.heroCitiesLabel}>Города</span>
@@ -774,13 +774,13 @@ export function NewYearUxPreview({
                 <input className={styles.searchInput} type="search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Поиск: ёлка, спектакль, город…" />
               </label>
               <div className={`${styles.segment} ${styles.segmentSort}`} role="group" aria-label="Сортировка">
-                <button type="button" className={sort === 'date' ? styles.segmentActive : ''} onClick={() => setSort('date')}>Дата</button>
+                <button type="button" className={sort === 'date' ? styles.segmentActive : ''} onClick={() => setSort('date')}>По дате</button>
                 <button type="button" className={sort === 'price' ? styles.segmentActive : ''} onClick={() => setSort('price')}>Дешевле</button>
                 <button type="button" className={sort === 'price-desc' ? styles.segmentActive : ''} onClick={() => setSort('price-desc')}>Дороже</button>
               </div>
-              <div className={`${styles.segment} ${styles.segmentDensity}`} role="group" aria-label="Плотность списка">
-                <button type="button" className={compact ? styles.segmentActive : ''} onClick={() => setCompact(true)} aria-pressed={compact}>▤</button>
-                <button type="button" className={!compact ? styles.segmentActive : ''} onClick={() => setCompact(false)} aria-pressed={!compact}>▥</button>
+              <div className={`${styles.segment} ${styles.segmentDensity}`} role="group" aria-label="Вид мероприятий">
+                <button type="button" className={viewMode === 'list' ? styles.segmentActive : ''} onClick={() => setViewMode('list')} aria-label="Показать списком" title="Список" aria-pressed={viewMode === 'list'}>▤</button>
+                <button type="button" className={viewMode === 'cards' ? styles.segmentActive : ''} onClick={() => setViewMode('cards')} aria-label="Показать карточками" title="Карточки" aria-pressed={viewMode === 'cards'}>▥</button>
               </div>
               <button type="button" className={styles.linkButton} onClick={() => void copyFiltersLink()} aria-label="Скопировать ссылку на выбранные фильтры">{copiedLink ? 'Ссылка скопирована' : 'Скопировать и поделиться'}</button>
             </div>
@@ -791,20 +791,20 @@ export function NewYearUxPreview({
               <label className={styles.desktopFilterField}>
                 <span className="sr-only">Формат</span>
                 <select aria-label="Формат" value={format} onChange={(event) => setFormat(event.target.value)}>
-                  {formats.map((item) => { const value = item.name || 'Все форматы'; return <option key={`desktop-format:${value}`} value={value}>{value} · {item.count}</option>; })}
+                  {formats.map((item) => { const value = item.name || 'Все форматы'; return <option key={`desktop-format:${value}`} value={value}>{value}</option>; })}
                 </select>
               </label>
               <label className={styles.desktopFilterField}>
                 <span className="sr-only">Цена</span>
                 <select aria-label="Цена" value={price} onChange={(event) => setPrice(event.target.value as PriceFilter)}>
-                  {PRICE_OPTIONS.map((item) => <option key={`desktop-price:${item.value}`} value={item.value}>{item.label} · {getFacetCount(data?.facets.prices, item.value)}</option>)}
+                  {PRICE_OPTIONS.map((item) => <option key={`desktop-price:${item.value}`} value={item.value}>{item.label}</option>)}
                 </select>
               </label>
               <label className={styles.desktopFilterField}>
                 <span className="sr-only">Наличие мест</span>
                 <select aria-label="Наличие мест" value={lowStock ? 'low' : 'any'} onChange={(event) => setLowStock(event.target.value === 'low')}>
                   <option value="any">Наличие мест</option>
-                  <option value="low" disabled={!data?.facets.lowStock && !lowStock}>Мало мест · {data?.facets.lowStock || 0}</option>
+                  <option value="low" disabled={!data?.facets.lowStock && !lowStock}>Мало мест</option>
                 </select>
               </label>
             </div>
@@ -816,20 +816,20 @@ export function NewYearUxPreview({
               <label className={styles.mobileFilterField}>
                 <span>Формат</span>
                 <select value={format} onChange={(event) => setFormat(event.target.value)}>
-                  {formats.map((item) => { const value = item.name || 'Все форматы'; return <option key={value} value={value} disabled={item.count === 0 && format !== value}>{value} · {item.count}</option>; })}
+                  {formats.map((item) => { const value = item.name || 'Все форматы'; return <option key={value} value={value} disabled={item.count === 0 && format !== value}>{value}</option>; })}
                 </select>
               </label>
               <label className={styles.mobileFilterField}>
                 <span>Цена</span>
                 <select value={price} onChange={(event) => setPrice(event.target.value as PriceFilter)}>
-                  {PRICE_OPTIONS.map((item) => { const count = getFacetCount(data?.facets.prices, item.value); return <option key={item.value} value={item.value} disabled={count === 0 && price !== item.value}>{item.label} · {count}</option>; })}
+                  {PRICE_OPTIONS.map((item) => <option key={item.value} value={item.value}>{item.label}</option>)}
                 </select>
               </label>
               <label className={styles.mobileFilterField}>
                 <span>Наличие мест</span>
                 <select value={lowStock ? 'low' : 'any'} onChange={(event) => setLowStock(event.target.value === 'low')}>
                   <option value="any">Наличие мест</option>
-                  <option value="low" disabled={!data?.facets.lowStock && !lowStock}>Мало мест · {data?.facets.lowStock || 0}</option>
+                  <option value="low" disabled={!data?.facets.lowStock && !lowStock}>Мало мест</option>
                 </select>
               </label>
             </div>
@@ -851,15 +851,15 @@ export function NewYearUxPreview({
           {errorMessage ? <div role="alert" className={styles.empty}><div className={styles.emptyTitle}>Не удалось загрузить новогоднюю афишу</div><div className={styles.emptyText}>{errorMessage}</div><button type="button" className={styles.reset} onClick={() => window.location.reload()}>Попробовать снова</button></div> : null}
           {loadError ? <div role="alert" className={styles.empty}><div className={styles.emptyTitle}>Не удалось обновить список</div><div className={styles.emptyText}>Для выбранных фильтров не загрузились свежие результаты. Предыдущие карточки скрыты, чтобы не показывать события из другой выборки.</div><button type="button" className={styles.reset} onClick={() => { setLoadError(null); setRetryToken((value) => value + 1); }}>Повторить</button></div> : null}
           {pageData?.items.length ? <>
-          <div className={styles.tableHeader} aria-hidden="true"><span>Дата и время</span><span>Мероприятие</span><span>Площадка</span><span>Цена</span><span>Наличие мест</span><span /></div>
-          <div className={styles.list} aria-busy={loading || loadingMore}>
+          {viewMode === 'list' ? <div className={styles.tableHeader} aria-hidden="true"><span>Дата и время</span><span>Мероприятие</span><span>Площадка</span><span>Цена</span><span>Наличие мест</span><span /></div> : null}
+          <div className={`${styles.list} ${viewMode === 'cards' ? styles.cardsView : ''}`} aria-busy={loading || loadingMore}>
             {pageData.items.map((event) => {
               const slot = event.upcomingSlots?.[0];
               const priceLabel = typeof event.priceFrom === 'number' ? event.priceFrom === 0 ? 'Бесплатно' : `от ${new Intl.NumberFormat('ru-RU').format(event.priceFrom)} ₽` : 'Цена уточняется';
               const slots = event.upcomingSlots || [];
               const timeZone = resolveSessionTimeZone(event);
               const slotDate = slot ? formatShortDate(slot, timeZone) : null;
-              return <article key={event.groupKey || event.eventPageSlug || event.id} className={`${styles.row} ${compact ? styles.rowCompact : ''}`} role="button" tabIndex={0} aria-haspopup="dialog" aria-label={`Подробнее: ${event.title}`} onClick={(clickEvent) => {
+              return <article key={event.groupKey || event.eventPageSlug || event.id} className={styles.row} role="button" tabIndex={0} aria-haspopup="dialog" aria-label={`Подробнее: ${event.title}`} onClick={(clickEvent) => {
                 if ((clickEvent.target as HTMLElement).closest('a, button, details, summary')) return;
                 setSelectedEvent(event);
               }} onKeyDown={(keyEvent) => {

@@ -2,6 +2,15 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Shared landing typography from the new-year HTML template. */
+.landing-font-system {
+  font-family: var(--font-inter), system-ui, sans-serif;
+}
+
+.landing-font-system :is(h1, h2) {
+  font-family: var(--font-unbounded), var(--font-inter), system-ui, sans-serif;
+}
+
 /* Before hydration and without JS, show the complete server suburb guide.
    Once the client carousel is ready, keep only its interactive version visible. */
 html[data-city-hydrated='1'] [data-city-suburbs-server] {
