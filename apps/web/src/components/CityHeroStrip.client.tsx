@@ -7,6 +7,7 @@ import Link from 'next/link';
 import { PageBreadcrumbBar } from '@/components/PageBreadcrumbs';
 import { SafeImage } from '@/components/SafeImage.client';
 import { buildCatalogHref } from '@/lib/catalog-url';
+import { candidateCityHubHeroBrief } from '@/lib/city-hub-candidate';
 import { resolveCityHeroRegionBadge } from '@/lib/city-hero-region';
 import { resolveCityImageObjectPosition } from '@/lib/city-image-focus';
 import { resolveCityImage } from '@/lib/city-images';
@@ -46,8 +47,14 @@ export function CityHeroStrip({
   const [shareCopied, setShareCopied] = React.useState(false);
   const cityIn = cityInPrepositional(city);
   const citySlug = city.slug || city.sourceSlug || undefined;
+  const candidateBrief = candidateCityHubHeroBrief({
+    slug: city.slug,
+    sourceSlug: city.sourceSlug,
+    name: city.name,
+  });
   const brief =
     guide?.brief?.trim() ||
+    candidateBrief ||
     `Экскурсии, музеи, мероприятия и активный отдых ${cityIn}. Выбирайте формат и дату - и покупайте билет онлайн на Дайбилете.`;
   const afficheHref = citySlug
     ? buildCatalogHref({ city: citySlug, sort: 'popular' })

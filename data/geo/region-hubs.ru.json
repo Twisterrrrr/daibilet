@@ -379,6 +379,74 @@
         "petrozavodsk"
       ],
       "tier": "B"
+    },
+    {
+      "regionName": "Республика Дагестан",
+      "regionSlug": "respublika-dagestan",
+      "centerCity": "Махачкала",
+      "centerSlugs": [
+        "mahachkala"
+      ],
+      "tier": "C",
+      "candidateHub": true,
+      "heroBrief": "Махачкала - южный город у Каспийского моря, где знакомство с Дагестаном начинается с набережной, местной кухни и насыщенной городской жизни."
+    },
+    {
+      "regionName": "Республика Саха (Якутия)",
+      "regionSlug": "respublika-saha-yakutiya",
+      "centerCity": "Якутск",
+      "centerSlugs": [
+        "yakutsk"
+      ],
+      "tier": "C",
+      "candidateHub": true,
+      "heroBrief": "Якутск - город на вечной мерзлоте и культурный центр Якутии. Здесь можно познакомиться с культурой саха, северной историей и особым укладом жизни."
+    },
+    {
+      "regionName": "Камчатский край",
+      "regionSlug": "kamchatskiy-kray",
+      "centerCity": "Петропавловск-Камчатский",
+      "centerSlugs": [
+        "petropavlovsk-kamchatskiy"
+      ],
+      "tier": "C",
+      "candidateHub": true,
+      "heroBrief": "Петропавловск-Камчатский раскинулся у Авачинской бухты в окружении вулканов. Сюда приезжают за морскими панорамами, историей Камчатки и ощущением края света."
+    },
+    {
+      "regionName": "Ямало-Ненецкий автономный округ",
+      "regionSlug": "yamalo-nenetskiy-avtonomnyy-okrug",
+      "centerCity": "Салехард",
+      "centerSlugs": [
+        "salehard",
+        "salekhard"
+      ],
+      "tier": "C",
+      "candidateHub": true,
+      "heroBrief": "Салехард - город на Полярном круге с историей Обдорска и особым северным характером. Начните знакомство с городских музеев, старых улиц и культурных событий."
+    },
+    {
+      "regionName": "Чукотский автономный округ",
+      "regionSlug": "chukotskiy-avtonomnyy-okrug",
+      "centerCity": "Анадырь",
+      "centerSlugs": [
+        "anadyr"
+      ],
+      "tier": "C",
+      "candidateHub": true,
+      "heroBrief": "Анадырь - яркий город на берегу Анадырского лимана и одна из самых необычных точек для знакомства с Чукоткой. Здесь северные пейзажи соседствуют с местной культурой и историей."
+    },
+    {
+      "regionName": "Республика Адыгея",
+      "regionSlug": "respublika-adygeya",
+      "centerCity": "Майкоп",
+      "centerSlugs": [
+        "maykop",
+        "maikop"
+      ],
+      "tier": "C",
+      "candidateHub": true,
+      "heroBrief": "Майкоп - южный город и удобное начало знакомства с Адыгеей. Здесь городские прогулки и местная культура дополняют поездки к предгорьям Кавказа."
     }
   ]
 }
