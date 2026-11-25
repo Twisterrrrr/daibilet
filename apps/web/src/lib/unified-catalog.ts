@@ -6,6 +6,7 @@ import type {
 import type { PublicCatalogListItemDto } from '@daibilet/contracts/public';
 
 import type { FinanceAdmissionProduct } from '@/lib/finance-projection';
+import { cityLookupSlug } from '@/lib/routes';
 
 export type AdmissionCatalogTaxonomy = {
   category: { slug: string; title: string } | null;
@@ -18,6 +19,13 @@ export function normalizeCatalogSearchKey(value: unknown): string {
     .toLowerCase()
     .replace(/ё/g, 'е')
     .replace(/\s+/g, ' ');
+}
+
+function normalizeCatalogCityKey(value: unknown): string {
+  const normalized = normalizeCatalogSearchKey(value);
+  return /^[a-z0-9]+(?:-[a-z0-9]+)*$/i.test(normalized)
+    ? normalizeCatalogSearchKey(cityLookupSlug(normalized))
+    : normalized;
 }
 function isoDay(value?: string | null): string | null {
   if (!value) return null;
@@ -97,16 +105,16 @@ export function matchesAdmissionCatalogFilters(
     if (!text.includes(q)) return false;
   }
 
-  const city = normalizeCatalogSearchKey(query.city);
+  const city = normalizeCatalogCityKey(query.city);
   if (city && city !== 'all') {
     const cityValues = [product.city?.slug, product.city?.citySlug, product.city?.title, product.venue?.citySlug, product.venue?.cityTitle]
-      .map(normalizeCatalogSearchKey);
+      .map(normalizeCatalogCityKey);
     if (!cityValues.includes(city)) return false;
   }
-  const destination = normalizeCatalogSearchKey(query.destination);
+  const destination = normalizeCatalogCityKey(query.destination);
   if (destination && destination !== 'all') {
     const destinationValues = [product.city?.slug, product.city?.citySlug, product.city?.title, product.venue?.citySlug, product.venue?.cityTitle]
-      .map(normalizeCatalogSearchKey);
+      .map(normalizeCatalogCityKey);
     if (!destinationValues.includes(destination)) return false;
   }
 

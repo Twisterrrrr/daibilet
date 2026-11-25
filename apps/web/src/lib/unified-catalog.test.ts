@@ -37,6 +37,16 @@ test('admission filters keep open date tickets for a selected future date', () =
   } as PublicCatalogQuery, new Date('2026-11-25T09:00:00+03:00')), true);
 });
 
+test('admission city filters resolve public moskva URLs to canonical moscow records', () => {
+  const moscowProduct = product({
+    city: { slug: 'moscow', title: 'Москва', citySlug: 'moscow', cityTitle: 'Москва' },
+    venue: { slug: 'virtual-museum', title: 'Виртуальный музей', citySlug: 'moscow', cityTitle: 'Москва' },
+  });
+
+  assert.equal(matchesAdmissionCatalogFilters(moscowProduct, taxonomy, { city: 'moskva' } as PublicCatalogQuery), true);
+  assert.equal(matchesAdmissionCatalogFilters(moscowProduct, taxonomy, { destination: 'moskva' } as PublicCatalogQuery), true);
+});
+
 test('admission date filters exclude tickets whose fixed validity ended before the requested range', () => {
   assert.equal(matchesAdmissionCatalogFilters(product({
     validityMode: 'FIXED_WINDOW', validFrom: '2026-11-01T00:00:00.000Z', validTo: '2026-12-10T20:59:59.999Z',
