@@ -6,7 +6,11 @@ export type NewYearPreviewQuery = {
   city?: string;
   region?: string;
   date?: string;
+  dateFrom?: string;
+  dateTo?: string;
   price?: string;
+  priceFrom?: number;
+  priceTo?: number;
   format?: string;
   q?: string;
   sort?: string;
@@ -40,8 +44,28 @@ export function parseNewYearPreviewQuery(params: URLSearchParams): NewYearPrevie
   if (date && date !== 'all' && !DATES.has(date) && !validCustomDate(date)) {
     throw new InvalidNewYearPreviewQuery('invalid_date');
   }
+  const dateFrom = shortText(params, 'dateFrom', 10);
+  const dateTo = shortText(params, 'dateTo', 10);
+  if ((dateFrom && !validCustomDate(dateFrom)) || (dateTo && !validCustomDate(dateTo))) {
+    throw new InvalidNewYearPreviewQuery('invalid_date_range');
+  }
+  if (dateFrom && dateTo && dateFrom > dateTo) throw new InvalidNewYearPreviewQuery('invalid_date_range');
+  if (date && (dateFrom || dateTo)) throw new InvalidNewYearPreviewQuery('conflicting_date_filters');
   const price = shortText(params, 'price', 20);
   if (price && price !== 'all' && !PRICES.has(price)) throw new InvalidNewYearPreviewQuery('invalid_price');
+  const priceFromValue = one(params, 'priceFrom');
+  const priceToValue = one(params, 'priceTo');
+  const priceFrom = priceFromValue === null ? undefined : /^\d{1,7}$/.test(priceFromValue) ? Number(priceFromValue) : NaN;
+  const priceTo = priceToValue === null ? undefined : /^\d{1,7}$/.test(priceToValue) ? Number(priceToValue) : NaN;
+  if ((priceFrom !== undefined && !Number.isSafeInteger(priceFrom)) || (priceTo !== undefined && !Number.isSafeInteger(priceTo))) {
+    throw new InvalidNewYearPreviewQuery('invalid_price_range');
+  }
+  if (priceFrom !== undefined && priceTo !== undefined && priceFrom > priceTo) {
+    throw new InvalidNewYearPreviewQuery('invalid_price_range');
+  }
+  if (price && price !== 'all' && (priceFrom !== undefined || priceTo !== undefined)) {
+    throw new InvalidNewYearPreviewQuery('conflicting_price_filters');
+  }
   const sort = shortText(params, 'sort', 20);
   if (sort && !SORTS.has(sort)) throw new InvalidNewYearPreviewQuery('invalid_sort');
   const lowStockValue = one(params, 'lowStock');
@@ -56,7 +80,11 @@ export function parseNewYearPreviewQuery(params: URLSearchParams): NewYearPrevie
     city: shortText(params, 'city', 100),
     region: shortText(params, 'region', 100),
     date: date || undefined,
+    dateFrom: dateFrom || undefined,
+    dateTo: dateTo || undefined,
     price: price || undefined,
+    priceFrom,
+    priceTo,
     format: shortText(params, 'format', 100),
     q: shortText(params, 'q', 120),
     sort: sort || undefined,

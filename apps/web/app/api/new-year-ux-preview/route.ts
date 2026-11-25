@@ -1,4 +1,4 @@
-import { buildNewYearPreviewData, type PreviewFilters } from '../../new-year-ux-preview/preview-data';
+import { buildNewYearPreviewData, buildNewYearPreviewIndex, type PreviewFilters } from '../../new-year-ux-preview/preview-data';
 import { InvalidNewYearPreviewQuery, parseNewYearPreviewQuery } from '@/lib/new-year-preview-query';
 
 export const dynamic = 'force-dynamic';
@@ -6,6 +6,16 @@ export const revalidate = 0;
 
 export async function GET(request: Request) {
   const params = new URL(request.url).searchParams;
+  if (params.get('index') === '1') {
+    try {
+      return Response.json(await buildNewYearPreviewIndex(), {
+        headers: { 'Cache-Control': 'no-store' },
+      });
+    } catch (error) {
+      console.error('[new-year-ux-preview] compact index request failed', error);
+      return Response.json({ error: 'preview_index_unavailable' }, { status: 503 });
+    }
+  }
   let filters: PreviewFilters;
   try {
     filters = parseNewYearPreviewQuery(params);

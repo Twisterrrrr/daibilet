@@ -3,10 +3,11 @@ import { fetchPublicApiJson, isProductionBuildPhase } from '@/server/public-api-
 import { resolveSessionTimeZone } from '@/lib/city-timezone';
 import { parseSessionStartsAt } from '@/lib/datetime';
 import { getNewYearPreviewPage, sortNewYearPreviewEvents } from '@/lib/new-year-preview-order';
-import { isExcludedFromNewYearLanding } from '@/lib/new-year-preview-relevance';
+import { isRelevantToNewYearLanding } from '@/lib/new-year-preview-relevance';
 import cityRouting from '../../../../data/geo/city-routing.ru.json';
 import regionHubs from '../../../../data/geo/region-hubs.ru.json';
-import { resolvePreviewFormat } from './preview-format';
+import { resolvePreviewFormat, visibleNewYearFormatNames } from './preview-format';
+import type { CompactPreviewEvent, NewYearPreviewIndex } from './preview-index';
 
 export type PreviewSlot = {
   id?: string;
@@ -59,7 +60,11 @@ export type PreviewFilters = {
   city?: string;
   region?: string;
   date?: string;
+  dateFrom?: string;
+  dateTo?: string;
   price?: string;
+  priceFrom?: number;
+  priceTo?: number;
   format?: string;
   q?: string;
   sort?: string;
@@ -335,6 +340,15 @@ function slotsForDate(event: PreviewEvent, date: string): PreviewSlot[] {
   });
 }
 
+function slotsForDateRange(event: PreviewEvent, from?: string, to?: string): PreviewSlot[] {
+  if (!from && !to) return seasonalSlots(event);
+  const eventTimeZone = resolveSessionTimeZone(event);
+  return seasonalSlots(event).filter((slot) => {
+    const day = slotDayKey(slot, eventTimeZone);
+    return Boolean(day && (!from || day >= from) && (!to || day <= to));
+  });
+}
+
 function matchesPrice(event: PreviewEvent, price: string): boolean {
   if (!price || price === 'all') return true;
   if (typeof event.priceFrom !== 'number') return false;
@@ -345,6 +359,15 @@ function matchesPrice(event: PreviewEvent, price: string): boolean {
   if (price === 'over5000') return event.priceFrom >= 5000;
   if (price === 'over10000') return event.priceFrom >= 10000;
   return true;
+}
+
+function matchesPriceRange(event: PreviewEvent, from?: number, to?: number): boolean {
+  if (from == null && to == null) return true;
+  // The visible “from” price is the event's lowest available tariff.
+  // Keep range filtering consistent with the price shown on each card.
+  const startingPrice = typeof event.priceFrom === 'number' ? event.priceFrom : event.priceTo;
+  if (typeof startingPrice !== 'number') return false;
+  return (from == null || startingPrice >= from) && (to == null || startingPrice <= to);
 }
 
 function lowStock(event: PreviewEvent): boolean {
@@ -387,7 +410,9 @@ export async function buildNewYearPreviewData(filters: PreviewFilters = {}) {
   const rawEvents = snapshot.events;
   const sourceTotal = snapshot.total;
 
-  const grouped = groupEvents(rawEvents.filter((event) => !isExcludedFromNewYearLanding(event)));
+  // First narrow the seasonal source to explicitly holiday-related events,
+  // then group sessions and derive the user-facing format facets.
+  const grouped = groupEvents(rawEvents.filter(isRelevantToNewYearLanding));
   const query = String(filters.q || '').trim().toLocaleLowerCase('ru');
   const dateFilter = filters.date || 'all';
   const priceFilter = filters.price || 'all';
@@ -405,7 +430,9 @@ export async function buildNewYearPreviewData(filters: PreviewFilters = {}) {
     const city = event.city || '';
     const region = cityRegion(city);
     const format = resolvePreviewFormat(event);
-    const upcomingSlots = slotsForDate(event, dateFilter);
+    const upcomingSlots = filters.dateFrom || filters.dateTo
+      ? slotsForDateRange(event, filters.dateFrom, filters.dateTo)
+      : slotsForDate(event, dateFilter);
     const haystack = query
       ? [event.title, event.city, event.venue, event.category, event.catalogCategory, event.catalogSubcategory, ...(event.tagLabels || []), ...(event.tags || [])]
         .map(String).join(' ').toLocaleLowerCase('ru')
@@ -420,7 +447,7 @@ export async function buildNewYearPreviewData(filters: PreviewFilters = {}) {
         geo: (!filters.city || filters.city === 'Вся Россия' || event.city === filters.city) &&
           (!filters.region || (region === filters.region && !isRegionalCenter(city))),
         date: upcomingSlots.length > 0,
-        price: matchesPrice(event, priceFilter),
+        price: matchesPrice(event, priceFilter) && matchesPriceRange(event, filters.priceFrom, filters.priceTo),
         format: !formatFilter || formatFilter === 'Все форматы' || format === formatFilter,
         stock: !filters.lowStock || lowStock(event),
         q: !query || haystack.includes(query),
@@ -471,7 +498,7 @@ export async function buildNewYearPreviewData(filters: PreviewFilters = {}) {
   }
   const cities = [...new Set(indexed.map((item) => item.city).filter(Boolean))].sort((a, b) => a.localeCompare(b, 'ru'));
   const regions = [...regionCounts.keys()];
-  const formats = [...new Set(indexed.map((item) => item.format))].sort((a, b) => a.localeCompare(b, 'ru'));
+  const visibleFormatNames = visibleNewYearFormatNames(formatCounts);
   const facets = {
     cities: [{ name: 'Вся Россия', count: allGeoFacetCount, filterable: true }, ...cities.map((name) => {
       const normalizedName = name.replace(/\s*\([^)]*\)\s*$/u, '').trim();
@@ -486,8 +513,17 @@ export async function buildNewYearPreviewData(filters: PreviewFilters = {}) {
     regions: regions.map((name) => ({ name, count: regionCounts.get(name) || 0 })).filter((region) => region.count > 0).sort((a, b) => b.count - a.count || (a.name || '').localeCompare(b.name || '', 'ru')),
     dates: dateValues.map((value) => ({ value, count: dateCounts.get(value) || 0 })),
     prices: priceValues.map((value) => ({ value, count: priceCounts.get(value) || 0 })),
-    formats: [{ name: 'Все форматы', count: [...formatCounts.values()].reduce((sum, value) => sum + value, 0) }, ...formats.map((name) => ({ name, count: formatCounts.get(name) || 0 }))],
+    formats: [
+      { name: 'Все форматы', count: [...formatCounts.values()].reduce((sum, value) => sum + value, 0) },
+      ...visibleFormatNames.map((name) => ({ name, count: formatCounts.get(name) || 0 })),
+    ],
     lowStock: lowStockCount,
+    priceRange: (() => {
+      const values = indexed.flatMap(({ event }) => [event.priceFrom, event.priceTo])
+        .filter((value): value is number => typeof value === 'number' && Number.isFinite(value) && value >= 0);
+      const max = values.length ? Math.max(...values) : 10_000;
+      return { min: 0, max: Math.max(10_000, Math.ceil(max / 1_000) * 1_000) };
+    })(),
   };
 
   const page = getNewYearPreviewPage(sorted, sorted.length, Number(filters.offset) || 0, PAGE_SIZE);
@@ -498,5 +534,81 @@ export async function buildNewYearPreviewData(filters: PreviewFilters = {}) {
     generatedAt: snapshot.generatedAt,
     priceFrom: prices.length ? Math.min(...prices) : null,
     facets,
+  };
+}
+
+/** Compact browser-side index. Rich descriptions and image data stay in SSR/detail requests. */
+export async function buildNewYearPreviewIndex(): Promise<NewYearPreviewIndex> {
+  const snapshot = await fetchCatalogSnapshot();
+  const events: CompactPreviewEvent[] = groupEvents(snapshot.events.filter(isRelevantToNewYearLanding)).map((event) => {
+    const region = cityRegion(event.city);
+    const cleanCity = (event.city || '').replace(/\s*\([^)]*\)\s*$/u, '').trim();
+    const catalogCategory = typeof event.catalogCategory === 'string'
+      ? event.catalogCategory
+      : event.catalogCategory ? { title: event.catalogCategory.title, slug: event.catalogCategory.slug } : null;
+    const catalogSubcategory = typeof event.catalogSubcategory === 'string'
+      ? event.catalogSubcategory
+      : event.catalogSubcategory ? { title: event.catalogSubcategory.title, slug: event.catalogSubcategory.slug } : null;
+    const searchText = [event.title, event.city, event.venue, event.category,
+      typeof catalogCategory === 'string' ? catalogCategory : catalogCategory?.title,
+      typeof catalogSubcategory === 'string' ? catalogSubcategory : catalogSubcategory?.title,
+      ...(event.tagLabels || []), ...(event.tags || []), ...(event.subcategories || []),
+    ].filter(Boolean).join(' ').toLocaleLowerCase('ru');
+    return {
+      id: event.id,
+      title: event.title,
+      city: event.city,
+      destination: event.destination,
+      timeZone: event.timeZone,
+      venue: event.venue,
+      category: event.category,
+      catalogCategory,
+      catalogSubcategory,
+      subcategories: event.subcategories,
+      tags: event.tags,
+      tagLabels: event.tagLabels,
+      sessionCount: event.sessionCount,
+      startsAt: event.startsAt,
+      eventPageSlug: event.eventPageSlug,
+      eventPageIndexableSlug: event.eventPageIndexableSlug,
+      slug: event.slug,
+      groupKey: event.groupKey,
+      priceFrom: event.priceFrom,
+      priceTo: event.priceTo,
+      vacant: event.vacant,
+      purchaseUrl: event.purchaseUrl,
+      widgetUrl: event.widgetUrl,
+      purchaseProvider: event.purchaseProvider,
+      offerSourceCode: event.offerSourceCode,
+      purchaseMode: event.purchaseMode,
+      purchaseReady: event.purchaseReady,
+      ageLimit: event.ageLimit,
+      upcomingSlots: (event.upcomingSlots || []).map((slot) => ({
+        id: slot.id,
+        startsAt: slot.startsAt,
+        dayKey: slotDayKey(slot, resolveSessionTimeZone(event)) || '',
+        dateLabel: slot.dateLabel,
+        timeLabel: slot.timeLabel,
+        timeZone: slot.timeZone,
+        purchaseUrl: slot.purchaseUrl,
+        purchaseUrls: slot.purchaseUrls,
+        vacant: slot.vacant,
+      })),
+      region,
+      regionCenter: isRegionalCenter(event.city),
+      standaloneCity: STANDALONE_CITY_NAMES.has(cleanCity),
+      format: resolvePreviewFormat(event),
+      searchText,
+    };
+  });
+  const prices = events.flatMap((event) => [event.priceFrom, event.priceTo])
+    .filter((value): value is number => typeof value === 'number' && Number.isFinite(value) && value >= 0);
+  const max = prices.length ? Math.max(...prices) : 10_000;
+  return {
+    events,
+    total: events.length,
+    sourceTotal: snapshot.total,
+    generatedAt: snapshot.generatedAt,
+    priceRange: { min: 0, max: Math.max(10_000, Math.ceil(max / 1_000) * 1_000) },
   };
 }

@@ -1,5 +1,9 @@
 # Текущее состояние Daibilet
 
+## Новогодний мультилендинг - SEO и производительность, 25.11.2026
+
+Проверены 19 национальных, городских и региональных URL в `landings-v2.xml`: до текущего выпуска все отвечали 200, имели self-canonical, `index, follow`, Title, description, H1 и серверную выдачу. В пилоте добавлены локальная фильтрация по компактному индексу, SSR первой выдачи, корректное округление количества программ в meta description и мелкие правки фильтров. Typecheck и 391 веб-тест прошли. Локальный prerender ограничен HTTP 429 публичного API; результат build и live smoke после Deploy MSK web зафиксировать в [отчёте](./new-year-landing-seo-and-performance-2026-11-25.md).
+
 ## EventPage rollout - 03.11.2026
 
 Production contains 2,166 private EventPage drafts with direct links to 2,167

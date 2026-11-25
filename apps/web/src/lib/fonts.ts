@@ -58,6 +58,16 @@ export const fontUnbounded = localFont({
   fallback: ['system-ui', 'sans-serif'],
 });
 
+/** Latin subset for year numerals in headings; the Cyrillic subset above omits ASCII digits. */
+export const fontUnboundedLatin = localFont({
+  src: [{ path: '../../public/fonts/Unbounded-Latin-Variable.woff2', style: 'normal' }],
+  variable: '--font-unbounded-latin',
+  display: 'swap',
+  weight: '200 900',
+  preload: true,
+  fallback: ['system-ui', 'sans-serif'],
+});
+
 /** Class list for `<html>`: CSS variables for sans-serif families consumed by globals.css + Tailwind. */
 export const fontSansVariableClassName = [
   fontInter.variable,
