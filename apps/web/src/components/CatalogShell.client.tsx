@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { LoaderCircle } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 
@@ -16,7 +17,11 @@ import { CatalogSortSelect } from '@/components/CatalogSortSelect.client';
 import { CatalogToolbar } from '@/components/CatalogToolbar.client';
 import { EventsCityGate } from '@/components/EventsCityGate.client';
 import { useSelectedCityOptional } from '@/components/SelectedCityProvider.client';
-import type { PublicCatalogDto, PublicCatalogListItemDto } from '@daibilet/contracts/public';
+import type {
+  PublicCatalogDto,
+  PublicCatalogListItemDto,
+  PublicDestinationDto,
+} from '@daibilet/contracts/public';
 import { CATALOG_PAGE_SIZE_DEFAULT, CATALOG_PAGE_SIZES, isCatalogPageSize, type CatalogPageSize } from '@daibilet/contracts/catalog';
 import {
   buildCatalogHref,
@@ -27,7 +32,7 @@ import {
 } from '@/lib/catalog-url';
 import { catalogClientFetchTimeoutMs } from '@/lib/catalog-client-fetch';
 import { pluralEvents } from '@/lib/format';
-import { resolveCatalogFetchCity } from '@/lib/selected-city';
+import { matchDestination, resolveCatalogFetchCity } from '@/lib/selected-city';
 import {
   parseCatalogViewMode,
   readStoredCatalogViewMode,
@@ -57,6 +62,21 @@ function parseEventsCatalogPageParam(raw: string | null): number {
 
 function catalogItemKey(item: PublicCatalogListItemDto): string {
   return `${item.id}-${item.startsAt}`;
+}
+
+function cityFromCatalogQueryKey(queryKey: string): string {
+  try {
+    const parsed = JSON.parse(queryKey) as { city?: unknown };
+    return typeof parsed.city === 'string' ? parsed.city : '';
+  } catch {
+    return '';
+  }
+}
+
+function catalogCityIdentity(city: string | undefined, destinations: PublicDestinationDto[]): string {
+  const value = String(city || '').trim();
+  if (!value || value.toLowerCase() === 'all') return '';
+  return (matchDestination(destinations, value)?.name || value).toLocaleLowerCase('ru');
 }
 
 function mergeCatalogItems(
@@ -89,11 +109,21 @@ export function CatalogShell({
   const bootQueryKeyRef = useRef(initialQueryKey);
   const fixedCity = routeCity.trim();
   const fixedCityRoute = Boolean(fixedCity);
+  if (bootQueryKeyRef.current !== initialQueryKey) {
+    bootQueryKeyRef.current = initialQueryKey;
+    bootCatalogRef.current = initialCatalog;
+  }
   const rawUrlCity = urlSearchParams.get('city')?.trim() || '';
   const urlCityIsAll = rawUrlCity.toLowerCase() === 'all';
   const urlHasCity = Boolean(rawUrlCity) && !urlCityIsAll;
   // Keep SSR catalog visible during city bootstrap; only refetch when injected city differs.
   const [catalog, setCatalog] = useState<PublicCatalogDto | null>(() => initialCatalog);
+  const [catalogCityKey, setCatalogCityKey] = useState(() =>
+    catalogCityIdentity(
+      fixedCity || cityFromCatalogQueryKey(initialQueryKey),
+      selectedCity?.destinations || [],
+    ),
+  );
   const [loading, setLoading] = useState(() => !initialCatalog);
   const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -283,6 +313,13 @@ export function CatalogShell({
     () => catalogFiltersCacheKey(filterValues, listPage),
     [filterValues, listPage],
   );
+  const activeCatalogCityKey = useMemo(
+    () => catalogCityIdentity(filterValues.city, selectedCity?.destinations || []),
+    [filterValues.city, selectedCity?.destinations],
+  );
+  const catalogMatchesCurrentCity = Boolean(catalog && catalogCityKey === activeCatalogCityKey);
+  const displayedCatalog = catalogMatchesCurrentCity ? catalog : null;
+  const cityTransitionPending = Boolean(catalog && !catalogMatchesCurrentCity);
 
   const paginationSearchParams = useMemo(() => {
     const next = { ...searchParamsRecord };
@@ -332,7 +369,9 @@ export function CatalogShell({
 
     // Geo gate: do not keep/refetch the national mixed feed.
     if (needsCityGate) {
-      setCatalog(null);
+      // Keep the cached SSR snapshot available if a granted geo lookup completes.
+      // The gate hides it while location is unavailable; city identity decides
+      // whether it can be shown after a city becomes selected.
       setLoading(false);
       setError(null);
       return;
@@ -350,6 +389,7 @@ export function CatalogShell({
       const bootQueryKey = bootQueryKeyRef.current;
       if (bootQueryKey && effectiveQueryKey === bootQueryKey && bootCatalog && (urlHasCity || fixedCityRoute)) {
         setCatalog(bootCatalog);
+        setCatalogCityKey(activeCatalogCityKey);
         setLoading(false);
         setError(null);
         fetchedQueryKeyRef.current = effectiveQueryKey;
@@ -358,6 +398,7 @@ export function CatalogShell({
 
       if (bootQueryKey && effectiveQueryKey === bootQueryKey && bootCatalog && !filterValues.city) {
         setCatalog(bootCatalog);
+        setCatalogCityKey(activeCatalogCityKey);
         setLoading(false);
         setError(null);
         fetchedQueryKeyRef.current = effectiveQueryKey;
@@ -389,6 +430,7 @@ export function CatalogShell({
         return response.json() as Promise<PublicCatalogDto>;
       })
       .then((payload) => {
+        setCatalogCityKey(activeCatalogCityKey);
         setCatalog((prev) => {
           if (appendMode && prev) {
             const items = mergeCatalogItems(prev.items, payload.items);
@@ -434,6 +476,7 @@ export function CatalogShell({
     urlHasCity,
     fixedCityRoute,
     filterValues,
+    activeCatalogCityKey,
   ]);
 
   const setViewMode = useCallback(
@@ -451,26 +494,26 @@ export function CatalogShell({
   );
 
   useEffect(() => {
-    if (!catalog || loading) return;
+    if (!catalog || !catalogMatchesCurrentCity || loading) return;
     const limit = Math.max(catalog.limit || CATALOG_PAGE_SIZE_DEFAULT, 1);
     const totalPages = Math.max(1, Math.ceil(catalog.total / limit));
     if (listPage <= totalPages) return;
     const clamped = totalPages > 1 ? totalPages : 1;
     setListPage(clamped);
     writePageToUrl(clamped);
-  }, [catalog, loading, listPage, writePageToUrl]);
+  }, [catalog, catalogMatchesCurrentCity, loading, listPage, writePageToUrl]);
 
-  const facets = catalog?.facets ?? {
+  const facets = displayedCatalog?.facets ?? {
     cities: [],
     categories: [],
     subcategories: [],
     landings: [],
     priceSteps: [],
   };
-  const catalogLimit = Math.max(catalog?.limit || CATALOG_PAGE_SIZE_DEFAULT, 1);
-  const nextFetchPage = catalog ? resolveCatalogNextFetchPage(catalog, catalogLimit) : null;
+  const catalogLimit = Math.max(displayedCatalog?.limit || CATALOG_PAGE_SIZE_DEFAULT, 1);
+  const nextFetchPage = displayedCatalog ? resolveCatalogNextFetchPage(displayedCatalog, catalogLimit) : null;
   const infiniteScrollEnabled = Boolean(
-    catalog &&
+    displayedCatalog &&
       nextFetchPage &&
       viewMode === 'cards' &&
       !error,
@@ -478,11 +521,12 @@ export function CatalogShell({
   const spotlightItems = useMemo(
     () =>
       viewMode === 'cards' &&
+      catalogMatchesCurrentCity &&
       !hasExtraCatalogFilters &&
       popularSpotlight?.cityKey === String(filterValues.city || '').trim().toLowerCase()
         ? popularSpotlight.items
         : [],
-    [filterValues.city, viewMode, hasExtraCatalogFilters, popularSpotlight],
+    [filterValues.city, viewMode, hasExtraCatalogFilters, popularSpotlight, catalogMatchesCurrentCity],
   );
 
   useEffect(() => {
@@ -545,7 +589,7 @@ export function CatalogShell({
       facets={facets}
       values={filterValues}
       buildHref={buildRouteHref}
-      disabled={(loading && !catalog) || cityBootstrapPending}
+      disabled={(loading && !displayedCatalog) || cityBootstrapPending || cityTransitionPending}
       cityReady={cityReady || urlHasCity}
       layout="split"
     >
@@ -562,12 +606,14 @@ export function CatalogShell({
             {quickSelectors}
           </div>
           <p className="min-w-0 text-sm text-graphite-muted">
-          {loading && !catalog ? 'Загрузка…' : null}
-          {loading && catalog ? 'Обновляем… · ' : null}
-          {catalog ? (
+          {loading && !displayedCatalog ? 'Загрузка…' : null}
+          {loading && displayedCatalog ? 'Обновляем… · ' : null}
+          {displayedCatalog ? (
             <>
-              {pluralEvents(catalog.total)}
-              {catalog.items.length < catalog.total ? ` · показано ${catalog.items.length}` : ''}
+              {pluralEvents(displayedCatalog.total)}
+              {displayedCatalog.items.length < displayedCatalog.total
+                ? ` · показано ${displayedCatalog.items.length}`
+                : ''}
             </>
           ) : null}
           {error ? error : null}
@@ -579,7 +625,7 @@ export function CatalogShell({
           <CatalogSortSelect
             id="catalog-sort"
             value={filterValues.sort}
-            disabled={(loading && !catalog) || cityBootstrapPending}
+            disabled={(loading && !displayedCatalog) || cityBootstrapPending || cityTransitionPending}
             className="min-w-0 shrink"
             onChange={(sort: CatalogSort) => {
               router.push(
@@ -604,7 +650,7 @@ export function CatalogShell({
                   type="button"
                   role="radio"
                   aria-checked={active}
-                  disabled={(loading && !catalog) || cityBootstrapPending}
+                  disabled={(loading && !displayedCatalog) || cityBootstrapPending || cityTransitionPending}
                   onClick={() => {
                     if (active) return;
                     router.push(
@@ -633,11 +679,20 @@ export function CatalogShell({
 
       {spotlightItems.length ? <CatalogZenSpotlight items={spotlightItems} /> : null}
 
-      {(loading && !catalog) || (cityBootstrapPending && !catalog) ? (
+      {cityTransitionPending ? (
+        <div
+          className="mt-5 flex min-h-16 items-center justify-center gap-2 rounded-xl border border-slate-100 bg-white px-4 py-5 text-sm text-graphite-muted"
+          role="status"
+          aria-live="polite"
+        >
+          <LoaderCircle className="h-4 w-4 animate-spin" aria-hidden />
+          Обновляем афишу{selectedCity?.cityLabel ? ` города ${selectedCity.cityLabel}` : ''}
+        </div>
+      ) : loading && !displayedCatalog || (cityBootstrapPending && !displayedCatalog) ? (
         <CatalogCardSkeletonGrid />
       ) : (
         <CatalogResults
-          items={catalog?.items ?? []}
+          items={displayedCatalog?.items ?? []}
           viewMode={viewMode}
           onViewModeChange={setViewMode}
           city={filterValues.city}
@@ -657,15 +712,21 @@ export function CatalogShell({
         rootMargin="600px 0px"
       />
 
-      {catalog ? (
+      {displayedCatalog ? (
         <CatalogPaginationLinks
           page={Math.min(
             listPage,
-            Math.max(1, Math.ceil((catalog.total || 0) / Math.max(catalog.limit || CATALOG_PAGE_SIZE_DEFAULT, 1))),
+            Math.max(
+              1,
+              Math.ceil(
+                (displayedCatalog.total || 0) /
+                  Math.max(displayedCatalog.limit || CATALOG_PAGE_SIZE_DEFAULT, 1),
+              ),
+            ),
           )}
-          shownCount={catalog.items.length}
-          total={catalog.total}
-          limit={catalog.limit}
+          shownCount={displayedCatalog.items.length}
+          total={displayedCatalog.total}
+          limit={displayedCatalog.limit}
           nextFetchPage={nextFetchPage}
           searchParams={paginationSearchParams}
           basePath={basePath}

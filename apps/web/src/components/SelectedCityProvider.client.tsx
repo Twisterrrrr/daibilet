@@ -24,7 +24,7 @@ import { canonicalLandingSlug } from '@/lib/landing-constants';
 import {
   hasGeoSessionAttempt,
   markGeoSessionAttempt,
-  readBrowserPosition,
+  readGrantedBrowserPosition,
   shouldAttemptSilentGeo,
   shouldDeferStorageCityForGeo,
   suggestNearestCity,
@@ -134,6 +134,7 @@ export function SelectedCityProvider({
   const [geoBootstrapPending, setGeoBootstrapPending] = useState(false);
   const [pendingConfirm, setPendingConfirm] = useState<PendingConfirm | null>(null);
   const pendingConfirmRef = useRef<PendingConfirm | null>(null);
+  const manualCityChoiceRef = useRef(false);
   /** Picker choice that must not be overwritten by a stale `?city=` / hub slug. */
   const pendingCityRef = useRef<string | null>(null);
   const geoAttemptedRef = useRef(false);
@@ -197,7 +198,9 @@ export function SelectedCityProvider({
           resolveCityLabel(destinations, readsCityQueryParam(pathname) ? urlCity : null);
       } else {
         const fromUrl = readsCityQueryParam(pathname) ? urlCity : null;
-        nextLabel = resolveCityLabel(destinations, fromUrl);
+        nextLabel = fromUrl
+          ? resolveCityLabel(destinations, fromUrl)
+          : matchDestination(destinations, initialCity)?.name || initialCity || resolveCityLabel(destinations);
       }
     }
 
@@ -220,7 +223,7 @@ export function SelectedCityProvider({
 
     setCityLabel(nextLabel);
     setCityReady(true);
-  }, [destinations, pathname, urlCity, searchParamsKey]);
+  }, [destinations, initialCity, pathname, urlCity, searchParamsKey]);
 
   // Index pages without explicit city= — inject header city into URL (deep-links untouched).
   useLayoutEffect(() => {
@@ -309,15 +312,19 @@ export function SelectedCityProvider({
     if (matched?.name) persistSelectedCity(matched.name);
   }, [destinations, pathname]);
 
-  // Session geo: background refinement, once per tab. It never gates SSR or catalog UI.
+  // Geo only checks an existing permission. It never prompts or gates SSR/catalog UI.
   useEffect(() => {
     if (!cityReady || pendingConfirm) return;
+    if (initialCity || readStoredSelectedCity(destinations)) return;
     if (!shouldAttemptSilentGeo(pathname)) return;
     if (hasGeoSessionAttempt()) return;
     if (resolveCityHubDestination(destinations, pathname)) return;
     if (parsePodborkiCityHubPath(pathname)) return;
     if (resolveLandingRouteFromLocation(pathname)?.citySlug) return;
+    const cityEventsPath = pathname.match(/^\/([^/]+)\/events\/?$/);
+    if (cityEventsPath && matchDestination(destinations, cityEventsPath[1])) return;
     if (readsCityQueryParam(pathname) && urlCity) return;
+    if (manualCityChoiceRef.current) return;
     if (geoAttemptedRef.current) return;
     geoAttemptedRef.current = true;
 
@@ -333,8 +340,8 @@ export function SelectedCityProvider({
     let cancelled = false;
     void (async () => {
       try {
-        const position = await readBrowserPosition();
-        if (cancelled) return;
+        const position = await readGrantedBrowserPosition();
+        if (cancelled || manualCityChoiceRef.current) return;
         const suggested = position
           ? suggestNearestCity(cities, position.latitude, position.longitude)
           : null;
@@ -357,7 +364,7 @@ export function SelectedCityProvider({
       cancelled = true;
       setGeoBootstrapPending(false);
     };
-  }, [cityLabel, cityReady, destinations, pathname, pendingConfirm, urlCity]);
+  }, [cityLabel, cityReady, destinations, initialCity, pathname, pendingConfirm, urlCity]);
 
   const cityValue = cityLabel === 'Все города' ? 'all' : cityLabel;
   const selectedDestination = useMemo(
@@ -376,6 +383,7 @@ export function SelectedCityProvider({
         if (!ok) return false;
       }
 
+      manualCityChoiceRef.current = true;
       persistSelectedCity(name);
       pendingCityRef.current = name;
       setCityLabel(name === 'all' ? 'Все города' : name);

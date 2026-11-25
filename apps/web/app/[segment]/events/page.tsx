@@ -109,7 +109,7 @@ export default async function CityEventsPage({ params }: PageProps) {
   return (
     <>
       <JsonLdScripts blocks={jsonLd} idPrefix="city-events-catalog-jsonld" />
-      <SiteLayout>
+      <SiteLayout initialCity={city?.name || null}>
         <Suspense fallback={<EventsCatalogSsrHero cityName={cityName} />}>
           <EventsCatalogHero cityNameOverride={cityName} basePath={path} />
         </Suspense>

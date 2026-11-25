@@ -36,9 +36,13 @@ export function EventsCatalogSsrHero({ cityName }: { cityName?: string }) {
 export function EventsCatalogSsrFallback({
   catalog,
   basePath = '/events',
+  cityName,
+  cityQuery,
 }: {
   catalog: PublicCatalogDto | null;
   basePath?: string;
+  cityName?: string;
+  cityQuery?: string;
 }) {
   if (!catalog) {
     return (
@@ -60,7 +64,7 @@ export function EventsCatalogSsrFallback({
         <div>
           <p className="text-xs font-semibold uppercase text-primary-700">Каталог</p>
           <h2 className="mt-1 font-display text-xl font-bold text-graphite sm:text-2xl">
-            Все события
+            {cityName ? `Афиша событий ${inCityPrepositional(cityName)}` : 'Все события'}
           </h2>
         </div>
         <p className="text-sm text-graphite-muted">{pluralEvents(catalog.total)}</p>
@@ -90,7 +94,7 @@ export function EventsCatalogSsrFallback({
         total={catalog.total}
         limit={catalog.limit}
         shownCount={Math.min(items.length, catalog.total)}
-        searchParams={{}}
+        searchParams={cityQuery ? { city: cityQuery } : {}}
         basePath={basePath}
       />
     </section>

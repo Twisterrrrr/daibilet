@@ -577,3 +577,22 @@ venue display, and deployment migration step are live. Venue
 `venue_6af1cb64a7280ee86d0f6959` now has editorial title
 `Цирк-шапито «Даймонд»`; its imported title and address remain unchanged. The
 public API and event page were checked after the update.
+
+## 2026-11-25 — City-consistent SSR for the events catalog
+
+**Decision:** Keep the public `/events?city={slug}` URL. A `beforeFiles` rewrite
+routes city-filtered requests to an internal city-keyed ISR page. That page
+loads its first catalog page from the existing server cache and renders the city
+in the header, H1, count, cards, and structured data before hydration. The plain
+`/events` route stays city-neutral and retains its cached SSR feed. On client
+city changes, hide the previous city's count, cards, pagination, and spotlight
+until the current city's catalog arrives. Geo runs only after hydration and
+only reads an already-granted browser permission; stored, URL, and manual city
+choices take priority.
+
+**Why:** The reusable public URL can remain unchanged while server HTML and
+cached data use the same city key. Static city and event pages remain
+independent of browser geolocation.
+
+**Status:** Implemented locally; typecheck and local SSR response checks pass.
+Staging verification is still required before production.

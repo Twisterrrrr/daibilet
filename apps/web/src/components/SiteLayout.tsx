@@ -36,7 +36,7 @@ export async function SiteLayout({
   chromeVariant?: 'default' | 'v2';
   hideHeader?: boolean;
   /**
-   * Cookie/SSR city from pages that are already dynamic (home).
+   * Trusted route/SSR city supplied by pages that already know the city.
    * Do NOT read the request cookie store here: SiteLayout is inlined into ISR hubs/PDPs
    * (`revalidate` + notFound). Dynamic request APIs during static generation
    * become HTTP 500 (DYNAMIC_SERVER_USAGE) on /events/[slug], /cities/*, venues.

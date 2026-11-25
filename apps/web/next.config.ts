@@ -38,10 +38,21 @@ const nextConfig: NextConfig = {
   // family facets. They rewrite to the same hub with the family query so the
   // rendering path stays single-sourced while the address is a clean path.
   async rewrites() {
-    return [
-      { source: '/places/institution', destination: '/places?family=institution' },
-      { source: '/places/location', destination: '/places?family=location' },
-    ];
+    return {
+      // Run before `/events` itself matches, while preserving that public URL.
+      beforeFiles: [
+        {
+          source: '/events',
+          has: [{ type: 'query', key: 'city', value: '(?<city>[^&]+)' }],
+          destination: '/events/city/:city',
+        },
+      ],
+      afterFiles: [
+        { source: '/places/institution', destination: '/places?family=institution' },
+        { source: '/places/location', destination: '/places?family=location' },
+      ],
+      fallback: [],
+    };
   },
   productionBrowserSourceMaps: false,
   experimental: {
