@@ -232,7 +232,7 @@ function isNavActive(pathname: string, href: string, label?: string): boolean {
   const normalized = href.replace(/\/$/, '').split('?')[0] || '/';
   if (normalized === '/') return path === '/';
   if (label === 'Афиша') {
-    return path === '/events' || path.startsWith('/events/');
+    return path === '/afisha' || path.startsWith('/afisha/') || path === '/events' || path.startsWith('/events/');
   }
   if (label === 'Город') {
     return path === '/cities' || path.startsWith('/cities/');

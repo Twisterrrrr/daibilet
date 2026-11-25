@@ -11,9 +11,9 @@ import '@/lib/env';
 import '@/styles/v2-events.css';
 
 export const metadata: Metadata = {
-  title: 'Афиша - превью нового дизайна',
+  title: 'Афиша событий и мероприятий',
   robots: { index: false, follow: false },
-  alternates: { canonical: '/afisha2' },
+  alternates: { canonical: '/afisha' },
 };
 
 const EMPTY: PublicCatalogDto = {

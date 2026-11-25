@@ -8,7 +8,7 @@ import { useSelectedCityOptional } from '@/components/SelectedCityProvider.clien
 import { fontUnbounded } from '@/lib/fonts';
 
 const NAV = [
-  { label: 'Афиша', href: '/events' },
+  { label: 'Афиша', href: '/afisha' },
   { label: 'Подборки', href: '/podborki' },
   { label: 'Гид', href: '/cities' },
   { label: 'Блог', href: '/blog' },
@@ -17,7 +17,7 @@ const NAV = [
 function isActive(pathname: string, href: string): boolean {
   const path = pathname.replace(/\/$/, '') || '/';
   const norm = href.replace(/\/$/, '');
-  if (norm === '/events') return path === '/events' || path.startsWith('/events/');
+  if (norm === '/afisha') return path === '/afisha' || path.startsWith('/afisha/') || path === '/events' || path.startsWith('/events/');
   if (norm === '/cities') return path === '/cities' || path.startsWith('/cities/');
   return path === norm || path.startsWith(`${norm}/`);
 }

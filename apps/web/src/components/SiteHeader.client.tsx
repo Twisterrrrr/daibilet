@@ -21,7 +21,7 @@ import { cityHref } from '@/lib/routes';
 
 /** Primary IA: Афиша · Город · Подборки · Блог. Места stay in footer / secondary. */
 const NAV_LINKS = [
-  { label: 'Афиша', href: '/events', catalog: true },
+  { label: 'Афиша', href: '/afisha', afisha: true },
   { label: 'Город', href: '/cities', cityHub: true },
   { label: 'Подборки', href: '/podborki' },
   { label: 'Блог', href: '/blog' },
@@ -32,7 +32,7 @@ function isNavActive(pathname: string, href: string, label?: string): boolean {
   const normalized = href.replace(/\/$/, '').split('?')[0] || '/';
   if (normalized === '/') return path === '/';
   if (label === 'Афиша') {
-    return path === '/events' || path.startsWith('/events/');
+    return path === '/afisha' || path.startsWith('/afisha/') || path === '/events' || path.startsWith('/events/');
   }
   if (label === 'Город') {
     return path === '/cities' || path.startsWith('/cities/');
@@ -77,6 +77,10 @@ export function SiteHeader({ destinations = [] }: SiteHeaderProps) {
       : 'all';
   const onCityChange = selectedCity?.setCity ?? (() => undefined);
   const navLinks = NAV_LINKS.map((item) => {
+    if ('afisha' in item && item.afisha) {
+      const query = cityQuery !== 'all' ? `?city=${encodeURIComponent(cityQuery)}` : '';
+      return { ...item, href: `/afisha${query}` };
+    }
     if ('catalog' in item && item.catalog) {
       return { ...item, href: catalogHrefWithSelectedCity(cityQuery) };
     }
@@ -133,7 +137,7 @@ export function SiteHeader({ destinations = [] }: SiteHeaderProps) {
               cities={destinations}
               value={cityValue}
               onChange={onCityChange}
-              allLabel="Город"
+              allLabel="Все города"
               variant="header"
               className="hidden shrink-0 lg:block lg:min-w-0 lg:max-w-[13rem] xl:max-w-[15rem]"
             />
@@ -170,7 +174,7 @@ export function SiteHeader({ destinations = [] }: SiteHeaderProps) {
               cities={destinations}
               value={cityValue}
               onChange={onCityChange}
-              allLabel="Город"
+              allLabel="Все города"
               variant="header"
               className="shrink-0 lg:hidden"
             />

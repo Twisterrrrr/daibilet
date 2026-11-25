@@ -5,7 +5,6 @@ import { usePathname } from 'next/navigation';
 import { CalendarDays, Compass, MapPin } from 'lucide-react';
 
 import { useSelectedCityOptional } from '@/components/SelectedCityProvider.client';
-import { catalogHrefWithSelectedCity } from '@/lib/catalog-url';
 import { cityHref } from '@/lib/routes';
 
 /**
@@ -22,15 +21,16 @@ export function HomeBottomNav() {
   const cityValue = cityReady ? selectedCity?.cityValue ?? 'all' : 'all';
   const citySlug = selectedCity?.selectedDestination?.slug || null;
   const cityQuery = citySlug || cityValue;
+  const afishaHref = cityQuery !== 'all' ? `/afisha?city=${encodeURIComponent(cityQuery)}` : '/afisha';
 
   const items = [
     {
       id: 'afisha',
       label: 'Афиша',
-      href: catalogHrefWithSelectedCity(cityQuery, { sort: 'popular' }),
+      href: afishaHref,
       icon: CalendarDays,
       accent: false,
-      match: (path: string) => path === '/events' || path.startsWith('/events/'),
+      match: (path: string) => path === '/afisha' || path.startsWith('/afisha/') || path === '/events' || path.startsWith('/events/'),
     },
     {
       id: 'podborki',

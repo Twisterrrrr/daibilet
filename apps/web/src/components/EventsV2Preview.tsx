@@ -200,7 +200,7 @@ export function EventsV2Preview({ catalog, landings = [], articles = [], destina
           <div className="calendar-wrap"><div className="calendar">{calendar(items, citySlug)}</div></div>
 
           <div className="quick-pills">
-            <Link href="/afisha2" className={`pill${!citySlug ? ' is-active' : ''}`}>Все города</Link>
+            <Link href="/afisha" className={`pill${!citySlug ? ' is-active' : ''}`}>Все города</Link>
             {cats.slice(0, 6).map((category) => <Link key={category.name} href={buildCatalogHref({ category: category.name, city: citySlug || undefined })} className="pill">{category.name}</Link>)}
           </div>
           {cityOptions.length ? (
@@ -209,7 +209,7 @@ export function EventsV2Preview({ catalog, landings = [], articles = [], destina
                 const slug = city.slug || city.sourceSlug || city.name;
                 const active = slug === citySlug || city.name === cityName;
                 const query = new URLSearchParams({ city: slug });
-                return <Link key={city.id || slug} href={`/afisha2?${query.toString()}`} className={`pill${active ? ' is-active' : ''}`}>{city.name}</Link>;
+                return <Link key={city.id || slug} href={`/afisha?${query.toString()}`} className={`pill${active ? ' is-active' : ''}`}>{city.name}</Link>;
               })}
             </div>
           ) : null}
