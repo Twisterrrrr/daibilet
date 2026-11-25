@@ -6,7 +6,7 @@ import {
   isPublicSalesStatusBlocked,
   isPublicSessionRowOnSale,
 } from './catalog-availability.js';
-import { resolveEditorialEventImage } from './event-cover-images.js';
+import { resolveEditorialEventGroupImage, resolveEditorialEventImage } from './event-cover-images.js';
 import { pickFirstUsableEventImageUrl } from './event-image-url.js';
 import {
   buildProviderWidgetUrl,
@@ -539,6 +539,9 @@ function cityNameStem(city: string): string {
 }
 
 function resolvePublicSessionImageUrl(row: PublicCatalogMappingRow): string | null {
+  const groupEditorial = resolveEditorialEventGroupImage(row.overrideMergeGroupKey);
+  if (groupEditorial) return groupEditorial;
+
   const editorial = resolveEditorialEventImage(row.id, row.slug, null);
   if (editorial) return editorial;
 
