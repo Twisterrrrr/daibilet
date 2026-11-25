@@ -1,6 +1,7 @@
 # Документация Daibilet
 
 [DAIBILET Events V2: аудит и карта реализации - 25.11.2026](./events-v2-audit-2026-11-25.md)
+[DAIBILET Events V2: утверждённая архитектура и объём реализации - 25.11.2026](./events-v2-approved-architecture-2026-11-25.md)
 
 [Roadmap Daibilet — сводка на 2026-10](./roadmap-2026-10.md)
 [SEO-аудит 18.10.2026: кэш sitemap, каноникал Москвы, главная no-store](./seo-audit-2026-10-18.md)
