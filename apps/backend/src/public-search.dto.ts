@@ -46,7 +46,7 @@ function landingSearchHref(slug: string): string {
 }
 
 export type PublicSearchItem = {
-  type: 'event' | 'venue' | 'article' | 'city' | 'landing' | 'suburb';
+  type: 'event' | 'admission' | 'venue' | 'article' | 'city' | 'landing' | 'suburb';
   label: string;
   sublabel: string;
   href: string;
@@ -176,8 +176,9 @@ export async function buildPublicSearchDto(
     );
   }
 
-  const [eventRows, venues, landings, articles] = await Promise.all([
+  const [eventRows, admissions, venues, landings, articles] = await Promise.all([
     searchEventsTrgm(primary, like, cityFilter, 24),
+    searchAdmissions(terms, cityFilter, 4),
     searchVenuesTrgm(primary, like, cityFilter, 4),
     searchLandingsIlike(terms, 3),
     prisma.article.findMany({
@@ -198,6 +199,11 @@ export async function buildPublicSearchDto(
     (await attachEventPageSlugs(eventRows)).filter((row) => Boolean(row.eventPageSlug)),
     6,
   );
+
+  // Place admission products beside events before the eight-item cap is reached.
+  for (const product of admissions) {
+    push(mapPublicSearchAdmissionItem(product), `admission:${product.id}`);
+  }
 
   for (const row of events) {
     push(
@@ -292,7 +298,10 @@ export async function buildPublicSearchResultsDto(
 
   if (requested('events')) {
     const eventCandidateLimit = type === 'all' ? 80 : Math.min(take * 4, 400);
-    const eventRows = await searchEventsTrgm(primary, like, city || '', eventCandidateLimit);
+    const [eventRows, admissions] = await Promise.all([
+      searchEventsTrgm(primary, like, city || '', eventCandidateLimit),
+      searchAdmissions(terms, city || '', type === 'all' ? 8 : take),
+    ]);
     const events = collapsePublicSearchEventRows(
       (await attachEventPageSlugs(eventRows)).filter((row) => Boolean(row.eventPageSlug)),
       take,
@@ -304,11 +313,17 @@ export async function buildPublicSearchResultsDto(
       href: publicSearchEventHref(row),
       imageUrl: row.imageUrl || null,
     }));
+    const admissionItems = admissions.map(mapPublicSearchAdmissionItem);
+    const catalogItems = [
+      ...eventItems.slice(0, 4),
+      ...admissionItems,
+      ...eventItems.slice(4),
+    ];
     sections.events = {
-      items: type === 'all' ? eventItems.slice(0, 8) : eventItems.slice(offset, offset + pageSize),
+      items: type === 'all' ? catalogItems.slice(0, 8) : catalogItems.slice(offset, offset + pageSize),
       hasMore: type === 'all'
-        ? eventItems.length > 8 || eventRows.length >= eventCandidateLimit
-        : eventItems.length > offset + pageSize || eventRows.length >= eventCandidateLimit,
+        ? catalogItems.length > 8 || eventRows.length >= eventCandidateLimit
+        : catalogItems.length > offset + pageSize || eventRows.length >= eventCandidateLimit,
     };
   }
 
@@ -389,8 +404,61 @@ async function attachEventPageSlugs<T extends TrgmRow>(rows: T[]): Promise<T[]> 
   return rows.map((row) => ({ ...row, eventPageSlug: slugByEventId.get(row.id) ?? null }));
 }
 
+function searchAdmissions(terms: string[], cityFilter: string, limit: number) {
+  return prisma.admissionProduct.findMany({
+    where: {
+      status: 'PUBLISHED',
+      isIndexable: true,
+      AND: [
+        {
+          OR: terms.flatMap((term) => [
+            { title: { contains: term, mode: 'insensitive' as const } },
+            { shortTitle: { contains: term, mode: 'insensitive' as const } },
+            { venue: { title: { contains: term, mode: 'insensitive' as const } } },
+            { city: { title: { contains: term, mode: 'insensitive' as const } } },
+          ]),
+        },
+        ...(cityFilter && cityFilter !== 'all'
+          ? [{
+              OR: [
+                { city: { slug: { equals: cityFilter, mode: 'insensitive' as const } } },
+                { city: { title: { equals: cityFilter, mode: 'insensitive' as const } } },
+                { venue: { city: { slug: { equals: cityFilter, mode: 'insensitive' as const } } } },
+                { venue: { city: { title: { equals: cityFilter, mode: 'insensitive' as const } } } },
+              ],
+            }]
+          : []),
+      ],
+    },
+    select: {
+      id: true,
+      slug: true,
+      title: true,
+      shortTitle: true,
+      imageUrl: true,
+      city: { select: { title: true } },
+      venue: { select: { title: true, city: { select: { title: true } } } },
+    },
+    orderBy: [{ updatedAt: 'desc' }, { title: 'asc' }],
+    take: limit,
+  });
+}
+
+type PublicSearchAdmissionRow = Awaited<ReturnType<typeof searchAdmissions>>[number];
+
+function mapPublicSearchAdmissionItem(product: PublicSearchAdmissionRow): PublicSearchItem {
+  const city = product.city?.title || product.venue.city?.title || '';
+  return {
+    type: 'admission',
+    label: product.shortTitle || product.title,
+    sublabel: ['Билет', product.venue.title, city].filter(Boolean).join(' · '),
+    href: `/admissions/${product.slug}`,
+    imageUrl: product.imageUrl || null,
+  };
+}
+
 /**
- * Align header search with `/events/[slug]` saleable gate (`hasUpcomingOrOpenSchedule`):
+ * Align event search with `/events/[slug]` saleable gate (`hasUpcomingOrOpenSchedule`):
  * past / wide-lifetime-only rows must not deep-link to pages that return null → 404.
  */
 async function searchEventsTrgm(

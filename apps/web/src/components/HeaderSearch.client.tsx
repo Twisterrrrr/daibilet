@@ -231,6 +231,8 @@ export function HeaderSearch({
                         ? 'М'
                       : item.type === 'article'
                         ? 'С'
+                      : item.type === 'admission'
+                        ? 'Б'
                         : 'E'}
                 </div>
               )}

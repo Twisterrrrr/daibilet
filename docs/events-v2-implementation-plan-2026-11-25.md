@@ -72,3 +72,15 @@
 - Не выполнять массовую переклассификацию исторических Event.
 - Не создавать дубликаты AdmissionProduct в таблице Event.
 - Не менять старые URL, canonical или category filters без совместимого адаптера.
+
+## Статус реализации
+
+Первая вертикаль реализации находится в коммитах `337581c51` и далее на этой ветке:
+
+- В `@daibilet/contracts` добавлен discriminated DTO объединённого каталога.
+- Серверный глобальный поиск включает опубликованные AdmissionProduct и ведёт на `/admissions/[slug]`; полный поиск показывает билеты в разделе «События» вместе с Event.
+- Создана SSR-страница `/admissions/[slug]` с canonical, validity-информацией и переходом по существующему checkout path.
+- Sitemap включает отдельный чанк опубликованных индексируемых AdmissionProduct.
+- Backend, web и contracts typecheck проходят после локального `pnpm db:generate`.
+
+Следующие обязательные части до staging: общий серверный composition endpoint для `/events` с точными фильтрами даты/цены и total; редактирование доступной классификации AdmissionProduct в админке; интеграция DTO и карточки в `/events`; проверка и восстановление редакционной `/afisha` в этой свежей ветке; адаптивный проход desktop/tablet/mobile и staging smoke. Миграции Prisma пока не создавались.

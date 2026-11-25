@@ -8,7 +8,7 @@ import { SafeImage, IMAGE_SIZES } from '@/components/SafeImage.client';
 
 type SearchType = 'all' | 'events' | 'venues' | 'articles' | 'cities' | 'collections';
 type SearchItem = {
-  type: 'event' | 'venue' | 'article' | 'city' | 'landing' | 'suburb';
+  type: 'event' | 'admission' | 'venue' | 'article' | 'city' | 'landing' | 'suburb';
   label: string;
   sublabel?: string | null;
   href: string;
@@ -122,7 +122,7 @@ export function GlobalSearchPage() {
               </span>
             ) : (
               <span className="grid h-[68px] w-[68px] shrink-0 place-items-center rounded-xl bg-slate-100 text-sm font-semibold text-slate-500">
-                {item.type === 'city' || item.type === 'suburb' ? 'Город' : item.type === 'venue' ? 'Место' : item.type === 'article' ? 'Статья' : item.type === 'landing' ? 'Подборка' : 'Событие'}
+                {item.type === 'city' || item.type === 'suburb' ? 'Город' : item.type === 'venue' ? 'Место' : item.type === 'article' ? 'Статья' : item.type === 'landing' ? 'Подборка' : item.type === 'admission' ? 'Билет' : 'Событие'}
               </span>
             )}
             <span className="min-w-0">

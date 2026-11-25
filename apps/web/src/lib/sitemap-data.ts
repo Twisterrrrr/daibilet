@@ -36,6 +36,7 @@ import { newYearLandingSitemapProvider } from './new-year-landing-sitemap-provid
 export const SITEMAP_CHUNKS = [
   'static',
   'events',
+  'admissions',
   'cities',
   'venues',
   'landings',
@@ -340,6 +341,25 @@ export async function buildEventsSitemapEntries(): Promise<SitemapEntry[]> {
     console.error('[sitemap] indexable EventPage lookup failed', error);
   }
 
+  return entries;
+}
+
+export async function buildAdmissionsSitemapEntries(): Promise<SitemapEntry[]> {
+  const products = await prisma.admissionProduct.findMany({
+    where: { status: 'PUBLISHED', isIndexable: true },
+    select: { slug: true, updatedAt: true },
+    orderBy: { slug: 'asc' },
+  });
+  const seen = new Set<string>();
+  const entries: SitemapEntry[] = [];
+  for (const product of products) {
+    const slug = String(product.slug || '').trim();
+    if (!slug) continue;
+    const path = `/admissions/${encodeURIComponent(slug)}`;
+    if (seen.has(path)) continue;
+    seen.add(path);
+    entries.push(entry(path, 'weekly', 0.7, product.updatedAt));
+  }
   return entries;
 }
 
@@ -657,6 +677,9 @@ export async function buildSitemapChunkEntries(chunk: SitemapChunk): Promise<Sit
       break;
     case 'events':
       entries = await buildEventsSitemapEntries();
+      break;
+    case 'admissions':
+      entries = await buildAdmissionsSitemapEntries();
       break;
     case 'cities':
       entries = await buildCitiesSitemapEntries();
