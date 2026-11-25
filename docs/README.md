@@ -43,6 +43,7 @@
 Навигация по репозиторию `Twisterrrrr/daibilet`.
 
 [Новогодний лендинг: SEO, фильтры и замеры производительности - 25.11.2026](./new-year-landing-seo-and-performance-2026-11-25.md)
+[Events V2: утверждённый план реализации - 25.11.2026](./events-v2-implementation-plan-2026-11-25.md)
 
 ## С чего начать
 
