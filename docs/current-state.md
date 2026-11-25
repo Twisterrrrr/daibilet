@@ -9,14 +9,19 @@ DTO/endpoint `/api/public/catalog`, mixed SSR для `/events` и городск
 редактор существующих полей и unit-проверки даты/сортировки. Никаких Prisma
 миграций или платежных изменений нет.
 
-Локально HTTP smoke: `/events` и `/api/public/catalog` возвращают 200. В этой
-среде backend выдаёт пустой Event-каталог, finance projection и локальная БД
-недоступны; смешанные реальные карточки и checkout end-to-end поэтому не
-проверены. Web CI: 397 тестов проходят; backend TS suite: 2 теста не проходят
-из-за недоступной локальной БД `127.0.0.1:5437`, остальные 296 проходят.
-Перед staging остаются mixed-data smoke на доступных API, проверка десктопа,
-планшета и мобильного устройства с реальными предложениями, а также checkout
-walkthrough без совершения платежа. Полный план и лимиты: [Events V2](./events-v2-implementation-plan-2026-11-25.md).
+Для интеграционного smoke подняты отдельная временная БД на локальном Docker,
+штатный TS backend и Next dev на Webpack. В смешанном `/api/public/catalog`
+получено 6 товаров: 1 Event и 5 AdmissionProduct; три страницы по 2 записи
+содержат 6 уникальных ссылок. Глобальный поиск вернул Event и AdmissionProduct,
+маршруты `/events/[slug]` и `/admissions/[slug]` ответили 200, sitemap включил
+5 тестовых билетов. С отдельной пустой finance projection каталог сохранил
+Event (`total=1`, `ADMISSION=0`). Тестовые записи не добавлялись в основную или
+staging-копию БД. GET checkout ответил 200; заказ и платеж не создавались.
+
+Web CI: 398 тестов проходят; backend TS suite: 298/298 на локальной Docker-БД.
+Desktop и tablet визуально проверены; mobile визуально ещё не проверен. Перед
+staging остаются мобильная проверка и согласованный walkthrough checkout без
+совершения платежа. Полный план и лимиты: [Events V2](./events-v2-implementation-plan-2026-11-25.md).
 
 ## Новогодний мультилендинг - SEO и производительность, 25.11.2026
 
