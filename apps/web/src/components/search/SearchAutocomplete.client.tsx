@@ -27,6 +27,7 @@ type SearchAutocompleteProps = {
   onValueChange?: (value: string) => void;
   onSubmitQuery?: (value: string) => void;
   catalogFilters?: CatalogFilterValues;
+  catalogPath?: string;
   catalogHref?: (filters: CatalogFilterValues) => string;
   variant?: 'inline' | 'overlay';
 };
@@ -57,6 +58,7 @@ export function SearchAutocomplete({
   onValueChange,
   onSubmitQuery,
   catalogFilters,
+  catalogPath,
   catalogHref,
   variant = 'inline',
 }: SearchAutocompleteProps) {
@@ -187,7 +189,7 @@ export function SearchAutocomplete({
     }
     if (context === 'events') {
       const next = { ...catalogFilters, q: normalized || undefined, page: undefined };
-      const href = catalogHref ? catalogHref(next) : buildCatalogHref(next, { pathname });
+      const href = catalogHref ? catalogHref(next) : buildCatalogHref(next, { pathname: catalogPath || pathname });
       close();
       router.push(href, { scroll: false });
       return;

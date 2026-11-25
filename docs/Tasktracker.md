@@ -11,7 +11,7 @@
 | EVENTS.V2.AUDIT | Карта существующих каталога, endpoint поиска, статей, подборок, Places и city day-routes; ограничения и фазы | Высокий | ✅ `docs/events-v2-audit-2026-11-25.md` |
 | EVENTS.V2.SEARCH | Общий `SearchAutocomplete` для global/events, `context=events`, AbortController, клавиатура, fallback свободного запроса; подключение в header и каталог | Высокий | ✅ локально; web/backend typecheck, lint, 31 целевой тест |
 | EVENTS.V2.PREVIEW | Исправить неверный editorial label и город в `/afisha2`, подключить общий search, сделать дни календаря ссылками на каталог | Высокий | ✅ локально; lint/typecheck |
-| EVENTS.V2.SHOWCASE | Управляемая последовательность редакционных блоков, городская витрина и mobile/staging QA | Высокий | ⏳ следующий срез; production `/events` и SEO пока не менялись |
+| EVENTS.V2.SHOWCASE | Типизированная конфигурация порядка блоков, AUTO/MANUAL/HYBRID, дедупликация событий, адаптивные статьи/подборки/города/маршруты; city query в noindex preview | Высокий | 🔄 локальная реализация и unit tests готовы; нужен browser/mobile smoke; production `/events` и SEO не менялись |
 
 ## 2026-10-18 - SEO-аудит: кэш sitemap, каноникал Москвы, главная no-store
 
