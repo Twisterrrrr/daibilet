@@ -99,6 +99,16 @@ fi
 INCOMING_BUILD_ID="$(cat "${WEB_NEXT_STAGE}/BUILD_ID")"
 echo "Incoming BUILD_ID=${INCOMING_BUILD_ID}"
 
+# Apply additive Prisma migrations before restarting the API. This keeps the
+# database schema ahead of code that starts querying newly added columns, while
+# leaving the currently running API/web process usable if a migration fails.
+if ! command -v pnpm >/dev/null 2>&1; then
+  echo "ERROR: pnpm is required to apply production Prisma migrations" >&2
+  exit 1
+fi
+pnpm db:deploy
+echo "Prisma migrations applied"
+
 start_web_handoff
 if systemctl_deploy is-active --quiet "$WEB_SERVICE" 2>/dev/null; then
   systemctl_deploy stop "$WEB_SERVICE"

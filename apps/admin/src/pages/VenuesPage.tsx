@@ -31,6 +31,7 @@ const PAGE_SIZE = 80;
 
 type VenueDraft = {
   title: string;
+  editorialTitle: string;
   shortDescription: string;
   description: string;
   heroImageUrl: string;
@@ -109,6 +110,7 @@ function kindLabel(kind?: string | null) {
 function emptyDraft(venue?: AdminVenueDetail | null): VenueDraft {
   return {
     title: venue?.title || '',
+    editorialTitle: venue?.editorialTitle || '',
     shortDescription: venue?.shortDescription || '',
     description: venue?.description || '',
     heroImageUrl: venue?.heroImageUrl || '',
@@ -126,8 +128,9 @@ function detailToRow(detail: AdminVenueDetail, previous?: AdminVenueRow): AdminV
   return {
     ...(previous || {}),
     id: detail.id,
-    name: detail.title,
+    name: detail.editorialTitle || detail.title,
     title: detail.title,
+    editorialTitle: detail.editorialTitle,
     slug: detail.slug,
     city: detail.city || previous?.city || 'Не указан',
     address: detail.address,
@@ -420,7 +423,7 @@ function VenueSheet(props: {
               {statusBadge(detail?.pageStatus || venue.pageStatus)}
               <Badge variant="outline">{kindLabel(detail?.kind || venue.kind || venue.proposedKind)}</Badge>
             </div>
-            <h2 className="mt-3 text-xl font-semibold leading-snug">{detail?.title || venue.name}</h2>
+            <h2 className="mt-3 text-xl font-semibold leading-snug">{detail?.editorialTitle || detail?.title || venue.name}</h2>
             <div className="mt-1 flex flex-wrap gap-3 text-xs text-muted-foreground">
               <span className="font-mono">{venue.id}</span>
               {detail?.slug ? <span>{detail.slug}</span> : null}
@@ -443,6 +446,10 @@ function VenueSheet(props: {
                     <div className="mt-4 grid gap-3 md:grid-cols-2">
                       <Field label="Название">
                         <Input value={draft.title} onChange={(event) => onDraftChange((current) => ({ ...current, title: event.target.value }))} />
+                      </Field>
+                      <Field label="Редакторское название">
+                        <Input value={draft.editorialTitle} onChange={(event) => onDraftChange((current) => ({ ...current, editorialTitle: event.target.value }))} placeholder="Пустое поле использует название из синка" />
+                        <p className="mt-1 text-xs text-muted-foreground">Показывается посетителям вместо исходного названия. Синк это поле не перезаписывает.</p>
                       </Field>
                       <Field label="Тип площадки">
                         <select value={draft.kind} onChange={(event) => onDraftChange((current) => ({ ...current, kind: event.target.value }))} className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm">

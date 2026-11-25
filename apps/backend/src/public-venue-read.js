@@ -350,7 +350,7 @@ async function loadStopEventsForVenue(db, venueIds) {
         override."imageUrl" as "overrideImageUrl",
         start_venue.id as "venueId",
         start_venue.slug as "venueSlug",
-        start_venue.title as "venueTitle",
+        coalesce(nullif(start_venue."editorialTitle", ''), start_venue.title) as "venueTitle",
         start_venue.address as "venueAddress",
         start_venue.kind as "venueKind",
         min(link."sortOrder") as "sortOrder",
@@ -365,7 +365,7 @@ async function loadStopEventsForVenue(db, venueIds) {
       group by
         e.id, e.slug, e.title, e."imageUrl", e."priceFromRub",
         override."imageUrl",
-        start_venue.id, start_venue.slug, start_venue.title, start_venue.address, start_venue.kind
+        start_venue.id, start_venue.slug, start_venue.title, start_venue."editorialTitle", start_venue.address, start_venue.kind
       order by min(link."sortOrder"), e.title
       limit 48
     `,
@@ -391,7 +391,7 @@ async function loadNearbyEventsForVenue(db, venue, excludeEventIds = []) {
         override."imageUrl" as "overrideImageUrl",
         start_venue.id as "venueId",
         start_venue.slug as "venueSlug",
-        start_venue.title as "venueTitle",
+        coalesce(nullif(start_venue."editorialTitle", ''), start_venue.title) as "venueTitle",
         start_venue.address as "venueAddress",
         start_venue.kind as "venueKind",
         start_venue.latitude as "venueLatitude",
@@ -435,6 +435,7 @@ export async function loadPublicEventVenueStops(db, eventId) {
         link."sortOrder",
         venue.slug,
         venue.title,
+        venue."editorialTitle",
         venue.kind,
         venue.address
       from "event_venue_route_items" link
@@ -446,9 +447,9 @@ export async function loadPublicEventVenueStops(db, eventId) {
     [eventId],
   );
   return result.rows.map((row) => {
-    const title = formatPublicVenueTitle(row.title);
+    const title = formatPublicVenueTitle(row.editorialTitle || row.title);
     const kind = resolvePublicVenueKind(row.kind, title, row.address);
-    const slug = publicVenueSlug(row.slug, title, row.venueId);
+    const slug = publicVenueSlug(row.slug, row.title, row.venueId);
     const template = publicVenuePageTemplate(kind);
     return {
       venueId: row.venueId,
@@ -497,8 +498,8 @@ export async function buildPublicVenuePage(db, venueSlugOrId) {
   const hubGateRow = {
     id: canonicalVenue.id,
     slug: canonicalVenue.slug,
-    title: canonicalVenue.title,
-    name: canonicalVenue.title,
+    title: canonicalVenue.editorialTitle || canonicalVenue.title,
+    name: canonicalVenue.editorialTitle || canonicalVenue.title,
     kind: canonicalVenue.kind,
     pageStatus: canonicalVenue.pageStatus,
     address: canonicalVenue.address,
@@ -532,8 +533,8 @@ export async function buildPublicVenuePage(db, venueSlugOrId) {
   const displayBase = applyPublicVenueNormalization({
     id: canonicalVenue.id,
     slug: canonicalVenue.slug,
-    name: formatPublicVenueTitle(canonicalVenue.title),
-    title: formatPublicVenueTitle(canonicalVenue.title),
+    name: formatPublicVenueTitle(canonicalVenue.editorialTitle || canonicalVenue.title),
+    title: formatPublicVenueTitle(canonicalVenue.editorialTitle || canonicalVenue.title),
     address: mergedGroup?.address || canonicalVenue.address,
     city: canonicalVenue.city || 'Не указан',
   });
@@ -588,7 +589,7 @@ export async function buildPublicVenuePage(db, venueSlugOrId) {
   const stopEventCount = stopEvents.length;
   const displayEventCount = routeCount > 0 ? routeCount : stopEventCount;
 
-  const pageSlug = publicVenueSlug(canonicalVenue.slug, normalizedVenue.name, canonicalVenue.id);
+  const pageSlug = publicVenueSlug(canonicalVenue.slug, canonicalVenue.title, canonicalVenue.id);
   return {
     generatedAt: new Date().toISOString(),
     pdp: await readReadyPdpDocument(db, 'venues', canonicalVenue.id),
@@ -1153,7 +1154,7 @@ async function rebuildPublicVenueHubRows(take, options = {}) {
   const enriched = applyVenueEventFacetCounts(leanRows, facets).map((row) => {
     const mapped = {
       ...row,
-      name: formatPublicVenueTitle(row.name || row.title),
+      name: formatPublicVenueTitle(row.editorialTitle || row.name || row.title),
       heroImageUrl: resolveVenueHeroImageUrl(row, heroImageFallbacks),
       nextSessionStartsAt: null,
     };
@@ -1260,6 +1261,7 @@ const PUBLIC_VENUE_ROW_SELECT = `
     venue.id,
     venue.slug,
     venue.title,
+    venue."editorialTitle",
     venue.description,
     venue."shortDescription",
     venue."heroImageUrl",
@@ -1434,6 +1436,7 @@ async function venueRows(db, limit, options = {}) {
         venue.id,
         venue.slug,
         venue.title as name,
+        venue."editorialTitle",
         ${lean ? 'null::text as "shortDescription",' : 'venue."shortDescription",'}
         ${lean ? 'null::text as description,' : 'venue.description,'}
         venue."heroImageUrl",
@@ -1461,6 +1464,7 @@ async function venueRows(db, limit, options = {}) {
       id: row.id,
       slug: row.slug,
       name,
+      editorialTitle: row.editorialTitle || null,
       city: row.city || 'Не указан',
       address: row.address,
       shortDescription: row.shortDescription,
@@ -2203,7 +2207,10 @@ function paginateVenueCatalogItems(items, { cursor, limit, page: pageIndex }) {
 export function mapPublicVenueListItem(row) {
   const normalized = applyPublicVenueNormalization(row);
   const type = resolvePublicVenueKindFromRow(normalized);
-  const name = applyPublicVenueDisplayName(normalized, type);
+  const displaySource = normalized.editorialTitle
+    ? { ...normalized, name: normalized.editorialTitle, title: normalized.editorialTitle }
+    : normalized;
+  const name = applyPublicVenueDisplayName(displaySource, type);
   const shortDescription = pickPublicVenueLeadText(normalized.shortDescription, normalized.description);
   // Same resolver as venue detail page (overrides / embedded slug coords / pier water offset).
   const coords = resolvePublicVenueCoordinates(normalized, { resolvedType: type });
@@ -2212,7 +2219,7 @@ export function mapPublicVenueListItem(row) {
     normalizeNullableString(normalized.citySlug) ||
     (normalized.city && normalized.city !== 'Не указан' ? publicCitySlug(normalized.city) : null);
   // Lean list DTO: no sessions / mini-affiche / empty categories blob.
-  const slug = publicVenueSlug(normalized.slug, name, normalized.id);
+  const slug = publicVenueSlug(normalized.slug, normalized.name, normalized.id);
   const template = publicVenuePageTemplate(type);
   const decision = indexabilityDecision({
     futureSessions: normalized.futureSessionCount,
@@ -2930,6 +2937,7 @@ async function venueRowsByIds(db, ids) {
         venue.id,
         venue.slug,
         venue.title as name,
+        venue."editorialTitle",
         venue."shortDescription",
         venue.description,
         venue."heroImageUrl",
@@ -2961,6 +2969,7 @@ async function venueRowsByIds(db, ids) {
       id: row.id,
       slug: row.slug,
       name,
+      editorialTitle: row.editorialTitle || null,
       cityId: row.cityId || null,
       city: row.city || 'Не указан',
       citySlug: row.citySlug || null,
@@ -2993,6 +3002,7 @@ async function venueRowsByIdsLean(db, ids) {
         venue.id,
         venue.slug,
         venue.title as name,
+        venue."editorialTitle",
         venue."shortDescription",
         venue.description,
         venue."heroImageUrl",
@@ -3020,6 +3030,7 @@ async function venueRowsByIdsLean(db, ids) {
       id: row.id,
       slug: row.slug,
       name,
+      editorialTitle: row.editorialTitle || null,
       cityId: row.cityId || null,
       city: row.city || 'Не указан',
       citySlug: row.citySlug || null,
@@ -3120,6 +3131,7 @@ export async function publicPublishedVenuesByCityId(db, cityId, limit = 200) {
         venue.id,
         venue.slug,
         venue.title as name,
+        venue."editorialTitle",
         venue."shortDescription",
         venue.description,
         venue."heroImageUrl",
@@ -3154,6 +3166,7 @@ export async function publicPublishedVenuesByCityId(db, cityId, limit = 200) {
         id: row.id,
         slug: row.slug,
         name,
+        editorialTitle: row.editorialTitle || null,
         cityId: row.cityId || null,
         city: row.city || 'Не указан',
         citySlug: row.citySlug || null,

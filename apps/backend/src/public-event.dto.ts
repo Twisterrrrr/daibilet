@@ -153,7 +153,7 @@ async function loadPublishedTourPeers(eventId: string): Promise<{ assigned: bool
         peer_event.title,
         city.title AS city,
         city.slug AS "citySlug",
-        COALESCE(venue.title, '') AS venue,
+        COALESCE(NULLIF(venue."editorialTitle", ''), venue.title, '') AS venue,
         COALESCE(venue.slug, '') AS "venueSlug",
         peer_event."startsAt" AS "startsAt",
         peer_event."priceFromRub" AS "priceFrom",
@@ -625,7 +625,7 @@ async function loadPublicEventDto(
     venueId: requestedEvent.venue?.id || null,
     venueSlug: requestedEvent.venue?.slug || null,
     venuePageIndexable: requestedEvent.venue?.pageStatus === 'PUBLISHED' && requestedEvent.venue?.isIndexable === true,
-    venue: requestedEvent.venue?.title || 'Не указано',
+    venue: requestedEvent.venue?.editorialTitle || requestedEvent.venue?.title || 'Не указано',
     venueAddress: requestedEvent.venue?.address || null,
     venueKind: requestedEvent.venue?.kind || 'OTHER',
     venueLatitude:
@@ -740,7 +740,7 @@ async function loadPublicEventDto(
         title: formatPublicEventTitle(peer.override?.title || peer.title),
         city: peer.primaryCity.title,
         citySlug: peer.primaryCity.slug || '',
-        venue: peer.venue?.title || '',
+        venue: peer.venue?.editorialTitle || peer.venue?.title || '',
         venueSlug: peer.venue?.slug || '',
         startsAt: nextSession.startsAt?.toISOString() || null,
         timeZone: resolveCityTimeZone(peer.primaryCity.title),
@@ -1061,7 +1061,7 @@ function mapSession(
   return {
     id: session.id,
     eventId: session.eventId,
-    venueTitle: event.venue?.title || null,
+    venueTitle: event.venue?.editorialTitle || event.venue?.title || null,
     venueAddress: event.venue?.address || null,
     startsAt,
     endsAt: normalizeStartsAt(session.endsAt),
@@ -1495,7 +1495,7 @@ function buildPurchaseOptionDescription(event: EventRecord): string | null {
   );
 
   // Build venue + city prefix for cross-city merge context.
-  const venueName = event.venue?.title?.trim() || '';
+  const venueName = (event.venue?.editorialTitle || event.venue?.title)?.trim() || '';
   const cityName = event.primaryCity?.title?.trim() || '';
   const locationPrefix = venueName && cityName
     ? `${venueName}, ${cityName}`
@@ -1812,7 +1812,7 @@ async function loadRelatedSessionsFromDb(
       destinationType: destType,
       venueId: row.venueId,
       venueSlug: row.venue?.slug || null,
-      venue: row.venue?.title || 'Не указано',
+      venue: row.venue?.editorialTitle || row.venue?.title || 'Не указано',
       venueKind: row.venue?.kind || 'OTHER',
       category: row.category?.title || 'События',
       tags,
