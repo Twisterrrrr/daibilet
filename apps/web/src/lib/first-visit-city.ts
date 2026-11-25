@@ -49,10 +49,7 @@ export function markGeoSessionAttempt() {
   }
 }
 
-/**
- * Catalog indexes wait for session GPS before injecting storage city (city gate).
- * Home uses storage/cookie immediately so rails do not flash «все города» → GPS city.
- */
+/** Keep the catalog URL cityless until first-session GPS has had a chance to refine it. */
 export function shouldDeferStorageCityForGeo(pathname: string | null | undefined): boolean {
   if (!shouldAttemptSilentGeo(pathname) || hasGeoSessionAttempt()) return false;
   const path = String(pathname || '').replace(/\/$/, '') || '/';
@@ -76,15 +73,6 @@ function isBrowsingPath(pathname: string | null | undefined): boolean {
 /** First session visit: silent GPS apply on all viewports (incl. /events, /podborki). */
 export function shouldAttemptSilentGeo(pathname: string | null | undefined): boolean {
   return isBrowsingPath(pathname);
-}
-
-/**
- * Home already paints cookie/storage city in SSR. GPS afterwards swaps rails
- * (title, chips, editors-pick) and looks like a glitch. Catalog indexes still
- * override stale storage on `/events` and friends.
- */
-export function shouldSkipSilentGeoOnHome(pathname: string | null | undefined): boolean {
-  return isHomePath(pathname);
 }
 
 /** @deprecated Use shouldAttemptSilentGeo */

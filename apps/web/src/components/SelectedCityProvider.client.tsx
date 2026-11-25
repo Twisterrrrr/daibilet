@@ -27,7 +27,6 @@ import {
   readBrowserPosition,
   shouldAttemptSilentGeo,
   shouldDeferStorageCityForGeo,
-  shouldSkipSilentGeoOnHome,
   suggestNearestCity,
 } from '@/lib/first-visit-city';
 import {
@@ -66,7 +65,7 @@ type SelectedCityContextValue = {
   cityLabel: string;
   /** False until client has read storage / URL — avoid flashing «Все города». */
   cityReady: boolean;
-  /** Session GPS in flight — catalog gates wait to avoid flash. */
+  /** Session GPS in flight; UI can show progress but pages never wait for it. */
   geoBootstrapPending: boolean;
   selectedDestination: PublicDestinationDto | null;
   /** Full destinations list (city picker on /my-day and chrome). */
@@ -127,12 +126,9 @@ export function SelectedCityProvider({
   const router = useRouter();
   const [urlCity, setUrlCity] = useState<string | null>(null);
   const [searchParamsKey, setSearchParamsKey] = useState('');
-  const seedCity = (() => {
-    if (!initialCity || shouldDeferStorageCityForGeo(pathname)) {
-      return { label: 'Все города', ready: false };
-    }
-    return { label: initialCity, ready: true };
-  })();
+  const seedCity = initialCity
+    ? { label: initialCity, ready: true }
+    : { label: 'Все города', ready: false };
   const [cityLabel, setCityLabel] = useState(seedCity.label);
   const [cityReady, setCityReady] = useState(seedCity.ready);
   const [geoBootstrapPending, setGeoBootstrapPending] = useState(false);
@@ -201,11 +197,7 @@ export function SelectedCityProvider({
           resolveCityLabel(destinations, readsCityQueryParam(pathname) ? urlCity : null);
       } else {
         const fromUrl = readsCityQueryParam(pathname) ? urlCity : null;
-        if (!fromUrl && shouldDeferStorageCityForGeo(pathname)) {
-          nextLabel = 'Все города';
-        } else {
-          nextLabel = resolveCityLabel(destinations, fromUrl);
-        }
+        nextLabel = resolveCityLabel(destinations, fromUrl);
       }
     }
 
@@ -317,8 +309,7 @@ export function SelectedCityProvider({
     if (matched?.name) persistSelectedCity(matched.name);
   }, [destinations, pathname]);
 
-  // Session geo: all viewports, once per tab. GPS wins over stale storage on catalog
-  // indexes. Home keeps cookie/storage city so rails do not swap after first paint.
+  // Session geo: background refinement, once per tab. It never gates SSR or catalog UI.
   useEffect(() => {
     if (!cityReady || pendingConfirm) return;
     if (!shouldAttemptSilentGeo(pathname)) return;
@@ -327,7 +318,6 @@ export function SelectedCityProvider({
     if (parsePodborkiCityHubPath(pathname)) return;
     if (resolveLandingRouteFromLocation(pathname)?.citySlug) return;
     if (readsCityQueryParam(pathname) && urlCity) return;
-    if (shouldSkipSilentGeoOnHome(pathname)) return;
     if (geoAttemptedRef.current) return;
     geoAttemptedRef.current = true;
 

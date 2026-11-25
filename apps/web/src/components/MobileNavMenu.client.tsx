@@ -15,6 +15,7 @@ type MobileNavMenuProps = {
   navLinks: Array<{ label: string; href: string }>;
   cityLabel: string;
   cityValue: string;
+  geoBootstrapPending: boolean;
   destinations: PublicDestinationDto[];
   isLoggedIn: boolean;
   auth: ReturnType<typeof useUserAuthOptional>;
@@ -51,6 +52,7 @@ export function MobileNavLayer({
   navLinks,
   cityLabel,
   cityValue,
+  geoBootstrapPending,
   destinations,
   isLoggedIn,
   auth,
@@ -131,6 +133,8 @@ export function MobileNavLayer({
                   close();
                 }}
                 allLabel={cityLabel === 'Все города' ? 'Город' : cityLabel}
+                hideAllOption
+                emptyLabel={geoBootstrapPending ? 'Определяем…' : 'Мой город'}
                 variant="compact"
                 className="w-full"
               />

@@ -17,7 +17,6 @@ import {
   shouldAttemptSilentGeo,
   shouldDeferStorageCityForGeo,
   shouldOfferFirstVisitCityPrompt,
-  shouldSkipSilentGeoOnHome,
   suggestNearestCity,
 } from './first-visit-city.ts';
 
@@ -57,12 +56,6 @@ test('shouldOfferFirstVisitCityPrompt is disabled (silent geo on all viewports)'
   assert.equal(shouldOfferFirstVisitCityPrompt('/cities'), false);
 });
 
-test('shouldSkipSilentGeoOnHome skips GPS on home even without a displayed city', () => {
-  assert.equal(shouldSkipSilentGeoOnHome('/'), true);
-  assert.equal(shouldSkipSilentGeoOnHome('/events'), false);
-  assert.equal(shouldSkipSilentGeoOnHome('/podborki'), false);
-});
-
 test('shouldAttemptSilentGeo includes catalog gates and account exclusions', () => {
   assert.equal(shouldAttemptSilentGeo('/'), true);
   assert.equal(shouldAttemptSilentGeo('/events'), true);
@@ -73,7 +66,7 @@ test('shouldAttemptSilentGeo includes catalog gates and account exclusions', () 
   assert.equal(shouldAttemptSilentGeo('/admin/events'), false);
 });
 
-test('shouldDeferStorageCityForGeo waits for session geo on catalog indexes only', () => {
+test('shouldDeferStorageCityForGeo keeps catalog URL cityless during first GPS attempt', () => {
   const storage = new Map<string, string>();
   const original = globalThis.sessionStorage;
   Object.defineProperty(globalThis, 'sessionStorage', {

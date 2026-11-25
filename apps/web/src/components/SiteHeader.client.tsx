@@ -138,6 +138,8 @@ export function SiteHeader({ destinations = [] }: SiteHeaderProps) {
               value={cityValue}
               onChange={onCityChange}
               allLabel="Все города"
+              hideAllOption
+              emptyLabel={selectedCity?.geoBootstrapPending ? 'Определяем…' : 'Мой город'}
               variant="header"
               className="hidden shrink-0 lg:block lg:min-w-0 lg:max-w-[13rem] xl:max-w-[15rem]"
             />
@@ -175,6 +177,8 @@ export function SiteHeader({ destinations = [] }: SiteHeaderProps) {
               value={cityValue}
               onChange={onCityChange}
               allLabel="Все города"
+              hideAllOption
+              emptyLabel={selectedCity?.geoBootstrapPending ? 'Определяем…' : 'Мой город'}
               variant="header"
               className="shrink-0 lg:hidden"
             />
@@ -218,6 +222,7 @@ export function SiteHeader({ destinations = [] }: SiteHeaderProps) {
         navLinks={navLinks}
         cityLabel={cityLabel}
         cityValue={cityValue}
+        geoBootstrapPending={selectedCity?.geoBootstrapPending ?? false}
         destinations={destinations}
         isLoggedIn={isLoggedIn}
         auth={auth}
