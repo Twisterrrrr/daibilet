@@ -1,7 +1,10 @@
+import Link from 'next/link';
 import type { PublicCatalogDto, PublicCatalogListItemDto } from '@daibilet/contracts/public';
+import type { PublicUnifiedCatalogDto, PublicUnifiedCatalogItemDto } from '@daibilet/contracts/catalog';
 
 import { CatalogPaginationLinks } from '@/components/CatalogPaginationLinks';
 import { EventCard } from '@/components/EventCard';
+import { SafeImage } from '@/components/SafeImage.client';
 import { isCatalogExcludedMuseumAdmission } from '@/lib/catalog-exclusions';
 import { pluralEvents } from '@/lib/format';
 import { collapseCatalogComboFamilies } from '@/lib/home-showcase-sections';
@@ -37,7 +40,7 @@ export function EventsCatalogSsrFallback({
   catalog,
   basePath = '/events',
 }: {
-  catalog: PublicCatalogDto | null;
+  catalog: PublicUnifiedCatalogDto | PublicCatalogDto | null;
   basePath?: string;
 }) {
   if (!catalog) {
@@ -51,7 +54,14 @@ export function EventsCatalogSsrFallback({
     );
   }
 
-  const items = selectEventsCatalogSsrItems(catalog.items || []);
+  const normalizedItems: PublicUnifiedCatalogItemDto[] = catalog.items.map((item) => 'productKind' in item ? item : ({
+    ...item,
+    productKind: 'EVENT' as const,
+    href: `/events/${encodeURIComponent(item.eventPageIndexableSlug || item.eventPageSlug || item.slug || item.id)}`,
+  }));
+  const events = normalizedItems.filter((item) => item.productKind === 'EVENT');
+  const visibleEvents = new Set(selectEventsCatalogSsrItems(events).map((item) => `${item.id}:${item.startsAt}`));
+  const items = normalizedItems.filter((item) => item.productKind === 'ADMISSION' || visibleEvents.has(`${item.id}:${item.startsAt}`));
   const page = Math.max(1, Math.floor((catalog.offset || 0) / Math.max(catalog.limit, 1)) + 1);
 
   return (
@@ -68,16 +78,9 @@ export function EventsCatalogSsrFallback({
 
       {items.length ? (
         <ul className="catalog-card-grid">
-          {items.map((session, index) => (
-            <li key={`${session.id}-${session.startsAt}`} className="min-w-0">
-              <EventCard
-                session={session}
-                compact
-                catalogDense
-                imagePriority={index < 4}
-              />
-            </li>
-          ))}
+          {items.map((item, index) => <li key={item.productKind === 'ADMISSION' ? `admission-${item.id}` : `event-${item.id}-${item.startsAt}`} className="min-w-0">
+            {item.productKind === 'ADMISSION' ? <AdmissionCatalogCard item={item} /> : <EventCard session={item} compact catalogDense imagePriority={index < 4} />}
+          </li>)}
         </ul>
       ) : (
         <p className="rounded-lg border border-slate-200 bg-white px-5 py-8 text-center text-sm text-graphite-muted">
@@ -95,4 +98,19 @@ export function EventsCatalogSsrFallback({
       />
     </section>
   );
+}
+
+function AdmissionCatalogCard({ item }: { item: Extract<PublicUnifiedCatalogItemDto, { productKind: 'ADMISSION' }> }) {
+  return <Link href={item.href} className="group block h-full overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
+    <div className="relative aspect-[4/3] bg-slate-100">
+      <SafeImage src={item.imageUrl} alt="" fill sizes="(max-width: 640px) 50vw, 300px" className="object-cover" fallback={<div className="h-full w-full bg-slate-100" />} />
+      <span className="absolute left-3 top-3 rounded-full bg-white/95 px-2.5 py-1 text-xs font-semibold text-slate-700">Входной билет</span>
+    </div>
+    <div className="p-3 sm:p-4">
+      <p className="text-xs font-medium text-slate-500">{item.dateLabel}</p>
+      <h3 className="mt-1 line-clamp-2 font-semibold text-slate-950 group-hover:text-primary-700">{item.title}</h3>
+      <p className="mt-1 line-clamp-1 text-sm text-slate-600">{[item.venue, item.city].filter(Boolean).join(' · ')}</p>
+      {item.priceFrom != null ? <p className="mt-3 font-bold text-slate-950">от {item.priceFrom.toLocaleString('ru-RU')} ₽</p> : null}
+    </div>
+  </Link>;
 }

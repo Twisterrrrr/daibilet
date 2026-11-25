@@ -2212,7 +2212,7 @@ Owner minimum: MSK→`.159` сеть ✅ · YooKassa `SHOP_ID`/`SECRET=<set>` �
 | CF.P1c | Service auth catalog↔finance (m2m Bearer - Codex lock) | Высокий | ⏳ env unset; ETA 0.5-1d | owner+Cursor |
 | CF.P2 | Venue page блок «Входные билеты» (test museum) | Высокий | ✅ UI; slug bridge `phase-g-test-museum` если нет в catalog | Cursor |
 | CF.P2b | City hub museums/admission при published | Высокий | ✅ `CityAdmissionBlock` (default min=1) | Cursor |
-| CF.P2c | `/events`: отдельный card type admission (не slotted event) | Средний | ⏳ card есть; feed later | Cursor |
+| CF.P2c | `/events`: отдельный card type admission (не slotted event) | Средний | 🛠 серверная mixed выдача, SSR и карточки реализуются в `codex/events-v2-implementation-20261125`; проверка на реальных finance data до staging | Codex |
 | CF.P2d | CTA → `pay.daibilet.ru`; TC/TEP widgets regression | Высокий | ✅ canSell gate; widgets untouched; env `FINANCE_CHECKOUT_BASE_URL` → pay | Cursor |
 | CF.P2e | Catalog venue slug bridge `phase-g-test-museum` на MSK PG | Средний | ✅ seeded 2026-07-31 (`ven_phase_g_test_museum_catalog`, PUBLISHED, `isIndexable=false`); script `ensure-phase-g-test-museum-venue.js`; Next venue HTML после web rebuild (dto admission-only gate) | Cursor |
 | CF.P3 | STUB/YooKassa order видим admin+supplier LC через PurchaseProjection | Высокий | 🔄 STUB ✅; secrets `<set>`; CHECKOUT=0; egress ❌; wide CTA out | Codex |

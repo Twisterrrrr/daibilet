@@ -12,6 +12,7 @@ import { createAdminLandingsRouteHandler } from './admin-landings-handler.js';
 import { createAdminDestinationPdpRouteHandler } from './destination-pdp-handler.js';
 import { createAdminOrdersRouteHandler } from './admin-orders-handler.js';
 import { createAdminOrdersReadRouteHandler } from './admin-orders-read-handler.js';
+import { createAdminAdmissionProductsRouteHandler } from './admin-admission-products-handler.js';
 import { buildAdminOrdersListDto } from './admin-orders.dto.js';
 import { createAdminAuthConfig } from './auth.js';
 import { readBackendEnv } from './env.js';
@@ -70,6 +71,7 @@ const server = startServer({
   handler: createValidatedHandler(handleRequest, {
     adminAuth,
     routeHandlers: [
+      createAdminAdmissionProductsRouteHandler({ prisma, invalidatePublicCaches }),
       createPublicCatalogRouteHandler({
         enabled: publicFlags.catalog,
         buildPublicCatalog: buildPublicCatalogDto,

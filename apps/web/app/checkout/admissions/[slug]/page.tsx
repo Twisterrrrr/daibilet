@@ -11,7 +11,10 @@ import {
 } from '@/lib/finance-projection';
 import { fetchAdmissionProductBySlug } from '@/server/finance-projection-client';
 
-type PageProps = { params: Promise<{ slug: string }> };
+type PageProps = {
+  params: Promise<{ slug: string }>;
+  searchParams?: Promise<{ offer?: string }>;
+};
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
@@ -30,8 +33,11 @@ export const dynamic = 'force-dynamic';
  * Simple admission / museum path: thin email → YooKassa confirmationUrl.
  * Complex pricing calculator (future) is a separate surface under /checkout/calc.
  */
-export default async function AdmissionCheckoutPage({ params }: PageProps) {
-  const { slug } = await params;
+export default async function AdmissionCheckoutPage({ params, searchParams }: PageProps) {
+  const [{ slug }, query] = await Promise.all([
+    params,
+    searchParams || Promise.resolve({} as { offer?: string }),
+  ]);
   const product = await fetchAdmissionProductBySlug(slug);
 
   if (!product) {
@@ -57,6 +63,7 @@ export default async function AdmissionCheckoutPage({ params }: PageProps) {
   const priceLabel = formatAdmissionPriceFrom(product.priceFromRub);
   const openDate = isOpenDateValidity(product.validityMode);
   const venueHref = product.venue?.slug ? `/venues/${encodeURIComponent(product.venue.slug)}` : null;
+  const requestedOfferId = product.offers.some((offer) => offer.id === query.offer) ? query.offer : null;
 
   return (
     <SiteLayout>
@@ -102,7 +109,7 @@ export default async function AdmissionCheckoutPage({ params }: PageProps) {
       </section>
 
       <section className="container-page py-8 sm:py-10">
-        <AdmissionCheckoutForm product={product} />
+        <AdmissionCheckoutForm product={product} initialOfferId={requestedOfferId} />
       </section>
     </SiteLayout>
   );

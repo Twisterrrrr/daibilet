@@ -2,6 +2,7 @@ import { Navigate, Route, Routes } from 'react-router-dom';
 
 import { AdminShell } from '@/components/admin/AdminShell';
 import { ArticlesPage } from '@/pages/ArticlesPage';
+import { AdmissionProductsPage } from '@/pages/AdmissionProductsPage';
 import { BuyersPage } from '@/pages/BuyersPage';
 import { DashboardPage } from '@/pages/DashboardPage';
 import { EventChangeRequestsPage } from '@/pages/EventChangeRequestsPage';
@@ -20,6 +21,7 @@ export function App() {
       <Route element={<AdminShell />}>
         <Route index element={<DashboardPage />} />
         <Route path="events" element={<EventsPage />} />
+        <Route path="admission-products" element={<AdmissionProductsPage />} />
         {(import.meta.env.VITE_DAIBILET_EVENT_CHANGE_REQUESTS === '1') ? (
           <Route path="change-requests" element={<EventChangeRequestsPage />} />
         ) : null}

@@ -17,6 +17,7 @@ import { CatalogToolbar } from '@/components/CatalogToolbar.client';
 import { EventsCityGate } from '@/components/EventsCityGate.client';
 import { useSelectedCityOptional } from '@/components/SelectedCityProvider.client';
 import type { PublicCatalogDto, PublicCatalogListItemDto } from '@daibilet/contracts/public';
+import type { PublicUnifiedCatalogDto, PublicUnifiedCatalogItemDto } from '@daibilet/contracts/catalog';
 import { CATALOG_PAGE_SIZE_DEFAULT, CATALOG_PAGE_SIZES, isCatalogPageSize, type CatalogPageSize } from '@daibilet/contracts/catalog';
 import {
   buildCatalogHref,
@@ -43,7 +44,7 @@ import {
 } from '@/server/catalog-query';
 
 type CatalogShellProps = {
-  initialCatalog?: PublicCatalogDto | null;
+  initialCatalog?: PublicUnifiedCatalogDto | PublicCatalogDto | null;
   initialQueryKey?: string;
   routeCity?: string;
   basePath?: string;
@@ -55,14 +56,28 @@ function parseEventsCatalogPageParam(raw: string | null): number {
   return parsed;
 }
 
-function catalogItemKey(item: PublicCatalogListItemDto): string {
-  return `${item.id}-${item.startsAt}`;
+function catalogItemKey(item: PublicUnifiedCatalogItemDto): string {
+  return item.productKind === 'ADMISSION' ? `admission-${item.id}` : `event-${item.id}-${item.startsAt}`;
+}
+
+function normalizeUnifiedCatalog(catalog: PublicUnifiedCatalogDto | PublicCatalogDto): PublicUnifiedCatalogDto {
+  if ('sources' in catalog) return catalog;
+  return {
+    ...catalog,
+    generatedAt: catalog.generatedAt || new Date().toISOString(),
+    items: catalog.items.map((item) => ({
+      ...item,
+      productKind: 'EVENT' as const,
+      href: `/events/${encodeURIComponent(item.eventPageIndexableSlug || item.eventPageSlug || item.slug || item.id)}`,
+    })),
+    sources: { admissionsAvailable: false },
+  };
 }
 
 function mergeCatalogItems(
-  existing: PublicCatalogListItemDto[],
-  incoming: PublicCatalogListItemDto[],
-): PublicCatalogListItemDto[] {
+  existing: PublicUnifiedCatalogItemDto[],
+  incoming: PublicUnifiedCatalogItemDto[],
+): PublicUnifiedCatalogItemDto[] {
   const seen = new Set(existing.map(catalogItemKey));
   const merged = [...existing];
   for (const item of incoming) {
@@ -80,12 +95,13 @@ export function CatalogShell({
   routeCity = '',
   basePath = '/events',
 }: CatalogShellProps) {
+  const normalizedInitialCatalog = initialCatalog ? normalizeUnifiedCatalog(initialCatalog) : null;
   const router = useRouter();
   const urlSearchParams = useSearchParams();
   const selectedCity = useSelectedCityOptional();
   // Next refreshes server props when History API updates ?page=. Keep the
   // hydration snapshot stable so it cannot replace an already-appended list.
-  const bootCatalogRef = useRef(initialCatalog);
+  const bootCatalogRef = useRef(normalizedInitialCatalog);
   const bootQueryKeyRef = useRef(initialQueryKey);
   const fixedCity = routeCity.trim();
   const fixedCityRoute = Boolean(fixedCity);
@@ -93,8 +109,8 @@ export function CatalogShell({
   const urlCityIsAll = rawUrlCity.toLowerCase() === 'all';
   const urlHasCity = Boolean(rawUrlCity) && !urlCityIsAll;
   // Keep SSR catalog visible during city bootstrap; only refetch when injected city differs.
-  const [catalog, setCatalog] = useState<PublicCatalogDto | null>(() => initialCatalog);
-  const [loading, setLoading] = useState(() => !initialCatalog);
+  const [catalog, setCatalog] = useState<PublicUnifiedCatalogDto | null>(() => normalizedInitialCatalog);
+  const [loading, setLoading] = useState(() => !normalizedInitialCatalog);
   const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [popularSpotlight, setPopularSpotlight] = useState<{
@@ -104,7 +120,7 @@ export function CatalogShell({
   const [viewMode, setViewModeState] = useState<CatalogViewMode>('cards');
   const pagingModeRef = useRef<'replace' | 'append'>('replace');
   const fetchedQueryKeyRef = useRef('');
-  const catalogRef = useRef<PublicCatalogDto | null>(initialCatalog);
+  const catalogRef = useRef<PublicUnifiedCatalogDto | null>(normalizedInitialCatalog);
   catalogRef.current = catalog;
 
   const cityReady = fixedCityRoute ? true : selectedCity?.cityReady ?? true;
@@ -383,10 +399,10 @@ export function CatalogShell({
 
     const params = buildCatalogApiSearchParams(filterValues, listPage);
     const qs = params.toString();
-    fetch(`/api/public/events${qs ? `?${qs}` : ''}`, { signal: controller.signal })
+    fetch(`/api/public/catalog${qs ? `?${qs}` : ''}`, { signal: controller.signal })
       .then(async (response) => {
         if (!response.ok) throw new Error('catalog_fetch_failed');
-        return response.json() as Promise<PublicCatalogDto>;
+        return response.json() as Promise<PublicUnifiedCatalogDto>;
       })
       .then((payload) => {
         setCatalog((prev) => {

@@ -20,6 +20,7 @@ import { useUserAuth } from '@/hooks/useUserAuth';
 
 type Props = {
   product: FinanceAdmissionProduct;
+  initialOfferId?: string | null;
 };
 
 type CheckoutApiOk = {
@@ -51,15 +52,18 @@ const WIDGET_ROOT_ID = 'daibilet-yookassa-widget';
  * email → create-payment → embedded YooKassa widget (fallback: redirect confirmationUrl).
  * Order state comes only from finance projection polling.
  */
-export function AdmissionCheckoutForm({ product }: Props) {
+export function AdmissionCheckoutForm({ product, initialOfferId = null }: Props) {
   const router = useRouter();
   const { user } = useUserAuth();
   const offers = product.offers;
 
+  const [selectedOfferId, setSelectedOfferId] = useState(initialOfferId || '');
   const defaultOffer = useMemo(() => {
     if (!offers.length) return null;
+    const selected = offers.find((offer) => offer.id === selectedOfferId);
+    if (selected) return selected;
     return [...offers].sort((a, b) => a.priceRub - b.priceRub)[0] || offers[0];
-  }, [offers]);
+  }, [offers, selectedOfferId]);
 
   const [email, setEmail] = useState(user?.email || '');
   const [firstName, setFirstName] = useState('');
@@ -293,6 +297,25 @@ export function AdmissionCheckoutForm({ product }: Props) {
       <p className="mt-1 text-sm text-slate-500">
         Укажите email - форма ЮKassa откроется прямо на этой странице.
       </p>
+
+      {priceRub != null ? (
+        offers.length > 1 ? (
+          <label className="mt-4 block text-sm font-semibold text-slate-800">
+            Тариф
+            <select
+              value={defaultOffer?.id || ''}
+              onChange={(event) => setSelectedOfferId(event.target.value)}
+              className="mt-1.5 w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-base font-normal text-slate-900 outline-none ring-primary-500/30 focus:border-primary-500 focus:ring-4"
+            >
+              {offers.map((offer) => (
+                <option key={offer.id} value={offer.id}>
+                  {offer.title} - {formatNumber(offer.priceRub)} ₽
+                </option>
+              ))}
+            </select>
+          </label>
+        ) : null
+      ) : null}
 
       {priceRub != null ? (
         <p className="mt-4 text-sm text-slate-700">

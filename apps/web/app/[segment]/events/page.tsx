@@ -16,11 +16,12 @@ import { buildShareMetadata, eventsCityDescriptionFallback, pageTitle } from '@/
 import { cityToPrepositional } from '@/lib/city-declension';
 import { evaluateCityIndexability, robotsForIndexability } from '@/lib/hub-indexability';
 import { buildBreadcrumbListJsonLd, buildEventsCatalogItemListJsonLd } from '@/lib/structured-data';
+import { leanUnifiedCatalogForSsr } from '@/lib/ssr-lean-payloads';
 import { isCityFirstLegacyRouteSlug } from '@/lib/city-first-route-slugs';
 import { isCityFirstUrlMode } from '@/lib/routes';
 import { loadCityDto } from '@/server/cached-city-data';
 import { catalogQueryCacheKey, parseCatalogPageQuery } from '@/server/catalog-query';
-import { getCachedCatalog } from '@/server/cached-catalog-data';
+import { getCachedUnifiedCatalog } from '@/server/unified-catalog-data';
 import '@/lib/env';
 
 export const revalidate = 300;
@@ -71,7 +72,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const pageQuery = parseCatalogPageQuery({ city: apiSlug });
   let hasEvents = false;
   try {
-    hasEvents = (await getCachedCatalog(pageQuery)).total > 0;
+    hasEvents = (await getCachedUnifiedCatalog(pageQuery)).total > 0;
   } catch {
     // A temporary catalog API failure must not make the city URL look indexable.
   }
@@ -84,10 +85,10 @@ export default async function CityEventsPage({ params }: PageProps) {
   const { segment } = await params;
   const { apiSlug, city } = await resolveCity(segment);
   const pageQuery = parseCatalogPageQuery({ city: apiSlug });
-  let initialCatalog: Awaited<ReturnType<typeof getCachedCatalog>> | null = null;
+  let initialCatalog: Awaited<ReturnType<typeof getCachedUnifiedCatalog>> | null = null;
 
   try {
-    initialCatalog = await getCachedCatalog(pageQuery);
+    initialCatalog = leanUnifiedCatalogForSsr(await getCachedUnifiedCatalog(pageQuery));
   } catch {
     initialCatalog = null;
   }
@@ -95,7 +96,7 @@ export default async function CityEventsPage({ params }: PageProps) {
   const cityName = city?.name || segment.replace(/-/g, ' ');
   const path = `/${canonicalCitySlug(segment)}/events`;
   const itemList = initialCatalog
-    ? buildEventsCatalogItemListJsonLd(selectEventsCatalogSsrItems(initialCatalog.items), `Афиша событий в ${cityName}`, path)
+    ? buildEventsCatalogItemListJsonLd(selectEventsCatalogSsrItems(initialCatalog.items.filter((item) => item.productKind === 'EVENT')), `Афиша событий в ${cityName}`, path)
     : null;
   const jsonLd = [
     buildBreadcrumbListJsonLd([

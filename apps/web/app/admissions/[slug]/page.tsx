@@ -41,6 +41,12 @@ function formatDate(value: string): string {
   return new Intl.DateTimeFormat('ru-RU', { dateStyle: 'long', timeZone: 'Europe/Moscow' }).format(date);
 }
 
+function checkoutUrlForOffer(checkoutUrl: string, offerId: string): string {
+  const url = new URL(checkoutUrl, 'https://daibilet.local');
+  url.searchParams.set('offer', offerId);
+  return /^https?:\/\//i.test(checkoutUrl) ? url.toString() : `${url.pathname}${url.search}${url.hash}`;
+}
+
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
   const product = await fetchAdmissionProductBySlug(slug);
@@ -127,18 +133,25 @@ export default async function AdmissionProductPage({ params }: PageProps) {
             {product.offers.length ? (
               <ul className="mt-4 divide-y divide-slate-100 border-y border-slate-100">
                 {product.offers.map((offer) => (
-                  <li key={offer.id} className="flex items-start justify-between gap-3 py-3 text-sm">
-                    <span className="text-slate-600">{offer.title}</span>
-                    <span className="shrink-0 font-semibold text-slate-900">от {new Intl.NumberFormat('ru-RU').format(offer.priceRub)} ₽</span>
+                  <li key={offer.id} className="flex items-center justify-between gap-3 py-3 text-sm">
+                    <div className="min-w-0">
+                      <p className="text-slate-700">{offer.title}</p>
+                      <p className="mt-0.5 font-semibold text-slate-900">{new Intl.NumberFormat('ru-RU').format(offer.priceRub)} ₽</p>
+                    </div>
+                    {checkoutUrl ? (
+                      <Link href={checkoutUrlForOffer(checkoutUrl, offer.id)} className="inline-flex min-h-9 shrink-0 items-center justify-center rounded-full border border-primary-200 px-3 text-xs font-semibold text-primary-700 hover:bg-primary-50">
+                        Выбрать
+                      </Link>
+                    ) : null}
                   </li>
                 ))}
               </ul>
             ) : null}
             <p className="mt-4 text-sm leading-6 text-slate-600">{validityText(product)}</p>
             {checkoutUrl ? (
-              <a href={checkoutUrl} className="mt-5 inline-flex min-h-12 w-full items-center justify-center rounded-xl bg-primary-600 px-5 text-base font-semibold text-white transition hover:bg-primary-700">
-                Перейти к покупке
-              </a>
+              <Link href={checkoutUrl} className="mt-5 inline-flex min-h-12 w-full items-center justify-center rounded-xl bg-primary-600 px-5 text-base font-semibold text-white transition hover:bg-primary-700">
+                {product.offers.length > 1 ? 'Выбрать тариф' : 'Перейти к покупке'}
+              </Link>
             ) : (
               <p className="mt-5 rounded-xl bg-slate-100 px-4 py-3 text-center text-sm font-medium text-slate-500">Билет временно недоступен</p>
             )}

@@ -7,9 +7,10 @@ import type { CatalogIntentDefinition } from '@/lib/catalog-intent-routes';
 import { catalogIntentPath, formatIntentSeoBody, listCatalogIntents } from '@/lib/catalog-intent-routes';
 import { sanitizeEventHtml } from '@/lib/event-description-format';
 import { cityHref } from '@/lib/routes';
+import { leanUnifiedCatalogForSsr } from '@/lib/ssr-lean-payloads';
 import type { CatalogPageQuery } from '@/server/catalog-query';
 import { catalogQueryCacheKey } from '@/server/catalog-query';
-import { getCachedCatalog } from '@/server/cached-catalog-data';
+import { getCachedUnifiedCatalog } from '@/server/unified-catalog-data';
 
 export async function IntentCollectionView({
   intent,
@@ -30,9 +31,9 @@ export async function IntentCollectionView({
   /** Optional DB customText (HTML) below catalog. */
   seoText?: string | null;
 }) {
-  let initialCatalog: Awaited<ReturnType<typeof getCachedCatalog>> | null = null;
+  let initialCatalog: Awaited<ReturnType<typeof getCachedUnifiedCatalog>> | null = null;
   try {
-    initialCatalog = await getCachedCatalog(pageQuery);
+    initialCatalog = leanUnifiedCatalogForSsr(await getCachedUnifiedCatalog(pageQuery));
   } catch {
     initialCatalog = null;
   }

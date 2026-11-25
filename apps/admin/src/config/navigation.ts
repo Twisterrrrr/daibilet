@@ -13,6 +13,7 @@ import {
   Settings,
   UserRound,
   GitPullRequest,
+  Ticket,
 } from 'lucide-react';
 
 export type NavZoneId = 'work' | 'hubs' | 'system';
@@ -34,6 +35,7 @@ export const NAV_ZONES: NavZone[] = [
     items: [
       { id: 'dashboard', title: 'Дашборд', path: '/', icon: LayoutDashboard, end: true },
       { id: 'events', title: 'События', path: '/events', icon: CalendarDays },
+      { id: 'admission-products', title: 'Входные билеты', path: '/admission-products', icon: Ticket },
       ...(import.meta.env.VITE_DAIBILET_EVENT_CHANGE_REQUESTS === '1'
         ? [{ id: 'change-requests', title: 'Заявки на изменения', path: '/change-requests', icon: GitPullRequest }]
         : []),

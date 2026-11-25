@@ -5,6 +5,7 @@ import type {
   PublicLandingDto,
   PublicSessionDto,
 } from '@daibilet/contracts/public';
+import type { PublicUnifiedCatalogDto } from '@daibilet/contracts/catalog';
 
 /** Nearest slots on home rails - enough for «сегодня/завтра» tabs. */
 const HOME_SLOT_LIMIT = 3;
@@ -148,6 +149,26 @@ export function leanCatalogForSsr(catalog: PublicCatalogDto): PublicCatalogDto {
       ...(catalog.facets?.tags?.length
         ? { tags: catalog.facets.tags.slice(0, 30) }
         : {}),
+    },
+  };
+}
+
+export function leanUnifiedCatalogForSsr(catalog: PublicUnifiedCatalogDto): PublicUnifiedCatalogDto {
+  return {
+    ...catalog,
+    items: catalog.items.map((item) => item.productKind === 'ADMISSION' ? item : {
+      ...toCatalogSsrItem(item),
+      productKind: 'EVENT' as const,
+      href: item.href,
+    }),
+    facets: {
+      ...catalog.facets,
+      cities: catalog.facets.cities.slice(0, 60),
+      categories: catalog.facets.categories.slice(0, 48),
+      subcategories: catalog.facets.subcategories.slice(0, 80),
+      landings: catalog.facets.landings.slice(0, 30),
+      priceSteps: catalog.facets.priceSteps.slice(0, 24),
+      ...(catalog.facets.tags?.length ? { tags: catalog.facets.tags.slice(0, 30) } : {}),
     },
   };
 }

@@ -108,6 +108,29 @@ export async function fetchCityAdmissionProducts(
   return mapAdmissionListPayload(raw);
 }
 
+export type FinanceAdmissionPageQuery = {
+  q?: string;
+  citySlug?: string;
+  limit?: number;
+  offset?: number;
+};
+
+/** One bounded page from the finance read projection. Returns null when unavailable. */
+export async function fetchAdmissionProductsPage(
+  query: FinanceAdmissionPageQuery,
+  env: FinanceProjectionEnv = process.env,
+): Promise<FinanceAdmissionListResult | null> {
+  const limit = Math.min(100, Math.max(1, Math.floor(query.limit ?? 100)));
+  const offset = Math.max(0, Math.floor(query.offset ?? 0));
+  const qs = new URLSearchParams({ limit: String(limit), offset: String(offset) });
+  if (query.q?.trim()) qs.set('q', query.q.trim());
+  if (query.citySlug?.trim()) qs.set('citySlug', query.citySlug.trim());
+
+  const raw = await financeFetchJson(`/api/public/admission-products?${qs.toString()}`, env);
+  if (!raw) return null;
+  return mapAdmissionListPayload(raw);
+}
+
 export async function fetchAdmissionProductBySlug(
   productSlug: string,
   env: FinanceProjectionEnv = process.env,

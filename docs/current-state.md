@@ -1,5 +1,23 @@
 # Текущее состояние Daibilet
 
+## Events V2: единый каталог Event + AdmissionProduct - 25.11.2026
+
+Реализация ведётся отдельно в `codex/events-v2-implementation-20261125`, без
+изменений основной ветки и финансового worktree. В ветке есть общий серверный
+DTO/endpoint `/api/public/catalog`, mixed SSR для `/events` и городских афиш,
+карточки входных билетов, availability gate для поиска/sitemap, AdmissionProduct
+редактор существующих полей и unit-проверки даты/сортировки. Никаких Prisma
+миграций или платежных изменений нет.
+
+Локально HTTP smoke: `/events` и `/api/public/catalog` возвращают 200. В этой
+среде backend выдаёт пустой Event-каталог, finance projection и локальная БД
+недоступны; смешанные реальные карточки и checkout end-to-end поэтому не
+проверены. Web CI: 397 тестов проходят; backend TS suite: 2 теста не проходят
+из-за недоступной локальной БД `127.0.0.1:5437`, остальные 296 проходят.
+Перед staging остаются mixed-data smoke на доступных API, проверка десктопа,
+планшета и мобильного устройства с реальными предложениями, а также checkout
+walkthrough без совершения платежа. Полный план и лимиты: [Events V2](./events-v2-implementation-plan-2026-11-25.md).
+
 ## Новогодний мультилендинг - SEO и производительность, 25.11.2026
 
 Выпуск `a9bf3c2d5` задеплоен на MSK через [Deploy MSK web #45597350223](https://github.com/Twisterrrrr/daibilet/actions/runs/45597350223). После деплоя проверены 19/19 URL в `landings-v2.xml`: HTTP 200, self-canonical, `index, follow`, Title/description/H1 и карточки в серверном HTML. Для национальной страницы 461 программа в каталоге округляются в meta как «более 400 программ». Компактный индекс: 89 720 байт gzip, API 157 мс; production HTML 19 URL: медиана 863 мс, p95 1 194 мс. Typecheck и 391 веб-тест прошли. Подробные результаты и ограничения замеров: [отчёт](./new-year-landing-seo-and-performance-2026-11-25.md). Отправку переобхода в Search Console/Яндекс Вебмастер отдельно не подтвердили.

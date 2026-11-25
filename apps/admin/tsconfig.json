@@ -18,7 +18,8 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["src/*"],
-      "@daibilet/contracts/admin": ["../../packages/contracts/src/admin.ts"]
+      "@daibilet/contracts/admin": ["../../packages/contracts/src/admin.ts"],
+      "@daibilet/contracts/catalog": ["../../packages/contracts/src/catalog.ts"]
     }
   },
   "include": ["src"],

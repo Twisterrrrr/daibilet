@@ -9,6 +9,7 @@ import { EventCardHorizontal } from '@/components/EventCardHorizontal';
 import { CatalogListRow } from '@/components/CatalogListRow.client';
 import { ScrollRail } from '@/components/ScrollRail.client';
 import type { PublicCatalogListItemDto } from '@daibilet/contracts/public';
+import type { PublicUnifiedCatalogItemDto } from '@daibilet/contracts/catalog';
 import { trackCatalogBannerClick } from '@/lib/catalog-analytics';
 import { isCatalogExcludedMuseumAdmission } from '@/lib/catalog-exclusions';
 import { catalogItemHasLiveSignal } from '@/lib/event-card-badges';
@@ -38,7 +39,7 @@ import { useCatalogFiltersLayout } from '@/components/CatalogSidebarLayout.clien
 const CATALOG_IMAGE_PRIORITY_COUNT = 9;
 
 type CatalogResultsProps = {
-  items: PublicCatalogListItemDto[];
+  items: PublicUnifiedCatalogItemDto[];
   viewMode: CatalogViewMode;
   onViewModeChange: (mode: CatalogViewMode) => void;
   clearHref?: string;
@@ -77,11 +78,11 @@ function isCurrentEmptyHubCity(
 }
 
 type CatalogGridEntry =
-  | { kind: 'event'; session: PublicCatalogListItemDto }
+  | { kind: 'event'; session: PublicUnifiedCatalogItemDto }
   | { kind: 'banner'; banner: CatalogInterstitial };
 
 function buildCatalogGridEntries(
-  items: PublicCatalogListItemDto[],
+  items: PublicUnifiedCatalogItemDto[],
   city?: string | null,
   columnsPerRow = 4,
 ): CatalogGridEntry[] {
@@ -188,16 +189,18 @@ export function CatalogResults({
 }: CatalogResultsProps) {
   const filtersLayout = useCatalogFiltersLayout();
   const filtersCollapsed = filtersLayout?.desktopCollapsed ?? false;
-  const catalogItems = collapseCatalogComboFamilies(items).filter(
-    (item) => !isCatalogExcludedMuseumAdmission(item),
-  );
-  const liveRailItems = pickLiveRailItems(catalogItems, sort);
+  const eventKeys = new Set(collapseCatalogComboFamilies(items.filter((item): item is Extract<PublicUnifiedCatalogItemDto, { productKind: 'EVENT' }> => item.productKind === 'EVENT'))
+    .filter((item) => !isCatalogExcludedMuseumAdmission(item))
+    .map((item) => `${item.id}:${item.startsAt}`));
+  const catalogItems = items.filter((item) => item.productKind === 'ADMISSION' || eventKeys.has(`${item.id}:${item.startsAt}`));
+  const eventItems = catalogItems.filter((item): item is Extract<PublicUnifiedCatalogItemDto, { productKind: 'EVENT' }> => item.productKind === 'EVENT');
+  const liveRailItems = pickLiveRailItems(eventItems, sort);
   // Owner 2026-08-13: temporarily hide «Сейчас выбирают» / «Популярное сейчас» rail on /events.
   const SHOW_CATALOG_LIVE_RAIL = false;
   const showLiveRail = SHOW_CATALOG_LIVE_RAIL && liveRailItems.length >= 3 && viewMode === 'cards';
   // Keep «Сейчас выбирают» / «Популярное сейчас» from mirroring the first page of cards 1:1.
   const listItemsWithoutLiveRail = showLiveRail
-    ? catalogItems.filter((item) => !liveRailItems.some((rail) => rail.id === item.id))
+    ? catalogItems.filter((item) => item.productKind === 'ADMISSION' || !liveRailItems.some((rail) => rail.id === item.id))
     : catalogItems;
   // «Стоит увидеть» is a duplicate city-popular rail; its events remain in the catalog below.
   const listItems = listItemsWithoutLiveRail;
@@ -307,15 +310,15 @@ export function CatalogResults({
         <>
           <ul className="mt-4 space-y-2 sm:hidden">
             {listItems.map((session) => (
-              <li key={`${session.id}-${session.startsAt}`}>
-                <CatalogListRow session={session} />
+              <li key={unifiedCatalogItemKeyLocal(session)}>
+                {session.productKind === 'ADMISSION' ? <AdmissionCatalogListRow item={session} /> : <CatalogListRow session={session} />}
               </li>
             ))}
           </ul>
           <ul className="mt-4 hidden space-y-4 sm:block sm:space-y-5">
             {listItems.map((session, index) => (
-              <li key={`${session.id}-${session.startsAt}`}>
-                <EventCardHorizontal session={session} imagePriority={index < CATALOG_IMAGE_PRIORITY_COUNT} />
+              <li key={unifiedCatalogItemKeyLocal(session)}>
+                {session.productKind === 'ADMISSION' ? <AdmissionCatalogHorizontalRow item={session} /> : <EventCardHorizontal session={session} imagePriority={index < CATALOG_IMAGE_PRIORITY_COUNT} />}
               </li>
             ))}
           </ul>
@@ -334,17 +337,55 @@ export function CatalogResults({
               }
               const priority = eventOrdinal < CATALOG_IMAGE_PRIORITY_COUNT;
               eventOrdinal += 1;
-              return (
-                <li key={`${entry.session.id}-${entry.session.startsAt}`}>
-                  <EventCard session={entry.session} compact catalogDense showDayRouteAction={false} imagePriority={priority} />
-                </li>
-              );
+              return <li key={unifiedCatalogItemKeyLocal(entry.session)}>
+                {entry.session.productKind === 'ADMISSION' ? <AdmissionCatalogCard item={entry.session} imagePriority={priority} /> : <EventCard session={entry.session} compact catalogDense showDayRouteAction={false} imagePriority={priority} />}
+              </li>;
             });
           })()}
         </ul>
       )}
     </>
   );
+}
+
+function unifiedCatalogItemKeyLocal(item: PublicUnifiedCatalogItemDto): string {
+  return item.productKind === 'ADMISSION' ? `admission-${item.id}` : `event-${item.id}-${item.startsAt}`;
+}
+
+function AdmissionCatalogCard({
+  item,
+  imagePriority = false,
+}: {
+  item: Extract<PublicUnifiedCatalogItemDto, { productKind: 'ADMISSION' }>;
+  imagePriority?: boolean;
+}) {
+  const category = item.subcategory?.title || item.category?.title || 'Входной билет';
+  return <Link href={item.href} className="group block h-full overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
+    <div className="relative aspect-[4/3] overflow-hidden bg-slate-100">
+      <CardSafeImage src={item.imageUrl} alt="" fill sizes={IMAGE_SIZES.eventCardCatalog} quality={CATALOG_IMAGE_QUALITY} priority={imagePriority} loading={imagePriority ? undefined : 'lazy'} className="object-cover transition-transform duration-500 group-hover:scale-[1.03]" fallback={<div className="h-full w-full bg-slate-100" />} />
+      <span className="absolute left-3 top-3 rounded-full bg-white/95 px-2.5 py-1 text-xs font-semibold text-slate-700">Входной билет</span>
+    </div>
+    <div className="p-3 sm:p-4">
+      <p className="text-xs font-medium text-primary-700">{category} · {item.dateLabel}</p>
+      <h3 className="mt-1 line-clamp-2 font-semibold leading-snug text-slate-950 group-hover:text-primary-700">{item.title}</h3>
+      <p className="mt-1 line-clamp-1 text-sm text-slate-600">{[item.venue, item.city].filter(Boolean).join(' · ')}</p>
+      {item.priceFrom != null ? <p className="mt-3 font-bold text-slate-950">от {item.priceFrom.toLocaleString('ru-RU')} ₽</p> : null}
+    </div>
+  </Link>;
+}
+
+function AdmissionCatalogListRow({ item }: { item: Extract<PublicUnifiedCatalogItemDto, { productKind: 'ADMISSION' }> }) {
+  return <Link href={item.href} className="flex min-h-20 items-center gap-3 rounded-xl border border-slate-200 bg-white p-3">
+    <div className="min-w-0 flex-1"><p className="text-xs text-primary-700">Входной билет · {item.dateLabel}</p><p className="mt-1 line-clamp-2 text-sm font-semibold text-slate-950">{item.title}</p><p className="mt-1 truncate text-xs text-slate-500">{[item.venue, item.city].filter(Boolean).join(' · ')}</p></div>
+    <span className="shrink-0 text-sm font-bold">{item.priceFrom != null ? `от ${item.priceFrom.toLocaleString('ru-RU')} ₽` : ''}</span>
+  </Link>;
+}
+
+function AdmissionCatalogHorizontalRow({ item }: { item: Extract<PublicUnifiedCatalogItemDto, { productKind: 'ADMISSION' }> }) {
+  return <Link href={item.href} className="flex min-h-32 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+    <div className="relative hidden w-44 shrink-0 bg-slate-100 sm:block">{item.imageUrl ? <SafeImage src={item.imageUrl} alt="" fill sizes="176px" className="object-cover" /> : null}</div>
+    <div className="flex min-w-0 flex-1 items-center justify-between gap-4 p-4"><div className="min-w-0"><p className="text-xs text-primary-700">Входной билет · {item.dateLabel}</p><h3 className="mt-1 line-clamp-2 font-semibold text-slate-950">{item.title}</h3><p className="mt-1 text-sm text-slate-500">{[item.venue, item.city].filter(Boolean).join(' · ')}</p></div><span className="shrink-0 text-sm font-bold">{item.priceFrom != null ? `от ${item.priceFrom.toLocaleString('ru-RU')} ₽` : ''}</span></div>
+  </Link>;
 }
 
 function pickLiveRailItems(
@@ -493,7 +534,7 @@ function ViewModeButton({
   );
 }
 
-function CatalogTable({ items }: { items: PublicCatalogListItemDto[] }) {
+function CatalogTable({ items }: { items: PublicUnifiedCatalogItemDto[] }) {
   return (
     <div className="mt-4 overflow-auto rounded-lg border border-slate-200 bg-white shadow-sm">
       <table className="w-full min-w-[980px] border-collapse text-sm">
@@ -509,6 +550,16 @@ function CatalogTable({ items }: { items: PublicCatalogListItemDto[] }) {
         </thead>
         <tbody>
           {items.map((session) => {
+            if (session.productKind === 'ADMISSION') {
+              return <tr key={unifiedCatalogItemKeyLocal(session)} className="border-b border-slate-100 last:border-0 hover:bg-slate-50">
+                <td className="min-w-[280px] px-4 py-3 align-top"><Link href={session.href} className="font-semibold text-slate-950 hover:text-primary-700">{session.title}</Link><div className="mt-1 text-xs text-slate-500">Входной билет · {session.venue}</div></td>
+                <td className="px-4 py-3 align-top text-slate-600">{session.subcategory?.title || session.category?.title || 'Музеи и арт'}</td>
+                <td className="px-4 py-3 align-top text-slate-600">{session.city || '—'}</td>
+                <td className="whitespace-nowrap px-4 py-3 align-top text-slate-700">{session.dateLabel}</td>
+                <td className="whitespace-nowrap px-4 py-3 align-top font-semibold text-slate-950">{session.priceFrom != null ? formatMoneyRange(session.priceFrom, session.priceTo) : '—'}</td>
+                <td className="px-4 py-3 align-top"><Link href={session.href} className="inline-flex min-h-9 items-center justify-center rounded-full bg-primary-600 px-4 text-sm font-semibold text-white hover:bg-primary-700">Купить</Link></td>
+              </tr>;
+            }
             const cityLabel = resolveEventCardDestinationLabel(session);
             const venueLink = sessionVenueHref(session);
             return (

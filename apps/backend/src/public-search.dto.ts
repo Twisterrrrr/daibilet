@@ -405,11 +405,24 @@ async function attachEventPageSlugs<T extends TrgmRow>(rows: T[]): Promise<T[]> 
 }
 
 function searchAdmissions(terms: string[], cityFilter: string, limit: number) {
+  const now = new Date();
   return prisma.admissionProduct.findMany({
     where: {
       status: 'PUBLISHED',
       isIndexable: true,
+      purchaseFlow: 'PLATFORM',
+      supplier: { is: { status: 'ACTIVE' } },
       AND: [
+        { OR: [{ salesStartsAt: null }, { salesStartsAt: { lte: now } }] },
+        { OR: [{ salesEndsAt: null }, { salesEndsAt: { gte: now } }] },
+        { OR: [{ validFrom: null }, { validFrom: { lte: now } }] },
+        { OR: [{ validTo: null }, { validTo: { gte: now } }] },
+        { OR: [{ ticketsVacant: null }, { ticketsVacant: { gt: 0 } }] },
+        { OR: [
+          { validityMode: { not: 'VALID_DAYS_AFTER_PURCHASE' } },
+          { validDaysAfterPurchase: { gt: 0 } },
+        ] },
+        { offers: { some: { active: true, priceRub: { gte: 100 } } } },
         {
           OR: terms.flatMap((term) => [
             { title: { contains: term, mode: 'insensitive' as const } },

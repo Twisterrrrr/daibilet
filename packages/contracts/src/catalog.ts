@@ -59,8 +59,70 @@ export interface PublicUnifiedCatalogDto {
     cities: FacetCount[];
     categories: FacetCount[];
     subcategories: FacetCount[];
+    tags?: FacetCount[];
     catalogLists?: Array<CatalogListLabel & { events: number }>;
     landings: Array<{ slug: string; title: string; events: number }>;
     priceSteps: number[];
   };
+  sources: {
+    admissionsAvailable: boolean;
+  };
+}
+
+export type AdmissionProductTypeDto =
+  | 'MUSEUM_ENTRY'
+  | 'GALLERY_ENTRY'
+  | 'ART_SPACE_ENTRY'
+  | 'EXHIBITION_ENTRY'
+  | 'OBSERVATION_ENTRY'
+  | 'PARK_ENTRY'
+  | 'ATTRACTION_ENTRY'
+  | 'ZOO_ENTRY'
+  | 'AQUARIUM_ENTRY'
+  | 'COMPLEX_ENTRY'
+  | 'OTHER';
+
+export type AdmissionValidityModeDto = 'OPEN_DATE' | 'FIXED_WINDOW' | 'VALID_DAYS_AFTER_PURCHASE';
+
+export interface AdminAdmissionProductDto {
+  id: string;
+  slug: string;
+  title: string;
+  type: AdmissionProductTypeDto;
+  status: string;
+  categoryId: string | null;
+  category: { id: string; slug: string; title: string } | null;
+  primarySubcategoryId: string | null;
+  primarySubcategory: { id: string; slug: string; title: string; categoryId: string } | null;
+  validityMode: AdmissionValidityModeDto;
+  validFrom: string | null;
+  validTo: string | null;
+  validDaysAfterPurchase: number | null;
+  salesStartsAt: string | null;
+  salesEndsAt: string | null;
+  city: { title: string; slug: string } | null;
+  venue: { title: string; slug: string };
+  updatedAt: string;
+}
+
+export interface AdminAdmissionProductsListDto {
+  items: AdminAdmissionProductDto[];
+  total: number;
+  limit: number;
+  offset: number;
+  hasMore: boolean;
+  categories: Array<{ id: string; slug: string; title: string }>;
+  subcategories: Array<{ id: string; slug: string; title: string; categoryId: string }>;
+}
+
+export interface AdminAdmissionClassificationPatchDto {
+  type: AdmissionProductTypeDto;
+  categoryId: string | null;
+  primarySubcategoryId: string | null;
+  validityMode: AdmissionValidityModeDto;
+  validFrom: string | null;
+  validTo: string | null;
+  validDaysAfterPurchase: number | null;
+  salesStartsAt: string | null;
+  salesEndsAt: string | null;
 }

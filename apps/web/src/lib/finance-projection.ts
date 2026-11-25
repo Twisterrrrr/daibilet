@@ -39,6 +39,8 @@ export type FinanceAdmissionProduct = {
   validFrom?: string | null;
   validTo?: string | null;
   validDaysAfterPurchase?: number | null;
+  salesStartsAt?: string | null;
+  salesEndsAt?: string | null;
   priceFromRub?: number | null;
   ticketsVacant?: number | null;
   canSell: boolean;
@@ -198,6 +200,8 @@ export function mapAdmissionProduct(raw: unknown): FinanceAdmissionProduct | nul
     validFrom: asString(row.validFrom),
     validTo: asString(row.validTo) || asString(row.validUntil),
     validDaysAfterPurchase: asNumber(row.validDaysAfterPurchase),
+    salesStartsAt: asString(row.salesStartsAt),
+    salesEndsAt: asString(row.salesEndsAt),
     priceFromRub: asNumber(row.priceFromRub),
     ticketsVacant: asNumber(row.ticketsVacant),
     canSell,
@@ -250,7 +254,7 @@ export function mapAdmissionListPayload(raw: unknown): FinanceAdmissionListResul
   return {
     items,
     summary,
-    total: items.length,
+    total: Math.max(0, asNumber(row.total) ?? items.length),
   };
 }
 

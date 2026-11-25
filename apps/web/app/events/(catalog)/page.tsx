@@ -11,13 +11,13 @@ import {
 import { JsonLdScripts } from '@/components/JsonLdScripts';
 import { SiteLayout } from '@/components/SiteLayout';
 import { buildEventsCatalogMetadata } from '@/lib/seo-events-catalog-meta';
-import { leanCatalogForSsr } from '@/lib/ssr-lean-payloads';
+import { leanUnifiedCatalogForSsr } from '@/lib/ssr-lean-payloads';
 import {
   buildBreadcrumbListJsonLd,
   buildEventsCatalogItemListJsonLd,
 } from '@/lib/structured-data';
 import { catalogQueryCacheKey, parseCatalogPageQuery } from '@/server/catalog-query';
-import { getCachedCatalog } from '@/server/cached-catalog-data';
+import { getCachedUnifiedCatalog } from '@/server/unified-catalog-data';
 
 /**
  * PERF.L4: do not await searchParams in metadata - forces private, no-store on `/events`.
@@ -31,23 +31,24 @@ export const revalidate = 300;
 
 /**
  * Do not await searchParams here - filtered catalog SSR was killing ISR/CDN HIT.
- * Default empty catalog is SSR'd; CatalogShell reads URL and refetches client-side.
+ * The default unified catalog is SSR'd; CatalogShell reads URL and refetches
+ * filtered pages through the same server composition endpoint.
  */
 export default async function EventsCatalogPage() {
   const pageQuery = parseCatalogPageQuery({});
-  let initialCatalog: Awaited<ReturnType<typeof getCachedCatalog>> | null = null;
+  let initialCatalog: Awaited<ReturnType<typeof getCachedUnifiedCatalog>> | null = null;
 
   try {
-    const raw = await getCachedCatalog(pageQuery);
+    const raw = await getCachedUnifiedCatalog(pageQuery);
     // Strip list blurbs / cap facets before they enter the CatalogShell client flight.
-    initialCatalog = leanCatalogForSsr(raw);
+    initialCatalog = leanUnifiedCatalogForSsr(raw);
   } catch {
     initialCatalog = null;
   }
 
   const initialQueryKey = catalogQueryCacheKey(pageQuery);
   const itemList = initialCatalog
-    ? buildEventsCatalogItemListJsonLd(selectEventsCatalogSsrItems(initialCatalog.items))
+    ? buildEventsCatalogItemListJsonLd(selectEventsCatalogSsrItems(initialCatalog.items.filter((item) => item.productKind === 'EVENT')))
     : null;
   const jsonLd = [
     buildBreadcrumbListJsonLd([
