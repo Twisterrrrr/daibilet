@@ -168,7 +168,9 @@ export const EVENT_GROUP_IMAGES: Record<string, string> = {
 export function resolveEditorialEventGroupImage(
   mergeGroupKey: string | null | undefined,
 ): string | null {
-  const key = String(mergeGroupKey || '').trim().toLowerCase();
+  const rawKey = String(mergeGroupKey || '').trim().toLowerCase();
+  const parts = rawKey.split('|');
+  const key = parts[0] === 'merge' ? parts[1] || '' : rawKey;
   return key ? EVENT_GROUP_IMAGES[key] || null : null;
 }
 
