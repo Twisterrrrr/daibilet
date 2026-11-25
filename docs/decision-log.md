@@ -550,7 +550,9 @@ other source text that reads poorly in event cards. Editing the imported title
 directly is not durable because TC and TEP syncs may replace it, and using an
 editorial label as a grouping key could merge otherwise distinct venues.
 
-**Status:** Schema migration, admin editing, and public display support are
-implemented locally. The Ishimbay circus venue should use
-`Цирк-шапито «Даймонд»` as its editorial title, with the existing address shown
-separately. Production application awaits the migration and API/web release.
+**Status:** Implemented and deployed in production on 2026-11-25 (SHA
+`8fb9d4578`). The additive migration, admin editing field, public event and
+venue display, and deployment migration step are live. Venue
+`venue_6af1cb64a7280ee86d0f6959` now has editorial title
+`Цирк-шапито «Даймонд»`; its imported title and address remain unchanged. The
+public API and event page were checked after the update.
