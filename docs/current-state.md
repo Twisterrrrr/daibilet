@@ -2,7 +2,7 @@
 
 ## Новогодний мультилендинг - SEO и производительность, 25.11.2026
 
-Проверены 19 национальных, городских и региональных URL в `landings-v2.xml`: до текущего выпуска все отвечали 200, имели self-canonical, `index, follow`, Title, description, H1 и серверную выдачу. В пилоте добавлены локальная фильтрация по компактному индексу, SSR первой выдачи, корректное округление количества программ в meta description и мелкие правки фильтров. Typecheck и 391 веб-тест прошли. Локальный prerender ограничен HTTP 429 публичного API; результат build и live smoke после Deploy MSK web зафиксировать в [отчёте](./new-year-landing-seo-and-performance-2026-11-25.md).
+Выпуск `a9bf3c2d5` задеплоен на MSK через [Deploy MSK web #45597350223](https://github.com/Twisterrrrr/daibilet/actions/runs/45597350223). После деплоя проверены 19/19 URL в `landings-v2.xml`: HTTP 200, self-canonical, `index, follow`, Title/description/H1 и карточки в серверном HTML. Для национальной страницы 461 программа в каталоге округляются в meta как «более 400 программ». Компактный индекс: 89 720 байт gzip, API 157 мс; production HTML 19 URL: медиана 863 мс, p95 1 194 мс. Typecheck и 391 веб-тест прошли. Подробные результаты и ограничения замеров: [отчёт](./new-year-landing-seo-and-performance-2026-11-25.md). Отправку переобхода в Search Console/Яндекс Вебмастер отдельно не подтвердили.
 
 ## EventPage rollout - 03.11.2026
 
