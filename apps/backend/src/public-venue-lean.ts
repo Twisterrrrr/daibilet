@@ -38,6 +38,7 @@ export type LeanPublicVenueRow = {
   slug: string;
   name: string;
   title: string;
+  editorialTitle: string | null;
   shortDescription: string | null;
   description: string | null;
   heroImageUrl: string | null;
@@ -73,6 +74,7 @@ const venueListSelect = {
   id: true,
   slug: true,
   title: true,
+  editorialTitle: true,
   shortDescription: true,
   description: true,
   heroImageUrl: true,
@@ -227,6 +229,7 @@ export async function fetchLeanPublicVenueRows(
   if (q) {
     where.OR = [
       { title: { contains: q, mode: 'insensitive' } },
+      { editorialTitle: { contains: q, mode: 'insensitive' } },
       { address: { contains: q, mode: 'insensitive' } },
       { city: { is: { title: { contains: q, mode: 'insensitive' } } } },
     ];
@@ -303,6 +306,7 @@ function mapLeanVenueRow(
     slug: row.slug,
     name: row.title,
     title: row.title,
+    editorialTitle: row.editorialTitle,
     shortDescription: leanText ? null : row.shortDescription,
     description: leanText ? null : row.description,
     heroImageUrl: row.heroImageUrl,

@@ -1034,6 +1034,8 @@ model Venue {
   id               String          @id @default(cuid())
   slug             String          @unique
   title            String
+  /// Human-authored public display name. Catalog sync updates title but leaves this override intact.
+  editorialTitle   String?
   description      String?
   /**
    * Set by a human (admin or supplier) when they take ownership of `description`.

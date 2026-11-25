@@ -543,7 +543,7 @@ async function searchEventsIlikeFallback(
       imageUrl: true,
       kind: true,
       primaryCity: { select: { title: true } },
-      venue: { select: { title: true } },
+      venue: { select: { title: true, editorialTitle: true } },
       sessions: {
         select: { startsAt: true, endsAt: true, sourceStatus: true },
         take: 8,
@@ -581,14 +581,14 @@ async function searchEventsIlikeFallback(
     title: string;
     imageUrl: string | null;
     primaryCity: { title: string } | null;
-    venue: { title: string } | null;
+    venue: { title: string; editorialTitle: string | null } | null;
   }) => ({
     id: row.id,
     slug: row.slug,
     title: row.title,
     score: 0.4,
     city: row.primaryCity?.title ?? null,
-    venue: row.venue?.title ?? null,
+    venue: row.venue?.editorialTitle || row.venue?.title || null,
     imageUrl: row.imageUrl,
   }));
 }

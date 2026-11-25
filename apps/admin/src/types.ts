@@ -79,6 +79,7 @@ export type AdminVenueRow = {
   id: string;
   name: string;
   title?: string;
+  editorialTitle?: string | null;
   slug?: string;
   city: string;
   address?: string | null;
@@ -101,6 +102,7 @@ export type AdminVenueRow = {
 
 export type AdminVenueDetail = Omit<AdminVenueRow, 'name' | 'proposedKind' | 'reason' | 'events'> & {
   title: string;
+  editorialTitle?: string | null;
   kind: string;
   pageStatus: string;
   events: Array<{

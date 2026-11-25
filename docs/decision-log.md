@@ -535,3 +535,22 @@ and satellite towns continue to roll into their regional collections.
 **Status:** Implemented in the city routing and regional-center data locally;
 hero briefs and candidate-only indexability are wired in web. Not committed,
 deployed, or verified against staging yet.
+
+## 2026-11-24 — Editorial display titles for imported venues
+
+**Decision:** Keep the supplier/imported `Venue.title` as the source identity for
+sync, search matching, grouping, and slug generation. Store an optional
+`Venue.editorialTitle` separately and use it only for public display and venue
+editorial work. Catalog sync must never write this field. An empty value falls
+back to the imported title; clearing the field restores that fallback without
+changing venue identity or URLs.
+
+**Why:** Supplier venue names can contain temporary-location instructions or
+other source text that reads poorly in event cards. Editing the imported title
+directly is not durable because TC and TEP syncs may replace it, and using an
+editorial label as a grouping key could merge otherwise distinct venues.
+
+**Status:** Schema migration, admin editing, and public display support are
+implemented locally. The Ishimbay circus venue should use
+`Цирк-шапито «Даймонд»` as its editorial title, with the existing address shown
+separately. Production application awaits the migration and API/web release.

@@ -1,0 +1,2 @@
+ALTER TABLE "Venue"
+  ADD COLUMN IF NOT EXISTS "editorialTitle" TEXT;

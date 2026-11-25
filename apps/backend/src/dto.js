@@ -1482,7 +1482,7 @@ export async function buildAdminOrderEventCandidates(db, searchParams = new URLS
           e."venueId",
           e."priceFromRub",
           city.title as city,
-          venue.title as venue,
+          coalesce(nullif(venue."editorialTitle", ''), venue.title) as venue,
           source.id as "sourceId",
           source.code::text as "sourceCode",
           source.name as "sourceName",
@@ -1504,10 +1504,10 @@ export async function buildAdminOrderEventCandidates(db, searchParams = new URLS
           $1 = ''
           or e.title ilike $2 escape '\\'
           or coalesce(city.title, '') ilike $2 escape '\\'
-          or coalesce(venue.title, '') ilike $2 escape '\\'
+          or coalesce(nullif(venue."editorialTitle", ''), venue.title, '') ilike $2 escape '\\'
           or coalesce(category.title, '') ilike $2 escape '\\'
           or coalesce(source_link."externalId", '') ilike $2 escape '\\'
-        group by e.id, city.title, venue.title, source.id, category.title
+        group by e.id, city.title, venue.title, venue."editorialTitle", source.id, category.title
       ),
       ranked as (
         select
@@ -2751,7 +2751,7 @@ export async function buildAdminVenuesList(db, searchParams) {
   const enriched = applyVenueEventFacetCounts(rows, facets).map((row) => {
     const mapped = {
       ...row,
-      name: formatPublicVenueTitle(row.name || row.title),
+      name: formatPublicVenueTitle(row.editorialTitle || row.name || row.title),
     };
     mapped.city = resolvePublicVenueCity(mapped);
     return applyPublicVenueNormalization(mapped);
@@ -2793,6 +2793,7 @@ export async function buildAdminVenueDetail(db, venueId) {
           venue.id,
           venue.slug,
           venue.title,
+          venue."editorialTitle",
           venue.description,
           venue."shortDescription",
           venue."heroImageUrl",
@@ -2897,6 +2898,7 @@ export async function updateAdminVenue(db, venueId, payload) {
         "websiteUrl" = $23,
         phone = $24,
         "openingHours" = $25,
+        "editorialTitle" = $26,
         "updatedAt" = now()
       where id = $1
       returning id
@@ -2927,6 +2929,7 @@ export async function updateAdminVenue(db, venueId, payload) {
       next.websiteUrl ?? null,
       next.phone ?? null,
       next.openingHours ?? null,
+      next.editorialTitle ?? null,
     ],
   );
 
@@ -2953,10 +2956,10 @@ export async function createAdminVenue(db, payload = {}) {
       id, slug, title, description, "descriptionOverridden", "shortDescription", "heroImageUrl",
       "seoH1", "seoTitle", "seoDescription", "canonicalPath", "isIndexable", "cityId", address,
       latitude, longitude, "metroStation", "wayToFind", "parkingInfo", "websiteUrl", phone,
-      "openingHours", kind, "placeType", "placeSubtype", "pageStatus", "createdAt", "updatedAt"
+      "openingHours", kind, "placeType", "placeSubtype", "pageStatus", "createdAt", "updatedAt", "editorialTitle"
     ) VALUES (
       $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, false, $12, $13,
-      $14, $15, $16, $17, $18, $19, $20, $21, $22::"VenueKind", $23::"PlaceType", $24, 'CANDIDATE', now(), now()
+      $14, $15, $16, $17, $18, $19, $20, $21, $22::"VenueKind", $23::"PlaceType", $24, 'CANDIDATE', now(), now(), $25
     ) RETURNING id
   `, [
     id, slug, title, normalized.description ?? null, Boolean(normalized.description),
@@ -2966,7 +2969,7 @@ export async function createAdminVenue(db, payload = {}) {
     normalized.latitude ?? null, normalized.longitude ?? null, normalized.metroStation ?? null,
     normalized.wayToFind ?? null, normalized.parkingInfo ?? null, normalized.websiteUrl ?? null,
     normalized.phone ?? null, normalized.openingHours ?? null, normalized.kind || venueKindForPlaceType(normalized.placeType, normalized.placeSubtype),
-    normalized.placeType ?? null, normalized.placeSubtype ?? null,
+    normalized.placeType ?? null, normalized.placeSubtype ?? null, normalized.editorialTitle ?? null,
   ]);
   if (!result.rows[0]) throw new Error('Не удалось создать площадку');
   return buildAdminVenueDetail(db, id);
@@ -5000,7 +5003,7 @@ export async function buildPublicEventPage(db, eventSlugOrId) {
         region.title as "regionTitle",
         venue.id as "venueId",
         venue.slug as "venueSlug",
-        venue.title as venue,
+        coalesce(nullif(venue."editorialTitle", ''), venue.title) as venue,
         venue.address as "venueAddress",
         venue.kind as "venueKind",
         venue.latitude as "venueLatitude",
@@ -5027,7 +5030,7 @@ export async function buildPublicEventPage(db, eventSlugOrId) {
       left join "Source" source on source.id = source_link."sourceId"
       left join "EventOverride" override on override."eventId" = e.id
       where e.id = $1 or e.slug = $1
-      group by e.id, cat.title, city.id, city.title, city.slug, city."isDestination", region.id, region.slug, region.title, venue.id, venue.slug, venue.title, venue.address, venue.kind, venue.latitude, venue.longitude, venue."metroStation", venue."wayToFind", venue."parkingInfo", source.code, source.name, source_link."externalId", override.id
+      group by e.id, cat.title, city.id, city.title, city.slug, city."isDestination", region.id, region.slug, region.title, venue.id, venue.slug, venue.title, venue."editorialTitle", venue.address, venue.kind, venue.latitude, venue.longitude, venue."metroStation", venue."wayToFind", venue."parkingInfo", source.code, source.name, source_link."externalId", override.id
       limit 1
     `,
       [eventLocator],
@@ -5131,7 +5134,7 @@ export async function buildPublicEventPage(db, eventSlugOrId) {
           session."ticketsVacant",
           session."externalId",
           session_event."sourceStatus" as "eventSourceStatus",
-          session_venue.title as "venueTitle",
+          coalesce(nullif(session_venue."editorialTitle", ''), session_venue.title) as "venueTitle",
           session_venue.address as "venueAddress",
           session_source_link."externalId" as "eventExternalId",
           session_source.code as "eventSourceCode",
@@ -5817,7 +5820,7 @@ async function eventRows(db, limit, options = {}) {
         region.title as "regionTitle",
         venue.id as "venueId",
         venue.slug as "venueSlug",
-        venue.title as venue,
+        coalesce(nullif(venue."editorialTitle", ''), venue.title) as venue,
         venue.kind as "venueKind",
         offer."sourceCode" as "offerSourceCode",
         offer.title as "offerTitle",
@@ -5878,6 +5881,7 @@ async function eventRows(db, limit, options = {}) {
         venue.id,
         venue.slug,
         venue.title,
+        venue."editorialTitle",
         venue.kind,
         offer."sourceCode",
         offer.title,
@@ -6124,6 +6128,7 @@ function normalizeVenuePayload(payload) {
   const normalized = {};
   for (const key of [
     'title',
+    'editorialTitle',
     'description',
     'shortDescription',
     'heroImageUrl',
@@ -6684,7 +6689,7 @@ async function destinationSummaryRowsFast(db) {
           region.slug as "regionSlug",
           region.title as "regionTitle",
           venue.id as "venueId",
-          venue.title as venue,
+          coalesce(nullif(venue."editorialTitle", ''), venue.title) as venue,
           min(session."startsAt") filter (where ${ACTIVE_SESSION_SQL}) as "startsAt",
           count(distinct session.id) filter (where ${ACTIVE_SESSION_SQL})::int as "slotCount",
           min(e."priceFromRub") filter (where e."priceFromRub" >= $1) as "eventPriceFromRub",
@@ -6723,7 +6728,8 @@ async function destinationSummaryRowsFast(db) {
           region.slug,
           region.title,
           venue.id,
-          venue.title
+          venue.title,
+          venue."editorialTitle"
       ),
       normalized as (
         select
@@ -7351,7 +7357,7 @@ async function publicCatalogSessionsFast(db) {
           region.title as "regionTitle",
           venue.id as "venueId",
           venue.slug as "venueSlug",
-          venue.title as venue,
+          coalesce(nullif(venue."editorialTitle", ''), venue.title) as venue,
           venue.address as "venueAddress",
           venue."heroImageUrl" as "venueHeroImageUrl",
           venue.kind as "venueKind",
@@ -7418,6 +7424,7 @@ async function publicCatalogSessionsFast(db) {
           venue.id,
           venue.slug,
           venue.title,
+          venue."editorialTitle",
           venue.address,
           venue."heroImageUrl",
           venue.kind,
@@ -7864,7 +7871,7 @@ async function publicEventRowsLean(db, limit) {
         region.title as "regionTitle",
         venue.id as "venueId",
         venue.slug as "venueSlug",
-        venue.title as venue,
+        coalesce(nullif(venue."editorialTitle", ''), venue.title) as venue,
         venue.kind as "venueKind",
         override.title as "overrideTitle",
         override."imageUrl" as "overrideImageUrl",
@@ -7915,6 +7922,7 @@ async function publicEventRowsLean(db, limit) {
         venue.id,
         venue.slug,
         venue.title,
+        venue."editorialTitle",
         venue.kind,
         offer."sourceCode",
         offer.title,
@@ -8631,7 +8639,7 @@ async function fetchLandingAuditEventRow(db, eventId) {
         e.status,
         cat.title as category,
         city.title as city,
-        venue.title as venue,
+        coalesce(nullif(venue."editorialTitle", ''), venue.title) as venue,
         count(session.id) filter (where ${ACTIVE_SESSION_SQL})::int as "futureSessionCount",
         min(session."startsAt") filter (where ${ACTIVE_SESSION_SQL}) as "nextStartsAt",
         ${orderedEventTagsSql('e.id')} as tags,
@@ -8654,7 +8662,7 @@ async function fetchLandingAuditEventRow(db, eventId) {
       left join "Venue" venue on venue.id = e."venueId"
       left join "EventSession" session on session."eventId" = e.id
       where e.id = $1
-      group by e.id, cat.title, city.title, venue.title
+      group by e.id, cat.title, city.title, venue.title, venue."editorialTitle"
     `,
     [eventId],
   );
