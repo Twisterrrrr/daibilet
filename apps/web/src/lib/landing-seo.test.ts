@@ -32,6 +32,37 @@ test('new-year city: prepositional city, no date injection', () => {
   assert.equal(/сегодня/i.test(seo.title), false);
 });
 
+test('new-year meta description uses correctly declined event counts and current price', () => {
+  const national = resolveLandingSeo({
+    slug: 'new-year',
+    profile: 'seasonal',
+    landingTitle: 'Новый год',
+    stats: { events: 461, priceFrom: 250 },
+  });
+  assert.match(national.description, /В афише более 400 программ\./);
+  assert.match(national.description, /Билеты от 250 ₽ онлайн/);
+  assert.equal(/Более 461 программ/.test(national.description), false);
+
+  const city = resolveLandingSeo({
+    slug: 'new-year',
+    profile: 'seasonal',
+    landingTitle: 'Новый год',
+    cityName: 'Санкт-Петербург',
+    stats: { events: 159, priceFrom: 250 },
+  });
+  assert.match(city.description, /в Санкт-Петербурге/);
+  assert.match(city.description, /В афише более 100 программ\./);
+  assert.ok(city.description.length <= 160);
+
+  const exactHundred = resolveLandingSeo({
+    slug: 'new-year',
+    profile: 'seasonal',
+    landingTitle: 'Новый год',
+    stats: { events: 100 },
+  });
+  assert.match(exactHundred.description, /В афише 100 программ\./);
+});
+
 test('salute keeps viewpoint framing but skips сегодня', () => {
   const seo = resolveLandingSeo({
     slug: 'salute-9-may',
