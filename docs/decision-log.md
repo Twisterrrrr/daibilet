@@ -1,5 +1,26 @@
 # Decision Log — Daibilet
 
+## 2026-11-25 — Единый autocomplete для global и Events
+
+**Decision:** Использовать общий `SearchAutocomplete` для глобальной шапки и
+каталога мероприятий. Оба контекста обращаются к существующему
+`/api/public/search`; `context=events` ограничивает backend выдачу событиями,
+городами и площадками и пропускает запросы статей/подборок. Свободный запрос из
+контекста афиши сохраняется как `q` в каталожном URL. Глобальный поиск
+сохраняет текущую позицию в шапке и переход на `/search`.
+
+Запросы подсказок используют debounce 250 мс и отменяются при смене текста или
+контекста. API error не блокирует обычную отправку запроса. Поиск мест на
+Places-страницах сохраняет существующий `/api/public/venues` адаптер, но
+использует тот же UI-компонент.
+
+**Границы:** новые DTO/модели и Prisma-миграции не добавляются. Готовые
+маршруты пока не входят в выдачу, так как единого подтверждённого публичного
+индекса day-route href нет. `/events` и SEO-маршруты не меняются.
+
+**Status:** Код и локальные проверки готовы в feature worktree; production
+release не выполнялся.
+
 ## 2026-11-24 — Dynamic landing sitemap rollout
 
 **Decision:** Introduce an internal provider → shared indexability filter → canonical-path renderer for landing sitemap entries. Pilot it through `/sitemaps/landings-v2.xml` with New Year only; derive its city and region candidates from the live New Year catalogue facets and resolve counts through the same loader as the public page. Remove the New Year family from the legacy `landings.xml` while the pilot is active, so the sitemap index never lists duplicate URLs. Do not migrate other landing families until their provider and indexability rules are reviewed. After live verification, move the generator behind the existing `landings.xml` URL and retire the temporary `landings-v2.xml` endpoint.

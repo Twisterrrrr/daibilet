@@ -2,18 +2,18 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Baby, Gift, Moon, MoreHorizontal, Search, SlidersHorizontal, X } from 'lucide-react';
+import { Baby, Gift, Moon, MoreHorizontal, SlidersHorizontal, X } from 'lucide-react';
 import dynamic from 'next/dynamic';
-import { FormEvent, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
+import { FormEvent, useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 
 import { CatalogDateRail } from '@/components/CatalogDateRail.client';
+import { SearchAutocomplete } from '@/components/search/SearchAutocomplete.client';
 import { CatalogExcludeThemes } from '@/components/CatalogExcludeThemes.client';
 import { CatalogMobileQuickFilters } from '@/components/CatalogMobileQuickFilters.client';
 import { CategoryTabIcon } from '@/components/CategoryTabIcon';
 import { displayCatalogLabel } from '@/lib/catalog-labels';
 import {
-  catalogSearchHintsFromFacets,
   shouldShowCatalogCategoryCount,
   splitCatalogCategories,
   type CatalogCategoryFacet,
@@ -70,52 +70,19 @@ export function CatalogToolbar({
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [categoriesMoreOpen, setCategoriesMoreOpen] = useState(false);
   const [qDraft, setQDraft] = useState(filters.q || '');
-  const [searchFocused, setSearchFocused] = useState(false);
-  const searchInputRef = useRef<HTMLInputElement>(null);
-  const searchWrapRef = useRef<HTMLDivElement>(null);
   const advancedCount = countAdvancedFilters(filters);
   const categorySplit = useMemo(
     () => splitCatalogCategories(facets.categories, filters.category),
     [facets.categories, filters.category],
   );
-  const searchHints = useMemo(
-    () => catalogSearchHintsFromFacets(facets.categories, 6),
-    [facets.categories],
-  );
-  const showSearchHints = searchFocused && !qDraft.trim() && searchHints.length > 0 && !disabled;
-  const previewContext = useMemo(
-    () => ({
-      q: qDraft.trim() || filters.q,
-      city: filters.city,
-      category: filters.category,
-      sort: filters.sort,
-    }),
-    [qDraft, filters.q, filters.city, filters.category, filters.sort],
-  );
-
   useEffect(() => {
     setQDraft(filters.q || '');
   }, [filters.q]);
 
-  useEffect(() => {
-    if (!showSearchHints) return;
-    const onPointerDown = (event: MouseEvent | TouchEvent) => {
-      const target = event.target as Node | null;
-      if (target && searchWrapRef.current?.contains(target)) return;
-      setSearchFocused(false);
-    };
-    document.addEventListener('mousedown', onPointerDown);
-    document.addEventListener('touchstart', onPointerDown);
-    return () => {
-      document.removeEventListener('mousedown', onPointerDown);
-      document.removeEventListener('touchstart', onPointerDown);
-    };
-  }, [showSearchHints]);
-
   const buildHref = buildRouteHref || buildCatalogHref;
-  const navigate = (next: CatalogFilterValues) => {
+  const navigate = useCallback((next: CatalogFilterValues) => {
     router.push(buildHref(next), { scroll: false });
-  };
+  }, [buildHref, router]);
 
   // Desktop search settles after a short pause; mobile commits on submit.
   useEffect(() => {
@@ -134,11 +101,10 @@ export function CatalogToolbar({
       });
     }, SEARCH_DEBOUNCE_MS);
     return () => window.clearTimeout(timer);
-  }, [qDraft]);
+  }, [navigate, qDraft]);
 
   const onSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    setSearchFocused(false);
     navigate({
       ...filters,
       q: qDraft.trim() || undefined,
@@ -319,90 +285,6 @@ export function CatalogToolbar({
     </>
   );
 
-  const catalogSearchField = (
-    <div ref={searchWrapRef} className="catalog-toolbar-search-field max-w-none md:max-w-none">
-      <label className="relative block min-w-0 flex-1">
-        <span className="sr-only">Поиск по событиям</span>
-        <Search
-          aria-hidden
-          className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500"
-          strokeWidth={1.75}
-        />
-        <input
-          ref={searchInputRef}
-          type="search"
-          name="q"
-          value={qDraft}
-          onChange={(event) => setQDraft(event.target.value)}
-          onFocus={() => setSearchFocused(true)}
-          placeholder="Название, место или артист"
-          aria-label="Поиск по событиям"
-          aria-expanded={showSearchHints}
-          aria-controls={showSearchHints ? 'catalog-search-hints-sidebar' : undefined}
-          disabled={disabled}
-          autoComplete="off"
-          className="inline-btn h-11 w-full rounded-xl border-0 bg-transparent pl-10 pr-9 text-sm text-graphite outline-none transition placeholder:text-slate-400 focus-visible:ring-2 focus-visible:ring-primary/30 disabled:opacity-60 search-input--custom-clear"
-        />
-        {qDraft ? (
-          <button
-            type="button"
-            aria-label="Очистить поиск"
-            disabled={disabled}
-            onClick={() => {
-              setQDraft('');
-              navigate({ ...filters, q: undefined, page: undefined });
-            }}
-            className="inline-btn absolute right-1.5 top-1/2 grid h-6 w-6 -translate-y-1/2 place-items-center rounded-lg text-graphite-muted hover:bg-surface-muted hover:text-graphite disabled:opacity-60"
-          >
-            <X aria-hidden className="h-3.5 w-3.5" strokeWidth={1.75} />
-          </button>
-        ) : null}
-      </label>
-      {showSearchHints ? (
-        <div
-          id="catalog-search-hints-sidebar"
-          role="listbox"
-          aria-label="Популярные запросы"
-          className="absolute left-0 right-0 top-[calc(100%+0.35rem)] z-50 overflow-hidden rounded-2xl border border-slate-200 bg-white py-1.5 shadow-lg"
-        >
-          <p className="px-3 pb-1 pt-0.5 text-[11px] font-semibold uppercase tracking-wider text-graphite-muted">
-            Часто ищут
-          </p>
-          {searchHints.map((hint) => (
-            <button
-              key={`sidebar-${hint.kind}:${hint.category || hint.q || hint.label}`}
-              type="button"
-              role="option"
-              className="flex w-full items-center gap-2 px-3 py-2.5 text-left text-sm text-graphite transition hover:bg-surface-muted"
-              onClick={() => {
-                setSearchFocused(false);
-                if (hint.kind === 'q' && hint.q) {
-                  setQDraft(hint.q);
-                  navigate({
-                    ...filters,
-                    q: hint.q,
-                    category: undefined,
-                    page: undefined,
-                  });
-                  return;
-                }
-                navigate({
-                  ...filters,
-                  q: undefined,
-                  category: hint.category,
-                  page: undefined,
-                });
-              }}
-            >
-              <Search aria-hidden className="h-3.5 w-3.5 shrink-0 text-graphite-muted" strokeWidth={1.75} />
-              <span className="truncate">{hint.label}</span>
-            </button>
-          ))}
-        </div>
-      ) : null}
-    </div>
-  );
-
   if (layout === 'split') {
     const splitChildren = typeof children === 'function'
       ? children({ filtersButton: splitFiltersButton, quickSelectors: splitQuickSelectors })
@@ -443,89 +325,31 @@ export function CatalogToolbar({
       <div className="catalog-toolbar sticky top-[var(--site-header-height)] z-30 -mx-4 space-y-2 border-b border-slate-200/60 bg-white/95 px-4 py-2 backdrop-blur-md supports-[backdrop-filter]:bg-white/90 sm:-mx-6 sm:px-6 md:mx-0 md:rounded-2xl md:border md:border-slate-200/70 md:px-3 md:py-2.5 md:shadow-sm">
         <form onSubmit={onSubmit} className="flex flex-col gap-2">
           <div className="catalog-toolbar-search-row">
-            <div
-              ref={searchWrapRef}
-              className="catalog-toolbar-search-field"
-            >
-              <label className="relative block min-w-0 flex-1">
-                <span className="sr-only">Поиск по событиям</span>
-                <Search
-                  aria-hidden
-                  className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500 md:left-3"
-                  strokeWidth={1.75}
-                />
-                <input
-                  ref={searchInputRef}
-                  type="search"
-                  name="q"
-                  value={qDraft}
-                  onChange={(event) => setQDraft(event.target.value)}
-                  onFocus={() => setSearchFocused(true)}
-                  placeholder="Название, место или артист"
-                  aria-label="Поиск по событиям"
-                  aria-expanded={showSearchHints}
-                  aria-controls={showSearchHints ? 'catalog-search-hints' : undefined}
+            <div className="catalog-toolbar-search-field">
+              <SearchAutocomplete
+                context="events"
+                disabled={disabled}
+                value={qDraft}
+                onValueChange={setQDraft}
+                cityFilter={filters.city}
+                catalogFilters={filters}
+                catalogHref={buildHref}
+                className="min-w-0 flex-1"
+                inputClassName="inline-btn h-11 w-full rounded-xl border-0 bg-transparent pl-10 pr-9 text-sm text-graphite outline-none transition placeholder:text-slate-400 focus-visible:ring-2 focus-visible:ring-primary/30 disabled:opacity-60 md:h-10 md:pl-11 search-input--custom-clear"
+              />
+              {qDraft ? (
+                <button
+                  type="button"
+                  aria-label="Очистить поиск"
                   disabled={disabled}
-                  autoComplete="off"
-                  className="inline-btn h-11 w-full rounded-xl border-0 bg-transparent pl-10 pr-9 text-sm text-graphite outline-none transition placeholder:text-slate-400 focus-visible:ring-2 focus-visible:ring-primary/30 disabled:opacity-60 md:h-10 md:pl-11 search-input--custom-clear"
-                />
-                {qDraft ? (
-                  <button
-                    type="button"
-                    aria-label="Очистить поиск"
-                    disabled={disabled}
-                    onClick={() => {
-                      setQDraft('');
-                      navigate({ ...filters, q: undefined, page: undefined });
-                    }}
-                    className="inline-btn absolute right-1.5 top-1/2 grid h-6 w-6 -translate-y-1/2 place-items-center rounded-lg text-graphite-muted hover:bg-surface-muted hover:text-graphite disabled:opacity-60"
-                  >
-                    <X aria-hidden className="h-3.5 w-3.5" strokeWidth={1.75} />
-                  </button>
-                ) : null}
-              </label>
-
-              {showSearchHints ? (
-                <div
-                  id="catalog-search-hints"
-                  role="listbox"
-                  aria-label="Популярные запросы"
-                  className="absolute left-0 right-0 top-[calc(100%+0.35rem)] z-50 overflow-hidden rounded-2xl border border-slate-200 bg-white py-1.5 shadow-lg"
+                  onClick={() => {
+                    setQDraft('');
+                    navigate({ ...filters, q: undefined, page: undefined });
+                  }}
+                  className="inline-btn absolute right-1.5 top-1/2 grid h-6 w-6 -translate-y-1/2 place-items-center rounded-lg text-graphite-muted hover:bg-surface-muted hover:text-graphite disabled:opacity-60"
                 >
-                  <p className="px-3 pb-1 pt-0.5 text-[11px] font-semibold uppercase tracking-wider text-graphite-muted">
-                    Часто ищут
-                  </p>
-                  {searchHints.map((hint) => (
-                    <button
-                      key={`${hint.kind}:${hint.category || hint.q || hint.label}`}
-                      type="button"
-                      role="option"
-                      className="flex w-full items-center gap-2 px-3 py-2.5 text-left text-sm text-graphite transition hover:bg-surface-muted"
-                      onClick={() => {
-                        setSearchFocused(false);
-                        if (hint.kind === 'q' && hint.q) {
-                          setQDraft(hint.q);
-                          navigate({
-                            ...filters,
-                            q: hint.q,
-                            category: undefined,
-                            page: undefined,
-                          });
-                          return;
-                        }
-                        navigate({
-                          ...filters,
-                          q: undefined,
-                          category: hint.category,
-                          page: undefined,
-                        });
-                      }}
-                    >
-                      <Search aria-hidden className="h-3.5 w-3.5 shrink-0 text-graphite-muted" strokeWidth={1.75} />
-                      <span className="truncate">{hint.label}</span>
-                    </button>
-                  ))}
-                </div>
+                  <X aria-hidden className="h-3.5 w-3.5" strokeWidth={1.75} />
+                </button>
               ) : null}
             </div>
 

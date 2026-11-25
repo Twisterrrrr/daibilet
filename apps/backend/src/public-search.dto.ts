@@ -150,6 +150,7 @@ export async function buildPublicSearchDto(
   }
 
   const cityFilter = String(searchParams.get('city') || '').trim().toLowerCase();
+  const eventsContext = String(searchParams.get('context') || '').trim().toLowerCase() === 'events';
   const terms = expandSearchQuery(q);
   const primary = terms[0] || q;
   const like = likePattern(primary);
@@ -179,8 +180,8 @@ export async function buildPublicSearchDto(
   const [eventRows, venues, landings, articles] = await Promise.all([
     searchEventsTrgm(primary, like, cityFilter, 24),
     searchVenuesTrgm(primary, like, cityFilter, 4),
-    searchLandingsIlike(terms, 3),
-    prisma.article.findMany({
+    eventsContext ? Promise.resolve([]) : searchLandingsIlike(terms, 3),
+    eventsContext ? Promise.resolve([]) : prisma.article.findMany({
       where: {
         status: 'PUBLISHED',
         OR: terms.flatMap((term) => [
@@ -217,30 +218,32 @@ export async function buildPublicSearchDto(
     push(item, `venue:${searchVenueTextKey(item.label)}|${searchVenueTextKey(row.city)}`);
   }
 
-  for (const article of articles) {
-    push(
-      {
-        type: 'article',
-        label: article.title,
-        sublabel: article.authorName || String(article.excerpt || '').slice(0, 100),
-        href: `/blog/${article.slug}`,
-        imageUrl: article.coverImageUrl || null,
-      },
-      `article:${article.slug}`,
-    );
-  }
+  if (!eventsContext) {
+    for (const article of articles) {
+      push(
+        {
+          type: 'article',
+          label: article.title,
+          sublabel: article.authorName || String(article.excerpt || '').slice(0, 100),
+          href: `/blog/${article.slug}`,
+          imageUrl: article.coverImageUrl || null,
+        },
+        `article:${article.slug}`,
+      );
+    }
 
-  for (const row of landings) {
-    push(
-      {
-        type: 'landing',
-        label: row.title,
-        sublabel: row.city || 'Подборка',
-        href: landingSearchHref(row.slug),
-        imageUrl: null,
-      },
-      `landing:${row.slug}`,
-    );
+    for (const row of landings) {
+      push(
+        {
+          type: 'landing',
+          label: row.title,
+          sublabel: row.city || 'Подборка',
+          href: landingSearchHref(row.slug),
+          imageUrl: null,
+        },
+        `landing:${row.slug}`,
+      );
+    }
   }
 
   return {

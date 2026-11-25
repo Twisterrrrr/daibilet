@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { Fragment } from 'react';
-import { Search } from 'lucide-react';
 
+import { SearchAutocomplete } from '@/components/search/SearchAutocomplete.client';
 import { SafeImage } from '@/components/SafeImage.client';
 import { V2EventCard } from '@/components/V2EventCard';
 import { fontUnbounded } from '@/lib/fonts';
@@ -28,11 +28,11 @@ function calendar(items: { startsAt: string }[]) {
     if (i === 0) cls.push('is-today');
     if (!withEvents.has(iso)) cls.push('is-empty');
     tiles.push(
-      <button key={iso} className={cls.join(' ')}>
+      <Link key={iso} href={buildCatalogHref({ from: iso, to: iso })} className={cls.join(' ')} aria-label={`События ${d.getDate()} ${MONTH[d.getMonth()]}`}>
         <span className="cal-day__dow">{i === 0 ? 'Сегодня' : DOW[dow]}</span>
         <span className="cal-day__num">{d.getDate()}</span>
         <span className="cal-day__month">{MONTH[d.getMonth()]}</span>
-      </button>,
+      </Link>,
     );
   }
   return tiles;
@@ -73,13 +73,14 @@ export function EventsV2Preview({ catalog, landings = [], articles = [] }: Props
             <nav className="breadcrumbs"><Link href="/">Главная</Link><span>/</span><span>Афиша</span></nav>
             <div className="page-head__row">
               <div>
-                <h1>Афиша Санкт-Петербурга</h1>
-                <p className="page-head__meta"><strong>{catalog?.total ?? items.length}</strong> событий · выбор редакции</p>
+                <h1>Афиша событий</h1>
+                <p className="page-head__meta"><strong>{catalog?.total ?? items.length}</strong> событий в каталоге</p>
               </div>
-              <div className="search-compact">
-                <span className="search-compact__icon"><Search className="h-4 w-4" aria-hidden /></span>
-                <input type="text" placeholder="Событие, площадка или артист" />
-              </div>
+              <SearchAutocomplete
+                context="events"
+                className="search-compact"
+                inputClassName="h-10 min-w-0 flex-1 bg-transparent text-sm text-graphite outline-none placeholder:text-graphite-muted"
+              />
             </div>
           </div>
 
@@ -105,7 +106,7 @@ export function EventsV2Preview({ catalog, landings = [], articles = [] }: Props
             <section className="section">
               <div className="container">
                 <div className="section__head">
-                  <div><h2>Стоит увидеть</h2><p>События, на которые советуем обратить внимание в первую очередь</p></div>
+                  <div><h2>Популярные события</h2><p>Мероприятия с ближайшими датами и доступными билетами</p></div>
                   <Link href="/events" className="link-more">Вся афиша →</Link>
                 </div>
                 <div className="featured-carousel">
@@ -151,7 +152,7 @@ export function EventsV2Preview({ catalog, landings = [], articles = [] }: Props
                   <div className="carousel__head">
                     <div>
                       <h2>{group.label}</h2>
-                      <p>{pluralEvents(group.items.length)} · выбор редакции</p>
+                      <p>{pluralEvents(group.items.length)} в этой категории</p>
                     </div>
                     <Link href={buildCatalogHref({ category: group.key })} className="link-more">Смотреть всё →</Link>
                   </div>

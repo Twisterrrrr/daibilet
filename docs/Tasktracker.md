@@ -4,6 +4,15 @@
 |----|--------|-----------|--------|
 | SEO.LANDING-SITEMAP-V2 | Новый provider/filter/renderer; пилот Нового года в отдельном `landings-v2.xml`, города и регионы из фасетов актуальной афиши; новогодние URL исключены из legacy `landings.xml` во избежание дублей | Критический | 🔄 код и web typecheck готовы; live URL и повторный обход после deploy |
 
+## 2026-11-25 - Events V2 / единый поиск
+
+| ID | Задача | Приоритет | Статус |
+|----|--------|-----------|--------|
+| EVENTS.V2.AUDIT | Карта существующих каталога, endpoint поиска, статей, подборок, Places и city day-routes; ограничения и фазы | Высокий | ✅ `docs/events-v2-audit-2026-11-25.md` |
+| EVENTS.V2.SEARCH | Общий `SearchAutocomplete` для global/events, `context=events`, AbortController, клавиатура, fallback свободного запроса; подключение в header и каталог | Высокий | ✅ локально; web/backend typecheck, lint, 31 целевой тест |
+| EVENTS.V2.PREVIEW | Исправить неверный editorial label и город в `/afisha2`, подключить общий search, сделать дни календаря ссылками на каталог | Высокий | ✅ локально; lint/typecheck |
+| EVENTS.V2.SHOWCASE | Управляемая последовательность редакционных блоков, городская витрина и mobile/staging QA | Высокий | ⏳ следующий срез; production `/events` и SEO пока не менялись |
+
 ## 2026-10-18 - SEO-аудит: кэш sitemap, каноникал Москвы, главная no-store
 
 Аудит live 18.10: [seo-audit-2026-10-18.md](./seo-audit-2026-10-18.md). Ядро зелёное (robots/sitemap/canonical/JSON-LD/404/СПб-308); блокеры ниже. Замеры шли во время параллельного деплоя - тайминги перепроверить на спокойном проде.
