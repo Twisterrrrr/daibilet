@@ -2,41 +2,15 @@ import Link from 'next/link';
 
 import { SearchAutocomplete } from '@/components/search/SearchAutocomplete.client';
 import { BlogCardSafeImage, SafeImage } from '@/components/SafeImage.client';
+import { EventsDateCalendar } from '@/components/EventsDateCalendar.client';
 import { V2EventCard } from '@/components/V2EventCard';
 import { buildCatalogHref } from '@/lib/catalog-url';
 import { eventHref } from '@/lib/routes';
 import { fontUnbounded } from '@/lib/fonts';
-import { pluralEvents } from '@/lib/format';
+import { formatPriceFrom, pluralEvents } from '@/lib/format';
 import { resolveAfishaBlocks, type ResolvedAfishaBlock } from '@/lib/events-v2-blocks';
 import type { BlogCardDto } from '@/lib/blog-utils';
 import type { PublicCatalogDto, PublicDestinationDto, PublicLandingDto } from '@daibilet/contracts/public';
-
-const DOW = ['вс', 'пн', 'вт', 'ср', 'чт', 'пт', 'сб'];
-const MONTH = ['янв', 'фев', 'мар', 'апр', 'мая', 'июн', 'июл', 'авг', 'сен', 'окт', 'ноя', 'дек'];
-
-function calendar(items: { startsAt: string }[], citySlug?: string | null) {
-  const withEvents = new Set(items.map((i) => String(i.startsAt || '').slice(0, 10)));
-  const today = new Date();
-  const tiles = [];
-  for (let i = 0; i < 14; i += 1) {
-    const d = new Date(today);
-    d.setDate(d.getDate() + i);
-    const dow = d.getDay();
-    const iso = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-    const cls = ['cal-day'];
-    if (dow === 0 || dow === 6) cls.push('is-weekend');
-    if (i === 0) cls.push('is-today');
-    if (!withEvents.has(iso)) cls.push('is-empty');
-    tiles.push(
-      <Link key={iso} href={buildCatalogHref({ from: iso, to: iso, city: citySlug || undefined })} className={cls.join(' ')} aria-label={`События ${d.getDate()} ${MONTH[d.getMonth()]}`}>
-        <span className="cal-day__dow">{i === 0 ? 'Сегодня' : DOW[dow]}</span>
-        <span className="cal-day__num">{d.getDate()}</span>
-        <span className="cal-day__month">{MONTH[d.getMonth()]}</span>
-      </Link>,
-    );
-  }
-  return tiles;
-}
 
 function SectionHeading({ title, description, href }: { title: string; description?: string; href?: string }) {
   return (
@@ -52,7 +26,7 @@ function EditorialBlock({ block, citySlug }: { block: ResolvedAfishaBlock; cityS
     return (
       <section className="section" data-afisha-block={block.type}>
         <div className="container">
-          <div className="section__head"><div><h2>События с ближайшими датами</h2><p>Актуальные мероприятия из каталога</p></div><Link href={buildCatalogHref({ city: citySlug || undefined })} className="link-more">Вся афиша →</Link></div>
+          <div className="section__head"><div><h2>Стоит увидеть</h2><p>Выбор редакции</p></div><Link href={buildCatalogHref({ city: citySlug || undefined })} className="link-more">Вся афиша →</Link></div>
           <div className="featured-carousel">
             {block.items.map((event) => (
               <Link key={event.id} href={eventHref(event)} className="featured-card">
@@ -60,7 +34,11 @@ function EditorialBlock({ block, citySlug }: { block: ResolvedAfishaBlock; cityS
                 <div className="featured-card__body">
                   <span className="featured-card__tag">{event.catalogSubcategory?.title || event.category}</span>
                   <h3>{event.title}</h3>
-                  <p>{event.dateLabel} · {event.venue}</p>
+                  <p>{event.dateLabel ? `${event.dateLabel} · ` : ''}{event.venue}</p>
+                  <div className="featured-card__foot">
+                    {event.priceFrom != null ? <span className="featured-card__price"><small>Билеты</small>{formatPriceFrom(event.priceFrom)}</span> : <span />}
+                    <span className="featured-card__cta">Билеты <span aria-hidden="true">→</span></span>
+                  </div>
                 </div>
               </Link>
             ))}
@@ -184,8 +162,8 @@ export function EventsV2Preview({ catalog, landings = [], articles = [], destina
             <nav className="breadcrumbs"><Link href="/">Главная</Link><span>/</span><span>Афиша</span></nav>
             <div className="page-head__row">
               <div>
-                <h1>{cityName ? `Афиша ${cityName}` : 'Афиша событий'}</h1>
-                <p className="page-head__meta"><strong>{catalog?.total ?? items.length}</strong> событий в каталоге</p>
+                <h1>{cityName ? `Афиша ${cityName}` : 'Афиша России'}</h1>
+                <p className="page-head__meta">{pluralEvents(catalog?.total ?? items.length).trim()} · выбор редакции</p>
               </div>
               <SearchAutocomplete
                 context="events"
@@ -198,7 +176,7 @@ export function EventsV2Preview({ catalog, landings = [], articles = [], destina
             </div>
           </div>
 
-          <div className="calendar-wrap"><div className="calendar">{calendar(items, citySlug)}</div></div>
+          <EventsDateCalendar items={items} citySlug={citySlug} />
 
           {catalogUnavailable ? <p role="status" className="catalog-unavailable">Не удалось загрузить события. Попробуйте обновить страницу позже.</p> : null}
 

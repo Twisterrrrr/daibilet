@@ -58,16 +58,9 @@
     padding-bottom:16px;
   }
   .v2 .catalog-unavailable{margin:16px 0;padding:12px 16px;border:1px solid #fed7aa;border-radius:12px;background:#fff7ed;color:#9a3412;font-size:14px}
-  .v2 .calendar-wrap::before, .v2 .calendar-wrap::after{
-    content:'';position:absolute;top:0;bottom:16px;width:64px;
-    pointer-events:none;z-index:1;
-  }
-  .v2 .calendar-wrap::before{left:0;background:linear-gradient(90deg,#fff 10%,rgba(255,255,255,0) 100%)}
-  .v2 .calendar-wrap::after{right:0;background:linear-gradient(270deg,#fff 10%,rgba(255,255,255,0) 100%)}
-
   .v2 .calendar{
     display:flex;gap:10px;overflow-x:auto;scroll-behavior:smooth;
-    padding:8px 24px 4px;margin:0 -24px;
+    padding:8px 56px 4px;margin:0;
     scrollbar-width:none;-ms-overflow-style:none;
   }
   .v2 .calendar::-webkit-scrollbar{display:none}
@@ -105,6 +98,7 @@
 
   
   .v2 .cal-day.is-today{background:var(--ink);border-color:var(--ink)}
+  .v2 .cal-day.is-today.is-empty{opacity:1}
   .v2 .cal-day.is-today .cal-day__dow, .v2 .cal-day.is-today .cal-day__num, .v2 .cal-day.is-today .cal-day__month{color:#fff}
   .v2 .cal-day.is-today:hover{border-color:var(--ink)}
 
@@ -125,12 +119,11 @@
   .v2 .calendar-arrow:hover{transform:translateY(-50%) scale(1.08);box-shadow:0 8px 22px rgba(15,17,23,.2)}
   .v2 .calendar-arrow:disabled{opacity:.25;cursor:default;transform:translateY(-50%)}
   .v2 .calendar-arrow svg{width:18px;height:18px}
-  .v2 .calendar-arrow--left{left:8px}
-  .v2 .calendar-arrow--right{right:8px}
+  .v2 .calendar-arrow--left{left:0}
+  .v2 .calendar-arrow--right{right:0}
 
   @media(max-width:900px){
     .v2 .calendar-arrow{display:none}
-    .v2 .calendar-wrap::before, .v2 .calendar-wrap::after{display:none}
     .v2 .calendar{padding:8px 24px 4px;margin:0 -24px}
   }
   @media(max-width:720px){
@@ -175,10 +168,10 @@
   .v2 .featured-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
   @media(max-width:700px){.v2 .featured-grid{grid-template-columns:1fr}}
 
-  .v2 .featured-card{position:relative;border-radius:var(--radius-lg);overflow:hidden;aspect-ratio:16/11;isolation:isolate;cursor:pointer}
+  .v2 .featured-card{position:relative;border-radius:var(--radius-lg);overflow:hidden;aspect-ratio:16/10;min-height:280px;background:linear-gradient(135deg,#33234b,#d04d61 55%,#ffad69);isolation:isolate;cursor:pointer;scroll-snap-align:start}
   .v2 .featured-card img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform .6s}
   .v2 .featured-card:hover img{transform:scale(1.04)}
-  .v2 .featured-card::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,0) 30%,rgba(0,0,0,.85) 100%)}
+  .v2 .featured-card::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(9,12,24,.08) 15%,rgba(9,12,24,.2) 42%,rgba(9,12,24,.88) 100%);pointer-events:none}
   .v2 .featured-card__body{position:absolute;left:0;right:0;bottom:0;padding:22px;color:#fff;z-index:2}
   .v2 .featured-card__tag{display:inline-block;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;background:rgba(255,255,255,.95);color:var(--ink);padding:4px 10px;border-radius:100px;margin-bottom:8px}
   .v2 .featured-card__body h3{font-family:var(--font-display);font-size:19px;line-height:1.2;letter-spacing:-.01em;margin-bottom:4px}
@@ -186,6 +179,10 @@
   .v2 .featured-card__foot{display:flex;align-items:center;justify-content:space-between;gap:12px}
   .v2 .featured-card__price{font-size:16px;font-weight:700}
   .v2 .featured-card__price small{font-size:11px;opacity:.7;font-weight:500;display:block}
+  .v2 .featured-card__cta{display:inline-flex;align-items:center;gap:8px;padding:10px 16px;border-radius:12px;background:var(--accent);color:#fff;font-size:13px;font-weight:700;box-shadow:0 6px 16px rgba(255,71,87,.25);transition:background .15s,transform .15s}
+  .v2 .featured-card:hover .featured-card__cta{background:var(--accent-dark);transform:translateY(-1px)}
+  .v2 .featured-card:focus-visible{outline:3px solid var(--accent);outline-offset:3px}
+  @media(max-width:720px){.v2 .featured-card{min-height:250px}.v2 .featured-card__body{padding:18px}.v2 .featured-card__body h3{font-size:17px}}
 
   
   .v2 .carousel{padding:16px 0 28px}
