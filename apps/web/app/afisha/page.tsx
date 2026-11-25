@@ -25,22 +25,25 @@ const EMPTY: PublicCatalogDto = {
   facets: { cities: [], categories: [], subcategories: [], landings: [], priceSteps: [] },
 };
 
-export default async function Afisha2Page({ searchParams }: { searchParams: Promise<{ city?: string | string[] }> }) {
+export default async function AfishaPage({ searchParams }: { searchParams: Promise<{ city?: string | string[] }> }) {
   const params = await searchParams;
   const requestedCity = Array.isArray(params.city) ? params.city[0] : params.city;
   const destinationsPayload = await getHomeDestinations().catch(() => ({ destinations: [] as PublicDestinationDto[] }));
   const selectedCity = matchDestination(destinationsPayload.destinations, requestedCity);
   const citySlug = selectedCity?.slug || selectedCity?.sourceSlug || null;
-  const [catalog, cityGuide] = await Promise.all([
-    (citySlug ? getHomeCatalogForCity(citySlug) : getHomeCatalog()).catch(() => EMPTY),
+  const [catalogResult, cityGuide, landingsResult, articlesResult] = await Promise.all([
+    (citySlug ? getHomeCatalogForCity(citySlug) : getHomeCatalog()).then((data) => ({ data, unavailable: false as const })).catch(() => ({ data: EMPTY, unavailable: true as const })),
     citySlug ? loadCityHubData(citySlug).catch(() => null) : Promise.resolve(null),
+    getHomeLandings().catch(() => null),
+    getHomeArticles().catch(() => null),
   ]);
-  const landings = (await getHomeLandings().catch(() => null))?.items ?? [];
-  const rawArticles = (await getHomeArticles().catch(() => null))?.articles;
+  const catalog = catalogResult.data;
+  const landings = landingsResult?.items ?? [];
+  const rawArticles = articlesResult?.articles;
   const articles = mergeBlogCards((rawArticles as BlogCardDto[] | null) ?? null);
   return (
     <SiteLayout chromeVariant="v2">
-      <EventsV2Preview catalog={catalog} landings={landings} articles={articles} destinations={destinationsPayload.destinations} citySlug={citySlug} cityName={selectedCity?.name ?? null} routes={(cityGuide?.dayRoutePresets ?? []).map(({ id, title }) => ({ id, title }))} />
+      <EventsV2Preview catalog={catalog} landings={landings} articles={articles} destinations={destinationsPayload.destinations} citySlug={citySlug} cityName={selectedCity?.name ?? null} routes={(cityGuide?.dayRoutePresets ?? []).map(({ id, title }) => ({ id, title }))} catalogUnavailable={catalogResult.unavailable} />
     </SiteLayout>
   );
 }

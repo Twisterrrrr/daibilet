@@ -28,7 +28,7 @@ test('validates limits, internal links, and publication windows', () => {
 test('orders live blocks, hides empty material, and avoids repeating events', () => {
   const items = [event('a', 'Музыка'), event('b', 'Музыка'), event('c', 'Театр'), event('d', 'Театр')];
   const config: AfishaBlockConfig[] = [
-    { id: 'rails', type: 'EVENT_RAIL', mode: 'AUTO', order: 20, status: 'PUBLISHED', limit: 5, minItems: 2, autoCategories: true, eventIds: [] },
+    { id: 'rails', type: 'EVENT_RAIL', mode: 'AUTO', order: 20, status: 'PUBLISHED', limit: 5, minItems: 2, maxCategories: 12, autoCategories: true, eventIds: [] },
     { id: 'featured', type: 'FEATURED_EVENTS', mode: 'HYBRID', order: 10, status: 'PUBLISHED', limit: 2, pinnedIds: ['a'] },
     { id: 'empty-articles', type: 'ARTICLE_RAIL', mode: 'MANUAL', order: 30, status: 'PUBLISHED', limit: 3, articleSlugs: ['missing'] },
     { id: 'draft', type: 'CUSTOM_CONTENT', mode: 'AUTO', order: 40, status: 'DRAFT', title: 'Draft', description: '' },
@@ -74,4 +74,15 @@ test('real city route presets link to the existing My Day route and retain the c
 test('MANUAL featured block never fills missing editorial picks automatically', () => {
   const config: AfishaBlockConfig[] = [{ id: 'manual-featured', type: 'FEATURED_EVENTS', mode: 'MANUAL', order: 1, status: 'PUBLISHED', limit: 3, pinnedIds: ['absent'] }];
   assert.deepEqual(resolveAfishaBlocks({ catalog: catalog([event('available', 'Музыка')]), articles: [], landings: [], config }), []);
+});
+
+test('AUTO event rails respect the configured category count limit', () => {
+  const config: AfishaBlockConfig[] = [{ id: 'rails', type: 'EVENT_RAIL', mode: 'AUTO', order: 1, status: 'PUBLISHED', limit: 4, minItems: 2, maxCategories: 2, autoCategories: true, eventIds: [] }];
+  const items = [
+    event('a1', 'Музыка'), event('a2', 'Музыка'),
+    event('b1', 'Театр'), event('b2', 'Театр'),
+    event('c1', 'Экскурсии'), event('c2', 'Экскурсии'),
+  ];
+  const resolved = resolveAfishaBlocks({ catalog: catalog(items), articles: [], landings: [], config });
+  assert.equal(resolved.filter((block) => block.type === 'EVENT_RAIL').length, 2);
 });

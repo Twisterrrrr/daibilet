@@ -30,7 +30,7 @@ type BaseBlock = {
 
 export type AfishaBlockConfig =
   | (BaseBlock & { type: 'FEATURED_EVENTS'; limit: number; pinnedIds: string[] })
-  | (BaseBlock & { type: 'EVENT_RAIL'; limit: number; minItems: number; autoCategories: boolean; category?: string; eventIds: string[] })
+  | (BaseBlock & { type: 'EVENT_RAIL'; limit: number; minItems: number; maxCategories: number; autoCategories: boolean; category?: string; eventIds: string[] })
   | (BaseBlock & { type: 'ARTICLE_RAIL'; limit: number; articleSlugs: string[] })
   | (BaseBlock & { type: 'ARTICLE'; articleSlug: string })
   | (BaseBlock & { type: 'COLLECTION'; limit: number; landingSlugs: string[] })
@@ -46,7 +46,7 @@ export type AfishaBlockConfig =
  */
 export const EVENTS_V2_BLOCKS: AfishaBlockConfig[] = [
   { id: 'featured-events', type: 'FEATURED_EVENTS', mode: 'HYBRID', order: 10, status: 'PUBLISHED', limit: 5, pinnedIds: [] },
-  { id: 'category-rails', type: 'EVENT_RAIL', mode: 'AUTO', order: 20, status: 'PUBLISHED', limit: 8, minItems: 2, autoCategories: true, eventIds: [] },
+  { id: 'category-rails', type: 'EVENT_RAIL', mode: 'AUTO', order: 20, status: 'PUBLISHED', limit: 8, minItems: 2, maxCategories: 4, autoCategories: true, eventIds: [] },
   { id: 'articles', type: 'ARTICLE_RAIL', mode: 'AUTO', order: 40, status: 'PUBLISHED', limit: 4, articleSlugs: [] },
   { id: 'city-routes', type: 'ROUTE', mode: 'AUTO', order: 45, status: 'PUBLISHED', limit: 4, presetIds: [] },
   { id: 'collections', type: 'COLLECTION', mode: 'AUTO', order: 50, status: 'PUBLISHED', limit: 4, landingSlugs: [] },
@@ -78,7 +78,10 @@ export function validateAfishaBlock(block: AfishaBlockConfig): boolean {
   if (!Number.isFinite(block.order) || !isValidDate(block.startsAt) || !isValidDate(block.endsAt)) return false;
   if (block.startsAt && block.endsAt && Date.parse(block.startsAt) > Date.parse(block.endsAt)) return false;
   if ('limit' in block && (!Number.isInteger(block.limit) || block.limit < 1 || block.limit > MAX_LIMIT)) return false;
-  if (block.type === 'EVENT_RAIL' && (!Number.isInteger(block.minItems) || block.minItems < 1 || block.minItems > block.limit)) return false;
+  if (block.type === 'EVENT_RAIL' && (
+    !Number.isInteger(block.minItems) || block.minItems < 1 || block.minItems > block.limit ||
+    !Number.isInteger(block.maxCategories) || block.maxCategories < 1 || block.maxCategories > MAX_LIMIT
+  )) return false;
   if ('href' in block && block.href && !INTERNAL_PATH.test(block.href)) return false;
   if ((block.type === 'PROMO_BANNER' || block.type === 'CUSTOM_CONTENT') && !block.title.trim()) return false;
   return true;
@@ -136,7 +139,7 @@ export function resolveAfishaBlocks(input: {
         ? Array.from(new Set(items.map((item) => item.category).filter(Boolean)))
         : [entry.category].filter((value): value is string => Boolean(value));
       let offset = 0;
-      for (const category of candidates) {
+      for (const category of candidates.slice(0, entry.maxCategories)) {
         const pinned = entry.mode === 'AUTO' ? [] : entry.eventIds
           .map((id) => items.find((item) => item.id === id && item.category === category))
           .filter((item): item is PublicCatalogListItemDto => Boolean(item));

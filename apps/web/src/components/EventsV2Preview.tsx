@@ -167,9 +167,10 @@ type Props = {
   citySlug?: string | null;
   cityName?: string | null;
   routes?: Array<{ id: string; title: string }>;
+  catalogUnavailable?: boolean;
 };
 
-export function EventsV2Preview({ catalog, landings = [], articles = [], destinations = [], citySlug = null, cityName = null, routes = [] }: Props) {
+export function EventsV2Preview({ catalog, landings = [], articles = [], destinations = [], citySlug = null, cityName = null, routes = [], catalogUnavailable = false }: Props) {
   const items = catalog?.items ?? [];
   const cats = catalog?.facets?.categories ?? [];
   const blocks = resolveAfishaBlocks({ catalog, landings, articles, citySlug, routes });
@@ -198,6 +199,8 @@ export function EventsV2Preview({ catalog, landings = [], articles = [], destina
           </div>
 
           <div className="calendar-wrap"><div className="calendar">{calendar(items, citySlug)}</div></div>
+
+          {catalogUnavailable ? <p role="status" className="catalog-unavailable">Не удалось загрузить события. Попробуйте обновить страницу позже.</p> : null}
 
           <div className="quick-pills">
             <Link href="/afisha" className={`pill${!citySlug ? ' is-active' : ''}`}>Все города</Link>
