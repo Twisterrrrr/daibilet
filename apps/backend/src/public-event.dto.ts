@@ -22,7 +22,7 @@ import {
   resolveSessionPurchaseExternalId,
 } from './provider-purchase.js';
 import type { PurchaseProvider } from './types/common.js';
-import { resolveEditorialEventImage } from './event-cover-images.js';
+import { resolveEditorialEventGroupImage, resolveEditorialEventImage } from './event-cover-images.js';
 import { pickFirstUsableEventImageUrl } from './event-image-url.js';
 import {
   pickPrimarySessionPurchase,
@@ -601,6 +601,7 @@ async function loadPublicEventDto(
     title,
     description: cleanImportedDescription(requestedEvent.override?.description || requestedEvent.description),
     imageUrl:
+      resolveEditorialEventGroupImage(requestedEvent.override?.mergeGroupKey) ||
       resolveEditorialEventImage(requestedEvent.id, requestedEvent.slug, null) ||
       pickFirstUsableEventImageUrl(
         requestedEvent.override?.imageUrl,
@@ -1827,6 +1828,7 @@ async function loadRelatedSessionsFromDb(
       priceFrom: displayPriceFrom(row.priceFromRub, next.priceFromRub),
       vacant: next.ticketsVacant ?? row.ticketsVacant,
       imageUrl:
+        resolveEditorialEventGroupImage(row.override?.mergeGroupKey) ||
         resolveEditorialEventImage(row.id, row.slug, null) ||
         pickFirstUsableEventImageUrl(row.override?.imageUrl, row.imageUrl, row.venue?.heroImageUrl),
       purchaseReady: true,

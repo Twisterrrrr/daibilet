@@ -46,6 +46,7 @@ import { LIST_SLOT_PREVIEW_LIMIT, toPublicCatalogListItem } from './public-catal
 import { providerForSource } from './provider-purchase.js';
 import { resolveEventPageSlugsForEventIds } from './public-event-page-links.ts';
 import { resolveProjectRoot } from './project-root.js';
+import { resolveEditorialEventGroupImage } from './event-cover-images.js';
 import type { PublicCatalogMappingRow } from './public-catalog.mapper.js';
 import type { PublicCatalogDto, PublicSessionDto } from './types/public.js';
 import type { PublicCatalogQuery } from './types/schemas.js';
@@ -119,14 +120,20 @@ function adoptCatalogCache(next: {
   builtAt: number;
   indexes?: PublicCatalogDiskIndexes;
 }): PublicSessionDto[] {
+  const sessions = next.sessions.map((session) => {
+    const editorialGroupImage = resolveEditorialEventGroupImage(session.groupKey);
+    return editorialGroupImage && session.imageUrl !== editorialGroupImage
+      ? { ...session, imageUrl: editorialGroupImage }
+      : session;
+  });
   catalogCache = {
     expiresAt: next.expiresAt,
     staleUntil: next.staleUntil,
-    sessions: next.sessions,
+    sessions,
     builtAt: next.builtAt,
     ...(next.indexes ? { indexes: next.indexes } : {}),
   };
-  return next.sessions;
+  return sessions;
 }
 
 function resolveSessionsFromIdIndex(

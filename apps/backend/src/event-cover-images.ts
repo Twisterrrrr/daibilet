@@ -160,6 +160,20 @@ export const EVENT_PACK_IMAGES: Record<string, string> = {
     '/images/events/generated/evt-cover-spb-evening-canal.jpg',
 };
 
+/** Stable editorial covers for merged catalog products; supplier slot posters must not replace them. */
+export const EVENT_GROUP_IMAGES: Record<string, string> = {
+  'harry-potter-spb': '/images/events/generated/evt-cover-hp-museum-spb-editorial.webp',
+};
+
+export function resolveEditorialEventGroupImage(
+  mergeGroupKey: string | null | undefined,
+): string | null {
+  const rawKey = String(mergeGroupKey || '').trim().toLowerCase();
+  const parts = rawKey.split('|');
+  const key = parts[0] === 'merge' ? parts[1] || '' : rawKey;
+  return key ? EVENT_GROUP_IMAGES[key] || null : null;
+}
+
 export function lookupEditorialEventImage(
   idOrSlug: string | null | undefined,
 ): string | null {

@@ -42,6 +42,8 @@
 
 Навигация по репозиторию `Twisterrrrr/daibilet`.
 
+[Новогодний лендинг: SEO, фильтры и замеры производительности - 25.11.2026](./new-year-landing-seo-and-performance-2026-11-25.md)
+
 ## С чего начать
 
 1. **[current-state.md](./current-state.md)** — текущее состояние, ветки, блокеры

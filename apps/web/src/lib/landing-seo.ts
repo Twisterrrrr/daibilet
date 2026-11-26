@@ -4,6 +4,7 @@ import { cityToDative, cityToPrepositional, resolveCityCases } from '@/lib/city-
 import { canonicalLandingSlug, isBridgesNightLandingSlug, isRiverPartyLandingSlug } from '@/lib/landing-constants';
 import type { LandingProfileKind } from '@/lib/landing-copy';
 import { formatLandingTodayParts, SITE_TIME_ZONE } from '@/lib/datetime';
+import { formatNumber, PLURAL_PROGRAM_FORMS, pluralRu } from '@/lib/format';
 import { resolveLandingTitleDateShort } from '@/lib/landing-event-windows';
 
 export type LandingSeoStats = {
@@ -123,6 +124,20 @@ function pricePhrase(price?: number | null): string {
   const value = formatRealPriceRub(price);
   if (value == null) return '';
   return `от ${value} рублей. `;
+}
+
+function newYearMetaDescription(cityName: string | null, events: number, priceFrom?: number | null): string {
+  const locationText = cityName
+    ? `Новогодняя афиша в ${cityToPrepositional(cityName)}: ёлки, шоу, экскурсии и праздничные программы.`
+    : 'Новогодняя афиша России: ёлки, шоу, круизы и праздничные программы.';
+  const roundedEvents = events >= 100 ? Math.floor(events / 100) * 100 : events;
+  const countText = roundedEvents > 0
+    ? ` В афише ${roundedEvents < events ? 'более ' : ''}${formatNumber(roundedEvents)} ${pluralRu(roundedEvents, PLURAL_PROGRAM_FORMS)}.`
+    : '';
+  const price = formatRealPriceRub(priceFrom);
+  const priceText = price == null ? '' : ` Билеты от ${formatNumber(price)} ₽ онлайн на Дайбилет.`;
+  const ending = price == null ? ' Выберите даты и город на Дайбилет.' : '';
+  return `${locationText}${countText}${priceText}${ending}`;
 }
 
 function cleanTitleSuffix(suffix: string): string {
@@ -322,20 +337,14 @@ export function resolveLandingSeo(input: LandingSeoInput): LandingSeo {
           `Новый год в ${cityPrep}`,
           'куда сходить и купить билеты',
           `Новый год в ${cityPrep}: куда сходить и купить билеты | Дайбилет`,
-          `Новогодние ёлки, шоу, экскурсии и праздничные программы в ${cityPrep}. ` +
-            eventsPhrase(events, 'программ') +
-            pricePhrase(priceFrom) +
-            'Сравните даты и оформите билет онлайн на Дайбилет!',
+          newYearMetaDescription(cityName, events, priceFrom),
         );
       }
       return staticSeoResult(
         'Новый год в России',
         'экскурсии, каникулы и праздничные программы',
         'Новый год в России: экскурсии, каникулы и праздничные программы | Дайбилет',
-        'Новогодние ёлки, шоу, круизы и праздничные программы по городам России. ' +
-          eventsPhrase(events, 'программ') +
-          pricePhrase(priceFrom) +
-          'Сравните варианты и купите билеты онлайн на Дайбилет!',
+        newYearMetaDescription(null, events, priceFrom),
       );
     }
 

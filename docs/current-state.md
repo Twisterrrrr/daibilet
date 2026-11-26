@@ -1,5 +1,9 @@
 # Текущее состояние Daibilet
 
+## Новогодний мультилендинг - SEO и производительность, 25.11.2026
+
+Выпуск `a9bf3c2d5` задеплоен на MSK через [Deploy MSK web #45597350223](https://github.com/Twisterrrrr/daibilet/actions/runs/45597350223). После деплоя проверены 19/19 URL в `landings-v2.xml`: HTTP 200, self-canonical, `index, follow`, Title/description/H1 и карточки в серверном HTML. Для национальной страницы 461 программа в каталоге округляются в meta как «более 400 программ». Компактный индекс: 89 720 байт gzip, API 157 мс; production HTML 19 URL: медиана 863 мс, p95 1 194 мс. Typecheck и 391 веб-тест прошли. Подробные результаты и ограничения замеров: [отчёт](./new-year-landing-seo-and-performance-2026-11-25.md). Отправку переобхода в Search Console/Яндекс Вебмастер отдельно не подтвердили.
+
 ## EventPage rollout - 03.11.2026
 
 Production contains 2,166 private EventPage drafts with direct links to 2,167
