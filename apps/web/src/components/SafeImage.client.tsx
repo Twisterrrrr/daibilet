@@ -42,6 +42,8 @@ export const IMAGE_SIZES = {
   blogCard: BLOG_LISTING_CARD_SIZES,
   /** Inline body photo (float ~20–28rem or standalone max-w-2xl) */
   blogInline: '(max-width: 640px) 100vw, (max-width: 1024px) 28rem, 42rem',
+  /** Blog article hero - full width on mobile, bounded on desktop to avoid oversized Retina downloads. */
+  blogHero: '(max-width: 640px) 100vw, (max-width: 1024px) 75vw, 640px',
   blogThumb: '5rem',
   blogFeatured: '(max-width: 768px) 100vw, 60vw',
   searchThumb: '2.5rem',
@@ -94,13 +96,14 @@ export function SafeImage({
 }: SafeImageProps) {
   const [failed, setFailed] = React.useState(false);
   const normalized = typeof src === 'string' ? src.trim() : '';
-  // LCP / priority: visible immediately. Lazy cards: skeleton parent + fade in.
-  const [loaded, setLoaded] = React.useState(() => Boolean(priority));
+  // LCP / priority: visible immediately. `fill` images already reserve space via
+  // aspect-* parent, so no fade-in needed (avoids CLS). Lazy cards keep opacity-0.
+  const [loaded, setLoaded] = React.useState(() => Boolean(priority || props.fill));
 
   React.useEffect(() => {
     setFailed(false);
-    setLoaded(Boolean(priority));
-  }, [normalized, priority]);
+    setLoaded(Boolean(priority || props.fill));
+  }, [normalized, priority, props.fill]);
 
   if (!normalized || failed) {
     return <>{fallback}</>;

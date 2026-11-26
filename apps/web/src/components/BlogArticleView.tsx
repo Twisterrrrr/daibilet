@@ -1,5 +1,7 @@
 import Link from 'next/link';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
+import fs from 'node:fs';
+import path from 'node:path';
 
 import { BlogArticleHero } from '@/components/BlogArticleHero';
 import { BlogArticleContent } from '@/components/BlogArticleContent';
@@ -12,6 +14,22 @@ import {
   resolveBlogCityEventsHref,
   resolveBlogCityHref,
 } from '@/lib/blog-article-city';
+import { blogCoverUrl, blogOgUrl } from '@/lib/blog-cover';
+
+const BLOG_IMAGES_DIR = path.join(process.cwd(), 'public', 'images', 'blog');
+
+/** На сервере проверяем, существует ли файл обложки; если нет — возвращаем null. */
+function existingBlogImage(url: string | null | undefined): string | null {
+  if (!url) return null;
+  const pathname = new URL(url, 'http://localhost').pathname;
+  const filePath = path.join(BLOG_IMAGES_DIR, path.basename(pathname));
+  try {
+    if (fs.existsSync(filePath)) return url;
+  } catch {
+    // ignore
+  }
+  return null;
+}
 import {
   COLUMN_BADGE_LABEL,
   blogSurfaceMeta,
@@ -136,7 +154,11 @@ export function BlogArticleView({
         <BlogArticleHero
           breadcrumbs={breadcrumbs}
           title={article.title}
-          coverImageUrl={article.coverImageUrl}
+          coverImageUrl={
+            existingBlogImage(article.coverImageUrl) ||
+            existingBlogImage(blogOgUrl(article.slug)) ||
+            existingBlogImage(blogCoverUrl(article.slug))
+          }
           publishedLabel={publishedLabel}
           readMin={readMin}
           city={cityLabel}

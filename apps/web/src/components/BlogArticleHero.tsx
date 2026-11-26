@@ -156,7 +156,7 @@ export function BlogArticleHero({
             alt=""
             fill
             priority
-            sizes={IMAGE_SIZES.homeHero}
+            sizes={IMAGE_SIZES.blogHero}
             className="object-cover object-center"
             fallback={<div className="absolute inset-0 bg-slate-200" />}
           />
@@ -179,7 +179,7 @@ export function BlogArticleHero({
                 alt=""
                 fill
                 priority
-                sizes={IMAGE_SIZES.homeHero}
+                sizes={IMAGE_SIZES.blogHero}
                 className="object-contain object-center"
                 fallback={<div className="absolute inset-0 bg-slate-100" />}
               />

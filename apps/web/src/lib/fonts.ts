@@ -21,7 +21,7 @@ export const fontInter = localFont({
   variable: '--font-inter',
   display: 'swap',
   weight: '100 900',
-  preload: false,
+  preload: true,
   fallback: ['system-ui', 'sans-serif'],
 });
 
