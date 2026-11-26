@@ -1,0 +1,42 @@
+{
+  "at": "2026-11-26T04:42:50.123Z",
+  "pageRoutes": 64,
+  "slotCanonicalRoutes": 85,
+  "batches": [
+    {
+      "n": 25,
+      "skipIndexNow": false,
+      "indexNowQueued": true
+    },
+    {
+      "n": 25,
+      "skipIndexNow": false,
+      "indexNowQueued": true
+    },
+    {
+      "n": 14,
+      "skipIndexNow": false,
+      "indexNowQueued": true
+    },
+    {
+      "n": 25,
+      "skipIndexNow": true,
+      "indexNowQueued": false
+    },
+    {
+      "n": 25,
+      "skipIndexNow": true,
+      "indexNowQueued": false
+    },
+    {
+      "n": 25,
+      "skipIndexNow": true,
+      "indexNowQueued": false
+    },
+    {
+      "n": 10,
+      "skipIndexNow": true,
+      "indexNowQueued": false
+    }
+  ]
+}
