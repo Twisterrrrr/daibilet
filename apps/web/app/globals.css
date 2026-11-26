@@ -99,26 +99,6 @@ html[data-nav-pending='1'] {
     --site-header-height: 4rem;
     /** Content column: 1280px on ordinary 16:9 desktop; 1600px on 21:9 below. */
   }
-
-  /* Fallback font metrics to minimize CLS during web font swap.
-     Matches Manrope proportions roughly so layout barely shifts when font loads. */
-  @font-face {
-    font-family: '__Manrope_Fallback';
-    src: local('Arial'), local('Helvetica'), local('sans-serif');
-    size-adjust: 102%;
-    ascent-override: 95%;
-    descent-override: 25%;
-    line-gap-override: 0%;
-  }
-
-  @font-face {
-    font-family: '__Inter_Fallback';
-    src: local('Arial'), local('Helvetica'), local('sans-serif');
-    size-adjust: 98%;
-    ascent-override: 90%;
-    descent-override: 24%;
-    line-gap-override: 0%;
-  }
     --container-page-max: 80rem;
     /* Compact equal gaps; ultrawide must not inflate menu into a sparse strip. */
     --header-menu-gap: 0.75rem;
@@ -347,7 +327,7 @@ html[data-nav-pending='1'] {
       scroll-behavior: auto;
     }
   }
-}
+
 
 @layer components {
   .container-page {
