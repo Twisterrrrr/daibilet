@@ -21,7 +21,9 @@ staging-копию БД. GET checkout ответил 200; заказ и плат
 Web CI: 398 тестов проходят; backend TS suite: 298/298 на локальной Docker-БД.
 Desktop и tablet визуально проверены; mobile визуально ещё не проверен. Перед
 staging остаются мобильная проверка и согласованный walkthrough checkout без
-совершения платежа. Полный план и лимиты: [Events V2](./events-v2-implementation-plan-2026-11-25.md).
+совершения платежа. Для Next 16 обычный `web dev` закреплён за Webpack: Turbopack
+не сопоставляет явные импорты `.js` с исходниками `.ts`; после изменения `/api/public/catalog`
+скомпилировался и ответил HTTP 200. Полный план и лимиты: [Events V2](./events-v2-implementation-plan-2026-11-25.md).
 
 ## Новогодний мультилендинг - SEO и производительность, 25.11.2026
 

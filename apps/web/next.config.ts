@@ -135,11 +135,9 @@ const nextConfig: NextConfig = {
       },
     ];
   },
-  // Turbopack config for Next.js 16 (Turbopack is default bundler).
-  // resolveExtensions: when a module is imported as './foo.js', Turbopack
-  // tries these extensions in order. Placing .ts/.tsx before .js makes it
-  // resolve TypeScript sources from .js import specifiers (same as the
-  // webpack extensionAlias that web Dev used previously).
+  // Turbopack resolveExtensions only applies to extensionless imports. It does
+  // not remap explicit './foo.js' specifiers to './foo.ts'; web dev/build are
+  // pinned to webpack below/in the package scripts while those imports remain.
   webpack: (config) => {
     config.resolve.extensionAlias = {
       '.js': ['.ts', '.tsx', '.js'],
