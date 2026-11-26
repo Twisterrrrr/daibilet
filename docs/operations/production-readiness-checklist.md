@@ -17,10 +17,10 @@
 
 | | Пункт | Owner | Статус | Evidence |
 |---|--------|-------|--------|----------|
-| - [x] | Границы сервисов задокументированы (web SSR vs API vs finance `.159`) | Agent | ✅ | [Project.md](./Project.md) § Path B |
+| - [x] | Границы сервисов задокументированы (web SSR vs API vs finance `.159`) | Agent | ✅ | [Project.md](../Project.md) § Path B |
 | - [x] | Контракты catalog/public в `packages/contracts` | Agent | ✅ | Zod + shared constants |
-| - [x] | Geo-routing / region hubs — канон в JSON + docs | Owner | ✅ | `data/geo/`, [region-hub-v1.md](./region-hub-v1.md) |
-| - [ ] | ADR на каждый крупный компромисс (widget-first, no internal checkout) | Owner | 🟡 | [decision-log.md](./decision-log.md) — не полный ADR-формат |
+| - [x] | Geo-routing / region hubs — канон в JSON + docs | Owner | ✅ | `data/geo/`, [region-hub-v1.md](../region-hub-v1.md) |
+| - [ ] | ADR на каждый крупный компромисс (widget-first, no internal checkout) | Owner | 🟡 | [decision-log.md](../decision-log.md) — не полный ADR-формат |
 | - [ ] | Диаграмма threat model (публичный read vs admin vs user auth) | CODEX | 🔴 | — |
 
 ---
@@ -33,11 +33,11 @@
 | - [x] | User auth: scrypt + JWT access/refresh + HttpOnly cookie | Agent | ✅ | `apps/backend/src/user-auth.js` |
 | - [x] | Rate limit на auth endpoints (in-memory) | Agent | 🟡 | `assertAuthRateLimit` — не Redis, сброс при restart |
 | - [x] | Секреты только в `.env` / GitHub Secrets, не в git | Owner | ✅ | deploy docs |
-| - [x] | Postgres не открыт наружу (CI tunnel только к API) | Owner | ✅ | [deploy-msk-web.yml](../.github/workflows/deploy-msk-web.yml) |
-| - [x] | AppSec review user/account API (IDOR, favorites, orders) | CODEX | ✅ | 2026-08-29: no Critical/High ([Tasktracker](./Tasktracker.md) PROD.AUTH-AUDIT) |
+| - [x] | Postgres не открыт наружу (CI tunnel только к API) | Owner | ✅ | [deploy-msk-web.yml](../../.github/workflows/deploy-msk-web.yml) |
+| - [x] | AppSec review user/account API (IDOR, favorites, orders) | CODEX | ✅ | 2026-08-29: no Critical/High ([Tasktracker](../Tasktracker.md) PROD.AUTH-AUDIT) |
 | - [ ] | Dependency audit в CI (`npm audit` / Dependabot) | Agent | 🔴 | — |
 | - [ ] | Security headers audit (nginx + Next) | CODEX | 🟡 | частично на nginx |
-| - [x] | Widget-first: нет своего checkout / PCI scope | Owner | ✅ | [mvp-spec.md](./mvp-spec.md) |
+| - [x] | Widget-first: нет своего checkout / PCI scope | Owner | ✅ | [mvp-spec.md](../mvp-spec.md) |
 
 ---
 
@@ -49,8 +49,8 @@
 | - [x] | Web lib unit tests в CI | Agent | ✅ | `pnpm web:test:ci` — 16 файлов / 91 test; full `pnpm web:test` — tech debt ~30 hub tests |
 | - [x] | Prisma validate + generate в CI | Agent | ✅ | CI job |
 | - [x] | Hub image guards в CI | Agent | ✅ | `hub:check-image-map/quality` |
-| - [ ] | E2E smoke (Playwright) на staging | CODEX | 🔴 | ручной [launch-staging-smoke-next.sh](../scripts/launch-staging-smoke-next.sh) |
-| - [ ] | Contract/parity tests в weekly cron (staging) | CODEX | 🟡 | [deploy/cron/README.md](../deploy/cron/README.md) |
+| - [ ] | E2E smoke (Playwright) на staging | CODEX | 🔴 | ручной [launch-staging-smoke-next.sh](../../scripts/launch-staging-smoke-next.sh) |
+| - [ ] | Contract/parity tests в weekly cron (staging) | CODEX | 🟡 | [deploy/cron/README.md](../../deploy/cron/README.md) |
 | - [ ] | Нагрузочный smoke catalog/home (20 parallel) | CODEX | 🟡 | [inc-504-ssr-hardening.md](./inc-504-ssr-hardening.md) smoke plan |
 
 ---
@@ -59,11 +59,11 @@
 
 | | Пункт | Owner | Статус | Evidence |
 |---|--------|-------|--------|----------|
-| - [x] | CI на push/PR (`feat/next-monorepo`) | Agent | ✅ | [.github/workflows/ci.yml](../.github/workflows/ci.yml) |
-| - [x] | Web deploy: GHA build + atomic `.next` swap | Agent | ✅ | [deploy-msk-web.yml](../.github/workflows/deploy-msk-web.yml) |
-| - [x] | Deploy lock + auto-rollback `.next.prev` on failed health | Agent | ✅ | [swap-web-next-artifact.sh](../deploy/scripts/swap-web-next-artifact.sh) |
+| - [x] | CI на push/PR (`feat/next-monorepo`) | Agent | ✅ | [.github/workflows/ci.yml](../../.github/workflows/ci.yml) |
+| - [x] | Web deploy: GHA build + atomic `.next` swap | Agent | ✅ | [deploy-msk-web.yml](../../.github/workflows/deploy-msk-web.yml) |
+| - [x] | Deploy lock + auto-rollback `.next.prev` on failed health | Agent | ✅ | [swap-web-next-artifact.sh](../../deploy/scripts/swap-web-next-artifact.sh) |
 | - [x] | Staging контур документирован | Owner | ✅ | [deploy-staging.md](./deploy-staging.md) |
-| - [ ] | Staging = prod parity (DB snapshot script есть, cadence?) | CODEX | 🟡 | [restore-staging-db.sh](../deploy/scripts/restore-staging-db.sh) |
+| - [ ] | Staging = prod parity (DB snapshot script есть, cadence?) | CODEX | 🟡 | [restore-staging-db.sh](../../deploy/scripts/restore-staging-db.sh) |
 | - [x] | Batch deploy cadence (не каждый UI-fix) | Owner | ✅ | Project.md, `.cursorrules` |
 
 ---
@@ -72,7 +72,7 @@
 
 | | Пункт | Owner | Статус | Evidence |
 |---|--------|-------|--------|----------|
-| - [x] | API health + stats после deploy | Agent | ✅ | [post-deploy-check.sh](../scripts/post-deploy-check.sh) |
+| - [x] | API health + stats после deploy | Agent | ✅ | [post-deploy-check.sh](../../scripts/post-deploy-check.sh) |
 | - [x] | Widget readiness check | Agent | ✅ | `check:widgets` |
 | - [x] | Next web health + `/` smoke (localhost) | Agent | ✅ | post-deploy + swap script (2026-08-28) |
 | - [ ] | `POST_DEPLOY_INVARIANTS_STRICT=1` на prod после backfill | Owner | 🟡 | сейчас warn-only |
@@ -85,13 +85,13 @@
 
 | | Пункт | Owner | Статус | Evidence |
 |---|--------|-------|--------|----------|
-| - [x] | SSR healthcheck every minute + restart | CODEX | 🟡 | [daibilet-tasks](../deploy/cron/daibilet-tasks) — verify installed on MSK |
+| - [x] | SSR healthcheck every minute + restart | CODEX | 🟡 | [daibilet-tasks](../../deploy/cron/daibilet-tasks) — verify installed on MSK |
 | - [x] | API healthcheck every minute | CODEX | 🟡 | `api-healthcheck.sh` |
-| - [x] | OOM watch (swap / MemoryHigh) | CODEX | 🟡 | [oom-watch.sh](../deploy/scripts/oom-watch.sh) |
+| - [x] | OOM watch (swap / MemoryHigh) | CODEX | 🟡 | [oom-watch.sh](../../deploy/scripts/oom-watch.sh) |
 | - [x] | TC catalog sync nightly + verify script | CODEX | 🟡 | deploy/cron |
 | - [ ] | Nightly health (widgets + invariants) **на prod** | CODEX | 🟡 | optional → handoff |
 | - [ ] | Centralized errors (Sentry / аналог) | Owner | 🔴 | отложено в MVP |
-| - [ ] | Uptime / TTFB dashboard (Metrika + server logs) | Owner | 🟡 | [metrika-goals-checklist.md](./metrika-goals-checklist.md) |
+| - [ ] | Uptime / TTFB dashboard (Metrika + server logs) | Owner | 🟡 | [metrika-goals-checklist.md](../metrika-goals-checklist.md) |
 | - [ ] | Telegram alerts проверены end-to-end | CODEX | 🟡 | listing audit cron |
 
 ---
@@ -101,8 +101,8 @@
 | | Пункт | Owner | Статус | Evidence |
 |---|--------|-------|--------|----------|
 | - [x] | Web rollback: `.next.prev` + restore in swap script | Agent | ✅ | swap script |
-| - [x] | Pre-next snapshot (nginx + static) | Agent | ✅ | [snapshot-prod-rollback.sh](../deploy/scripts/snapshot-prod-rollback.sh) |
-| - [x] | Vite rollback script (legacy) | Agent | ✅ | [rollback-prod-vite.sh](../deploy/scripts/rollback-prod-vite.sh) |
+| - [x] | Pre-next snapshot (nginx + static) | Agent | ✅ | [snapshot-prod-rollback.sh](../../deploy/scripts/snapshot-prod-rollback.sh) |
+| - [x] | Vite rollback script (legacy) | Agent | ✅ | [rollback-prod-vite.sh](../../deploy/scripts/rollback-prod-vite.sh) |
 | - [x] | Postgres backup cadence / restore drill (документирован) | CODEX | ✅ | [postgres-backup.md](./postgres-backup.md); dump 62M; verify cron installed |
 | - [x] | Restore drill проведён за последние 6 мес | Owner | ✅ | 2026-08-30 MSK: `DRILL OK` counts 71672/3630/44 → `:5438/daibilet_staging` |
 | - [x] | Incident runbook | Agent | ✅ | [incident-runbook.md](./incident-runbook.md) |
@@ -117,7 +117,7 @@
 | - [x] | Deploy scripts syntax-checked в CI | Agent | ✅ | CI `bash -n` |
 | - [ ] | CODEOWNERS / formal review policy | Owner | 🔴 | owner + agent ad-hoc |
 | - [ ] | On-call rotation / эскалация | Owner | 🔴 | — |
-| - [x] | Finance host `.159` — отдельный контур, не трогать | Owner | ✅ | `.cursorrules`, [spb-finance-host.md](./spb-finance-host.md) |
+| - [x] | Finance host `.159` — отдельный контур, не трогать | Owner | ✅ | `.cursorrules`, [spb-finance-host.md](../spb-finance-host.md) |
 
 ---
 

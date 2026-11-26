@@ -149,7 +149,7 @@ Prod entrypoint: server.js (не server-entry.ts без явной задачи)
 
 Stash на prod: pre-integrate-deploy-20260709 — проверить перед discard.
 
-Документы: docs/checkpoint-2026-07-10-mvp-launch.md, docs/current-state.md.
+Документы: docs/reports/2026/checkpoint-2026-07-10-mvp-launch.md, docs/current-state.md.
 ```
 
 ### Вопросы к Codex / владельцу
@@ -211,8 +211,8 @@ Stash на prod: pre-integrate-deploy-20260709 — проверить перед
 
 ## Связанные документы
 
-- [current-state.md](./current-state.md)
-- [decision-log.md](./decision-log.md)
-- [backend-typescript-migration.md](./backend-typescript-migration.md)
-- [launch-qa-and-deploy.md](./launch-qa-and-deploy.md)
-- [deploy-staging.md](./deploy-staging.md)
+- [current-state.md](../../current-state.md)
+- [decision-log.md](../../decision-log.md)
+- [backend-typescript-migration.md](../../backend-typescript-migration.md)
+- [launch-qa-and-deploy.md](../../operations/launch-qa-and-deploy.md)
+- [deploy-staging.md](../../operations/deploy-staging.md)

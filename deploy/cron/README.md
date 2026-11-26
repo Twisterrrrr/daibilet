@@ -120,7 +120,7 @@ crontab -e
 ```
 
 Лог: `/var/log/daibilet/nightly-health.log`  
-CODEX: см. [codex-prod-readiness-handoff.md](../docs/codex-prod-readiness-handoff.md) §1.
+CODEX: см. [codex-prod-readiness-handoff.md](../docs/operations/codex-prod-readiness-handoff.md) §1.
 
 ## Parity (раз в неделю, только staging с typed stack)
 

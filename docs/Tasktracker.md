@@ -1,12 +1,32 @@
-## 2026-11-24 - Динамическая карта тематических лендингов
+> **Правило чтения:** это накопленный журнал работ, а не гарантированно
+> актуальный список открытых задач. Свежие незакрытые пункты размещаются в
+> верхних датированных разделах; старые статусы ниже — история и требуют
+> повторной проверки по коду, staging/production и связанным отчётам. Закрытие
+> задачи фиксируйте в её записи, не копируйте её как открытую без новой даты.
+
+## 2026-11-26 - Сверка документации и актуального backlog
 
 | ID | Задача | Приоритет | Статус |
 |----|--------|-----------|--------|
-| SEO.LANDING-SITEMAP-V2 | Новый provider/filter/renderer; пилот Нового года в отдельном `landings-v2.xml`, города и регионы из фасетов актуальной афиши; новогодние URL исключены из legacy `landings.xml` во избежание дублей | Критический | 🔄 код и web typecheck готовы; live URL и повторный обход после deploy |
+| DOCS.CANON-MAP | Зафиксировать единственную рабочую docs-копию Daibilet, роль finance worktree, scratch и legacy; обозначить назначения якорных файлов | Средний | ✅ README/current-state/Project обновлены; история и старые материалы сохранены |
+| DOCS.MD-TRIAGE | Разобрать Markdown-корпус по слоям: канон, действующая спецификация, dated report, handoff, устаревший план; убрать явно устаревшие документы из корня в архив с сохранением ссылок | Средний | 🔄 создана структура `docs/reports/2026/` и `docs/operations/`; 20 общих отчётов и 12 runbook’ов сгруппированы, два устаревших orphan-плана перенесены в архив. EventPage документы не менялись; остальные root-спеки требуют тематической группировки |
+| DOCS.TASKTRACKER-AUDIT | Проверить старые пункты Tasktracker и определить, что ещё актуально | Средний | 🔄 в работе; исторические разделы не переклассифицировать без подтверждения кодом или свежим smoke |
+| DOCS.DECISION-LOG-DEDUP | Сверить повторяющиеся записи EventPage/Places в decision-log и оставить одну каноническую запись с сохранением полезных ссылок | Низкий | ⏳ дубли найдены в исторической части файла; сначала сопоставить абзацы, входящие ссылки и происхождение |
+| DOCS.OLD-STATUS-REVIEW | Проверить старые статусы «Активно» и implementation-status в Project, decision-log и ссылочных отчётах | Средний | ⏳ в журнале есть записи 2026-05—07 и локальные статусы 2026-11-12/24; закрывать только по актуальной проверке |
+| DOCS.EVIDENCE-TRIAGE | Разметить крупные CSV/JSON/TSV и текстовые батчи: актуальный артефакт, исторический срез, дубль или кандидат в архив; перед перемещением проверить ссылки и audit trail | Средний | 🔄 инвентаризация начата; `docs/` содержит 44 CSV (~46,6 MB), 2 JSON (~0,6 MB), большой дневник и датированные EventPage выгрузки. До классификации файлы не перемещать и не удалять |
+| EVENTS-V2.STAGING-MOBILE | Завершить Events V2 staging smoke и визуальную mobile-проверку; сверить выдачу на объёме выше finance projection limit | Высокий | ⏳ локальные typecheck/tests и synthetic smoke подтверждены отдельным планом реализации от 25.11 (`codex/events-v2-implementation-20261125`, база `0c6e5d71e`); staging, mobile и полнота на production-like объёме не подтверждены. Аудит исходного состояния от 25.11 сделан на базе `3996e111`. См. [аудит](./events-v2-audit-2026-11-25.md) |
+| SEO.LANDING-RECrawl | Отправить актуальную sitemap/URL на переобход в Search Console и Яндекс Вебмастер и зафиксировать подтверждение | Средний | ⏳ в production-отчёте 25.11 отправка не подтверждена; ручной шаг зависит от доступа к кабинетам. См. [отчёт](./new-year-landing-seo-and-performance-2026-11-25.md) |
+| SEO.LANDING-URL-AUDIT | Повторить URL-за-URL live-аудит sitemap, robots, canonical и indexability тематических посадок по матрице | Высокий | ⏳ аудит 18.11 неполон; после выпуска новогоднего пилота проверить текущий live и обновить матрицу. См. [архитектуру и аудит](./reports/2026/landing-url-architecture-and-audit-2026-11-18.md) |
+
+## 2026-11-25 - Динамическая карта тематических лендингов
+
+| ID | Задача | Приоритет | Статус |
+|----|--------|-----------|--------|
+| SEO.LANDING-SITEMAP-V2 | Новый provider/filter/renderer; пилот Нового года в отдельном `landings-v2.xml`, города и регионы из фасетов актуальной афиши; новогодние URL исключены из legacy `landings.xml` во избежание дублей | Критический | ✅ live deploy 25.11; 19/19 URL проверены на 200, self-canonical, index/follow, метаданные и SSR-карточки. Переобход — отдельная задача `SEO.LANDING-RECrawl` выше |
 
 ## 2026-10-18 - SEO-аудит: кэш sitemap, каноникал Москвы, главная no-store
 
-Аудит live 18.10: [seo-audit-2026-10-18.md](./seo-audit-2026-10-18.md). Ядро зелёное (robots/sitemap/canonical/JSON-LD/404/СПб-308); блокеры ниже. Замеры шли во время параллельного деплоя - тайминги перепроверить на спокойном проде.
+Аудит live 18.10: [seo-audit-2026-10-18.md](./reports/2026/seo-audit-2026-10-18.md). Ядро зелёное (robots/sitemap/canonical/JSON-LD/404/СПб-308); блокеры ниже. Замеры шли во время параллельного деплоя - тайминги перепроверить на спокойном проде.
 
 | ID | Задача | Приоритет | Статус |
 |----|--------|-----------|--------|
@@ -23,7 +43,7 @@
 |----|--------|-----------|--------|
 | UX.MY-DAY-RESTORE | My-day (сценарии/точки в городах) пропали после lazy-хабов: добавлен registry fallback (Москва, СПб, Пермь, Киров, Сочи, Ульяновск) в `city-hub-lazy.ts` + тест в `ci-test-files.txt` | Высокий | ✅ `69b9a4cb5` fix(my-day) — live Deploy MSK web |
 | OPS.MOBILE-UX-DEPLOY | Мобильная итерация `cline/8b0dd` SHA `3f0e006f5` (нижний док фильтров /events, карточка места без сдвига контента бейджем, «Город» в нижней навигации, hero-чипы скролл): мерж в `feat/next-monorepo` + деплой на MSK | Высокий | ✅ `3f0e006f5` — live Deploy MSK web |
-| CONT.CITY-HUBS-70 | Добить 70 хабов городов (контент-путь: хаб → тематические гиды → билеты) | Высокий | 🔄 readiness audit: 70 city destinations / 55 indexable by current policy / 25 missing registry; editorial validation queue in [city-hub-readiness-2026-10-24.md](./city-hub-readiness-2026-10-24.md), no public changes |
+| CONT.CITY-HUBS-70 | Добить 70 хабов городов (контент-путь: хаб → тематические гиды → билеты) | Высокий | 🔄 readiness audit: 70 city destinations / 55 indexable by current policy / 25 missing registry; editorial validation queue in [city-hub-readiness-2026-10-24.md](./reports/2026/city-hub-readiness-2026-10-24.md), no public changes |
 | CONT.PLACE-PDP-3500 | Подробные PDP ~3 500 площадок и локаций - продолжение Places-выпуска 15.10 (1 383 классифицированы, 701 строка на сверке, 784 скрытых до проверки фото) | Высокий | ⏳ |
 | OPS.ADMIN-RBAC-IMPL | Подготовка админки: реализация RBAC по готовому дизайну (аудит legacy + роли) | Высокий | ⏳ дизайн готов |
 | OPS.FINANCE-RELEASE | Подготовка финконтура: выпуск finance schema unification (`codex/finance-schema-unification`, 47 миграций) + `schema_alignment` на прод-БД (IF NOT EXISTS готов) | Высокий | 🔄 ветка готова, ждёт развёртывания |
@@ -286,7 +306,7 @@
 | FIX.EVENT-MAP-YANDEX | PDP карта: Yandex iframe вместо blank Leaflet | Критический | ✅ live 2026-09-09 (Yandex + batch deploy 34378885906) |
 | FIX.MYDAY-PIN-LABELS | CSS подписи пинов (`left:100%` клипал caption) | Высокий | ✅ live `26e4289e` в Deploy [34378885906](https://github.com/Twisterrrrr/daibilet/actions/runs/34378885906) |
 | UX.TITLE-CAPS | `formatPublicTitle` на list/table/hub/affiche + region/favorites/venue stop-lists | Высокий | ✅ live 2026-09-09 Deploy [34378885906](https://github.com/Twisterrrrr/daibilet/actions/runs/34378885906) |
-| SEO.AUDIT-0902 | `docs/seo-audit-2026-09-02.md` вердикт + чеклист | Высокий | ✅ docs |
+| SEO.AUDIT-0902 | `docs/reports/2026/seo-audit-2026-09-02.md` вердикт + чеклист | Высокий | ✅ docs |
 
 ## 2026-08-30 - Live smoke audit (batch «code vs live»)
 
@@ -311,8 +331,8 @@
 
 | ID | Задача | Приоритет | Owner | Статус |
 |---|---|---|---|---|
-| PROD.CHECKLIST | `docs/production-readiness-checklist.md` — owners + gaps | Высокий | Agent | ✅ |
-| PROD.RUNBOOK | `docs/incident-runbook.md` — MSK rollback/smoke | Высокий | Agent | ✅ |
+| PROD.CHECKLIST | `docs/operations/production-readiness-checklist.md` — owners + gaps | Высокий | Agent | ✅ |
+| PROD.RUNBOOK | `docs/operations/incident-runbook.md` — MSK rollback/smoke | Высокий | Agent | ✅ |
 | PROD.WEB-TEST-CI | `pnpm web:test:ci` в CI (16 stable lib tests); full `web:test` — tech debt hub packs | Высокий | Agent | ✅ code |
 | PROD.POST-DEPLOY-WEB | post-deploy + nightly-health: Next :3001 smoke | Высокий | Agent | ✅ code |
 | PROD.GHA-SMOKE | deploy-msk-web: curl https://daibilet.ru после swap | Высокий | Agent | ✅ code |
@@ -1386,7 +1406,7 @@ Live: Deploy MSK web [`32371428354`](https://github.com/Twisterrrrr/daibilet/act
 
 | ID | Задача | Приоритет | Статус |
 |----|--------|-----------|--------|
-| INC.LINK.1 | Crawl daibilet.ru hubs/venues/blog/footer (~485 checks) | Высокий | ✅ `docs/link-audit-2026-08-08.md` |
+| INC.LINK.1 | Crawl daibilet.ru hubs/venues/blog/footer (~485 checks) | Высокий | ✅ `docs/reports/2026/link-audit-2026-08-08.md` |
 | INC.LINK.2 | Fix API city/venue/event miss `200 null` → 404 | Критический | ✅ handlers |
 | INC.LINK.3 | Fix web miss → 404 not 500 (cache/metadata) | Критический | ✅ cached-*-data + VenuePages/city metadata |
 | INC.LINK.4 | Footer SPB rooftops → saint-petersburg | Высокий | ✅ `seo-internal-links.ts` |
@@ -1877,12 +1897,12 @@ Alias `museum-1` = первый open-date контракт (не «музеи fo
 
 ## INC.504 SSR hardening (2026-08-02)
 
-Canon: [inc-504-ssr-hardening.md](./inc-504-ssr-hardening.md).
+Canon: [inc-504-ssr-hardening.md](./operations/inc-504-ssr-hardening.md).
 
 | # | Task | Priority | Status |
 |---|------|----------|--------|
 | INC.504.22 | Move public HTML hot path in `apps/web` off direct `@daibilet/backend/public-read`; SSR/API read through backend HTTP with bounded timeout | Critical | ✅ PR #3 merge `f93b770` MSK **BUILD_ID=`3zmDWHpY7rXAJgqu0-pnR`** |
-| INC.504.23 | Move sitemap generation off direct `public-read` or give it a separate bounded backend path | Medium | ✅ deployed 2026-10-24: venues/blog/freshness use loopback HTTP; live sitemap chunks 200 in 47-617ms. Follow-up removes build-time dynamic usage and false lastmod before next release. RCA: [ssr-hang-rca-2026-10-21.md](./ssr-hang-rca-2026-10-21.md) |
+| INC.504.23 | Move sitemap generation off direct `public-read` or give it a separate bounded backend path | Medium | ✅ deployed 2026-10-24: venues/blog/freshness use loopback HTTP; live sitemap chunks 200 in 47-617ms. Follow-up removes build-time dynamic usage and false lastmod before next release. RCA: [ssr-hang-rca-2026-10-21.md](./reports/2026/ssr-hang-rca-2026-10-21.md) |
 | INC.504.24 | Add staging HTTP load smoke for `/`, `/events`, `/cities`, `/venues`, `/api/public/events?limit=50` | High | todo |
 
 ---
@@ -2149,7 +2169,7 @@ Brief: [ux-locations-mobile-catalog-brief.md](./ux-locations-mobile-catalog-brie
 | INC.504.19 | Owner 504 ~16:49 UTC: live hang (0B TTFB); SIGKILL restart; healthcheck bug (`curl \|\| echo 999` → bc never fires); fixed cron + `deploy/cron/daibilet-tasks` | Критический | ✅ mitigated live; root cause still INC.504.15 / event-loop |
 | INC.504.20 | Owner fury ~17:19 UTC: live hang again (0B TTFB); SIGKILL+start; **cron `%` truncates healthcheck** (log empty despite minutely fire); warm **OFF**; `ssr-healthcheck.sh` + SIGKILL recovery | Критический | ✅ mitigated live MSK; warm off until hang RC; root still INC.504.15 |
 | INC.504.21 | 2026-08-02 ~07:19 UTC: SSR hang 0B TTFB again (~11h next RSS~1.6G); SIGKILL+start; healthcheck silent - script **644 not +x** → Permission denied; chmod 755 + cron via `/bin/bash` | Критический | ✅ mitigated live MSK; auto-net fixed; root still INC.504.15 |
-| INC.504.22 | **Codex handoff:** независимый RCA + PR-sized фикс SSR hang (event-loop / Prisma in Next). Brief: [codex-ssr-hang-brief.md](./codex-ssr-hang-brief.md); canon [inc-504-ssr-hardening.md](./inc-504-ssr-hardening.md) | Критический | ✅ merge `f93b770` MSK BUILD `3zmDWHpY7rXAJgqu0-pnR` |
+| INC.504.22 | **Codex handoff:** независимый RCA + PR-sized фикс SSR hang (event-loop / Prisma in Next). Brief: [codex-ssr-hang-brief.md](./codex-ssr-hang-brief.md); canon [inc-504-ssr-hardening.md](./operations/inc-504-ssr-hardening.md) | Критический | ✅ merge `f93b770` MSK BUILD `3zmDWHpY7rXAJgqu0-pnR` |
 | INC.504.25 | Owner 502 `/my-day` 2026-08-04: не SSR my-day; minutely healthcheck SIGKILL+start mid-deploy (curl=7) → ENOENT prerender-manifest crash-loop; cold-start curl=28 kill. Fix: deploy flock+active marker; healthcheck SKIP; start-web refuse incomplete `.next` | Критический | ✅ `59aba2f` MSK **BUILD_ID=`3VxNvT0CDvcI3jB-BMvpP`**; health SKIP mid-deploy; NRestarts=0; `/my-day` `/` 200 |
 | INC.504.26 | 2026-08-09: API hang (health/events TTFB timeout); swap.peak~4G + MemorySwapMax=max; venue/city PDP still full-catalog. Fix: index-scoped+soft PDP/city; API healthcheck; MemorySwapMax=512M; docs [catalog-full-json-consumers.md](./catalog-full-json-consumers.md) | Критический | ✅ `8990eb3c` MSK live |
 

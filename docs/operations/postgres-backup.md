@@ -12,10 +12,10 @@ Restore drills use isolated staging Postgres on `127.0.0.1:5438`.
 
 | Script | Purpose |
 |--------|---------|
-| [deploy/cron/postgres-backup.sh](../deploy/cron/postgres-backup.sh) | Daily `pg_dump` (custom format), verify, retention |
-| [deploy/scripts/postgres-restore-drill.sh](../deploy/scripts/postgres-restore-drill.sh) | Restore latest dump → staging + count parity |
-| [deploy/scripts/install-postgres-backup-cron.sh](../deploy/scripts/install-postgres-backup-cron.sh) | One-time install `/etc/cron.d/daibilet-postgres-backup` |
-| [deploy/scripts/restore-staging-db.sh](../deploy/scripts/restore-staging-db.sh) | Full prod→staging when `/opt/daibilet-staging` exists |
+| [deploy/cron/postgres-backup.sh](../../deploy/cron/postgres-backup.sh) | Daily `pg_dump` (custom format), verify, retention |
+| [deploy/scripts/postgres-restore-drill.sh](../../deploy/scripts/postgres-restore-drill.sh) | Restore latest dump → staging + count parity |
+| [deploy/scripts/install-postgres-backup-cron.sh](../../deploy/scripts/install-postgres-backup-cron.sh) | One-time install `/etc/cron.d/daibilet-postgres-backup` |
+| [deploy/scripts/restore-staging-db.sh](../../deploy/scripts/restore-staging-db.sh) | Full prod→staging when `/opt/daibilet-staging` exists |
 
 ## Production state
 
@@ -104,6 +104,6 @@ Complements but does not replace logical `pg_dump` (granular restore, staging pa
 After first successful backup + drill on MSK, update:
 
 - [production-readiness-checklist.md](./production-readiness-checklist.md) §7
-- [Tasktracker.md](./Tasktracker.md) `PROD.POSTGRES-BACKUP`
+- [Tasktracker.md](../Tasktracker.md) `PROD.POSTGRES-BACKUP`
 
 Record in Diary: dump filename, size, drill timestamp, prod/staging counts.

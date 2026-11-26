@@ -11,7 +11,7 @@
 
 ## Решение
 
-Переходим на **Path B** из [audit-2026-07-10-stack-state.md](../audit-2026-07-10-stack-state.md):
+Переходим на **Path B** из [audit-2026-07-10-stack-state.md](../reports/2026/audit-2026-07-10-stack-state.md):
 
 - **Next.js App Router** — public + admin в одном `apps/web`
 - **Route Handlers** вместо отдельного `server.js` для read API
@@ -168,6 +168,6 @@ pnpm check:parity          # сохраняем до F5
 
 ## Связанные документы
 
-- [audit-2026-07-10-stack-state.md](../audit-2026-07-10-stack-state.md)
+- [audit-2026-07-10-stack-state.md](../reports/2026/audit-2026-07-10-stack-state.md)
 - [codex-phase2-next-handoff.md](../codex-phase2-next-handoff.md)
 - [phase-e-prisma-runtime.md](./phase-e-prisma-runtime.md)

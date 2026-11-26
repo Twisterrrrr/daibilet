@@ -155,7 +155,7 @@ pnpm launch:staging-smoke-next
 pnpm backend:next:parity
 ```
 
-Чеклист: [phases/phase-f3-cutover-checklist.md](./phases/phase-f3-cutover-checklist.md)
+Чеклист: [phases/phase-f3-cutover-checklist.md](../phases/phase-f3-cutover-checklist.md)
 
 ### Production catalog reads, isolated staging writes
 

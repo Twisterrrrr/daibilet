@@ -53,7 +53,7 @@ No web service restart is required for this nginx-served static path. New reques
 
 1. Run the new mapping unit test and the web CI test allowlist; confirm all 20 WebP files exist and their dimensions are correct.
 2. Build the web package so `sync-public-assets` copies the pilot files to `apps/web/public/images/events/teplohod-pdp/`.
-3. The first production swap on 2026-10-21 exposed a separate ISR 500 on expired event slugs in the Googlebot smoke and was rolled back. PR #42 fixed the not-found fallback and deployed build `8baf2e6`; its smoke passed. See [event-not-found-ssr-regression-2026-10-21.md](./event-not-found-ssr-regression-2026-10-21.md).
+3. The first production swap on 2026-10-21 exposed a separate ISR 500 on expired event slugs in the Googlebot smoke and was rolled back. PR #42 fixed the not-found fallback and deployed build `8baf2e6`; its smoke passed. See [event-not-found-ssr-regression-2026-10-21.md](../../event-not-found-ssr-regression-2026-10-21.md).
 4. Post-deploy checks on 2026-10-21: all five PDP URLs returned 200; sample derivative URLs returned 200 with `Content-Type: image/webp` and `Cache-Control: public, max-age=2592000`; Event1360 HTML advertised the static WebP image. The WebP pilot is active in production.
 5. In mobile Chrome, capture `currentSrc`, natural dimensions, actual transferred bytes, viewport, DPR, and LCP node for 2-3 cold-cache runs before and after. Repeat for desktop. Event1360 is the primary comparison because its hero was previously measured as the LCP element.
 6. Compare LCP, FCP, TBT, and page bytes. Do not report the 18-25× image-byte reduction as an LCP percentage improvement. No post-deploy Lighthouse/WebPageTest or RUM comparison has been collected yet.

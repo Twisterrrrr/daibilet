@@ -13,7 +13,8 @@
 | **F** | Next.js full-stack monorepo (Path B, SEO SSR) | ✅ F2 / 🔄 F3 | [phase-f-next-fullstack.md](./phase-f-next-fullstack.md) |
 | **G** | Phase 2 finance runtime (Codex + flags) | ⏳ После F | [codex-phase2-next-handoff.md](../codex-phase2-next-handoff.md) |
 
-**Аудит стека (2026-07-10):** [audit-2026-07-10-stack-state.md](../audit-2026-07-10-stack-state.md)  
+**Аудит стека (2026-07-10):** [audit-2026-07-10-stack-state.md](../reports/2026/audit-2026-07-10-stack-state.md)
+
 **Решение 2026-07-10:** Path B утверждён — SEO через Next SSR, Codex → Phase 2 foundation.
 
 ## Команды

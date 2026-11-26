@@ -49,7 +49,7 @@ cat /var/lock/daibilet-web-deploy.active 2>/dev/null || echo "no active deploy"
 
 ## 2. SSR / Next recovery
 
-Авто: `deploy/cron/ssr-healthcheck.sh` каждую минуту (если установлен [daibilet-tasks](../deploy/cron/daibilet-tasks)).
+Авто: `deploy/cron/ssr-healthcheck.sh` каждую минуту (если установлен [daibilet-tasks](../../deploy/cron/daibilet-tasks)).
 
 **Ручной restart web:**
 
@@ -97,7 +97,7 @@ docker ps | grep postgres
 `_prisma_migrations`, наличие ожидаемых таблиц/колонок и версии generated client.
 Не считать `/api/health` достаточной проверкой: после восстановления пройти
 конкретный public API route и соответствующую SSR-страницу. Для разбора инцидента
-17.11.2026 см. [отчёт](./prod-prisma-city-pdp-incident-2026-11-17.md).
+17.11.2026 см. [отчёт](../reports/2026/prod-prisma-city-pdp-incident-2026-11-17.md).
 
 ---
 
@@ -201,4 +201,4 @@ stat -c %y /opt/daibilet/.env     # .env новее обоих? какой-то 
 2. **CODEX** — SSH, cron/systemd, DB read-only checks.
 3. **Finance `.159`** — только payment/YooKassa; не трогать из public deploy.
 
-Зафиксировать в [Diary.md](./Diary.md): дата, симптом, root cause, fix, follow-up task.
+Зафиксировать в [Diary.md](../Diary.md): дата, симптом, root cause, fix, follow-up task.

@@ -41,7 +41,7 @@
 
 ## Источники внутри репозитория
 
-- `docs/stage0-r12-r13-release-2026-10-08.md`
+- `docs/reports/2026/stage0-r12-r13-release-2026-10-08.md`
 - `D:\coding\daibilet-phase2-finance\docs\finance-supplier-launch-qa.md`
 - `D:\coding\daibilet-phase2-finance\docs\finance-e2e-foundation-roadmap.md`
 - `D:\coding\SPBBOATS\packages\backend\src\edo\providers\edo-provider.registry.ts`

@@ -1,12 +1,23 @@
 # Decision Log — Daibilet
 
+> Этот файл — журнал причин и принятых правил, а не единый статус реализации.
+> Статус решения указывать отдельно от статуса кода/deploy; последний
+> подтверждённый срез системы — в [current-state.md](./current-state.md),
+> открытые задачи — в [Tasktracker.md](./Tasktracker.md). Повторяющиеся записи
+> одного решения оставлять до сверки ссылок и истории, не считать их разными
+> контрактами.
+
 ## 2026-11-24 — Dynamic landing sitemap rollout
 
 **Decision:** Introduce an internal provider → shared indexability filter → canonical-path renderer for landing sitemap entries. Pilot it through `/sitemaps/landings-v2.xml` with New Year only; derive its city and region candidates from the live New Year catalogue facets and resolve counts through the same loader as the public page. Remove the New Year family from the legacy `landings.xml` while the pilot is active, so the sitemap index never lists duplicate URLs. Do not migrate other landing families until their provider and indexability rules are reviewed. After live verification, move the generator behind the existing `landings.xml` URL and retire the temporary `landings-v2.xml` endpoint.
 
 **Indexability:** Reuse `isLandingRouteIndexable`, including its offer-count, editorial and seasonal rules. A newly observed geo facet does not by itself make a page indexable; it must resolve to a public route and pass the same rule used by metadata.
 
-**Status:** Implemented locally; production verification is pending.
+**Status:** Production verification complete 2026-11-25: the sitemap is live,
+and all 19 New Year URLs passed HTTP/canonical/robots/metadata/SSR checks.
+Search-engine recrawl submission is not confirmed. See
+[`new-year-landing-seo-and-performance-2026-11-25.md`](./new-year-landing-seo-and-performance-2026-11-25.md)
+and task `SEO.LANDING-RECrawl` in [`Tasktracker.md`](./Tasktracker.md).
 
 ## 2026-11-17 — Tour-bus pickup places and metro geotag
 
@@ -61,28 +72,6 @@ Ticketscloud/Teplohod imports and remain attached to the stable page identity.
 **Implementation:** Additive Prisma migration, EventPage admin editor and DTO,
 public page and OpenGraph rendering. The MSK artifact deployment applies
 `pnpm db:deploy` before Prisma client generation and service restart.
-
-## 2026-11-12 — Imported place candidate versus editorial PDP
-
-**Decision:** An imported Venue with `pageStatus=CANDIDATE` is a public,
-accessible basic PDP and must return HTTP 200 with `noindex, follow` by default.
-Missing editorial fields must not turn that candidate route into a 404; they
-remain visible as completion requirements in the editor. After an editor
-completes and publishes the PDP, it becomes indexable and enters the public
-sitemap. `HIDDEN` remains unavailable. Do not expose draft editorial content
-while serving the candidate page.
-
-**Why:** Availability and search indexing are separate controls. Imported
-places should be reviewable and usable as simple informational cards before
-they have a full editorial profile or sales contract; publication is the
-editorial gate for search.
-
-**Implementation status:** Implemented on 2026-11-12: CANDIDATE detail routes
-bypass missing-copy gates and remain noindex; the admin derives indexation from
-editorial status; PUBLISHED pages are indexable regardless of ticket
-availability and remain eligible for sitemap verification. City-page venue
-counters are recalculated from the matched session-to-venue links. Regression
-tests and typechecks pass locally; staging verification is pending.
 
 ## 2026-10-27 — EventPage candidate slug drops the provider slot ID
 
@@ -143,7 +132,7 @@ identity, factual copy and object-specific imagery are reviewed.
 Финансовый backend исполняет `codex/stage0-r12` (`7f756a58a`) на `.159`.
 Каталог исполняет `feat/next-monorepo` (`c18b97259`) на MSK и получает DTO
 по HTTPS. Для выпуска R12 не требуется переносить весь финансовый runtime
-в каталожную ветку. [Проверки выпуска](./stage0-r12-r13-release-2026-10-08.md).
+в каталожную ветку. [Проверки выпуска](./reports/2026/stage0-r12-r13-release-2026-10-08.md).
 
 Хронология ключевых архитектурных и продуктовых решений.
 
@@ -304,7 +293,7 @@ identity, factual copy and object-specific imagery are reviewed.
 
 **Почему:** Контролируемый rollout без big-bang; legacy остаётся rollback и source of truth для сложной venue/admin логики.
 
-**Статус:** Активно. Аудит: [audit-2026-07-10-stack-state.md](./audit-2026-07-10-stack-state.md).
+**Статус:** Активно. Аудит: [audit-2026-07-10-stack-state.md](./reports/2026/audit-2026-07-10-stack-state.md).
 
 ---
 
@@ -447,7 +436,10 @@ production-карте. Event/slot URL редиректятся только по
 до проверки редиректов и canonical parity.
 
 **Статус:** Целевой канон и матрица зафиксированы; новые маршруты, sitemap,
-canonical и редиректы внедряются отдельными этапами. Production URL не менялись.
+canonical и редиректы внедряются отдельными этапами. Production URL не менялись
+по состоянию отчёта 2026-11-16. Route/staging acceptance remains open; see
+[`city-region-place-url-canon-2026-11-16.md`](./city-region-place-url-canon-2026-11-16.md)
+and [`pdp-closeout-progress-2026-11-16.md`](./pdp-closeout-progress-2026-11-16.md).
 
 ## 2026-11-12 — Imported place candidate versus editorial PDP
 
@@ -469,7 +461,12 @@ routes bypass missing-copy gates and remain noindex; the admin derives indexatio
 from editorial status; PUBLISHED pages are indexable regardless of ticket
 availability and remain eligible for sitemap verification. City-page venue
 counters are recalculated from the matched session-to-venue links. Regression
-tests and typechecks pass locally; staging verification is pending.
+tests and typechecks pass locally; staging verification is pending in the
+2026-11-16 closeout report. This is code evidence, not confirmed release state;
+see [`pdp-closeout-progress-2026-11-16.md`](./pdp-closeout-progress-2026-11-16.md).
+
+The original decision was recorded 2026-11-12. A later copy was consolidated
+here on 2026-11-26; it is not a second contract.
 
 ## 2026-11-12 — Safe automatic migration from legacy Event URLs
 
@@ -495,7 +492,9 @@ exact-ID route-map dry run, conflict reporting, and public permanent redirects
 in code; validate legacy fallback and redirect behavior on staging before
 populating production route mappings. Hidden/removed Events without an exact
 published EventPage remain 404 unless a later reviewed lifecycle policy says
-otherwise.
+otherwise. This implementation status is from the 2026-11-12 review and needs
+fresh verification before activation; see the route migration gates in
+[`pdp-closeout-progress-2026-11-16.md`](./pdp-closeout-progress-2026-11-16.md).
 
 ---
 
@@ -515,7 +514,7 @@ otherwise.
 
 **Why:** The existing topic-first hierarchy scales across themes and cities while preserving URLs already exposed to search engines. Crawlers and users need ordinary links between the national page, city variants, city hubs, collections, and related articles.
 
-**Status:** Architecture locked; live URL/SEO audit is incomplete. The 17.11 snapshot confirmed 4 sitemap/noindex conflicts and left 60 robots rows unchecked; it does not contain the complete reported list of 13. Live page checks show a count mismatch for New Year (catalog index 490 in Moscow versus 0 events in the national landing HTML); the exact seasonal inventory and live sitemap remain unverified. See [landing URL architecture and audit](./landing-url-architecture-and-audit-2026-11-18.md). Do not change indexability thresholds, seasonal rules, routes, redirects, or sitemap membership until the URL-by-URL audit is complete.
+**Status:** Architecture locked; live URL/SEO audit is incomplete. The 17.11 snapshot confirmed 4 sitemap/noindex conflicts and left 60 robots rows unchecked; it does not contain the complete reported list of 13. Live page checks show a count mismatch for New Year (catalog index 490 in Moscow versus 0 events in the national landing HTML); the exact seasonal inventory and live sitemap remain unverified. See [landing URL architecture and audit](./reports/2026/landing-url-architecture-and-audit-2026-11-18.md). Do not change indexability thresholds, seasonal rules, routes, redirects, or sitemap membership until the URL-by-URL audit is complete.
 
 ## 2026-11-24 — Six regional capitals as city-hub candidates
 
@@ -534,7 +533,9 @@ and satellite towns continue to roll into their regional collections.
 
 **Status:** Implemented in the city routing and regional-center data locally;
 hero briefs and candidate-only indexability are wired in web. Not committed,
-deployed, or verified against staging yet.
+deployed, or verified against staging in the 2026-11-24 decision snapshot.
+Confirm current branch and staging status before treating the candidates as
+available publicly.
 
 ## 2026-11-24 — Editorial display titles for imported venues
 

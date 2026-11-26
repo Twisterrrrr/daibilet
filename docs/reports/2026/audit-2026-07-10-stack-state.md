@@ -32,7 +32,7 @@
 
 ### Рекомендации (frontend) — superseded 2026-07-10
 
-~~Не мигрировать на Next.js до стабилизации backend~~ → **Path B утверждён**, см. [phase-f-next-fullstack.md](./phases/phase-f-next-fullstack.md).
+~~Не мигрировать на Next.js до стабилизации backend~~ → **Path B утверждён**, см. [phase-f-next-fullstack.md](../../phases/phase-f-next-fullstack.md).
 
 ---
 
@@ -206,7 +206,7 @@ systemctl restart daibilet-api-staging
 
 ## Связанные документы
 
-- [phase-e-prisma-runtime.md](./phases/phase-e-prisma-runtime.md) — rollout E1–E5
-- [backend-typescript-migration.md](./backend-typescript-migration.md) — история TS migration
-- [codex-handoff-2026-07-10.md](./codex-handoff-2026-07-10.md) — границы Codex
-- [current-state.md](./current-state.md) — ops backlog
+- [phase-e-prisma-runtime.md](../../phases/phase-e-prisma-runtime.md) — rollout E1–E5
+- [backend-typescript-migration.md](../../backend-typescript-migration.md) — история TS migration
+- [codex-handoff-2026-07-10.md](../../codex-handoff-2026-07-10.md) — границы Codex
+- [current-state.md](../../current-state.md) — ops backlog

@@ -1,7 +1,7 @@
-﻿# Deploy: Timeweb Cloud MVP
+# Deploy: Timeweb Cloud MVP
 
 Дата: 2026-06-20.  
-**Исторический runbook** (ранний MVP на СПб). **Актуально 2026-08-07:** live catalog + web build = MSK `201.24.125.184` (`daibilet-msk`). SPB Intelligent Hoopoe `213.171.7.16` = **труп** (MIG.9.7) - см. [Project.md](./Project.md), [spb-finance-host.md](./spb-finance-host.md), `deploy/scripts/deploy-prod-next.sh`.
+**Исторический runbook** (ранний MVP на СПб). **Актуально 2026-08-07:** live catalog + web build = MSK `201.24.125.184` (`daibilet-msk`). SPB Intelligent Hoopoe `213.171.7.16` = **труп** (MIG.9.7) - см. [Project.md](../Project.md), [spb-finance-host.md](../spb-finance-host.md), `deploy/scripts/deploy-prod-next.sh`.
 
 Цель: поднять новый легкий MVP на сервере Timeweb Cloud без потери старой версии `daibilet.ru`.
 

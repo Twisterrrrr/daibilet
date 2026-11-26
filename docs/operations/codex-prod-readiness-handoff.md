@@ -126,7 +126,7 @@ done
 | Sentry / APM | Подключить DSN |
 | Timeweb VM autobackup 80GB | Панель ~480₽/мес × copies |
 | Off-host PG dump copy | Object Storage / second VM |
-| Finance Stage 0 | Webhook ЮKassa + sandbox e2e ([checklist](./checklists/yookassa-e2e-sandbox.md)) |
+| Finance Stage 0 | Webhook ЮKassa + sandbox e2e ([checklist](../checklists/yookassa-e2e-sandbox.md)) |
 | m2m token catalog↔finance | Env на MSK + `.159` |
 | Dependabot / npm audit CI | Agent PR |
 | CODEOWNERS / on-call | Process |
@@ -142,7 +142,7 @@ SSH: deploy@ (root off, sudo -n systemctl). Finance 85.193.80.159 — secrets н
 Уже закрыто 2026-08-29/30: nightly cron, ops verify, AUTH audit (no Critical/High),
 pg_dump 62M + restore drill DRILL OK (71672/3630/44 → :5438), VPN=причина медленного SSH.
 
-Handoff: docs/codex-prod-readiness-handoff.md
+Handoff: docs/operations/codex-prod-readiness-handoff.md
 
 Сделай по порядку:
 

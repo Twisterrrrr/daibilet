@@ -1,74 +1,82 @@
 # Документация Daibilet
 
-[Roadmap Daibilet — сводка на 2026-10](./roadmap-2026-10.md)
-[SEO-аудит 18.10.2026: кэш sitemap, каноникал Москвы, главная no-store](./seo-audit-2026-10-18.md)
-[Карта соответствий PDP событий, слотов и legacy URL - 27.10.2026](./event-pdp-url-correspondence-audit-2026-10-27.md)
-[EventPage: схема, API, редактор, продажи и блокер Event ID - 27.10.2026](./event-page-foundation-2026-10-27.md)
-[Матрица Event ID → EventPage и решения по типам событий - 03.11.2026](./eventpage-event-matrix-2026-11-03.md)
-[Статус rollout EventPage: production drafts, staging, CI и оставшиеся SEO-шаги - 03.11.2026](./eventpage-rollout-status-2026-11-03.md)
-[Партия: Музей матрёшки и речные маршруты - 03.11.2026](./eventpage-museum-river-review-2026-11-03.md)
-[Построчные решения по 19 Event ID этой партии](./eventpage-museum-river-decisions-2026-11-03.csv)
-[Стендап и музыканты: полная очередь проверки EventPage](./eventpage-performer-review-2026-11-03.md)
-[Кластеры исполнителей и 641 Event ID](./eventpage-performer-clusters-2026-11-03.csv)
-[Triage Event ID, текущих и исторических URL - 03.11.2026](./eventpage-link-triage-2026-11-03.md)
-[Разовые события: живые, пустые и прошедшие - production snapshot 03.11.2026](./single-events-live-and-expired-policy-2026-11-03.md)
-[PDP событий в админке и ЛК поставщика - план реализации](./event-pdp-admin-supplier-workbench-2026-10.md)
-[Подготовка schema_alignment к прод-БД - 17.10.2026](./schema-alignment-prod-fix-2026-10-17.md)
-[Сверка схемы и миграций каталога и финконтура - 17.10.2026](./finance-schema-unification-2026-10-17.md)
-[Places: типизация, сверка PDP и передача Cline](./places-taxonomy-cline-handoff-2026-10.md)
-[Выпуск Places и сверка PDP - 15.10.2026](./places-release-2026-10-15.md)
-[Доступ сотрудников к админке: аудит legacy и проект RBAC](./admin-rbac-design-2026-10.md)
-[Нагрузка CPU на MSK - 15.10.2026](./cpu-load-msk.md)
-[Зависание SSR и ответы 502 роботам - 16.10.2026](./ssr-hang-crawler-2026-10-16.md)
-[Teplohod: baseline Sharp и Next Image Optimizer - 21.10.2026](./teplohod-image-optimization-experiment-2026-10-21.md)
-[Teplohod PDP: выборочные статические WebP обложки - 21.10.2026](./teplohod-pdp-webp-pilot-2026-10-21.md)
-[Городские хабы: сверка коммитов и незавершённых правок - 12.11.2026](./city-hub-work-log-2026-11-12.md)
-[Place: карта городских и национальных типовых каталогов и API-фильтров - 17.11.2026](./place-city-type-filter-map-2026-11-17.md)
-[Архив изображений и переход на активную статику - 13.11.2026](./image-archive-runtime-migration-2026-11-13.md)
-[Карта рабочих копий и переносов - 10.11.2026](./local-workspace-inventory-2026-11-10.md)
-[Канон URL тематических посадок и незавершённая live-сверка - 18.11.2026](./landing-url-architecture-and-audit-2026-11-18.md)
-[Сверка tours с активной копией Daibilet - 10.11.2026](./tours-vs-daibilet-audit-2026-11-10.md)
-[Консервация локальной копии tours и сверка рабочего состояния - 16.11.2026](./tours-vs-daibilet-audit-2026-11-16.md)
-[Изоляция legacy apps/public](./legacy-public-isolation.md)
-[Диагностика production-сети и диска](./production-network-and-disk-diagnostics.md)
-[Инцидент production: незавершённая Prisma-миграция, stale client и 5xx - 17.11.2026](./prod-prisma-city-pdp-incident-2026-11-17.md)
-[Индексируемые EventPage с активными рерайтами - 12.11.2026](./eventpage-rewrite-recrawl-queue-2026-11-12.md)
-[Редакторский батч EventPage: 30 текстов, источники и сверка - 11.11.2026](./eventpage-rewrite-batch-30-source-audit-2026-11-11.md)
-[Рерайты EventPage: production apply и редакционные источники - 05.11.2026](./eventpage-rewrite-production-apply-2026-11-05.md)
-[Аудит источников редакционных EventPage - 04.11.2026](./eventpage-editorial-source-audit-2026-11-04.md)
-[Новогодние EventPage B01–B03: production apply - 10.11.2026](./archives/new-year-batches-b01-b03-production-2026-11-10.md)
-[Архив редакционных правок EventPage - 09–10.11.2026](./eventpage-editorial-archive-2026-11-09-10.md)
-[ISR 500 на удалённых событиях - 21.10.2026](./event-not-found-ssr-regression-2026-10-21.md)
+## Канон и границы
 
-Навигация по репозиторию `Twisterrrrr/daibilet`.
+- Этот каталог в `D:\coding\daibilet` — единственный актуальный источник
+  документации основной ветки Daibilet.
+- `D:\coding\daibilet-phase2-finance` — отдельная рабочая ветка финконтура.
+  Её документы используются при работе в той ветке; принятые общепроектные
+  решения и итоговый статус синхронизируются сюда после интеграции.
+- `D:\coding\_scratch\2026-11-25\events-v2-implementation\docs` — временная
+  копия, не отдельный источник правды. `D:\coding\SPBBOATS` и
+  `D:\coding\tours` — legacy-проекты и не описывают текущее состояние Daibilet.
+- Старые отчёты, дневники и выгрузки могут сохранять историческую ценность,
+  но их статус определяется датой и ссылкой из актуального документа. Само
+  наличие файла в `docs/` не означает, что он описывает текущую систему.
 
-[Новогодний лендинг: SEO, фильтры и замеры производительности - 25.11.2026](./new-year-landing-seo-and-performance-2026-11-25.md)
+## Куда смотреть
+
+| Вопрос | Источник |
+|---|---|
+| Что работает сейчас и что блокирует выпуск | [current-state.md](./current-state.md) |
+| Каковы следующие незакрытые задачи | [Tasktracker.md](./Tasktracker.md), только разделы с актуальным статусом |
+| Почему принято архитектурное решение | [decision-log.md](./decision-log.md) |
+| Устойчивые контракты, архитектура и эксплуатационные правила | [Project.md](./Project.md) и профильные документы/runbook |
+| Что происходило по датам | [Diary.md](./Diary.md); это история, не список задач |
+
+При расхождении текущие факты подтверждаются свежим кодом, проверкой staging
+или production и датированным отчётом. `current-state.md` фиксирует результат;
+`Tasktracker.md` — только оставшуюся работу; закрытые задачи и подробный ход
+работ сохраняются в истории и не считаются открытыми без свежего подтверждения.
+
+## Снимки и большие приложения
+
+В `docs/` есть датированные CSV/JSON/TSV-выгрузки и полные тексты редакционных
+батчей. Это приложения к конкретным аудитам и операциям, а не актуальная БД и
+не самостоятельный источник текущего статуса. Использовать их только вместе с
+сопровождающим отчётом: сверять дату, базовый SHA, назначение и ограничения
+выборки. Более поздний файл с похожим именем не автоматически заменяет старый,
+если отчёт явно не подтверждает замену.
+
+Перед переносом или удалением проверять входящие ссылки, уникальные данные,
+происхождение и необходимость аудиторского следа. Не копировать большие
+выгрузки в README или current-state; там оставлять ссылку на отчёт.
+
+[DAIBILET Events V2: аудит и карта реализации - 25.11.2026](./events-v2-audit-2026-11-25.md)
 
 ## С чего начать
 
-1. **[current-state.md](./current-state.md)** — текущее состояние, ветки, блокеры
-2. **[Project.md](./Project.md)** — архитектура и этапы F
-3. **[Tasktracker.md](./Tasktracker.md)** — прогресс задач
-4. **[Diary.md](./Diary.md)** — технический дневник
-5. **[decision-log.md](./decision-log.md)** — зафиксированные решения
-3. **[launch-qa-and-deploy.md](./launch-qa-and-deploy.md)** — smoke перед продажами
-4. **[deploy-timeweb.md](./deploy-timeweb.md)** — prod на Timeweb
-5. **[deploy-staging.md](./deploy-staging.md)** — staging `/opt/daibilet-staging`
+1. [current-state.md](./current-state.md) — подтверждённое состояние и открытые блокеры.
+2. [Tasktracker.md](./Tasktracker.md) — актуальные задачи в верхних датированных разделах; остальное — накопленная история.
+3. [decision-log.md](./decision-log.md) — принятые решения и границы их реализации.
+4. [Project.md](./Project.md) — архитектура и долговременные правила; последний целостный обзор от 2026-08-17.
+5. [operations/README.md](./operations/README.md) — инструкции по выпуску, backup, health и incidents.
+6. [Diary.md](./Diary.md) — исторический журнал, не использовать как источник текущего статуса.
+
+## Свежие отчёты
+
+- [Архив проверок, выпусков и snapshots](./reports/README.md)
+- [Новогодний лендинг: production SEO и производительность - 25.11.2026](./new-year-landing-seo-and-performance-2026-11-25.md)
+- [Events V2: аудит исходного состояния - 25.11.2026](./events-v2-audit-2026-11-25.md)
+- [Канон тематических URL и незавершённая live-сверка - 18.11.2026](./reports/2026/landing-url-architecture-and-audit-2026-11-18.md)
+- [EventPage rollout: production drafts, staging и SEO-гейты - 03.11.2026](./eventpage-rollout-status-2026-11-03.md)
 
 ## Ops / production readiness
 
+Весь эксплуатационный раздел: [operations/README.md](./operations/README.md).
+
 | Документ | Описание |
 |----------|----------|
-| **[production-readiness-checklist.md](./production-readiness-checklist.md)** | Чеклист «демо vs prod» (Habr), owners, ROI |
-| **[incident-runbook.md](./incident-runbook.md)** | Быстрая диагностика и rollback MSK |
-| **[codex-prod-readiness-handoff.md](./codex-prod-readiness-handoff.md)** | CODEX: cron на prod, auth audit, backup drill |
+| **[production-readiness-checklist.md](./operations/production-readiness-checklist.md)** | Чеклист «демо vs prod» (Habr), owners, ROI |
+| **[incident-runbook.md](./operations/incident-runbook.md)** | Быстрая диагностика и rollback MSK |
+| **[codex-prod-readiness-handoff.md](./operations/codex-prod-readiness-handoff.md)** | CODEX: cron на prod, auth audit, backup drill |
 
 ## Checkpoint / аудит
 
 | Документ | Описание |
 |----------|----------|
-| **[audit-2026-07-10-stack-state.md](./audit-2026-07-10-stack-state.md)** | **Аудит стека:** Vite vs Next, Prisma vs dto.js, prod flags, рекомендации Phase F |
-| **[checkpoint-2026-07-10-mvp-launch.md](./checkpoint-2026-07-10-mvp-launch.md)** | Checkpoint MVP launch, handoff Codex |
+| **[audit-2026-07-10-stack-state.md](./reports/2026/audit-2026-07-10-stack-state.md)** | **Аудит стека:** Vite vs Next, Prisma vs dto.js, prod flags, рекомендации Phase F |
+| **[checkpoint-2026-07-10-mvp-launch.md](./reports/2026/checkpoint-2026-07-10-mvp-launch.md)** | Checkpoint MVP launch, handoff Codex |
 
 ## Фазы: виджеты + импорт
 
@@ -127,6 +135,7 @@
 |----------|----------|
 | [legacy-public-inventory.md](./legacy-public-inventory.md) | Legacy inventory |
 | [landing-snapshot.md](./landing-snapshot.md) | Snapshot лендингов |
+| [Архив документов](./archives/README.md) | Исторические планы и материалы, не являющиеся текущим источником требований |
 
 ## Приложения
 

@@ -1,6 +1,6 @@
 # SSR-hang RCA: остаточный Path B в sitemap, 2026-10-21
 
-Связанные: INC.504.15 (root), INC.504.22, INC.504.23, [codex-ssr-hang-brief.md](./codex-ssr-hang-brief.md), [ssr-hang-crawler-2026-10-16.md](./ssr-hang-crawler-2026-10-16.md), [inc-504-ssr-hardening.md](./inc-504-ssr-hardening.md).
+Связанные: INC.504.15 (root), INC.504.22, INC.504.23, [codex-ssr-hang-brief.md](../../codex-ssr-hang-brief.md), [ssr-hang-crawler-2026-10-16.md](./ssr-hang-crawler-2026-10-16.md), [inc-504-ssr-hardening.md](../../operations/inc-504-ssr-hardening.md).
 
 ## Симптомы
 
