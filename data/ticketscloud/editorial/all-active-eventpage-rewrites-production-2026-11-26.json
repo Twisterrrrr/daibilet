@@ -1,11 +1,11 @@
 {
-  "generatedAt": "2026-11-26T04:45:56.133Z",
-  "checkedAt": "2026-11-26T04:45:49.098Z",
+  "generatedAt": "2026-11-26T07:34:22.375Z",
+  "checkedAt": "2026-11-26T07:34:10.208Z",
   "database": "daibilet",
   "counts": {
-    "rows": 19254,
-    "pages": 1980,
-    "events": 19254
+    "rows": 19269,
+    "pages": 1973,
+    "events": 19269
   },
   "entries": [
     {
@@ -27260,6 +27260,66 @@
         "status": "ACTIVE_EDITORIAL_REWRITE",
         "version": "2026-11-13-next-batches-01-03"
       },
+      "eventId": "evt_6ad7522a568bee245017a6f1",
+      "eventTitle": "Большой Stand Up",
+      "eventSlug": "большои-stand-up-концерт-6ad7522a568bee245017a6f1",
+      "city": "Москва",
+      "venue": "COMEDY 34",
+      "address": "ул. Стретенка 34/1 с.1",
+      "source": "TICKETSCLOUD"
+    },
+    {
+      "eventPageId": "95724e1c-e7d0-4143-8a63-9eeaaf8118e0",
+      "slug": "bolshoi-stand-up-koncert-moskva-4",
+      "title": "Большой Stand Up",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T14:20:23.364Z",
+      "editorialMarker": {
+        "field": "sections",
+        "status": "ACTIVE_EDITORIAL_REWRITE",
+        "version": "2026-11-13-next-batches-01-03"
+      },
+      "eventId": "evt_6adb143e995a7a90481669c9",
+      "eventTitle": "Большой Stand Up",
+      "eventSlug": "большои-stand-up-концерт-6adb143e995a7a90481669c9",
+      "city": "Москва",
+      "venue": "COMEDY 34",
+      "address": "ул. Стретенка 34/1 с.1",
+      "source": "TICKETSCLOUD"
+    },
+    {
+      "eventPageId": "95724e1c-e7d0-4143-8a63-9eeaaf8118e0",
+      "slug": "bolshoi-stand-up-koncert-moskva-4",
+      "title": "Большой Stand Up",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T14:20:23.364Z",
+      "editorialMarker": {
+        "field": "sections",
+        "status": "ACTIVE_EDITORIAL_REWRITE",
+        "version": "2026-11-13-next-batches-01-03"
+      },
+      "eventId": "evt_6adb1b3c3e04151f70355924",
+      "eventTitle": "Большой Stand Up",
+      "eventSlug": "большои-stand-up-концерт-6adb1b3c3e04151f70355924",
+      "city": "Москва",
+      "venue": "COMEDY 34",
+      "address": "ул. Стретенка 34/1 с.1",
+      "source": "TICKETSCLOUD"
+    },
+    {
+      "eventPageId": "95724e1c-e7d0-4143-8a63-9eeaaf8118e0",
+      "slug": "bolshoi-stand-up-koncert-moskva-4",
+      "title": "Большой Stand Up",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T14:20:23.364Z",
+      "editorialMarker": {
+        "field": "sections",
+        "status": "ACTIVE_EDITORIAL_REWRITE",
+        "version": "2026-11-13-next-batches-01-03"
+      },
       "eventId": "evt_6adb1be6ac94eda60a851a96",
       "eventTitle": "Большой Stand Up",
       "eventSlug": "большои-stand-up-концерт-6adb1be6ac94eda60a851a96",
@@ -27269,12 +27329,32 @@
       "source": "TICKETSCLOUD"
     },
     {
-      "eventPageId": "c2157b20-97cf-41af-968e-d0cbe2d29b7c",
-      "slug": "bolshoi-stand-up-koncert-moskva-6",
+      "eventPageId": "95724e1c-e7d0-4143-8a63-9eeaaf8118e0",
+      "slug": "bolshoi-stand-up-koncert-moskva-4",
       "title": "Большой Stand Up",
       "status": "READY",
-      "isIndexable": false,
-      "publishedAt": "2026-11-13T14:20:23.886Z",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T14:20:23.364Z",
+      "editorialMarker": {
+        "field": "sections",
+        "status": "ACTIVE_EDITORIAL_REWRITE",
+        "version": "2026-11-13-next-batches-01-03"
+      },
+      "eventId": "evt_6adb1d2fe46d92b77d971348",
+      "eventTitle": "Большой Stand Up",
+      "eventSlug": "большои-stand-up-концерт-6adb1d2fe46d92b77d971348",
+      "city": "Москва",
+      "venue": "COMEDY 34",
+      "address": "ул. Стретенка 34/1 с.1",
+      "source": "TICKETSCLOUD"
+    },
+    {
+      "eventPageId": "95724e1c-e7d0-4143-8a63-9eeaaf8118e0",
+      "slug": "bolshoi-stand-up-koncert-moskva-4",
+      "title": "Большой Stand Up",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T14:20:23.364Z",
       "editorialMarker": {
         "field": "sections",
         "status": "ACTIVE_EDITORIAL_REWRITE",
@@ -27289,12 +27369,12 @@
       "source": "TICKETSCLOUD"
     },
     {
-      "eventPageId": "2174c118-bc57-4808-9931-a7fdc0ac2f9b",
-      "slug": "bolshoi-stand-up-koncert-moskva-7",
+      "eventPageId": "95724e1c-e7d0-4143-8a63-9eeaaf8118e0",
+      "slug": "bolshoi-stand-up-koncert-moskva-4",
       "title": "Большой Stand Up",
       "status": "READY",
-      "isIndexable": false,
-      "publishedAt": "2026-11-13T14:20:24.278Z",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T14:20:23.364Z",
       "editorialMarker": {
         "field": "sections",
         "status": "ACTIVE_EDITORIAL_REWRITE",
@@ -27303,6 +27383,46 @@
       "eventId": "evt_6adb312f00a0af54c93238af",
       "eventTitle": "Большой Stand Up",
       "eventSlug": "большои-stand-up-концерт-6adb312f00a0af54c93238af",
+      "city": "Москва",
+      "venue": "COMEDY 34",
+      "address": "ул. Стретенка 34/1 с.1",
+      "source": "TICKETSCLOUD"
+    },
+    {
+      "eventPageId": "95724e1c-e7d0-4143-8a63-9eeaaf8118e0",
+      "slug": "bolshoi-stand-up-koncert-moskva-4",
+      "title": "Большой Stand Up",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T14:20:23.364Z",
+      "editorialMarker": {
+        "field": "sections",
+        "status": "ACTIVE_EDITORIAL_REWRITE",
+        "version": "2026-11-13-next-batches-01-03"
+      },
+      "eventId": "evt_6b06a64c99b0e1121e15e9fe",
+      "eventTitle": "Большой Stand Up",
+      "eventSlug": "большои-stand-up-6b06a64c99b0e1121e15e9fe",
+      "city": "Москва",
+      "venue": "COMEDY 34",
+      "address": "ул. Стретенка 34/1 с.1",
+      "source": "TICKETSCLOUD"
+    },
+    {
+      "eventPageId": "95724e1c-e7d0-4143-8a63-9eeaaf8118e0",
+      "slug": "bolshoi-stand-up-koncert-moskva-4",
+      "title": "Большой Stand Up",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T14:20:23.364Z",
+      "editorialMarker": {
+        "field": "sections",
+        "status": "ACTIVE_EDITORIAL_REWRITE",
+        "version": "2026-11-13-next-batches-01-03"
+      },
+      "eventId": "evt_6b06a694ba5dba3fc0cbe901",
+      "eventTitle": "Большой Stand Up",
+      "eventSlug": "большои-stand-up-6b06a694ba5dba3fc0cbe901",
       "city": "Москва",
       "venue": "COMEDY 34",
       "address": "ул. Стретенка 34/1 с.1",
@@ -36209,12 +36329,12 @@
       "source": "TICKETSCLOUD"
     },
     {
-      "eventPageId": "21984cbc-2349-4b52-ad80-6f301f630342",
-      "slug": "cirk-fantastik-lobnya-2",
+      "eventPageId": "1856042d-afa6-4f94-9996-7b00e56aa563",
+      "slug": "cirk-fantastik-lobnya",
       "title": "ЦИРК ФАНТАСТИК",
       "status": "READY",
       "isIndexable": true,
-      "publishedAt": "2026-11-13T01:59:05.608Z",
+      "publishedAt": "2026-11-13T01:59:05.852Z",
       "editorialMarker": {
         "field": "sections",
         "status": "ACTIVE_EDITORIAL_REWRITE",
@@ -36229,12 +36349,12 @@
       "source": "TICKETSCLOUD"
     },
     {
-      "eventPageId": "73e47130-f923-4275-881b-6f62eeb8678e",
-      "slug": "cirk-fantastik-lobnya-3",
+      "eventPageId": "1856042d-afa6-4f94-9996-7b00e56aa563",
+      "slug": "cirk-fantastik-lobnya",
       "title": "ЦИРК ФАНТАСТИК",
       "status": "READY",
       "isIndexable": true,
-      "publishedAt": "2026-11-13T01:59:04.757Z",
+      "publishedAt": "2026-11-13T01:59:05.852Z",
       "editorialMarker": {
         "field": "sections",
         "status": "ACTIVE_EDITORIAL_REWRITE",
@@ -36249,12 +36369,12 @@
       "source": "TICKETSCLOUD"
     },
     {
-      "eventPageId": "4cfa4dae-70dd-4cf6-8c88-f953adfa8aec",
-      "slug": "cirk-fantastik-lobnya-4",
+      "eventPageId": "1856042d-afa6-4f94-9996-7b00e56aa563",
+      "slug": "cirk-fantastik-lobnya",
       "title": "ЦИРК ФАНТАСТИК",
       "status": "READY",
       "isIndexable": true,
-      "publishedAt": "2026-11-13T01:59:05.403Z",
+      "publishedAt": "2026-11-13T01:59:05.852Z",
       "editorialMarker": {
         "field": "sections",
         "status": "ACTIVE_EDITORIAL_REWRITE",
@@ -36280,6 +36400,26 @@
         "status": "ACTIVE_EDITORIAL_REWRITE",
         "version": "2026-11-13-tour-batch-01"
       },
+      "eventId": "evt_6ac93f30ae88c2a8c92ddc60",
+      "eventTitle": "ЦИРК ФАНТАСТИК",
+      "eventSlug": "цирк-фантастик-6ac93f30ae88c2a8c92ddc60",
+      "city": "Люберцы",
+      "venue": "Цирк шапито \"FantastiC\"",
+      "address": "Октябрьский проспект 202, возле стадиона \"Торпедо\"",
+      "source": "TICKETSCLOUD"
+    },
+    {
+      "eventPageId": "5dcb0ffd-7349-4047-9713-266c6e088e0c",
+      "slug": "cirk-fantastik-lyubercy-2",
+      "title": "ЦИРК ФАНТАСТИК",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T01:59:06.203Z",
+      "editorialMarker": {
+        "field": "sections",
+        "status": "ACTIVE_EDITORIAL_REWRITE",
+        "version": "2026-11-13-tour-batch-01"
+      },
       "eventId": "evt_6ac93f4e35ed8944ed57cf43",
       "eventTitle": "ЦИРК ФАНТАСТИК",
       "eventSlug": "цирк-фантастик-6ac93f4e35ed8944ed57cf43",
@@ -36289,12 +36429,32 @@
       "source": "TICKETSCLOUD"
     },
     {
-      "eventPageId": "1614ce94-2529-4dee-964c-d146390baba0",
-      "slug": "cirk-fantastik-lyubercy-3",
+      "eventPageId": "5dcb0ffd-7349-4047-9713-266c6e088e0c",
+      "slug": "cirk-fantastik-lyubercy-2",
       "title": "ЦИРК ФАНТАСТИК",
       "status": "READY",
       "isIndexable": true,
-      "publishedAt": "2026-11-13T01:59:04.957Z",
+      "publishedAt": "2026-11-13T01:59:06.203Z",
+      "editorialMarker": {
+        "field": "sections",
+        "status": "ACTIVE_EDITORIAL_REWRITE",
+        "version": "2026-11-13-tour-batch-01"
+      },
+      "eventId": "evt_6aec6fc196890f27f71eb525",
+      "eventTitle": "ЦИРК ФАНТАСТИК",
+      "eventSlug": "цирк-фантастик-6aec6fc196890f27f71eb525",
+      "city": "Люберцы",
+      "venue": "Цирк шапито \"FantastiC\"",
+      "address": "Октябрьский проспект 202, возле стадиона \"Торпедо\"",
+      "source": "TICKETSCLOUD"
+    },
+    {
+      "eventPageId": "5dcb0ffd-7349-4047-9713-266c6e088e0c",
+      "slug": "cirk-fantastik-lyubercy-2",
+      "title": "ЦИРК ФАНТАСТИК",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T01:59:06.203Z",
       "editorialMarker": {
         "field": "sections",
         "status": "ACTIVE_EDITORIAL_REWRITE",
@@ -36309,20 +36469,40 @@
       "source": "TICKETSCLOUD"
     },
     {
-      "eventPageId": "1770953a-4e57-439f-bd3c-a1b13444c817",
-      "slug": "cirk-fantastik-lyubercy-4",
+      "eventPageId": "5dcb0ffd-7349-4047-9713-266c6e088e0c",
+      "slug": "cirk-fantastik-lyubercy-2",
       "title": "ЦИРК ФАНТАСТИК",
       "status": "READY",
       "isIndexable": true,
-      "publishedAt": "2026-11-13T01:59:05.168Z",
+      "publishedAt": "2026-11-13T01:59:06.203Z",
       "editorialMarker": {
         "field": "sections",
         "status": "ACTIVE_EDITORIAL_REWRITE",
         "version": "2026-11-13-tour-batch-01"
       },
-      "eventId": "evt_6aec6fc196890f27f71eb525",
+      "eventId": "evt_6b07062b5d1a2edcc6eb868c",
       "eventTitle": "ЦИРК ФАНТАСТИК",
-      "eventSlug": "цирк-фантастик-6aec6fc196890f27f71eb525",
+      "eventSlug": "цирк-фантастик-6b07062b5d1a2edcc6eb868c",
+      "city": "Люберцы",
+      "venue": "Цирк шапито \"FantastiC\"",
+      "address": "Октябрьский проспект 202, возле стадиона \"Торпедо\"",
+      "source": "TICKETSCLOUD"
+    },
+    {
+      "eventPageId": "5dcb0ffd-7349-4047-9713-266c6e088e0c",
+      "slug": "cirk-fantastik-lyubercy-2",
+      "title": "ЦИРК ФАНТАСТИК",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T01:59:06.203Z",
+      "editorialMarker": {
+        "field": "sections",
+        "status": "ACTIVE_EDITORIAL_REWRITE",
+        "version": "2026-11-13-tour-batch-01"
+      },
+      "eventId": "evt_6b07069be81496ed3851cc23",
+      "eventTitle": "ЦИРК ФАНТАСТИК",
+      "eventSlug": "цирк-фантастик-6b07069be81496ed3851cc23",
       "city": "Люберцы",
       "venue": "Цирк шапито \"FantastiC\"",
       "address": "Октябрьский проспект 202, возле стадиона \"Торпедо\"",
@@ -379080,9 +379260,129 @@
         "status": "ACTIVE_EDITORIAL_REWRITE",
         "version": "2026-11-13"
       },
+      "eventId": "evt_6ad74709895b6550321d5a64",
+      "eventTitle": "Женский Stand-up на Сретенке",
+      "eventSlug": "женскии-stand-up-на-сретенке-6ad74709895b6550321d5a64",
+      "city": "Москва",
+      "venue": "Московский стендап клуб",
+      "address": "ул. Сретенка 34/1 с.1",
+      "source": "TICKETSCLOUD"
+    },
+    {
+      "eventPageId": "c700e4e4-f721-4125-9662-95f19063a0a9",
+      "slug": "zhenskii-stand-up-na-sretenke-moskva-3",
+      "title": "Женский Stand-up на Сретенке",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-12T18:03:37.718Z",
+      "editorialMarker": {
+        "field": "sections",
+        "status": "ACTIVE_EDITORIAL_REWRITE",
+        "version": "2026-11-13"
+      },
+      "eventId": "evt_6adb0d70c34c60f537b5d088",
+      "eventTitle": "Женский Stand-up на Сретенке",
+      "eventSlug": "женскии-stand-up-на-сретенке-6adb0d70c34c60f537b5d088",
+      "city": "Москва",
+      "venue": "Московский стендап клуб",
+      "address": "ул. Сретенка 34/1 с.1",
+      "source": "TICKETSCLOUD"
+    },
+    {
+      "eventPageId": "c700e4e4-f721-4125-9662-95f19063a0a9",
+      "slug": "zhenskii-stand-up-na-sretenke-moskva-3",
+      "title": "Женский Stand-up на Сретенке",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-12T18:03:37.718Z",
+      "editorialMarker": {
+        "field": "sections",
+        "status": "ACTIVE_EDITORIAL_REWRITE",
+        "version": "2026-11-13"
+      },
       "eventId": "evt_6adb1713aae814aa3feec288",
       "eventTitle": "Женский Stand-up на Сретенке",
       "eventSlug": "женскии-stand-up-на-сретенке-6adb1713aae814aa3feec288",
+      "city": "Москва",
+      "venue": "Московский стендап клуб",
+      "address": "ул. Сретенка 34/1 с.1",
+      "source": "TICKETSCLOUD"
+    },
+    {
+      "eventPageId": "c700e4e4-f721-4125-9662-95f19063a0a9",
+      "slug": "zhenskii-stand-up-na-sretenke-moskva-3",
+      "title": "Женский Stand-up на Сретенке",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-12T18:03:37.718Z",
+      "editorialMarker": {
+        "field": "sections",
+        "status": "ACTIVE_EDITORIAL_REWRITE",
+        "version": "2026-11-13"
+      },
+      "eventId": "evt_6adb1f5b355d0c437052c4f3",
+      "eventTitle": "Женский Stand-up на Сретенке",
+      "eventSlug": "женскии-stand-up-на-сретенке-6adb1f5b355d0c437052c4f3",
+      "city": "Москва",
+      "venue": "Московский стендап клуб",
+      "address": "ул. Сретенка 34/1 с.1",
+      "source": "TICKETSCLOUD"
+    },
+    {
+      "eventPageId": "c700e4e4-f721-4125-9662-95f19063a0a9",
+      "slug": "zhenskii-stand-up-na-sretenke-moskva-3",
+      "title": "Женский Stand-up на Сретенке",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-12T18:03:37.718Z",
+      "editorialMarker": {
+        "field": "sections",
+        "status": "ACTIVE_EDITORIAL_REWRITE",
+        "version": "2026-11-13"
+      },
+      "eventId": "evt_6afc29aacfdcc52feb6ead20",
+      "eventTitle": "Женский Stand-up на Сретенке",
+      "eventSlug": "женскии-stand-up-на-сретенке-6afc29aacfdcc52feb6ead20",
+      "city": "Москва",
+      "venue": "Московский стендап клуб",
+      "address": "ул. Сретенка 34/1 с.1",
+      "source": "TICKETSCLOUD"
+    },
+    {
+      "eventPageId": "c700e4e4-f721-4125-9662-95f19063a0a9",
+      "slug": "zhenskii-stand-up-na-sretenke-moskva-3",
+      "title": "Женский Stand-up на Сретенке",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-12T18:03:37.718Z",
+      "editorialMarker": {
+        "field": "sections",
+        "status": "ACTIVE_EDITORIAL_REWRITE",
+        "version": "2026-11-13"
+      },
+      "eventId": "evt_6b068d497a5b62e16fcec63f",
+      "eventTitle": "Женский Stand-up на Сретенке",
+      "eventSlug": "женскии-stand-up-на-сретенке-6b068d497a5b62e16fcec63f",
+      "city": "Москва",
+      "venue": "Московский стендап клуб",
+      "address": "ул. Сретенка 34/1 с.1",
+      "source": "TICKETSCLOUD"
+    },
+    {
+      "eventPageId": "c700e4e4-f721-4125-9662-95f19063a0a9",
+      "slug": "zhenskii-stand-up-na-sretenke-moskva-3",
+      "title": "Женский Stand-up на Сретенке",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-12T18:03:37.718Z",
+      "editorialMarker": {
+        "field": "sections",
+        "status": "ACTIVE_EDITORIAL_REWRITE",
+        "version": "2026-11-13"
+      },
+      "eventId": "evt_6b06a678e7a26612adc868b8",
+      "eventTitle": "Женский Stand-up на Сретенке",
+      "eventSlug": "женскии-stand-up-на-сретенке-6b06a678e7a26612adc868b8",
       "city": "Москва",
       "venue": "Московский стендап клуб",
       "address": "ул. Сретенка 34/1 с.1",
