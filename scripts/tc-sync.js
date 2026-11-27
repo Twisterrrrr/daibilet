@@ -102,6 +102,8 @@ async function runIdsSync(options) {
     process.exit(sessionArchive.status ?? 1);
   }
 
+  runIndexabilityReconcile();
+
   // Persist/promote/generate covers after upsert (CDN first; generate only if empty).
   const covers = spawnSync(process.execPath, [path.join(rootDir, "scripts", "ensure-catalog-covers.js")], {
     cwd: rootDir,
@@ -158,6 +160,7 @@ function runFullSyncPipeline() {
     ["scripts/tc-full-sync.js"],
     ["scripts/tc-import-catalog.js"],
     ["scripts/archive-past-tc-sessions.js", "--apply"],
+    ["scripts/reconcile-eventpage-indexability.mjs"],
     // After import: promote CDN/event images to venues; generate only when truly empty.
     ["scripts/ensure-catalog-covers.js"],
     // Light revalidate/warm by default; set TC_CATALOG_SYNC_FULL_WARM=1 for nightly full warm.
@@ -179,6 +182,19 @@ function runFullSyncPipeline() {
       }
       process.exit(code);
     }
+  }
+}
+
+function runIndexabilityReconcile() {
+  const result = spawnSync(process.execPath, [path.join(rootDir, "scripts/reconcile-eventpage-indexability.mjs")], {
+    cwd: rootDir,
+    env: process.env,
+    stdio: "inherit",
+    windowsHide: true,
+  });
+  if (result.error || result.status || result.signal) {
+    if (result.signal) console.error(`[tc-sync] EventPage indexability reconciliation killed by ${result.signal}`);
+    process.exit(result.status ?? 1);
   }
 }
 

@@ -20,6 +20,7 @@ export const JOBS = {
     description: 'Teplohod catalog import + cover ensure + Next home revalidate',
     scripts: [
       'scripts/tep-import-fixtures.js',
+      'scripts/reconcile-eventpage-indexability.mjs',
       'scripts/ensure-catalog-covers.js',
       'scripts/revalidate-next-home.mjs',
     ],

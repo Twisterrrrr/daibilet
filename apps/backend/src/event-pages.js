@@ -1182,6 +1182,151 @@ export async function publishAdminEventPage(db, id, actorId = null) {
   });
 }
 
+/**
+ * Keep editorial EventPages indexable only while a published page represents
+ * something customers can still buy. Called after catalog syncs and by the
+ * periodic reconciliation job because sessions can expire without a sync.
+ */
+export async function reconcileActiveRewriteIndexability(db, { actorId = null, dryRun = false } = {}) {
+  return db.transaction(async ({ query }) => {
+    const result = await query(`
+      SELECT page.*,
+        EXISTS (
+          SELECT 1
+          FROM "EventPageEvent" link
+          JOIN "Event" event ON event.id = link."eventId"
+          JOIN "EventOffer" offer ON offer."eventId" = event.id AND offer.active IS NOT FALSE
+          WHERE link."eventPageId" = page.id
+            AND upper(coalesce(event.status::text, '')) <> 'HIDDEN'
+            AND (
+              (upper(event.kind::text) = 'OPEN_DATE'
+                AND (event."openDateValidTo" IS NULL OR event."openDateValidTo" >= now()))
+              OR EXISTS (
+                SELECT 1 FROM "EventSession" session
+                WHERE session."eventId" = event.id
+                  AND session."isActive" IS NOT FALSE
+                  AND session."cancelledAt" IS NULL
+                  AND lower(coalesce(session."sourceStatus", '')) NOT IN
+                    ('widget_blocked', 'paused', 'suspended', 'stopped', 'cancelled', 'canceled', 'draft', 'hidden', 'stand_by', 'closed', 'sales_closed', 'sale_closed', 'not_for_sale')
+                  AND (
+                    (session."startsAt" IS NOT NULL AND session."startsAt" >= now() - interval '15 minutes')
+                    OR (session."startsAt" IS NOT NULL AND session."endsAt" IS NOT NULL
+                      AND session."startsAt" < now() AND session."endsAt" >= now()
+                      AND session."endsAt" - session."startsAt" < interval '36 hours')
+                    OR lower(coalesce(session."sourceStatus", '')) IN ('open_date', 'widget')
+                  )
+              )
+            )
+        ) AS "hasSaleableEvents",
+        EXISTS (
+          SELECT 1 FROM "EventPageRoute" route
+          WHERE route."eventPageId" = page.id AND lower(route.path) = lower('/events/' || page.slug)
+        ) AS "hasSelfRoute"
+      FROM "EventPage" page
+      WHERE page.status = 'READY'
+        AND page."publishedAt" IS NOT NULL
+        AND page.content->'activeEditorialText'->>'status' = 'ACTIVE_EDITORIAL_REWRITE'
+      ORDER BY page.id
+      FOR UPDATE OF page
+    `);
+
+    const summary = {
+      checked: result.rows.length,
+      currentlyIndexed: 0,
+      currentlyNoindex: 0,
+      indexed: 0,
+      noindex: 0,
+      changed: [],
+      changedToIndex: 0,
+      changedToNoindex: 0,
+      flagChangedToIndex: 0,
+      flagChangedToNoindex: 0,
+      canonicalOnlyChanges: 0,
+      reviewRequired: [],
+    };
+
+    for (const page of result.rows) {
+      if (page.isIndexable === true) summary.currentlyIndexed += 1;
+      else summary.currentlyNoindex += 1;
+      const canonicalPath = `/events/${page.slug}`;
+      const canonicalCompatible = !page.canonicalPath || page.canonicalPath === canonicalPath;
+      const canIndex = page.hasSaleableEvents === true && page.hasSelfRoute === true && canonicalCompatible;
+      // The public route resolver already emits /events/{slug} as the self-canonical
+      // when the stored value is empty. Persist it when promoting a page to index,
+      // but do not rewrite existing indexable pages that already resolve correctly.
+      const nextCanonical = page.canonicalPath || (!page.isIndexable && canIndex && page.hasSelfRoute ? canonicalPath : null);
+      const nextIndexable = canIndex;
+      const indexabilityFlagChanges = page.isIndexable !== nextIndexable;
+      if (indexabilityFlagChanges && nextIndexable) summary.flagChangedToIndex += 1;
+      else if (indexabilityFlagChanges) summary.flagChangedToNoindex += 1;
+      else if (page.canonicalPath !== nextCanonical) summary.canonicalOnlyChanges += 1;
+      if (!page.hasSelfRoute || !canonicalCompatible) {
+        summary.reviewRequired.push({
+          id: page.id,
+          slug: page.slug,
+          reason: !page.hasSelfRoute ? 'missing-self-route' : 'canonical-mismatch',
+          canonicalPath: page.canonicalPath,
+          hasSaleableEvents: page.hasSaleableEvents,
+        });
+      }
+
+      if (page.isIndexable === nextIndexable && page.canonicalPath === nextCanonical) {
+        if (nextIndexable) summary.indexed += 1;
+        else summary.noindex += 1;
+        continue;
+      }
+
+      if (dryRun) {
+        summary.changed.push({
+          id: page.id,
+          slug: page.slug,
+          isIndexable: nextIndexable,
+          canonicalPath: nextCanonical,
+          reason: !page.hasSelfRoute ? 'missing-self-route' : !canonicalCompatible ? 'canonical-mismatch' : page.hasSaleableEvents ? 'saleable' : 'no-saleable-events',
+          dryRun: true,
+        });
+        if (nextIndexable) {
+          summary.indexed += 1;
+          summary.changedToIndex += 1;
+        } else {
+          summary.noindex += 1;
+          summary.changedToNoindex += 1;
+        }
+        continue;
+      }
+
+      const updated = await query(`
+        UPDATE "EventPage"
+        SET "isIndexable" = $2, "canonicalPath" = $3, "updatedAt" = now()
+        WHERE id = $1
+        RETURNING *
+      `, [page.id, nextIndexable, nextCanonical]);
+      await appendPageRevision(query, page.id, updated.rows[0], {
+        changeNote: nextIndexable
+          ? 'Автопересчёт индексации: есть активные продаваемые показы редакционного рерайта'
+          : 'Автопересчёт индексации: активных продаваемых показов нет или требуется проверка маршрута/canonical',
+        actorId,
+      });
+      summary.changed.push({
+        id: page.id,
+        slug: page.slug,
+        isIndexable: nextIndexable,
+        canonicalPath: nextCanonical,
+        reason: !page.hasSelfRoute ? 'missing-self-route' : !canonicalCompatible ? 'canonical-mismatch' : page.hasSaleableEvents ? 'saleable' : 'no-saleable-events',
+      });
+      if (nextIndexable) {
+        summary.indexed += 1;
+        summary.changedToIndex += 1;
+      } else {
+        summary.noindex += 1;
+        summary.changedToNoindex += 1;
+      }
+    }
+
+    return summary;
+  });
+}
+
 export async function createAdminEventPage(db, payload, actorId = null) {
   const page = normalizePage(payload, { creating: true });
   return db.transaction(async ({ query }) => {
