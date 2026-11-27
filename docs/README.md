@@ -56,6 +56,7 @@
 ## Свежие отчёты
 
 - [Архив проверок, выпусков и snapshots](./reports/README.md)
+- [SEO индексация событий: аудит, фаза 1 - 27.11.2026](./reports/2026/event-seo-indexability-phase1-audit-2026-11-27.md)
 - [Новогодний лендинг: production SEO и производительность - 25.11.2026](./new-year-landing-seo-and-performance-2026-11-25.md)
 - [Events V2: аудит исходного состояния - 25.11.2026](./events-v2-audit-2026-11-25.md)
 - [Канон тематических URL и незавершённая live-сверка - 18.11.2026](./reports/2026/landing-url-architecture-and-audit-2026-11-18.md)

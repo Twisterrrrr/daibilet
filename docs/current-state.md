@@ -8,6 +8,15 @@
 
 ## Последние подтверждённые срезы
 
+- **SEO индексируемость событий, 27.11.2026:** production read-only сверка API
+  и sitemap нашла 3 997 уникальных canonical keys каталога и 4 635 URL событий
+  в sitemap; выборка 20/20 страниц дала HTTP 200, index/follow и self-canonical.
+  Это подтверждает текущее состояние, но не качество всех URL. Локальная Docker
+  БД содержит 1 Event и не годится для контрольной группы; найденный 19k
+  EventPage snapshot не заменяет Event-level статусы и охватывает только TC.
+  Добавлен изолированный
+  preview evaluator, пока не подключённый к robots/sitemap и без записи статусов.
+  Полный отчёт и остаток работ: [SEO аудит](./reports/2026/event-seo-indexability-phase1-audit-2026-11-27.md).
 - **Production, 25.11.2026:** новогодний мультилендинг выпущен; 19/19 URL
   проверены на HTTP 200, canonical, robots, метаданные и серверные карточки.
   Переобход поисковиками отдельно не подтверждён. Отчёт ниже.
@@ -23,6 +32,10 @@
 
 ### Подтверждённые открытые пункты
 
+- SEO событий: получить актуальную production-like БД для переходов old/new,
+  уточнить признаки rewrite/duplicate/sync uncertainty, затем завершить
+  server-side preview counters и parity с metadata/sitemap. Массовая смена
+  статусов не выполнялась; см. [аудит от 27.11](./reports/2026/event-seo-indexability-phase1-audit-2026-11-27.md).
 - Events V2: завершить staging smoke, mobile review и проверить полноту общей
   выдачи при объёме выше лимита finance projection — [аудит](./events-v2-audit-2026-11-25.md).
 - Тематические посадки: завершить live URL-за-URL сверку матрицы sitemap,
