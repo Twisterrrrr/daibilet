@@ -19,6 +19,7 @@ import {
   mergeAdminEventPages,
   moveAdminEventPageEvent,
   publishAdminEventPage,
+  reconcileActiveRewriteIndexability,
   replaceAdminEventPageEvents,
   searchAdminEventPageEventCandidates,
   splitAdminEventPageEvent,
@@ -108,7 +109,7 @@ import {
   renderSocialPreviewHtml,
 } from './social-preview.js';
 import { clearPublicArticlesDtoCache } from './public-articles.dto.js';
-import { revalidateNextBlogArticle } from './revalidate-next-blog.js';
+import { revalidateEventPageIndexabilityChanges, revalidateNextBlogArticle } from './revalidate-next-blog.js';
 import {
   assertAuthRateLimit,
   authenticateAccessToken,
@@ -650,20 +651,32 @@ export async function handleRequest(request, response) {
 
     if (route === 'POST /api/v1/tep/sync') {
       const result = await runTeplohodSync();
+      const indexability = await reconcileActiveRewriteIndexability(db);
+      if (indexability.changed.length) {
+        await revalidateEventPageIndexabilityChanges(indexability.changed, 'teplohod-sync-indexability');
+        invalidatePublicCaches('rewrite indexability reconciled', { warm: false });
+      }
       invalidatePublicCaches('teplohod sync', { warm: true });
       const landingAudit = await runLandingAudit(db, rootDir);
-      sendJson(response, { ...result, landingAudit });
+      sendJson(response, { ...result, indexability: summarizeIndexability(indexability), landingAudit });
       return;
     }
 
     if (route === 'POST /api/v1/tc/sync' || route === 'POST /api/admin/sources/ticketscloud/sync') {
       const result = await runTicketscloudCatalogSync(url.searchParams);
+      // ID sync uses scripts/tc-sync.js (which already reconciles); full API sync
+      // imports in-process, so re-running is cheap and safely idempotent.
+      const indexability = await reconcileActiveRewriteIndexability(db);
+      if (indexability.changed.length) {
+        await revalidateEventPageIndexabilityChanges(indexability.changed, 'ticketscloud-sync-indexability');
+        invalidatePublicCaches('rewrite indexability reconciled', { warm: false });
+      }
       // Light warm by default — full warm stacks CPU with import; nightly cron can request full.
       const warmMode = ['1', 'true', 'full'].includes(String(url.searchParams.get('fullWarm') || '').toLowerCase())
         ? 'full'
         : 'light';
       invalidatePublicCaches('ticketscloud catalog sync', { warm: warmMode });
-      sendJson(response, result);
+      sendJson(response, { ...result, indexability: summarizeIndexability(indexability) });
       return;
     }
 
@@ -1410,6 +1423,11 @@ function scheduleTeplohodAutoSync() {
     try {
       console.log(`Teplohod auto-sync started (${reason})`);
       const result = await runTeplohodSync();
+      const indexability = await reconcileActiveRewriteIndexability(db);
+      if (indexability.changed.length) {
+        await revalidateEventPageIndexabilityChanges(indexability.changed, 'teplohod-auto-sync-indexability');
+        console.log(`EventPage indexability reconciled: changed=${indexability.changed.length}`);
+      }
       // Invalidate immediately; defer warm/revalidate to avoid stacking with import peak.
       invalidatePublicCaches('teplohod auto-sync', { warm: false });
       if (tepAutoSyncWarmTimer) clearTimeout(tepAutoSyncWarmTimer);
@@ -1426,7 +1444,7 @@ function scheduleTeplohodAutoSync() {
       const landingAudit = await runLandingAudit(db, rootDir);
       const elapsed = Date.now() - startedAt;
       console.log(
-        `Teplohod auto-sync finished in ${elapsed}ms: imported=${result.stats?.importedEvents ?? '?'}, sessions=${result.stats?.sessions ?? '?'}, openDate=${result.stats?.openDateEvents ?? '?'}, audit=${landingAudit?.summary?.failed ?? 0} failed`,
+        `Teplohod auto-sync finished in ${elapsed}ms: imported=${result.stats?.importedEvents ?? '?'}, sessions=${result.stats?.sessions ?? '?'}, openDate=${result.stats?.openDateEvents ?? '?'}, indexabilityChanged=${indexability.changed.length}, audit=${landingAudit?.summary?.failed ?? 0} failed`,
       );
     } catch (error) {
       console.warn(
@@ -1575,6 +1593,17 @@ function resolveWarmMode(options = {}) {
   if (options.warm === 'full' || options.warmMode === 'full') return 'full';
   if (options.warm === true) return 'full';
   return 'none';
+}
+
+function summarizeIndexability(result) {
+  return {
+    checked: result.checked,
+    indexed: result.indexed,
+    noindex: result.noindex,
+    changedToIndex: result.flagChangedToIndex,
+    changedToNoindex: result.flagChangedToNoindex,
+    reviewRequired: result.reviewRequired.length,
+  };
 }
 
 export function registerPublicCacheInvalidator(invalidator) {

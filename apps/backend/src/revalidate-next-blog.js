@@ -2,7 +2,7 @@
  * POST to Next internal revalidate for arbitrary tags/paths.
  * Optional `slug` → Next adds `event-page:{slug}` tag + `/events/{slug}` path.
  */
-export async function revalidateNextPaths({ tags = [], paths = [], slug, reason = 'manual' } = {}) {
+export async function revalidateNextPaths({ tags = [], paths = [], slug, reason = 'manual', skipIndexNow = false } = {}) {
   const secret = process.env.DAIBILET_NEXT_REVALIDATE_SECRET?.trim();
   const base = (process.env.DAIBILET_WEB_REVALIDATE_URL || 'http://127.0.0.1:3001').replace(/\/$/, '');
 
@@ -11,7 +11,7 @@ export async function revalidateNextPaths({ tags = [], paths = [], slug, reason 
     return { ok: false, skipped: true, reason: 'missing_secret' };
   }
 
-  const body = { tags, paths };
+  const body = { tags, paths, skipIndexNow };
   const eventSlug = String(slug || '').trim();
   if (eventSlug) body.slug = eventSlug;
 
@@ -47,6 +47,25 @@ export async function revalidateNextEventPage({ slug, reason = 'event update' } 
     paths.push(`/events/${encodeURIComponent(eventSlug)}`);
   }
   return revalidateNextPaths({ tags, paths, slug: eventSlug || undefined, reason });
+}
+
+/** Revalidate changed published EventPages and notify IndexNow only for indexable ones. */
+export async function revalidateEventPageIndexabilityChanges(changes = [], reason = 'eventpage-indexability') {
+  const results = [];
+  for (const isIndexable of [true, false]) {
+    const pages = (changes || []).filter((page) => page?.isIndexable === isIndexable && page?.slug);
+    for (let offset = 0; offset < pages.length; offset += 40) {
+      const batch = pages.slice(offset, offset + 40);
+      results.push(await revalidateNextPaths({
+        tags: ['event-page', 'catalog-page', ...batch.map((page) => `event-page:${page.slug}`)],
+        paths: ['/events', ...batch.map((page) => `/events/${encodeURIComponent(page.slug)}`)],
+        skipIndexNow: !isIndexable,
+        reason: `${reason}:${isIndexable ? 'index' : 'noindex'}`,
+      }));
+    }
+  }
+  const failed = results.some((result) => result?.ok === false && !result.skipped);
+  return { ok: !failed, batches: results.length, results };
 }
 
 /**

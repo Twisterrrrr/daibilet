@@ -272,6 +272,19 @@ INC.504.20: **не** держать inline `date +%Y…` / `%{time_…}` без 
 
 INC.504.25: `deploy-prod-next.sh` держит flock `/var/lock/daibilet-web-deploy.lock` + marker `daibilet-web-deploy.active` на всё окно stop→build→start→warm. Healthcheck при curl=7 mid-deploy больше не поднимает web на half-built `.next` (ENOENT `prerender-manifest.json` → crash-loop 502, в т.ч. на `/my-day`).
 
+### EventPage rewrite indexability
+
+Published EventPages with an active editorial rewrite are reconciled after TC/TEP catalog imports. An hourly job also catches sessions that expire between syncs:
+
+```bash
+cp /opt/daibilet/deploy/cron/daibilet-tasks /etc/cron.d/daibilet-tasks
+chmod 644 /etc/cron.d/daibilet-tasks
+install -d -m 755 /var/log/daibilet
+touch /var/log/daibilet/eventpage-indexability.log
+```
+
+The reconciler counts active offers for future or ongoing sessions and valid open-date events. Pages with no saleable linked event become `noindex`; eligible published rewrites become `index` with a self-canonical. Drafts, slugs, routes and EventPage↔Event links are not changed. Every status change creates a revision and invalidates the page caches.
+
 ### OOM watch
 `ash
 chmod +x /opt/daibilet/deploy/scripts/oom-watch.sh

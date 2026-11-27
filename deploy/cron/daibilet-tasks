@@ -21,3 +21,7 @@ PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
 
 # 3. API healthcheck every minute (INC.504.26: hung API while web still 200 from ISR)
 * * * * * root flock -n /var/lock/daibilet-api-health.lock /usr/bin/timeout --kill-after=10s 90s /bin/bash /opt/daibilet/deploy/cron/api-healthcheck.sh
+
+# 4. Keep published editorial EventPages indexed only while their linked events remain saleable.
+# Sync jobs reconcile immediately; this hourly pass catches sessions that simply expired.
+17 * * * * root flock -n /var/lock/daibilet-eventpage-indexability.lock /usr/bin/timeout --kill-after=20s 10m /bin/bash -lc 'cd /opt/daibilet && exec /usr/bin/node scripts/reconcile-eventpage-indexability.mjs' >>/var/log/daibilet/eventpage-indexability.log 2>&1
