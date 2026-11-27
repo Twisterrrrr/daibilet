@@ -18,6 +18,7 @@
 
 ### SEO, производительность и медиа
 
+- [Спецификация SEO-счётчиков EventPage и canonical URL, 27.11](./2026/seo-admin-dashboard-spec.md)
 - [EventPage без рерайта: canonical-аудит и карта возможной миграции, 27.11](./2026/seo-no-rewrite-canonical-audit-2026-11-27.md)
 - [SEO-аудит, 02.09](./2026/seo-audit-2026-09-02.md)
 - [SEO-аудит, 18.10](./2026/seo-audit-2026-10-18.md)

@@ -7,6 +7,13 @@
 > одного решения оставлять до сверки ссылок и истории, не считать их разными
 > контрактами.
 
+## 2026-11-27 - Admin SEO dashboard keeps editorial and URL metrics separate
+
+**Decision:** Specify the admin dashboard with EventPage editorial groups counted by page ID and technical health counted by distinct normalized public canonical URL. The four editorial groups must sum to total EventPage; route-level indexability comes only from the saved HTML audit, not the EventPage editorial flag. Stale/unknown sync or crawl data remains explicit and does not become zero or `noindex`. Dashboard reads must not trigger a full production crawl.
+
+**Data gap:** `EventPageRevision.createdAt` is not a reliable activation timestamp for `ACTIVE_EDITORIAL_REWRITE`. If 7/30-day rewrite activation counts are required, record an append-only activation event; do not substitute page `updatedAt` or `publishedAt`. See [dashboard specification](./reports/2026/seo-admin-dashboard-spec.md).
+
+**Status:** Specification only. No admin, API, Prisma or production changes.
 ## 2026-11-27 - EventPage SEO pilot separates new indexing from URL migration
 
 **Decision:** Treat SEO indexability and editorial publication as independent gates. Before opening a no-rewrite EventPage stable URL, establish whether an old public canonical URL already represents the same event. Keep “new canonical without migration” separate from “existing canonical migration”; do not change canonical, redirect or close the old URL automatically on publication. A shared/ambiguous public grouping or insufficient route evidence excludes a page from the pilot. Search visibility must not be inferred from `index, follow` or sitemap inclusion.
