@@ -7,6 +7,11 @@
 > одного решения оставлять до сверки ссылок и истории, не считать их разными
 > контрактами.
 
+## 2026-11-27 - EventPage SEO pilot separates new indexing from URL migration
+
+**Decision:** Treat SEO indexability and editorial publication as independent gates. Before opening a no-rewrite EventPage stable URL, establish whether an old public canonical URL already represents the same event. Keep “new canonical without migration” separate from “existing canonical migration”; do not change canonical, redirect or close the old URL automatically on publication. A shared/ambiguous public grouping or insufficient route evidence excludes a page from the pilot. Search visibility must not be inferred from `index, follow` or sitemap inclusion.
+
+**Evidence/status:** Live read-only audit of 3,190 freshly selected candidates on 2026-11-27 found 0 confirmed new canonicals without migration, 3,189 old canonical migration candidates and one grouping conflict. A control group of 100 cannot be selected from this cohort. This is an audit finding; no production changes or migrations were applied. Full per-page evidence and a proposed URL mapping are in [the report](./reports/2026/seo-no-rewrite-canonical-audit-2026-11-27.md).
 ## 2026-11-24 — Dynamic landing sitemap rollout
 
 **Decision:** Introduce an internal provider → shared indexability filter → canonical-path renderer for landing sitemap entries. Pilot it through `/sitemaps/landings-v2.xml` with New Year only; derive its city and region candidates from the live New Year catalogue facets and resolve counts through the same loader as the public page. Remove the New Year family from the legacy `landings.xml` while the pilot is active, so the sitemap index never lists duplicate URLs. Do not migrate other landing families until their provider and indexability rules are reviewed. After live verification, move the generator behind the existing `landings.xml` URL and retire the temporary `landings-v2.xml` endpoint.
