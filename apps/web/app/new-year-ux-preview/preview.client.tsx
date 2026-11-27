@@ -187,10 +187,6 @@ function previewSlotPurchaseUrls(event: PreviewEvent, slot: NonNullable<PreviewE
   return [...new Set(candidates)];
 }
 
-function hasSlotSpecificPurchaseUrl(slot: NonNullable<PreviewEvent['upcomingSlots']>[number]): boolean {
-  return [slot.purchaseUrl, ...(slot.purchaseUrls || [])].some((url) => Boolean(safeExternalUrl(url)));
-}
-
 function PreviewPurchaseButton({ event, className, label = 'Купить' }: { event: PreviewEvent; className: string; label?: string }) {
   const purchaseUrl = event.widgetUrl || event.purchaseUrl || event.upcomingSlots?.[0]?.purchaseUrl || null;
   if (event.purchaseReady === false) return <span>Билеты уточняются</span>;
@@ -1205,7 +1201,7 @@ export function NewYearUxPreview({
                 <div className={styles.rowMain}>
                   <div className={styles.rowTitle} title={event.title}>{event.title}</div>
                   <div className={styles.rowMeta}>{city === 'Вся Россия' && event.city ? <span className={styles.rowCity}>{event.city}</span> : null}{city !== 'Вся Россия' && event.city ? <span className={styles.rowCityMobile}>{event.city}</span> : null}{eventBadges(event).map((badge) => <span key={badge.id} className={`${styles.tag} ${badge.className}`}>{badge.label}</span>)}<span className={`${styles.rowVenue} ${styles.rowVenueInline}`}>{event.venue || 'Площадка уточняется'}</span></div>
-                  {slots.length > 1 ? <details className={styles.schedule}><summary><span className={styles.scheduleDesktopLabel}>Расписание · </span><span className={styles.scheduleCompactLabel}>{slots.length} {pluralRu(slots.length, PLURAL_SESSION_FORMS)}</span></summary><ul className={styles.scheduleList}>{slots.map((item, index) => { const itemUrls = previewSlotPurchaseUrls(event, item); return <li className={styles.scheduleItem} key={item.id || `${event.id}:${item.startsAt}:${index}`}><span>{formatSlot(item, timeZone)}</span>{itemUrls.map((itemUrl, urlIndex) => <PreviewPurchaseButton key={`${itemUrl}:${urlIndex}`} event={{ ...event, widgetUrl: null, purchaseUrl: itemUrl, upcomingSlots: [{ ...item, purchaseUrl: itemUrl, purchaseUrls: undefined }] }} className={styles.scheduleBuy} label={itemUrls.length > 1 ? `Билет на сеанс ${urlIndex + 1}` : hasSlotSpecificPurchaseUrl(item) ? 'Билет на этот сеанс' : 'Открыть билеты'} />)}{!itemUrls.length ? <span className={styles.drawerScheduleUnavailable}>Ссылка покупки недоступна</span> : null}</li>; })}</ul></details> : null}
+                  {slots.length > 1 ? <details className={styles.schedule}><summary><span className={styles.scheduleDesktopLabel}>Расписание · </span><span className={styles.scheduleCompactLabel}>{slots.length} {pluralRu(slots.length, PLURAL_SESSION_FORMS)}</span></summary><ul className={styles.scheduleList}>{slots.map((item, index) => { const itemUrls = previewSlotPurchaseUrls(event, item); return <li className={styles.scheduleItem} key={item.id || `${event.id}:${item.startsAt}:${index}`}><span>{formatSlot(item, timeZone)}</span>{itemUrls.map((itemUrl, urlIndex) => <PreviewPurchaseButton key={`${itemUrl}:${urlIndex}`} event={{ ...event, widgetUrl: null, purchaseUrl: itemUrl, upcomingSlots: [{ ...item, purchaseUrl: itemUrl, purchaseUrls: undefined }] }} className={styles.scheduleBuy} label="Билет на этот сеанс" />)}{!itemUrls.length ? <span className={styles.drawerScheduleUnavailable}>Ссылка покупки недоступна</span> : null}</li>; })}</ul></details> : null}
                 </div>
                 <div className={styles.rowVenueColumn}>{event.venue || 'Площадка не указана'}</div>
                 <div className={styles.rowPrice}>{priceLabel}{typeof event.priceFrom === 'number' && event.priceFrom === 0 ? <small className={styles.freePrice}>вход свободный</small> : <small>за билет</small>}</div>
@@ -1256,7 +1252,7 @@ export function NewYearUxPreview({
                     const urls = previewSlotPurchaseUrls(selectedEvent, item);
                     return <li key={item.id || `${selectedEvent.id}:${item.startsAt}:${index}`}>
                       <span>{formatSlot(item, resolveSessionTimeZone(selectedEvent))}</span>
-                      {urls.map((url, urlIndex) => <PreviewPurchaseButton key={`${url}:${urlIndex}`} event={{ ...selectedEvent, widgetUrl: null, purchaseUrl: url, upcomingSlots: [{ ...item, purchaseUrl: url, purchaseUrls: undefined }] }} className={styles.drawerScheduleBuy} label={urls.length > 1 ? `Билет на сеанс ${urlIndex + 1}` : hasSlotSpecificPurchaseUrl(item) ? 'Купить билет на этот сеанс' : 'Открыть билеты'} />)}
+                      {urls.map((url, urlIndex) => <PreviewPurchaseButton key={`${url}:${urlIndex}`} event={{ ...selectedEvent, widgetUrl: null, purchaseUrl: url, upcomingSlots: [{ ...item, purchaseUrl: url, purchaseUrls: undefined }] }} className={styles.drawerScheduleBuy} label="Билет на этот сеанс" />)}
                       {!urls.length ? <span className={styles.drawerScheduleUnavailable}>Ссылка покупки недоступна</span> : null}
                     </li>;
                   })}
