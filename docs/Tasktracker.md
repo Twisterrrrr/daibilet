@@ -8,7 +8,7 @@
 
 | ID | Задача | Приоритет | Статус |
 |----|--------|-----------|--------|
-| SEO.EVENT-INDEXABILITY-AUDIT | Сравнить текущую и предлагаемую индексацию по Event ID, подготовить контрольные группы, подключить preview counters и проверить parity robots/sitemap | Высокий | 🔄 Production API+sitemap сверены по нормализованному canonical key; 20/20 URL smoke прошли. Найденный snapshot 19 143 EventPage не заменяет Event.isIndexable и покрывает только Ticketscloud. Локальная БД тестовая (1 Event), Event-level transition counts и валидная контрольная группа не получены. Pure preview evaluator и 12 сценариев добавлены, runtime не менялся. См. [отчёт](./reports/2026/event-seo-indexability-phase1-audit-2026-11-27.md). Массовое изменение статусов запрещено до отдельного согласования |
+| SEO.EVENT-INDEXABILITY-AUDIT | Сравнить текущую и предлагаемую индексацию на уровне canonical page/group, подготовить контрольные группы, подключить preview counters и проверить parity robots/sitemap | Высокий | 🔄 Production API/sitemap перепроверены с учётом группировки слотов: 3 997 canonical keys каталога + 638 дополнительных URL; все дополнительные URL соответствуют опубликованным индексируемым EventPage с EventPageEvent. 20/20 URL smoke прошли. 42 077 связей EventPageEvent - inventory, не число URL. Pure Event-level evaluator и 12 сценариев добавлены, runtime не менялся; до интеграции определить агрегацию на page/group уровне. См. [отчёт](./reports/2026/event-seo-indexability-phase1-audit-2026-11-27.md). Массовая смена статусов запрещена до отдельного согласования |
 
 ## 2026-11-26 - Сверка документации и актуального backlog
 
