@@ -1,0 +1,2613 @@
+{
+  "createdAt": "2026-11-27T08:43:53.755Z",
+  "database": "daibilet",
+  "checkedAt": "2026-11-27T08:43:54.339Z",
+  "version": "2026-11-27-eventpage-editorial-batch-30",
+  "pages": [
+    {
+      "id": "ca5b530f-5540-4abe-9f2b-441c03cdd3b0",
+      "slug": "balet-schelkunchik-sankt-peterburg-4",
+      "title": "Балет \"Щелкунчик\"",
+      "summary": null,
+      "heroImageUrl": null,
+      "content": {
+        "sections": []
+      },
+      "seoH1": "Балет \"Щелкунчик\"",
+      "seoTitle": "Балет \"Щелкунчик\" | Дайбилет",
+      "seoDescription": null,
+      "canonicalPath": null,
+      "status": "DRAFT",
+      "isIndexable": false,
+      "publishedAt": null,
+      "tourGroupId": null,
+      "links": [
+        {
+          "role": "PRIMARY",
+          "eventId": "evt_6a917d03b16f25bfb6a10497",
+          "position": 0
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6a91b0eb49e3088643214d56",
+          "position": 1
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6a91b03a49e3088643214a29",
+          "position": 2
+        }
+      ],
+      "routes": [
+        "/events/balet-schelkunchik-sankt-peterburg-4",
+        "/events/balet-schelkunchik-sankt-peterburg-6",
+        "/events/balet-schelkunchik-sankt-peterburg-8"
+      ],
+      "revisions": 2,
+      "activeSaleableEvents": 3
+    },
+    {
+      "id": "067efac8-40c6-405d-893d-6dcc3d5b0741",
+      "slug": "bogemnyi-art-branch-novogodnii-peterburg-xix-veka-vecherinki-dueli-svetskie-salony-sankt-peterburg",
+      "title": "Богемный арт-бранч: «Новогодний Петербург XIX века: вечеринки, дуэли, светские салоны»",
+      "summary": null,
+      "heroImageUrl": null,
+      "content": {
+        "sections": []
+      },
+      "seoH1": "Богемный арт-бранч: «Новогодний Петербург XIX века: вечеринки, дуэли, светские салоны»",
+      "seoTitle": "Богемный арт-бранч: «Новогодний Петербург XIX века: вечеринки, дуэли, светские салоны» | Дайбилет",
+      "seoDescription": null,
+      "canonicalPath": null,
+      "status": "DRAFT",
+      "isIndexable": false,
+      "publishedAt": null,
+      "tourGroupId": null,
+      "links": [
+        {
+          "role": "PRIMARY",
+          "eventId": "evt_6b058312e21486ea5d6c3c4a",
+          "position": 0
+        }
+      ],
+      "routes": [
+        "/events/bogemnyi-art-branch-novogodnii-peterburg-xix-veka-vecherinki-dueli-svetskie-salony-sankt-peterburg"
+      ],
+      "revisions": 1,
+      "activeSaleableEvents": 1
+    },
+    {
+      "id": "842a6f4c-63db-42e5-8016-d83ec3f9cd0b",
+      "slug": "bogemnyi-art-branch-novyi-god-v-carskoi-stolice-elki-podarki-zimnie-zabavy-sankt-peterburg",
+      "title": "Богемный арт-бранч: «Новый год в царской столице: елки, подарки, зимние забавы»",
+      "summary": null,
+      "heroImageUrl": null,
+      "content": {
+        "sections": []
+      },
+      "seoH1": "Богемный арт-бранч: «Новый год в царской столице: елки, подарки, зимние забавы»",
+      "seoTitle": "Богемный арт-бранч: «Новый год в царской столице: елки, подарки, зимние забавы» | Дайбилет",
+      "seoDescription": null,
+      "canonicalPath": null,
+      "status": "DRAFT",
+      "isIndexable": false,
+      "publishedAt": null,
+      "tourGroupId": null,
+      "links": [
+        {
+          "role": "PRIMARY",
+          "eventId": "evt_6b05c9e78628f283c3b0e62d",
+          "position": 0
+        }
+      ],
+      "routes": [
+        "/events/bogemnyi-art-branch-novyi-god-v-carskoi-stolice-elki-podarki-zimnie-zabavy-sankt-peterburg"
+      ],
+      "revisions": 1,
+      "activeSaleableEvents": 1
+    },
+    {
+      "id": "1b24458d-1a3e-4f0d-94c3-f5d9ce0172b6",
+      "slug": "chaikovskii-pri-svechah-rozhdestvenskaya-klassika-i-balet-v-atmosfere-starinnogo-evropeiskogo-teatr-moskva",
+      "title": "Чайковский при свечах. Рождественская классика и балет в атмосфере старинного европейского театра",
+      "summary": null,
+      "heroImageUrl": null,
+      "content": {
+        "sections": []
+      },
+      "seoH1": "Чайковский при свечах. Рождественская классика и балет в атмосфере старинного европейского театра",
+      "seoTitle": "Чайковский при свечах. Рождественская классика и балет в атмосфере старинного европейского театра | Дайбилет",
+      "seoDescription": null,
+      "canonicalPath": null,
+      "status": "DRAFT",
+      "isIndexable": false,
+      "publishedAt": null,
+      "tourGroupId": null,
+      "links": [
+        {
+          "role": "PRIMARY",
+          "eventId": "evt_6b06c1421756fe74d9e9748d",
+          "position": 0
+        }
+      ],
+      "routes": [
+        "/events/chaikovskii-pri-svechah-rozhdestvenskaya-klassika-i-balet-v-atmosfere-starinnogo-evropeiskogo-teatr-moskva"
+      ],
+      "revisions": 1,
+      "activeSaleableEvents": 1
+    },
+    {
+      "id": "6518174f-cb5d-41c9-a81a-b4e842a99b03",
+      "slug": "craft-magic-night-2027-novosibirsk",
+      "title": "CRAFT MAGIC NIGHT 2027",
+      "summary": null,
+      "heroImageUrl": null,
+      "content": {
+        "sections": []
+      },
+      "seoH1": "CRAFT MAGIC NIGHT 2027",
+      "seoTitle": "CRAFT MAGIC NIGHT 2027 | Дайбилет",
+      "seoDescription": null,
+      "canonicalPath": null,
+      "status": "DRAFT",
+      "isIndexable": false,
+      "publishedAt": null,
+      "tourGroupId": null,
+      "links": [
+        {
+          "role": "PRIMARY",
+          "eventId": "evt_6ac5e45b3d44bbb55c3d83bc",
+          "position": 0
+        }
+      ],
+      "routes": [
+        "/events/craft-magic-night-2027-novosibirsk"
+      ],
+      "revisions": 1,
+      "activeSaleableEvents": 1
+    },
+    {
+      "id": "1353b766-5449-4726-ab50-23649885a8d8",
+      "slug": "dve-arfy-pri-svechah-prednovogodnii-koncert-tatyana-vasileva-i-marina-kulinich-tver",
+      "title": "Две арфы при свечах. Предновогодний концерт. Татьяна Васильева и Марина Кулинич",
+      "summary": null,
+      "heroImageUrl": null,
+      "content": {
+        "sections": []
+      },
+      "seoH1": "Две арфы при свечах. Предновогодний концерт. Татьяна Васильева и Марина Кулинич",
+      "seoTitle": "Две арфы при свечах. Предновогодний концерт. Татьяна Васильева и Марина Кулинич | Дайбилет",
+      "seoDescription": null,
+      "canonicalPath": null,
+      "status": "DRAFT",
+      "isIndexable": false,
+      "publishedAt": null,
+      "tourGroupId": null,
+      "links": [
+        {
+          "role": "PRIMARY",
+          "eventId": "evt_6afb5faecd12abe5822ef703",
+          "position": 0
+        }
+      ],
+      "routes": [
+        "/events/dve-arfy-pri-svechah-prednovogodnii-koncert-tatyana-vasileva-i-marina-kulinich-tver"
+      ],
+      "revisions": 1,
+      "activeSaleableEvents": 1
+    },
+    {
+      "id": "0d7426d8-1a7c-4579-a413-3e488f5a9162",
+      "slug": "dzhaz-klub-nz-posle-rozhdestva-kaliningrad",
+      "title": "Джаз клуб NZ. После Рождества",
+      "summary": null,
+      "heroImageUrl": null,
+      "content": {
+        "sections": []
+      },
+      "seoH1": "Джаз клуб NZ. После Рождества",
+      "seoTitle": "Джаз клуб NZ. После Рождества | Дайбилет",
+      "seoDescription": null,
+      "canonicalPath": null,
+      "status": "DRAFT",
+      "isIndexable": false,
+      "publishedAt": null,
+      "tourGroupId": null,
+      "links": [
+        {
+          "role": "PRIMARY",
+          "eventId": "evt_6b06ce7e8873b1b2661de150",
+          "position": 0
+        }
+      ],
+      "routes": [
+        "/events/dzhaz-klub-nz-posle-rozhdestva-kaliningrad"
+      ],
+      "revisions": 1,
+      "activeSaleableEvents": 1
+    },
+    {
+      "id": "5d568113-4f03-4f96-9bca-0ed927b22e37",
+      "slug": "dzhaz-klub-nz-s-novym-2027-godom-kaliningrad",
+      "title": "Джаз клуб NZ. С Новым 2027 годом!",
+      "summary": null,
+      "heroImageUrl": null,
+      "content": {
+        "sections": []
+      },
+      "seoH1": "Джаз клуб NZ. С Новым 2027 годом!",
+      "seoTitle": "Джаз клуб NZ. С Новым 2027 годом! | Дайбилет",
+      "seoDescription": null,
+      "canonicalPath": null,
+      "status": "DRAFT",
+      "isIndexable": false,
+      "publishedAt": null,
+      "tourGroupId": null,
+      "links": [
+        {
+          "role": "PRIMARY",
+          "eventId": "evt_6b06c7755586fe01725f7348",
+          "position": 0
+        }
+      ],
+      "routes": [
+        "/events/dzhaz-klub-nz-s-novym-2027-godom-kaliningrad"
+      ],
+      "revisions": 1,
+      "activeSaleableEvents": 1
+    },
+    {
+      "id": "ec34f97c-7b13-4e29-b970-d0a6cc3f1bba",
+      "slug": "elka-novogodnee-shou-rostov-na-donu",
+      "title": "Ёлка дождя! Новогоднее шоу!",
+      "summary": null,
+      "heroImageUrl": null,
+      "content": {
+        "sections": []
+      },
+      "seoH1": "Ёлка дождя! Новогоднее шоу!",
+      "seoTitle": "Ёлка дождя! Новогоднее шоу! | Дайбилет",
+      "seoDescription": null,
+      "canonicalPath": null,
+      "status": "DRAFT",
+      "isIndexable": false,
+      "publishedAt": null,
+      "tourGroupId": null,
+      "links": [
+        {
+          "role": "PRIMARY",
+          "eventId": "evt_6990980ec9c9ce0093e6c6d5",
+          "position": 0
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_69909849a8a407e3c091a0cb",
+          "position": 1
+        }
+      ],
+      "routes": [
+        "/events/elka-novogodnee-shou-rostov-na-donu",
+        "/events/elka-novogodnee-shou-rostov-na-donu-2"
+      ],
+      "revisions": 2,
+      "activeSaleableEvents": 2
+    },
+    {
+      "id": "8a5e0877-ae7e-4045-a043-826ef83f6cf2",
+      "slug": "immersivnoe-shou-rozhdestvo-ozhivshie-tradicii-sankt-peterburg",
+      "title": "Иммерсивное шоу «Рождество. Ожившие традиции»",
+      "summary": null,
+      "heroImageUrl": null,
+      "content": {
+        "sections": []
+      },
+      "seoH1": "Иммерсивное шоу «Рождество. Ожившие традиции»",
+      "seoTitle": "Иммерсивное шоу «Рождество. Ожившие традиции» | Дайбилет",
+      "seoDescription": null,
+      "canonicalPath": null,
+      "status": "DRAFT",
+      "isIndexable": false,
+      "publishedAt": null,
+      "tourGroupId": null,
+      "links": [
+        {
+          "role": "PRIMARY",
+          "eventId": "evt_6b06bd013d9220697c600d90",
+          "position": 0
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6b06bd013d9220697c600d88",
+          "position": 1
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6b06bd003d9220697c600d80",
+          "position": 2
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6b06bcff3d9220697c600d78",
+          "position": 3
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6b06bcff3d9220697c600d70",
+          "position": 4
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6b06bcfe3d9220697c600d68",
+          "position": 5
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6b06bcfe3d9220697c600d60",
+          "position": 6
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6b06bcfd3d9220697c600d58",
+          "position": 7
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6b06bcfd3d9220697c600d50",
+          "position": 8
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6b06bcfc3d9220697c600d48",
+          "position": 9
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6b06bcfc3d9220697c600d40",
+          "position": 10
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6b06bcfb3d9220697c600d38",
+          "position": 11
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6b06bcfb3d9220697c600d30",
+          "position": 12
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6b06bcfa3d9220697c600d28",
+          "position": 13
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6b06bcfa3d9220697c600d20",
+          "position": 14
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6b06bcf93d9220697c600d18",
+          "position": 15
+        }
+      ],
+      "routes": [
+        "/events/immersivnoe-shou-rozhdestvo-ozhivshie-tradicii-sankt-peterburg"
+      ],
+      "revisions": 16,
+      "activeSaleableEvents": 16
+    },
+    {
+      "id": "075ffee4-d6cb-4133-9874-e77fea0a57bd",
+      "slug": "infiniti-solnyi-koncert-4-yanvarya-2027-g-korolev-moskva-nebo-ruftop-6-korolev",
+      "title": "\"ИНФИНИТИ\" сольный концерт- 4 января 2027 г. Королёв (Москва) \"NЕБО\" Руфтоп 6+",
+      "summary": null,
+      "heroImageUrl": null,
+      "content": {
+        "sections": []
+      },
+      "seoH1": "\"ИНФИНИТИ\" сольный концерт- 4 января 2027 г. Королёв (Москва) \"NЕБО\" Руфтоп 6+",
+      "seoTitle": "\"ИНФИНИТИ\" сольный концерт- 4 января 2027 г. Королёв (Москва) \"NЕБО\" Руфтоп 6+ | Дайбилет",
+      "seoDescription": null,
+      "canonicalPath": null,
+      "status": "DRAFT",
+      "isIndexable": false,
+      "publishedAt": null,
+      "tourGroupId": null,
+      "links": [
+        {
+          "role": "PRIMARY",
+          "eventId": "evt_6ae881f37779cfd820e69659",
+          "position": 0
+        }
+      ],
+      "routes": [
+        "/events/infiniti-solnyi-koncert-4-yanvarya-2027-g-korolev-moskva-nebo-ruftop-6-korolev"
+      ],
+      "revisions": 1,
+      "activeSaleableEvents": 1
+    },
+    {
+      "id": "1b123799-47d6-43e8-b125-a02f29940654",
+      "slug": "kvintet-pavla-timofeeva-ironiya-sudby-ili-uragannyi-novyi-god-moskva",
+      "title": "КВИНТЕТ ПАВЛА ТИМОФЕЕВА: «ИРОНИЯ СУДЬБЫ, ИЛИ УРАГАННЫЙ НОВЫЙ ГОД»",
+      "summary": null,
+      "heroImageUrl": null,
+      "content": {
+        "sections": []
+      },
+      "seoH1": "КВИНТЕТ ПАВЛА ТИМОФЕЕВА: «ИРОНИЯ СУДЬБЫ, ИЛИ УРАГАННЫЙ НОВЫЙ ГОД»",
+      "seoTitle": "КВИНТЕТ ПАВЛА ТИМОФЕЕВА: «ИРОНИЯ СУДЬБЫ, ИЛИ УРАГАННЫЙ НОВЫЙ ГОД» | Дайбилет",
+      "seoDescription": null,
+      "canonicalPath": null,
+      "status": "DRAFT",
+      "isIndexable": false,
+      "publishedAt": null,
+      "tourGroupId": null,
+      "links": [
+        {
+          "role": "PRIMARY",
+          "eventId": "evt_6b06cf39dead791a101a2838",
+          "position": 0
+        }
+      ],
+      "routes": [
+        "/events/kvintet-pavla-timofeeva-ironiya-sudby-ili-uragannyi-novyi-god-moskva"
+      ],
+      "revisions": 1,
+      "activeSaleableEvents": 1
+    },
+    {
+      "id": "9f020bd6-c8ea-48b1-ab3b-5a68cc5f48fb",
+      "slug": "muzei-raketnyh-voisk-strategicheskogo-naznacheniya-v-zakrytom-poselke-vlasiha-mikroavtobus-moskva",
+      "title": "Музей Ракетных войск стратегического назначения в закрытом поселке Власиха. Микроавтобус",
+      "summary": null,
+      "heroImageUrl": null,
+      "content": {
+        "sections": []
+      },
+      "seoH1": "Музей Ракетных войск стратегического назначения в закрытом поселке Власиха. Микроавтобус",
+      "seoTitle": "Музей Ракетных войск стратегического назначения в закрытом поселке Власиха. Микроавтобус | Дайбилет",
+      "seoDescription": null,
+      "canonicalPath": null,
+      "status": "DRAFT",
+      "isIndexable": false,
+      "publishedAt": null,
+      "tourGroupId": null,
+      "links": [
+        {
+          "role": "PRIMARY",
+          "eventId": "evt_6ae873fe8446f7eb36494bd5",
+          "position": 0
+        }
+      ],
+      "routes": [
+        "/events/muzei-raketnyh-voisk-strategicheskogo-naznacheniya-v-zakrytom-poselke-vlasiha-mikroavtobus-moskva"
+      ],
+      "revisions": 1,
+      "activeSaleableEvents": 1
+    },
+    {
+      "id": "8a2463eb-28ac-4e81-99c9-876a826d5cd8",
+      "slug": "my-vstrechaem-novyi-2027-god-v-karaoke-eho-tak-chtoby-eho-nashih-golosov-i-boi-kurantov-slyshali-po-moskva",
+      "title": "Мы встречаем Новый 2027 год в караоке \"Эхо\" так, чтобы эхо наших голосов и бой курантов слышали по всей Москве! Зажигаем до самого утра!",
+      "summary": null,
+      "heroImageUrl": null,
+      "content": {
+        "sections": []
+      },
+      "seoH1": "Мы встречаем Новый 2027 год в караоке \"Эхо\" так, чтобы эхо наших голосов и бой курантов слышали по всей Москве! Зажигаем до самого утра!",
+      "seoTitle": "Мы встречаем Новый 2027 год в караоке \"Эхо\" так, чтобы эхо наших голосов и бой курантов слышали по всей Москве! Зажигаем до самого утра! | Дайбилет",
+      "seoDescription": null,
+      "canonicalPath": null,
+      "status": "DRAFT",
+      "isIndexable": false,
+      "publishedAt": null,
+      "tourGroupId": null,
+      "links": [
+        {
+          "role": "PRIMARY",
+          "eventId": "evt_6b046a4908bee3898f6b27a7",
+          "position": 0
+        }
+      ],
+      "routes": [
+        "/events/my-vstrechaem-novyi-2027-god-v-karaoke-eho-tak-chtoby-eho-nashih-golosov-i-boi-kurantov-slyshali-po-moskva"
+      ],
+      "revisions": 1,
+      "activeSaleableEvents": 1
+    },
+    {
+      "id": "458bbcb3-c22c-498f-9d44-bac9b4c911ee",
+      "slug": "myuzikl-ali-baba-i-sorok-razboinikov-muzykalnaya-skazka-novogodnee-predstavlenie-sankt-peterburg",
+      "title": "Мюзикл \"Али-Баба и сорок разбойников\"- музыкальная сказка. Новогоднее представление.",
+      "summary": null,
+      "heroImageUrl": null,
+      "content": {
+        "sections": []
+      },
+      "seoH1": "Мюзикл \"Али-Баба и сорок разбойников\"- музыкальная сказка. Новогоднее представление.",
+      "seoTitle": "Мюзикл \"Али-Баба и сорок разбойников\"- музыкальная сказка. Новогоднее представление. | Дайбилет",
+      "seoDescription": null,
+      "canonicalPath": null,
+      "status": "DRAFT",
+      "isIndexable": false,
+      "publishedAt": null,
+      "tourGroupId": null,
+      "links": [
+        {
+          "role": "PRIMARY",
+          "eventId": "evt_6ad1f180a3e18e421d0b6c6a",
+          "position": 0
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6ad1f76a53d2aaad84fa9c3b",
+          "position": 1
+        }
+      ],
+      "routes": [
+        "/events/myuzikl-ali-baba-i-sorok-razboinikov-muzykalnaya-skazka-novogodnee-predstavlenie-sankt-peterburg",
+        "/events/myuzikl-ali-baba-i-sorok-razboinikov-muzykalnaya-skazka-novogodnee-predstavlenie-sankt-peterburg-2"
+      ],
+      "revisions": 2,
+      "activeSaleableEvents": 2
+    },
+    {
+      "id": "a3a383ea-87a8-4b02-805b-7e346e374e19",
+      "slug": "naik-borzov-bolshoi-novogodnii-koncert-nizhniy-novgorod",
+      "title": "Найк Борзов \"Большой Новогодний Концерт\"",
+      "summary": null,
+      "heroImageUrl": null,
+      "content": {
+        "sections": []
+      },
+      "seoH1": "Найк Борзов \"Большой Новогодний Концерт\"",
+      "seoTitle": "Найк Борзов \"Большой Новогодний Концерт\" | Дайбилет",
+      "seoDescription": null,
+      "canonicalPath": null,
+      "status": "DRAFT",
+      "isIndexable": false,
+      "publishedAt": null,
+      "tourGroupId": "815522c2-978b-4950-8233-12d482119690",
+      "links": [
+        {
+          "role": "PRIMARY",
+          "eventId": "evt_6aba79ca9b9732652ace9369",
+          "position": 0
+        }
+      ],
+      "routes": [
+        "/events/naik-borzov-bolshoi-novogodnii-koncert-nizhniy-novgorod"
+      ],
+      "revisions": 2,
+      "activeSaleableEvents": 1
+    },
+    {
+      "id": "cfa2a9aa-87ca-45ed-8f24-526c3a17ed39",
+      "slug": "novogodnii-otkrytyi-mikrofon-surgut",
+      "title": "НОВОГОДНИЙ ОТКРЫТЫЙ МИКРОФОН",
+      "summary": null,
+      "heroImageUrl": null,
+      "content": {
+        "sections": []
+      },
+      "seoH1": "НОВОГОДНИЙ ОТКРЫТЫЙ МИКРОФОН",
+      "seoTitle": "НОВОГОДНИЙ ОТКРЫТЫЙ МИКРОФОН | Дайбилет",
+      "seoDescription": null,
+      "canonicalPath": null,
+      "status": "DRAFT",
+      "isIndexable": false,
+      "publishedAt": null,
+      "tourGroupId": null,
+      "links": [
+        {
+          "role": "PRIMARY",
+          "eventId": "evt_6b06d3c02d60868db6b23032",
+          "position": 0
+        }
+      ],
+      "routes": [
+        "/events/novogodnii-otkrytyi-mikrofon-surgut"
+      ],
+      "revisions": 1,
+      "activeSaleableEvents": 1
+    },
+    {
+      "id": "842b808d-09e5-4738-aa16-fe0d2cbeebc5",
+      "slug": "novogodnii-semeinyi-branch-moskva",
+      "title": "Новогодний семейный бранч",
+      "summary": null,
+      "heroImageUrl": null,
+      "content": {
+        "sections": []
+      },
+      "seoH1": "Новогодний семейный бранч",
+      "seoTitle": "Новогодний семейный бранч | Дайбилет",
+      "seoDescription": null,
+      "canonicalPath": null,
+      "status": "DRAFT",
+      "isIndexable": false,
+      "publishedAt": null,
+      "tourGroupId": null,
+      "links": [
+        {
+          "role": "PRIMARY",
+          "eventId": "evt_6b06ca7ee24e59171b398570",
+          "position": 0
+        }
+      ],
+      "routes": [
+        "/events/novogodnii-semeinyi-branch-moskva"
+      ],
+      "revisions": 1,
+      "activeSaleableEvents": 1
+    },
+    {
+      "id": "d6b440e3-3b84-48e7-9762-3749278539a4",
+      "slug": "novogodnii-utrennik-1-nizhniy-novgorod-2",
+      "title": "Новогодний утренник 1+",
+      "summary": null,
+      "heroImageUrl": null,
+      "content": {
+        "sections": []
+      },
+      "seoH1": "Новогодний утренник 1+",
+      "seoTitle": "Новогодний утренник 1+ | Дайбилет",
+      "seoDescription": null,
+      "canonicalPath": null,
+      "status": "DRAFT",
+      "isIndexable": false,
+      "publishedAt": null,
+      "tourGroupId": null,
+      "links": [
+        {
+          "role": "PRIMARY",
+          "eventId": "evt_6b06a56e71176c8cfb20e502",
+          "position": 0
+        }
+      ],
+      "routes": [
+        "/events/novogodnii-utrennik-1-nizhniy-novgorod-2"
+      ],
+      "revisions": 1,
+      "activeSaleableEvents": 1
+    },
+    {
+      "id": "7b1e9486-600c-4b31-8dbb-426822f066f0",
+      "slug": "novogodnyaya-skazka-v-peterburge-vechernyaya-avtobusnaya-ekskursiya-po-prazdnichnomu-gorodu-sankt-peterburg",
+      "title": "Новогодняя сказка в Петербурге: вечерняя автобусная экскурсия по праздничному городу",
+      "summary": null,
+      "heroImageUrl": null,
+      "content": {
+        "sections": []
+      },
+      "seoH1": "Новогодняя сказка в Петербурге: вечерняя автобусная экскурсия по праздничному городу",
+      "seoTitle": "Новогодняя сказка в Петербурге: вечерняя автобусная экскурсия по праздничному городу | Дайбилет",
+      "seoDescription": null,
+      "canonicalPath": null,
+      "status": "DRAFT",
+      "isIndexable": false,
+      "publishedAt": null,
+      "tourGroupId": null,
+      "links": [
+        {
+          "role": "PRIMARY",
+          "eventId": "evt_6afa9f372cb5938f16c3b8cc",
+          "position": 0
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6afa9f392cb5938f16c3b8e8",
+          "position": 1
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6afa9f3a2cb5938f16c3b904",
+          "position": 2
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6afa9f3b2cb5938f16c3b920",
+          "position": 3
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6afa9f3c2cb5938f16c3b93c",
+          "position": 4
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6afa9f3d2cb5938f16c3b958",
+          "position": 5
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6afa9f3f2cb5938f16c3b974",
+          "position": 6
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6afa9f402cb5938f16c3b990",
+          "position": 7
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6afa9f412cb5938f16c3b9ac",
+          "position": 8
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6afa9f422cb5938f16c3b9c8",
+          "position": 9
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6afa9f432cb5938f16c3b9e4",
+          "position": 10
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6afa9f442cb5938f16c3ba00",
+          "position": 11
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6afa9f452cb5938f16c3ba1c",
+          "position": 12
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6afa9f472cb5938f16c3ba38",
+          "position": 13
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6afa9f482cb5938f16c3ba54",
+          "position": 14
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6afa9f492cb5938f16c3ba70",
+          "position": 15
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6afa9f4a2cb5938f16c3ba8c",
+          "position": 16
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6afa9f4b2cb5938f16c3baa8",
+          "position": 17
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6afa9f4c2cb5938f16c3bac4",
+          "position": 18
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6afa9f4d2cb5938f16c3bae0",
+          "position": 19
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6afa9f4f2cb5938f16c3bafc",
+          "position": 20
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6afa9f502cb5938f16c3bb18",
+          "position": 21
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6afa9f512cb5938f16c3bb34",
+          "position": 22
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6afa9f522cb5938f16c3bb50",
+          "position": 23
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6afa9f532cb5938f16c3bb6c",
+          "position": 24
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6afa9f542cb5938f16c3bb88",
+          "position": 25
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6afa9f552cb5938f16c3bba4",
+          "position": 26
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6afa9f572cb5938f16c3bbc0",
+          "position": 27
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6afa9f582cb5938f16c3bbdc",
+          "position": 28
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6afa9f592cb5938f16c3bbf8",
+          "position": 29
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6afa9f5a2cb5938f16c3bc14",
+          "position": 30
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6afa9f5b2cb5938f16c3bc30",
+          "position": 31
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6afa9f5c2cb5938f16c3bc4c",
+          "position": 32
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6afa9f5d2cb5938f16c3bc68",
+          "position": 33
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6afa9f5f2cb5938f16c3bc84",
+          "position": 34
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6afa9f602cb5938f16c3bca0",
+          "position": 35
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6afa9f612cb5938f16c3bcbc",
+          "position": 36
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6afa9f622cb5938f16c3bcd8",
+          "position": 37
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6afa9f632cb5938f16c3bcf4",
+          "position": 38
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6afa9f642cb5938f16c3bd10",
+          "position": 39
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6afa9f652cb5938f16c3bd2c",
+          "position": 40
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6afa9f662cb5938f16c3bd48",
+          "position": 41
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6afa9f682cb5938f16c3bd64",
+          "position": 42
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6afa9f692cb5938f16c3bd80",
+          "position": 43
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6afa9f6a2cb5938f16c3bd9c",
+          "position": 44
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6afa9f6b2cb5938f16c3bdb8",
+          "position": 45
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6afa9f6c2cb5938f16c3bdd4",
+          "position": 46
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6afa9f6d2cb5938f16c3bdf0",
+          "position": 47
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6afa9f6f2cb5938f16c3be0c",
+          "position": 48
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6afa9f702cb5938f16c3be28",
+          "position": 49
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6afa9f712cb5938f16c3be44",
+          "position": 50
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6afa9f722cb5938f16c3be60",
+          "position": 51
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6afa9f732cb5938f16c3be7c",
+          "position": 52
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6afa9f742cb5938f16c3be98",
+          "position": 53
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6afa9f762cb5938f16c3beb4",
+          "position": 54
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6afa9f772cb5938f16c3bed0",
+          "position": 55
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6afa9f782cb5938f16c3beec",
+          "position": 56
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6afa9f792cb5938f16c3bf08",
+          "position": 57
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6afa9f7a2cb5938f16c3bf24",
+          "position": 58
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6afa9f7c2cb5938f16c3bf40",
+          "position": 59
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6afa9f7d2cb5938f16c3bf5c",
+          "position": 60
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6afa9f7e2cb5938f16c3bf78",
+          "position": 61
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6afa9f7f2cb5938f16c3bf94",
+          "position": 62
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6afa9f812cb5938f16c3bfb0",
+          "position": 63
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6afa9f822cb5938f16c3bfcc",
+          "position": 64
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6afa9f832cb5938f16c3bfe8",
+          "position": 65
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6afa9f842cb5938f16c3c004",
+          "position": 66
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6afa9f852cb5938f16c3c020",
+          "position": 67
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6afa9f862cb5938f16c3c03c",
+          "position": 68
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6afa9f882cb5938f16c3c058",
+          "position": 69
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6afa9f892cb5938f16c3c074",
+          "position": 70
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6afa9f8a2cb5938f16c3c090",
+          "position": 71
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6afa9f8b2cb5938f16c3c0ac",
+          "position": 72
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6afa9f8c2cb5938f16c3c0c8",
+          "position": 73
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6afa9f8d2cb5938f16c3c0e4",
+          "position": 74
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6afa9f8f2cb5938f16c3c100",
+          "position": 75
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6afa9f902cb5938f16c3c11c",
+          "position": 76
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6afa9f912cb5938f16c3c138",
+          "position": 77
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6afa9f922cb5938f16c3c154",
+          "position": 78
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6afa9f932cb5938f16c3c170",
+          "position": 79
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6afa9f942cb5938f16c3c18c",
+          "position": 80
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6afa9f962cb5938f16c3c1a8",
+          "position": 81
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6afa9f972cb5938f16c3c1c4",
+          "position": 82
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6afa9f982cb5938f16c3c1e0",
+          "position": 83
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6afa9f992cb5938f16c3c1fc",
+          "position": 84
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6afa9f9a2cb5938f16c3c218",
+          "position": 85
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6afa9f9b2cb5938f16c3c234",
+          "position": 86
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6afa9f9c2cb5938f16c3c250",
+          "position": 87
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6afa9f9d2cb5938f16c3c26c",
+          "position": 88
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6afa9f9e2cb5938f16c3c288",
+          "position": 89
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6afa9f9f2cb5938f16c3c2a4",
+          "position": 90
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6afa9fa02cb5938f16c3c2c0",
+          "position": 91
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6afa9fa12cb5938f16c3c2dc",
+          "position": 92
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6afa9fa22cb5938f16c3c2f8",
+          "position": 93
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6afa9fa32cb5938f16c3c314",
+          "position": 94
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6afa9fa42cb5938f16c3c330",
+          "position": 95
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6afa9fa52cb5938f16c3c34c",
+          "position": 96
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6afa9fa62cb5938f16c3c368",
+          "position": 97
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6afa9fa72cb5938f16c3c384",
+          "position": 98
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6afa9fa82cb5938f16c3c3a0",
+          "position": 99
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6afa9fa92cb5938f16c3c3bc",
+          "position": 100
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6afa9faa2cb5938f16c3c3d8",
+          "position": 101
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6afa9fab2cb5938f16c3c3f4",
+          "position": 102
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6afa9fac2cb5938f16c3c410",
+          "position": 103
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6afa9fae2cb5938f16c3c42c",
+          "position": 104
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6afa9faf2cb5938f16c3c448",
+          "position": 105
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6afa9fb02cb5938f16c3c464",
+          "position": 106
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6afa9fb12cb5938f16c3c480",
+          "position": 107
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6afa9fb22cb5938f16c3c49c",
+          "position": 108
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6afa9fb32cb5938f16c3c4b8",
+          "position": 109
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6afa9fb42cb5938f16c3c4d4",
+          "position": 110
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6afa9fb52cb5938f16c3c4f0",
+          "position": 111
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6afa9fb62cb5938f16c3c50c",
+          "position": 112
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6afa9fb72cb5938f16c3c528",
+          "position": 113
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6afa9fb82cb5938f16c3c544",
+          "position": 114
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6afa9fb92cb5938f16c3c560",
+          "position": 115
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6afa9fba2cb5938f16c3c57c",
+          "position": 116
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6afa9fbb2cb5938f16c3c598",
+          "position": 117
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6afa9fbc2cb5938f16c3c5b4",
+          "position": 118
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6afa9fbd2cb5938f16c3c5d0",
+          "position": 119
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6afa9fbe2cb5938f16c3c5ec",
+          "position": 120
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6afa9fbf2cb5938f16c3c608",
+          "position": 121
+        }
+      ],
+      "routes": [
+        "/events/novogodnyaya-skazka-v-peterburge-vechernyaya-avtobusnaya-ekskursiya-po-prazdnichnomu-gorodu-sankt-peterburg"
+      ],
+      "revisions": 122,
+      "activeSaleableEvents": 122
+    },
+    {
+      "id": "b755da6e-1f60-4140-b2db-3da04deec00f",
+      "slug": "novyi-god-v-dome-muzyki-smolensk",
+      "title": "НОВЫЙ ГОД В ДОМЕ МУЗЫКИ!",
+      "summary": null,
+      "heroImageUrl": null,
+      "content": {
+        "sections": []
+      },
+      "seoH1": "НОВЫЙ ГОД В ДОМЕ МУЗЫКИ!",
+      "seoTitle": "НОВЫЙ ГОД В ДОМЕ МУЗЫКИ! | Дайбилет",
+      "seoDescription": null,
+      "canonicalPath": null,
+      "status": "DRAFT",
+      "isIndexable": false,
+      "publishedAt": null,
+      "tourGroupId": null,
+      "links": [
+        {
+          "role": "PRIMARY",
+          "eventId": "evt_6b056c1cde4176310da7fdcb",
+          "position": 0
+        }
+      ],
+      "routes": [
+        "/events/novyi-god-v-dome-muzyki-smolensk"
+      ],
+      "revisions": 1,
+      "activeSaleableEvents": 1
+    },
+    {
+      "id": "5fce8389-c935-4fea-ad1b-21b0935e331a",
+      "slug": "prednovogodnii-bal-moskva",
+      "title": "ПРЕДНОВОГОДНИЙ БАЛ",
+      "summary": null,
+      "heroImageUrl": null,
+      "content": {
+        "sections": []
+      },
+      "seoH1": "ПРЕДНОВОГОДНИЙ БАЛ",
+      "seoTitle": "ПРЕДНОВОГОДНИЙ БАЛ | Дайбилет",
+      "seoDescription": null,
+      "canonicalPath": null,
+      "status": "DRAFT",
+      "isIndexable": false,
+      "publishedAt": null,
+      "tourGroupId": null,
+      "links": [
+        {
+          "role": "PRIMARY",
+          "eventId": "evt_6afce27eab20691bdaa601c9",
+          "position": 0
+        }
+      ],
+      "routes": [
+        "/events/prednovogodnii-bal-moskva"
+      ],
+      "revisions": 1,
+      "activeSaleableEvents": 1
+    },
+    {
+      "id": "82f33a24-327e-4c81-b1e7-a28efffb904f",
+      "slug": "rozhdestvenskaya-kvest-progulka-s-veduschim-moskva-ya-lyublyu-tebya-moskva",
+      "title": "Рождественская квест-прогулка с ведущим «Москва, я люблю тебя»",
+      "summary": null,
+      "heroImageUrl": null,
+      "content": {
+        "sections": []
+      },
+      "seoH1": "Рождественская квест-прогулка с ведущим «Москва, я люблю тебя»",
+      "seoTitle": "Рождественская квест-прогулка с ведущим «Москва, я люблю тебя» | Дайбилет",
+      "seoDescription": null,
+      "canonicalPath": null,
+      "status": "DRAFT",
+      "isIndexable": false,
+      "publishedAt": null,
+      "tourGroupId": null,
+      "links": [
+        {
+          "role": "PRIMARY",
+          "eventId": "evt_6af5e15a755cbbd717a6f28c",
+          "position": 0
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e15b755cbbd717a6f299",
+          "position": 1
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e15b755cbbd717a6f2a6",
+          "position": 2
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e15c755cbbd717a6f2b3",
+          "position": 3
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e15c755cbbd717a6f2c0",
+          "position": 4
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e15d755cbbd717a6f2cd",
+          "position": 5
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e15d755cbbd717a6f2da",
+          "position": 6
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e15e755cbbd717a6f2e7",
+          "position": 7
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e15e755cbbd717a6f2f4",
+          "position": 8
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e15f755cbbd717a6f301",
+          "position": 9
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e15f755cbbd717a6f30e",
+          "position": 10
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e160755cbbd717a6f31b",
+          "position": 11
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e160755cbbd717a6f328",
+          "position": 12
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e161755cbbd717a6f335",
+          "position": 13
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e161755cbbd717a6f342",
+          "position": 14
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e162755cbbd717a6f34f",
+          "position": 15
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e162755cbbd717a6f35c",
+          "position": 16
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e163755cbbd717a6f369",
+          "position": 17
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e164755cbbd717a6f376",
+          "position": 18
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e164755cbbd717a6f383",
+          "position": 19
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e165755cbbd717a6f390",
+          "position": 20
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e165755cbbd717a6f39d",
+          "position": 21
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e166755cbbd717a6f3aa",
+          "position": 22
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e166755cbbd717a6f3b7",
+          "position": 23
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e167755cbbd717a6f3c4",
+          "position": 24
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e167755cbbd717a6f3d1",
+          "position": 25
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e168755cbbd717a6f3de",
+          "position": 26
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e168755cbbd717a6f3eb",
+          "position": 27
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e169755cbbd717a6f3f8",
+          "position": 28
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e169755cbbd717a6f405",
+          "position": 29
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e16a755cbbd717a6f412",
+          "position": 30
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e16a755cbbd717a6f41f",
+          "position": 31
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e16b755cbbd717a6f42c",
+          "position": 32
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e16b755cbbd717a6f439",
+          "position": 33
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e16c755cbbd717a6f446",
+          "position": 34
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e16d755cbbd717a6f453",
+          "position": 35
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e16d755cbbd717a6f460",
+          "position": 36
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e16e755cbbd717a6f46d",
+          "position": 37
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e16e755cbbd717a6f47a",
+          "position": 38
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e16f755cbbd717a6f487",
+          "position": 39
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e16f755cbbd717a6f494",
+          "position": 40
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e170755cbbd717a6f4a1",
+          "position": 41
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e170755cbbd717a6f4ae",
+          "position": 42
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e171755cbbd717a6f4bb",
+          "position": 43
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e171755cbbd717a6f4c8",
+          "position": 44
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e172755cbbd717a6f4d5",
+          "position": 45
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e173755cbbd717a6f4e2",
+          "position": 46
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e173755cbbd717a6f4ef",
+          "position": 47
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e174755cbbd717a6f4fc",
+          "position": 48
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e174755cbbd717a6f509",
+          "position": 49
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e175755cbbd717a6f516",
+          "position": 50
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e175755cbbd717a6f523",
+          "position": 51
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e176755cbbd717a6f530",
+          "position": 52
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e176755cbbd717a6f53d",
+          "position": 53
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e177755cbbd717a6f54a",
+          "position": 54
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e177755cbbd717a6f557",
+          "position": 55
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e178755cbbd717a6f564",
+          "position": 56
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e179755cbbd717a6f571",
+          "position": 57
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e179755cbbd717a6f57e",
+          "position": 58
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e17a755cbbd717a6f58b",
+          "position": 59
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e17a755cbbd717a6f598",
+          "position": 60
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e17b755cbbd717a6f5a5",
+          "position": 61
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e17b755cbbd717a6f5b2",
+          "position": 62
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e17c755cbbd717a6f5bf",
+          "position": 63
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e17c755cbbd717a6f5cc",
+          "position": 64
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e17d755cbbd717a6f5d9",
+          "position": 65
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e17d755cbbd717a6f5e6",
+          "position": 66
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e17e755cbbd717a6f5f3",
+          "position": 67
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e17e755cbbd717a6f600",
+          "position": 68
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e17f755cbbd717a6f60d",
+          "position": 69
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e17f755cbbd717a6f61a",
+          "position": 70
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e180755cbbd717a6f627",
+          "position": 71
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e180755cbbd717a6f634",
+          "position": 72
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e181755cbbd717a6f641",
+          "position": 73
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e182755cbbd717a6f64e",
+          "position": 74
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e182755cbbd717a6f65b",
+          "position": 75
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e183755cbbd717a6f668",
+          "position": 76
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e183755cbbd717a6f675",
+          "position": 77
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e184755cbbd717a6f682",
+          "position": 78
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e184755cbbd717a6f68f",
+          "position": 79
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e185755cbbd717a6f69c",
+          "position": 80
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e185755cbbd717a6f6a9",
+          "position": 81
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e186755cbbd717a6f6b6",
+          "position": 82
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e186755cbbd717a6f6c3",
+          "position": 83
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e187755cbbd717a6f6d0",
+          "position": 84
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e187755cbbd717a6f6dd",
+          "position": 85
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e188755cbbd717a6f6ea",
+          "position": 86
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e188755cbbd717a6f6f7",
+          "position": 87
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e189755cbbd717a6f704",
+          "position": 88
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e189755cbbd717a6f711",
+          "position": 89
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e18a755cbbd717a6f71e",
+          "position": 90
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e18a755cbbd717a6f72b",
+          "position": 91
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e18b755cbbd717a6f738",
+          "position": 92
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e18c755cbbd717a6f745",
+          "position": 93
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e18c755cbbd717a6f752",
+          "position": 94
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e18d755cbbd717a6f75f",
+          "position": 95
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e18d755cbbd717a6f76c",
+          "position": 96
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e18e755cbbd717a6f779",
+          "position": 97
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e18e755cbbd717a6f786",
+          "position": 98
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e18f755cbbd717a6f793",
+          "position": 99
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e18f755cbbd717a6f7a0",
+          "position": 100
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e190755cbbd717a6f7ad",
+          "position": 101
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e190755cbbd717a6f7ba",
+          "position": 102
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e191755cbbd717a6f7c7",
+          "position": 103
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e191755cbbd717a6f7d4",
+          "position": 104
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e192755cbbd717a6f7e1",
+          "position": 105
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e192755cbbd717a6f7ee",
+          "position": 106
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e193755cbbd717a6f7fb",
+          "position": 107
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e193755cbbd717a6f808",
+          "position": 108
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e194755cbbd717a6f815",
+          "position": 109
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e195755cbbd717a6f822",
+          "position": 110
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e195755cbbd717a6f82f",
+          "position": 111
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e196755cbbd717a6f83c",
+          "position": 112
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e196755cbbd717a6f849",
+          "position": 113
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e197755cbbd717a6f856",
+          "position": 114
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e197755cbbd717a6f863",
+          "position": 115
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e198755cbbd717a6f870",
+          "position": 116
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e198755cbbd717a6f87d",
+          "position": 117
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e199755cbbd717a6f88a",
+          "position": 118
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e199755cbbd717a6f897",
+          "position": 119
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e19a755cbbd717a6f8a4",
+          "position": 120
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e19a755cbbd717a6f8b1",
+          "position": 121
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e19b755cbbd717a6f8be",
+          "position": 122
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e19b755cbbd717a6f8cb",
+          "position": 123
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e19c755cbbd717a6f8d8",
+          "position": 124
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e19c755cbbd717a6f8e5",
+          "position": 125
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e19d755cbbd717a6f8f2",
+          "position": 126
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e19d755cbbd717a6f8ff",
+          "position": 127
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e19e755cbbd717a6f90c",
+          "position": 128
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e19e755cbbd717a6f919",
+          "position": 129
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e19f755cbbd717a6f926",
+          "position": 130
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e1a0755cbbd717a6f933",
+          "position": 131
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e1a0755cbbd717a6f940",
+          "position": 132
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e1a1755cbbd717a6f94d",
+          "position": 133
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e1a1755cbbd717a6f95a",
+          "position": 134
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e1a2755cbbd717a6f967",
+          "position": 135
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e1a2755cbbd717a6f974",
+          "position": 136
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e1a3755cbbd717a6f981",
+          "position": 137
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e1a3755cbbd717a6f98e",
+          "position": 138
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e1a4755cbbd717a6f99b",
+          "position": 139
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e1a4755cbbd717a6f9a8",
+          "position": 140
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e1a5755cbbd717a6f9b5",
+          "position": 141
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e1a6755cbbd717a6f9c2",
+          "position": 142
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e1a6755cbbd717a6f9cf",
+          "position": 143
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e1a7755cbbd717a6f9dc",
+          "position": 144
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e1a7755cbbd717a6f9e9",
+          "position": 145
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e1a8755cbbd717a6f9f6",
+          "position": 146
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e1a8755cbbd717a6fa03",
+          "position": 147
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e1a9755cbbd717a6fa10",
+          "position": 148
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e1a9755cbbd717a6fa1d",
+          "position": 149
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e1aa755cbbd717a6fa2a",
+          "position": 150
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e1aa755cbbd717a6fa37",
+          "position": 151
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e1ab755cbbd717a6fa44",
+          "position": 152
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e1ac755cbbd717a6fa51",
+          "position": 153
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e1ac755cbbd717a6fa5e",
+          "position": 154
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e1ad755cbbd717a6fa6b",
+          "position": 155
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e1ad755cbbd717a6fa78",
+          "position": 156
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e1ae755cbbd717a6fa85",
+          "position": 157
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e1ae755cbbd717a6fa92",
+          "position": 158
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e1af755cbbd717a6fa9f",
+          "position": 159
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e1b0755cbbd717a6faac",
+          "position": 160
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e1b0755cbbd717a6fab9",
+          "position": 161
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e1b1755cbbd717a6fac6",
+          "position": 162
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e1b1755cbbd717a6fad3",
+          "position": 163
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e1b2755cbbd717a6fae0",
+          "position": 164
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e1b2755cbbd717a6faed",
+          "position": 165
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e1b3755cbbd717a6fafa",
+          "position": 166
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e1b3755cbbd717a6fb07",
+          "position": 167
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e268755cbbd717a70b95",
+          "position": 168
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e269755cbbd717a70ba2",
+          "position": 169
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e269755cbbd717a70baf",
+          "position": 170
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e26a755cbbd717a70bbc",
+          "position": 171
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e26a755cbbd717a70bc9",
+          "position": 172
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e26b755cbbd717a70bd6",
+          "position": 173
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e26b755cbbd717a70be3",
+          "position": 174
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e26c755cbbd717a70bf0",
+          "position": 175
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e26d755cbbd717a70bfd",
+          "position": 176
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e26d755cbbd717a70c0a",
+          "position": 177
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e26e755cbbd717a70c17",
+          "position": 178
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e26e755cbbd717a70c24",
+          "position": 179
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e26f755cbbd717a70c31",
+          "position": 180
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e26f755cbbd717a70c3e",
+          "position": 181
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e270755cbbd717a70c4b",
+          "position": 182
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e270755cbbd717a70c58",
+          "position": 183
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e271755cbbd717a70c65",
+          "position": 184
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e272755cbbd717a70c72",
+          "position": 185
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e272755cbbd717a70c7f",
+          "position": 186
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e273755cbbd717a70c8c",
+          "position": 187
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e273755cbbd717a70c99",
+          "position": 188
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e274755cbbd717a70ca6",
+          "position": 189
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e274755cbbd717a70cb3",
+          "position": 190
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e275755cbbd717a70cc0",
+          "position": 191
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e275755cbbd717a70ccd",
+          "position": 192
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e276755cbbd717a70cda",
+          "position": 193
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e276755cbbd717a70ce7",
+          "position": 194
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e277755cbbd717a70cf4",
+          "position": 195
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e278755cbbd717a70d01",
+          "position": 196
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e278755cbbd717a70d0e",
+          "position": 197
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e279755cbbd717a70d1b",
+          "position": 198
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6af5e279755cbbd717a70d28",
+          "position": 199
+        }
+      ],
+      "routes": [
+        "/events/rozhdestvenskaya-kvest-progulka-s-veduschim-moskva-ya-lyublyu-tebya-moskva"
+      ],
+      "revisions": 200,
+      "activeSaleableEvents": 149
+    },
+    {
+      "id": "7e97f489-97fa-4d64-bb3f-5b55d553997f",
+      "slug": "rozhdestvenskie-istorii-pri-svechah-moskva",
+      "title": "РОЖДЕСТВЕНСКИЕ ИСТОРИИ ПРИ СВЕЧАХ",
+      "summary": null,
+      "heroImageUrl": null,
+      "content": {
+        "sections": []
+      },
+      "seoH1": "РОЖДЕСТВЕНСКИЕ ИСТОРИИ ПРИ СВЕЧАХ",
+      "seoTitle": "РОЖДЕСТВЕНСКИЕ ИСТОРИИ ПРИ СВЕЧАХ | Дайбилет",
+      "seoDescription": null,
+      "canonicalPath": null,
+      "status": "DRAFT",
+      "isIndexable": false,
+      "publishedAt": null,
+      "tourGroupId": null,
+      "links": [
+        {
+          "role": "PRIMARY",
+          "eventId": "evt_6b0683672aee8214ea336869",
+          "position": 0
+        }
+      ],
+      "routes": [
+        "/events/rozhdestvenskie-istorii-pri-svechah-moskva"
+      ],
+      "revisions": 1,
+      "activeSaleableEvents": 1
+    },
+    {
+      "id": "55dc58f6-21e1-4cb6-9033-cc6df10f90b1",
+      "slug": "rozhdestvenskii-dzhaz-pri-svechah-v-atmosfere-starinnogo-evropeiskogo-teatra-moskva",
+      "title": "Рождественский джаз при свечах в атмосфере старинного европейского театра",
+      "summary": null,
+      "heroImageUrl": null,
+      "content": {
+        "sections": []
+      },
+      "seoH1": "Рождественский джаз при свечах в атмосфере старинного европейского театра",
+      "seoTitle": "Рождественский джаз при свечах в атмосфере старинного европейского театра | Дайбилет",
+      "seoDescription": null,
+      "canonicalPath": null,
+      "status": "DRAFT",
+      "isIndexable": false,
+      "publishedAt": null,
+      "tourGroupId": null,
+      "links": [
+        {
+          "role": "PRIMARY",
+          "eventId": "evt_6b061fc08aaf70d6983852c1",
+          "position": 0
+        },
+        {
+          "role": "PURCHASE_OPTION",
+          "eventId": "evt_6b061ef67e6021fcdcee4cfb",
+          "position": 1
+        }
+      ],
+      "routes": [
+        "/events/rozhdestvenskii-dzhaz-pri-svechah-v-atmosfere-starinnogo-evropeiskogo-teatra-moskva",
+        "/events/rozhdestvenskii-dzhaz-pri-svechah-v-atmosfere-starinnogo-evropeiskogo-teatra-moskva-2"
+      ],
+      "revisions": 2,
+      "activeSaleableEvents": 2
+    },
+    {
+      "id": "41e1bf8c-341f-40d2-9846-871a21a89c5a",
+      "slug": "rozhdestvenskii-dzhaz-pri-svechah-v-atmosfere-starinnogo-evropeiskogo-teatra-s-ani-minasi-jazz-qui-moskva",
+      "title": "Рождественский джаз при свечах в атмосфере старинного европейского театра с Áni Minasi Jazz Quintet",
+      "summary": null,
+      "heroImageUrl": null,
+      "content": {
+        "sections": []
+      },
+      "seoH1": "Рождественский джаз при свечах в атмосфере старинного европейского театра с Áni Minasi Jazz Quintet",
+      "seoTitle": "Рождественский джаз при свечах в атмосфере старинного европейского театра с Áni Minasi Jazz Quintet | Дайбилет",
+      "seoDescription": null,
+      "canonicalPath": null,
+      "status": "DRAFT",
+      "isIndexable": false,
+      "publishedAt": null,
+      "tourGroupId": null,
+      "links": [
+        {
+          "role": "PRIMARY",
+          "eventId": "evt_6b074af7c4df3d271c7c47a4",
+          "position": 0
+        }
+      ],
+      "routes": [
+        "/events/rozhdestvenskii-dzhaz-pri-svechah-v-atmosfere-starinnogo-evropeiskogo-teatra-s-ani-minasi-jazz-qui-moskva"
+      ],
+      "revisions": 1,
+      "activeSaleableEvents": 1
+    },
+    {
+      "id": "13aece39-c474-47d3-a0bc-efa48442205e",
+      "slug": "rozhdestvenskii-festival-serenada-uhodyaschemu-godu-naberezhnye-chelny",
+      "title": "Рождественский фестиваль \"Серенада уходящему году\"",
+      "summary": null,
+      "heroImageUrl": null,
+      "content": {
+        "sections": []
+      },
+      "seoH1": "Рождественский фестиваль \"Серенада уходящему году\"",
+      "seoTitle": "Рождественский фестиваль \"Серенада уходящему году\" | Дайбилет",
+      "seoDescription": null,
+      "canonicalPath": null,
+      "status": "DRAFT",
+      "isIndexable": false,
+      "publishedAt": null,
+      "tourGroupId": null,
+      "links": [
+        {
+          "role": "PRIMARY",
+          "eventId": "evt_6ae1e1ab54e9a330fd7902d4",
+          "position": 0
+        }
+      ],
+      "routes": [
+        "/events/rozhdestvenskii-festival-serenada-uhodyaschemu-godu-naberezhnye-chelny"
+      ],
+      "revisions": 1,
+      "activeSaleableEvents": 1
+    },
+    {
+      "id": "7cfcb082-3590-4368-b16c-c2a404ff687e",
+      "slug": "rozhdestvenskii-koncert-nikolaya-volkova-spb-sankt-peterburg",
+      "title": "Рождественский концерт Николая Волкова-СПБ",
+      "summary": null,
+      "heroImageUrl": null,
+      "content": {
+        "sections": []
+      },
+      "seoH1": "Рождественский концерт Николая Волкова-СПБ",
+      "seoTitle": "Рождественский концерт Николая Волкова-СПБ | Дайбилет",
+      "seoDescription": null,
+      "canonicalPath": null,
+      "status": "DRAFT",
+      "isIndexable": false,
+      "publishedAt": null,
+      "tourGroupId": null,
+      "links": [
+        {
+          "role": "PRIMARY",
+          "eventId": "evt_6b05abc845182ab1475f6ec1",
+          "position": 0
+        }
+      ],
+      "routes": [
+        "/events/rozhdestvenskii-koncert-nikolaya-volkova-spb-sankt-peterburg"
+      ],
+      "revisions": 1,
+      "activeSaleableEvents": 1
+    },
+    {
+      "id": "5ae34435-c9bd-4fd5-bdab-4b86a0654c44",
+      "slug": "vstrecha-novogo-goda-2027-avtobusnaya-ekskursiya-s-furshetom-i-podarkami-sankt-peterburg",
+      "title": "Встреча Нового года 2027: автобусная экскурсия с фуршетом и подарками",
+      "summary": null,
+      "heroImageUrl": null,
+      "content": {
+        "sections": []
+      },
+      "seoH1": "Встреча Нового года 2027: автобусная экскурсия с фуршетом и подарками",
+      "seoTitle": "Встреча Нового года 2027: автобусная экскурсия с фуршетом и подарками | Дайбилет",
+      "seoDescription": null,
+      "canonicalPath": null,
+      "status": "DRAFT",
+      "isIndexable": false,
+      "publishedAt": null,
+      "tourGroupId": null,
+      "links": [
+        {
+          "role": "PRIMARY",
+          "eventId": "evt_6ae41f9d63f1cdbeafeec0fd",
+          "position": 0
+        }
+      ],
+      "routes": [
+        "/events/vstrecha-novogo-goda-2027-avtobusnaya-ekskursiya-s-furshetom-i-podarkami-sankt-peterburg"
+      ],
+      "revisions": 1,
+      "activeSaleableEvents": 1
+    },
+    {
+      "id": "3acd436e-fe93-405b-8d9c-88456f90dd33",
+      "slug": "ya-idu-tebe-navstrechu-novogodnii-uzhin-koncert-valerii-yuschenko-eks-solist-sinyaya-ptica-sankt-peterburg-2",
+      "title": "«Я иду тебе навстречу» новогодний ужин-концерт. Валерий Ющенко экс-солист «Синяя птица»",
+      "summary": null,
+      "heroImageUrl": null,
+      "content": {
+        "sections": []
+      },
+      "seoH1": "«Я иду тебе навстречу» новогодний ужин-концерт. Валерий Ющенко экс-солист «Синяя птица»",
+      "seoTitle": "«Я иду тебе навстречу» новогодний ужин-концерт. Валерий Ющенко экс-солист «Синяя птица» | Дайбилет",
+      "seoDescription": null,
+      "canonicalPath": null,
+      "status": "DRAFT",
+      "isIndexable": false,
+      "publishedAt": null,
+      "tourGroupId": null,
+      "links": [
+        {
+          "role": "PRIMARY",
+          "eventId": "evt_6afda2f2af9ba14af3f85f1e",
+          "position": 0
+        }
+      ],
+      "routes": [
+        "/events/ya-idu-tebe-navstrechu-novogodnii-uzhin-koncert-valerii-yuschenko-eks-solist-sinyaya-ptica-sankt-peterburg-2"
+      ],
+      "revisions": 1,
+      "activeSaleableEvents": 1
+    }
+  ]
+}
