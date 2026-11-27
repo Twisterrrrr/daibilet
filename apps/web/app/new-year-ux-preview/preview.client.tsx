@@ -446,6 +446,7 @@ export function NewYearUxPreview({
   const [sort, setSort] = useState<PreviewFilters['sort']>('date');
   const [viewMode, setViewMode] = useState<'list' | 'cards'>('list');
   const [heroVisibleGeoCount, setHeroVisibleGeoCount] = useState(8);
+  const [heroAllCitiesExpanded, setHeroAllCitiesExpanded] = useState(false);
   const [mobileHeroCitiesExpanded, setMobileHeroCitiesExpanded] = useState(false);
   const [mobileHeroVisibleCityCount, setMobileHeroVisibleCityCount] = useState(3);
   const heroCitiesRef = useRef<HTMLDivElement>(null);
@@ -1047,17 +1048,13 @@ export function NewYearUxPreview({
           </div>
           <div ref={heroCitiesRef} className={styles.heroCities} aria-label="Выбрать город или регион">
             <div className={styles.heroCitiesDesktop}>
-            {featuredGeoOptions.map(renderGeoChip)}
+            {(heroAllCitiesExpanded ? orderedGeoOptions : featuredGeoOptions).map(renderGeoChip)}
             {hiddenGeoOptions.length ? <button
                 type="button"
                 className={`${styles.heroCityChip} ${styles.heroMoreButton}`}
-                onClick={() => {
-                  const control = document.querySelector<HTMLButtonElement>('[data-new-year-geo-trigger="true"]')
-                    || document.getElementById('new-year-mobile-city');
-                  control?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                  window.setTimeout(() => control?.click(), 250);
-                }}
-            >Все города</button> : null}
+                aria-expanded={heroAllCitiesExpanded}
+                onClick={() => setHeroAllCitiesExpanded((expanded) => !expanded)}
+            >{heroAllCitiesExpanded ? 'Свернуть ↑' : `Ещё ${hiddenGeoOptions.length} ${pluralRu(hiddenGeoOptions.length, ['город', 'города', 'городов'])} ↓`}</button> : null}
             </div>
             <div className={styles.heroCitiesMobile}>
               {allGeoOption ? renderGeoChip(allGeoOption) : null}
@@ -1071,7 +1068,7 @@ export function NewYearUxPreview({
             </div>
             <div ref={heroGeoMeasureRef} className={styles.heroGeoMeasure} aria-hidden="true">
               {orderedGeoOptions.map((item) => <span key={`measure:${item.geoKind}:${item.name}`} className={styles.heroCityChip}><span className={styles.heroCityName}>{item.name}</span><b className={styles.heroCityCount}>{item.count}</b></span>)}
-              <span className={`${styles.heroCityChip} ${styles.heroMoreButton}`}>Ещё {orderedGeoOptions.length} ↓</span>
+              <span className={`${styles.heroCityChip} ${styles.heroMoreButton}`}>Ещё {orderedGeoOptions.length} городов ↓</span>
             </div>
             <div ref={heroMobileGeoMeasureRef} className={`${styles.heroGeoMeasure} ${styles.heroGeoMeasureMobile}`} aria-hidden="true">
               {mobileGeoOptions.map((item) => <span key={`mobile-measure:${item.geoKind}:${item.name}`} className={styles.heroCityChip}><span className={styles.heroCityName}>{item.name}</span><b className={styles.heroCityCount}>{item.count}</b></span>)}
@@ -1182,7 +1179,7 @@ export function NewYearUxPreview({
 
           {hasFilters ? <div className={styles.activeBar}>
             <span className={styles.activeDot} />{activeFilterSummary !== 'Все мероприятия' ? <span className={styles.activeText}>{activeFilterSummary}</span> : null}
-            {geographySummary ? <button type="button" className={styles.activeCity} onClick={selectAllGeography} aria-label={`Сбросить фильтр: ${geographySummary}`}>{geographySummary} ×</button> : null}
+            {geographySummary ? <button type="button" className={styles.activeCity} onClick={selectAllGeography} aria-label={`Сбросить фильтр: ${geographySummary}`}>{geographySummary}</button> : null}
           </div> : null}
 
           {errorMessage ? <div role="alert" className={styles.empty}><div className={styles.emptyTitle}>Не удалось загрузить новогоднюю афишу</div><div className={styles.emptyText}>{errorMessage}</div><button type="button" className={styles.reset} onClick={() => window.location.reload()}>Попробовать снова</button></div> : null}
