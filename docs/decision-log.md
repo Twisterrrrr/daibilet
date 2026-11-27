@@ -11,7 +11,9 @@
 
 **Decision:** Specify the admin dashboard with EventPage editorial groups counted by page ID and technical health counted by distinct normalized public canonical URL. The four editorial groups must sum to total EventPage; route-level indexability comes only from the saved HTML audit, not the EventPage editorial flag. Stale/unknown sync or crawl data remains explicit and does not become zero or `noindex`. Dashboard reads must not trigger a full production crawl.
 
-**Data gap:** `EventPageRevision.createdAt` is not a reliable activation timestamp for `ACTIVE_EDITORIAL_REWRITE`. If 7/30-day rewrite activation counts are required, record an append-only activation event; do not substitute page `updatedAt` or `publishedAt`. See [dashboard specification](./reports/2026/seo-admin-dashboard-spec.md).
+**Decision:** Do not include 7/30-day rewrite activation counters in v1. After the four remaining outputs of the main SEO audit are complete and reviewed, consider the v1 dashboard: four editorial groups, total and rewrite coverage, unique indexable canonical URLs, sitemap/canonical findings, and last check date. Every counter is clickable. Editorial clicks open EventPage rows; technical SEO clicks open one row per canonical URL with linked old URL and EventPage states side by side.
+
+**Editorial history:** Start storing append-only lifecycle events in a separately approved implementation. `EDITORIAL_REWRITE_ACTIVATED` must distinguish `FIRST_ACTIVATION` from `REACTIVATION`; changing a version while rewrite remains active is `EDITORIAL_REWRITE_VERSION_UPDATED`, not a newly processed page. Use explicit event/version timestamps; never infer activation from `updatedAt` or `publishedAt`. See [dashboard specification](./reports/2026/seo-admin-dashboard-spec.md).
 
 **Status:** Specification only. No admin, API, Prisma or production changes.
 ## 2026-11-27 - EventPage SEO pilot separates new indexing from URL migration

@@ -1,6 +1,6 @@
 # Спецификация SEO-счётчиков и мониторинга рерайтов в админке
 
-**Статус:** проектная спецификация, реализация не начата
+**Статус:** спецификация принята; реализацию отложить до завершения и review четырёх остальных артефактов основного SEO-аудита
 **Дата:** 27.11.2026
 **Основание:** аудит EventPage/canonical от 27.11.2026 и исходное ТЗ полного SEO-аудита.
 **Ограничение:** этот документ не разрешает изменение SEO-поведения или production. Перед разработкой обновить live-аудит и сверить фактические backend-контракты.
@@ -73,17 +73,35 @@ editorialCoveragePct = rewritten / totalEventPages * 100
 
 Нулевой знаменатель даёт `null`/`NOT_AVAILABLE`, не `NaN` и не 0%.
 
-### 3.2. Дополнительные редакционные показатели
+### 3.2. Состав каталога и production-срез
 
-- **Всего EventPage:** `count(distinct id)` по полной таблице, включая черновики и страницы без связи с Event. Отдельный фильтр может ограничивать список, но верхний total остаётся ясным.
-- **Всего с рерайтом:** уникальные EventPage с активным маркером, независимо от публикации.
-- **Покрытие:** всего с активным рерайтом / всего EventPage.
-- **Новые рерайты за 7/30 дней:** число уникальных EventPage по времени **активации** активного рерайта, не по `EventPage.updatedAt`, `EventPage.publishedAt` или времени создания произвольной версии.
+- **Всего EventPage:** `count(distinct EventPage.id)` по полной таблице, включая черновики и страницы без связи с Event.
+- **Всего с активным рерайтом:** уникальные EventPage с маркером `ACTIVE_EDITORIAL_REWRITE`.
+- **Покрытие каталога рерайтом:** страницы с активным маркером / все EventPage × 100.
+- **Редакционные группы:** четыре mutually exclusive группы из §3.1; их сумма равна общему количеству EventPage.
 
-В текущей модели `EventPageRevision.createdAt` хранит дату версии, но публикация текста добавляет revision без гарантированного отдельного события смены active rewrite marker. В текущих apply-скриптах маркер кладётся в JSON content; его `version` — не временная метка активации. Поэтому метрики новых активаций 7/30 дней сейчас **не рассчитываются надёжно**.
+Production-реестр активных рерайтов на `2026-11-27T08:45:43Z` содержит **2 003 уникальные EventPage**. Из них 1 803 имеют редакционный статус `READY + publishedAt + isIndexable` (Index), 200 опубликованы, но `isIndexable=false` (Noindex). Реестр содержит 19 645 строк связей EventPage–Event, поэтому подсчёт должен дедуплицировать по `eventPageId`, а не считать строки или Event. Это датированный срез, не константы API; см. [production-реестр](../../../data/ticketscloud/editorial/all-active-eventpage-rewrites-production-2026-11-27.json). Отдельный live smoke 30 страниц после публикации батча 30 завершён в `2026-11-27T08:50:58Z`: 30/30 HTTP 200, `index, follow`, self-canonical; backend/Next ISR/nginx кэш сброшен, переобход поставлен в очередь. Сводка и проверенные URL: [production smoke](../../../data/ticketscloud/editorial/eventpage-editorial-batch-30-production-smoke-2026-11-27.json). Проверка robots не означает, что URL уже включены в выдачу.
 
-Минимальный вариант для будущей реализации: append-only таблица `EventPageEditorialActivation` с `id`, `eventPageId`, `activatedAt`, `deactivatedAt` (nullable), `revisionId` (nullable FK), `actorId` (nullable), `source`/`changeNote`; индекс `(activatedAt)` и `(eventPageId, activatedAt)`. Считать страницу один раз по последней текущей непрерывной активации, начавшейся в периоде; повторно активированный рерайт является новой активацией. Старые записи без события не реконструировать по `updatedAt`: показывать `HISTORY_UNAVAILABLE` и начинать достоверную статистику с даты внедрения. Альтернатива без схемы — отложить 7/30 метрики и прямо показывать `NOT_TRACKED`; не обещать их из revision timestamp.
+### 3.3. История работы с рерайтом (не счётчик v1)
 
+В первую версию дашборда **не включать показатели новых активаций за 7 и 30 дней**. Их нельзя достоверно получить из текущих `EventPageRevision.createdAt`, `EventPage.updatedAt` или `publishedAt`; показывать нулевые значения также нельзя. После утверждения основного SEO-аудита и отдельного старта реализации начать записывать неизменяемые события editorial lifecycle.
+
+Предлагаемая запись `EventPageEditorialEvent`:
+
+```text
+id, eventPageId, eventType, editorialVersion, revisionId?, occurredAt,
+activationKind?, previousEditorialVersion?, actorId?, source?, idempotencyKey
+```
+
+Минимальные `eventType`:
+
+- `EDITORIAL_REWRITE_ACTIVATED` — переход от отсутствующего/неактивного rewrite к активному;
+- `EDITORIAL_REWRITE_VERSION_UPDATED` — новая редакционная версия заменяет активную, страница уже была обработана;
+- `EDITORIAL_REWRITE_DEACTIVATED` — текущий rewrite снят/заменён неактивным текстом.
+
+Для `EDITORIAL_REWRITE_ACTIVATED` поле `activationKind` различает `FIRST_ACTIVATION` (для этого EventPage активный rewrite впервые) и `REACTIVATION` (страница уже активировалась ранее, затем rewrite был снят и включён снова). Изменение текста при непрерывно активном маркере записывается как `EDITORIAL_REWRITE_VERSION_UPDATED`, а не как новая первая обработка. Каждое событие содержит идентификатор/версию текста, время изменения, источник и идемпотентный ключ; `revisionId` связывает запись с `EventPageRevision`, когда версия представлена этой моделью. Если текущий apply path не создаёт revision, событие всё равно обязано сохранить устойчивый editorial version key и snapshot/hash по согласованному формату.
+
+Метрика «впервые обработанные EventPage» считает distinct `eventPageId` с `EDITORIAL_REWRITE_ACTIVATED + FIRST_ACTIVATION`; повторная редакция учитывается отдельно как число `VERSION_UPDATED`, повторное включение — как `REACTIVATION`. Историю можно начать только с даты внедрения: для старых активаций backfill допустим лишь при явном архивном timestamp, подтверждённом источником. Иначе прошлый период обозначается `HISTORY_UNAVAILABLE`. При накоплении достаточной истории владелец отдельно решит, нужны ли темпы за 7/30 дней.
 ### 3.3. Динамические фильтры и списки
 
 Счётчики загружаются серверной выборкой из БД и кликабельны. Клик ведёт на список EventPage с сохранёнными query-параметрами:
@@ -189,7 +207,7 @@ SeoAuditFinding
 
 ### 6.3. Что требует schema change
 
-- **Нужно, если нужны достоверные 7/30-day rewrite activations:** append-only activation history, описанная в §3.2.
+- **Для editorial history после отдельного согласования:** append-only lifecycle events, описанные в §3.3; они не требуются для первичной реализации счётчиков и не включают автоматическое отображение 7/30-day counts.
 - **Нужно, если нужен исторический/периодический SEO dashboard:** таблицы audit run/URL/finding либо эквивалентное durable storage. Текущие sitemap и runtime не хранят историю состояния.
 - **Нужно для интеграции поисковиков:** provider import run + агрегированные page/day metrics, credentials только через безопасную конфигурацию runtime, не в БД-таблицах и не в репозитории.
 - **Не нужно:** поле `seoStatus` на EventPage для технической crawl-истины. Оно будет смешивать редакционный флаг и динамические robots/canonical. Не добавлять такое поле для реализации этой спецификации.
@@ -218,10 +236,6 @@ GET /api/admin/seo/dashboard?cityId=...&offerState=...&publicationStatus=...
       "rewrittenNoindex": 0,
       "plainIndex": 0,
       "plainNoindex": 0
-    },
-    "rewriteActivations": {
-      "last7Days": { "value": null, "status": "HISTORY_UNAVAILABLE" },
-      "last30Days": { "value": null, "status": "HISTORY_UNAVAILABLE" }
     }
   },
   "technicalSeo": {
@@ -244,7 +258,9 @@ GET /api/admin/seo/dashboard?cityId=...&offerState=...&publicationStatus=...
 }
 ```
 
-Числа в примере — нулевые placeholders только для формы DTO и не являются рабочим ответом: production API обязан заменить их реальными согласованными значениями либо вернуть соответствующий `status`/`null`. Не копировать audit snapshot 27.11 в live UI без повторного подтверждения свежести; production значения должны вычисляться из актуальных источников.
+Поля в примере показывают форму ответа, а нулевые placeholders не являются рабочими значениями. Production API вычисляет редакционные числа из live БД, а технические метрики берёт из последнего сохранённого audit run; при отсутствии проверенного результата возвращает `null` вместе с `NOT_CHECKED`/`STALE`.
+
+В API v1 не возвращать счётчики 7/30 дней активации рерайта. Историю сначала начать записывать отдельной задачей; после накопления достаточного периода владелец решит, добавлять ли такие метрики в API/UI.
 
 ### 7.2. Drill-down EventPage
 
@@ -252,7 +268,7 @@ GET /api/admin/seo/dashboard?cityId=...&offerState=...&publicationStatus=...
 GET /api/admin/seo/event-pages?editorialGroup=plain-noindex&cityId=...&offerState=available&publicationStatus=draft&cursor=...&limit=50
 ```
 
-Ответ: `items[]` с `eventPageId`, title/slug, publication status, rewrite marker boolean, editorial index boolean, связанный city/offer filter summary, normalized current candidate URL, canonical URL и **происхождение/дата** canonical evidence (audit snapshot либо `NOT_CHECKED`); `nextCursor`, `total` для действующих фильтров и `dataAsOf`. Technical fields не выводить как свежие, если audit stale.
+Ответ: `items[]` с `eventPageId`, title/slug, publication status, rewrite marker boolean, editorial index boolean, связанный city/offer filter summary, normalized current candidate URL, canonical URL и **происхождение/дата** canonical evidence (audit snapshot либо `NOT_CHECKED`); `nextCursor`, `total` для действующих фильтров и `dataAsOf`. Technical fields не выводить как свежие, если audit stale. При выборе редакционной группы строки остаются EventPage-единицами; для каждой показывать текущую публичную canonical сущность и её URL-level состояние, включая случаи, когда stable EventPage `noindex`, а старый canonical `indexable`.
 
 ### 7.3. Drill-down canonical groups/findings
 
@@ -262,7 +278,7 @@ GET /api/admin/seo/audits/latest
 GET /api/admin/seo/audits/{auditRunId}/findings?type=CANONICAL_CONFLICT&cursor=...
 ```
 
-URL row: `normalizedCanonicalUrl`, список observed `sourceUrls`, HTTP status/robots/canonical/sitemap/offer state, связанный EventPage/Event identities, last checked, freshness, finding codes. Для поисковых систем — только imported provider metrics с property/date range.
+Этот список — **URL-level**, одна строка на уникальный normalized canonical, а не список EventPage. URL row: `normalizedCanonicalUrl`, sitemap membership, HTTP status/effective robots/self-canonical для canonical target, last checked, freshness, finding codes. Раскрываемые `entities[]` показывают все связанные EventPage и Event; для каждой пары вывести stable EventPage URL и её собственные publication/robots/canonical, роль `CURRENT|LEGACY|ALIAS`, связь с общим canonical и собственный HTTP/sitemap status, если он наблюдался. Так клик по URL-счётчику показывает старый индексируемый canonical и noindex EventPage рядом, а клик по редакционной карточке ведёт к списку EventPage с этой же диагностикой. Для поисковых систем — только imported provider metrics с property/date range.
 
 ### 7.4. API инварианты
 
@@ -274,11 +290,11 @@ URL row: `normalizedCanonicalUrl`, список observed `sourceUrls`, HTTP stat
 
 ## 8. Структура интерфейса
 
-Новая вкладка/страница «SEO-мониторинг» рядом со списком EventPage:
+Новая вкладка/страница «SEO-мониторинг» рядом со списком EventPage **после завершения и review четырёх остальных артефактов основного SEO-аудита**:
 
 1. **Обновление данных:** «Редакционные данные на …», состояние и время последней успешной синхронизации; «Технический аудит на …», покрытие и status последнего run.
-2. **EventPage — редакция:** карточки Total, с рерайтом, покрытие, новые активации 7/30 дней (либо поясняющий `История активаций не ведётся`). Ниже четыре кликабельные группы. Группы суммируются в Total.
-3. **SEO-здоровье URL:** unique indexable canonical, missing from sitemap, noindex-in-sitemap, canonical conflicts, grouping findings, no-current-offer, orphan, unknown/stale. Каждая карточка открывает соответствующий URL list.
+2. **EventPage — редакция:** карточки Total, с активным рерайтом и покрытие. В первой версии нет счётчиков активаций за 7/30 дней. Ниже четыре кликабельные группы. Клик открывает соответствующий отфильтрованный EventPage list; в каждой строке видны EventPage и текущая связанная canonical URL сущность с раздельными состояниями. Группы суммируются в Total.
+3. **SEO-здоровье URL:** unique indexable canonical, missing from sitemap, noindex-in-sitemap, canonical conflicts, grouping findings, no-current-offer, orphan, unknown/stale. Каждая карточка открывает URL inventory, отфильтрованный тем же predicate и auditRunId. На строку — один unique canonical; раскрытие показывает связанные EventPage/Event и собственные состояния старого/stable URL.
 4. **Поисковые системы:** две отдельные панели Google и Яндекс со статусом, диапазоном 28 дней, indexed/excluded/impressions/clicks и сравнением; `NOT_CHECKED` виден явно.
 5. **Фильтры:** город, offer state (`AVAILABLE|NONE|UNKNOWN`), publication status, editorial group, audit freshness. Query state сохраняется при переходе и возврате из детали.
 
@@ -304,7 +320,7 @@ URL row: `normalizedCanonicalUrl`, список observed `sourceUrls`, HTTP stat
 |---|---|---:|
 | 0. Read-only spike: EventPage query, rewrite marker, URL normalization, offer policy, объем/EXPLAIN | подтвердить определения и не блокировать DB | 2–3 дн. |
 | 1. Редакционные агрегаты + фильтруемый EventPage list API/UI | 4 группы, total/coverage, фильтры, timestamp | 3–5 дн. |
-| 2. История активаций рерайта | migration, append-only write integration, корректное повторное включение и backfill status | 2–4 дн.; historical 7/30 counts без источника не восстановить |
+| 2. История editorial lifecycle | append-only events, idempotency, различение первой активации, обновления версии и повторной активации | 2–4 дн.; не входит в счётчики v1 и не backfill-ится без источника |
 | 3. SEO audit persistence + scheduler/crawler + canonical grouping + links | rate-limited crawler, sitemap parser, partial runs, findings, retries | 5–9 дн. |
 | 4. SEO API/read-model + dashboard/drill-down | URL unique counts, stale/unknown semantics, UI | 4–6 дн. |
 | 5. Search-provider ingestion, если доступ/подключение одобрены | Яндекс + GSC отдельно, mapping/quotas/backfill | 3–6 дн. |
@@ -314,15 +330,15 @@ URL row: `normalizedCanonicalUrl`, список observed `sourceUrls`, HTTP stat
 
 ## 11. План внедрения без влияния на SEO
 
-1. Согласовать определения, список public route families, нормализацию canonical, фильтр актуального предложения и freshness thresholds.
-2. Сделать read-only spike и сверить редакционные 4 группы на актуальном snapshot; отдельно посчитать distinct canonical и сверить минимум 20 URL двумя независимыми способами.
-3. Реализовать editor-only агрегаты и список, не меняя public URL/canonical/robots/sitemap.
-4. Добавить историю activation events. Начать периодические числа 7/30 только с timestamp внедрения; старую историю обозначить как недоступную.
-5. Добавить audit run/observation storage и crawler за sitemap/HTML по расписанию; сначала shadow mode, сопоставить результаты с ручной выборкой.
-6. Показать технические метрики из сохранённых runs; stale/unknown/partial состояния и ссылки на finding list.
-7. Подключить поисковые API только после отдельного подтверждения credentials, scope, лимитов и хранения; до этого `NOT_CHECKED`.
-8. Пройти staging и read-only production smoke dashboard. Любое изменение текущей indexability policy, публикации, canonical, redirect или sitemap — отдельное решение/релиз.
-
+1. Завершить четыре остальных артефакта полного SEO-аудита: инвентаризацию публичных URL/canonical, аудит 551 URL вне sitemap, фактическую индексацию Яндекса/Google либо явный `NOT_CHECKED`, приоритетный backlog. Связать результаты одной датой/snapshot и пройти review.
+2. После review согласовать public route families, canonical normalization, правило актуального предложения, внутренние ссылки и freshness thresholds по фактическим данным аудита.
+3. Отдельно утвердить реализацию v1: четыре редакционные группы, total/coverage, уникальные indexable canonical, sitemap/canonical findings из сохранённого аудита и дата последней успешной проверки.
+4. Определить оба уровня drill-down: редакционная группа ведёт к списку EventPage; SEO URL-card ведёт к URL inventory с одной строкой на уникальный canonical. Раскрытие URL показывает старый адрес и stable EventPage URL с отдельными robots/canonical/publication состояниями.
+5. В рамках отдельно согласованной реализации начать сохранять editorial lifecycle events. Счётчики 7/30 дней в v1 не входят.
+6. Запустить плановые audit runs после завершения ночной синхронизации; сначала shadow mode, сверить coverage, ошибки и UNKNOWN/STALE/partial состояния при ограниченной concurrency.
+7. После накопления истории отдельно решить, нужны ли в админке показатели FIRST_ACTIVATION, VERSION_UPDATED и REACTIVATION.
+8. Подключать поисковые API только после отдельного подтверждения credentials, scope, лимитов и хранения; до этого показывать `NOT_CHECKED`.
+9. Пройти staging и read-only production smoke дашборда. Изменение текущей indexability policy, публикации, canonical, redirect или sitemap оформлять отдельным решением и выпуском.
 ## 12. Ограничения и критерии готовности спецификации
 
 - Редакционные метрики EventPage и технические canonical URL разделены.
