@@ -1,0 +1,254 @@
+{
+  "checkedAt": "2026-11-27T08:50:58.303Z",
+  "urlCount": 30,
+  "passed": 30,
+  "failed": 0,
+  "cacheInvalidated": {
+    "backend": true,
+    "nextIsr": true,
+    "nginxHtmlCache": true,
+    "indexNowQueued": true
+  },
+  "pages": [
+    {
+      "eventPageId": "ca5b530f-5540-4abe-9f2b-441c03cdd3b0",
+      "slug": "balet-schelkunchik-sankt-peterburg-4",
+      "status": 200,
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/balet-schelkunchik-sankt-peterburg-4",
+      "passed": true
+    },
+    {
+      "eventPageId": "067efac8-40c6-405d-893d-6dcc3d5b0741",
+      "slug": "bogemnyi-art-branch-novogodnii-peterburg-xix-veka-vecherinki-dueli-svetskie-salony-sankt-peterburg",
+      "status": 200,
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/bogemnyi-art-branch-novogodnii-peterburg-xix-veka-vecherinki-dueli-svetskie-salony-sankt-peterburg",
+      "passed": true
+    },
+    {
+      "eventPageId": "842a6f4c-63db-42e5-8016-d83ec3f9cd0b",
+      "slug": "bogemnyi-art-branch-novyi-god-v-carskoi-stolice-elki-podarki-zimnie-zabavy-sankt-peterburg",
+      "status": 200,
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/bogemnyi-art-branch-novyi-god-v-carskoi-stolice-elki-podarki-zimnie-zabavy-sankt-peterburg",
+      "passed": true
+    },
+    {
+      "eventPageId": "1b24458d-1a3e-4f0d-94c3-f5d9ce0172b6",
+      "slug": "chaikovskii-pri-svechah-rozhdestvenskaya-klassika-i-balet-v-atmosfere-starinnogo-evropeiskogo-teatr-moskva",
+      "status": 200,
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/chaikovskii-pri-svechah-rozhdestvenskaya-klassika-i-balet-v-atmosfere-starinnogo-evropeiskogo-teatr-moskva",
+      "passed": true
+    },
+    {
+      "eventPageId": "6518174f-cb5d-41c9-a81a-b4e842a99b03",
+      "slug": "craft-magic-night-2027-novosibirsk",
+      "status": 200,
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/craft-magic-night-2027-novosibirsk",
+      "passed": true
+    },
+    {
+      "eventPageId": "1353b766-5449-4726-ab50-23649885a8d8",
+      "slug": "dve-arfy-pri-svechah-prednovogodnii-koncert-tatyana-vasileva-i-marina-kulinich-tver",
+      "status": 200,
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/dve-arfy-pri-svechah-prednovogodnii-koncert-tatyana-vasileva-i-marina-kulinich-tver",
+      "passed": true
+    },
+    {
+      "eventPageId": "0d7426d8-1a7c-4579-a413-3e488f5a9162",
+      "slug": "dzhaz-klub-nz-posle-rozhdestva-kaliningrad",
+      "status": 200,
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/dzhaz-klub-nz-posle-rozhdestva-kaliningrad",
+      "passed": true
+    },
+    {
+      "eventPageId": "5d568113-4f03-4f96-9bca-0ed927b22e37",
+      "slug": "dzhaz-klub-nz-s-novym-2027-godom-kaliningrad",
+      "status": 200,
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/dzhaz-klub-nz-s-novym-2027-godom-kaliningrad",
+      "passed": true
+    },
+    {
+      "eventPageId": "ec34f97c-7b13-4e29-b970-d0a6cc3f1bba",
+      "slug": "elka-novogodnee-shou-rostov-na-donu",
+      "status": 200,
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/elka-novogodnee-shou-rostov-na-donu",
+      "passed": true
+    },
+    {
+      "eventPageId": "8a5e0877-ae7e-4045-a043-826ef83f6cf2",
+      "slug": "immersivnoe-shou-rozhdestvo-ozhivshie-tradicii-sankt-peterburg",
+      "status": 200,
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/immersivnoe-shou-rozhdestvo-ozhivshie-tradicii-sankt-peterburg",
+      "passed": true
+    },
+    {
+      "eventPageId": "075ffee4-d6cb-4133-9874-e77fea0a57bd",
+      "slug": "infiniti-solnyi-koncert-4-yanvarya-2027-g-korolev-moskva-nebo-ruftop-6-korolev",
+      "status": 200,
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/infiniti-solnyi-koncert-4-yanvarya-2027-g-korolev-moskva-nebo-ruftop-6-korolev",
+      "passed": true
+    },
+    {
+      "eventPageId": "1b123799-47d6-43e8-b125-a02f29940654",
+      "slug": "kvintet-pavla-timofeeva-ironiya-sudby-ili-uragannyi-novyi-god-moskva",
+      "status": 200,
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/kvintet-pavla-timofeeva-ironiya-sudby-ili-uragannyi-novyi-god-moskva",
+      "passed": true
+    },
+    {
+      "eventPageId": "9f020bd6-c8ea-48b1-ab3b-5a68cc5f48fb",
+      "slug": "muzei-raketnyh-voisk-strategicheskogo-naznacheniya-v-zakrytom-poselke-vlasiha-mikroavtobus-moskva",
+      "status": 200,
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/muzei-raketnyh-voisk-strategicheskogo-naznacheniya-v-zakrytom-poselke-vlasiha-mikroavtobus-moskva",
+      "passed": true
+    },
+    {
+      "eventPageId": "8a2463eb-28ac-4e81-99c9-876a826d5cd8",
+      "slug": "my-vstrechaem-novyi-2027-god-v-karaoke-eho-tak-chtoby-eho-nashih-golosov-i-boi-kurantov-slyshali-po-moskva",
+      "status": 200,
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/my-vstrechaem-novyi-2027-god-v-karaoke-eho-tak-chtoby-eho-nashih-golosov-i-boi-kurantov-slyshali-po-moskva",
+      "passed": true
+    },
+    {
+      "eventPageId": "458bbcb3-c22c-498f-9d44-bac9b4c911ee",
+      "slug": "myuzikl-ali-baba-i-sorok-razboinikov-muzykalnaya-skazka-novogodnee-predstavlenie-sankt-peterburg",
+      "status": 200,
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/myuzikl-ali-baba-i-sorok-razboinikov-muzykalnaya-skazka-novogodnee-predstavlenie-sankt-peterburg",
+      "passed": true
+    },
+    {
+      "eventPageId": "a3a383ea-87a8-4b02-805b-7e346e374e19",
+      "slug": "naik-borzov-bolshoi-novogodnii-koncert-nizhniy-novgorod",
+      "status": 200,
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/naik-borzov-bolshoi-novogodnii-koncert-nizhniy-novgorod",
+      "passed": true
+    },
+    {
+      "eventPageId": "cfa2a9aa-87ca-45ed-8f24-526c3a17ed39",
+      "slug": "novogodnii-otkrytyi-mikrofon-surgut",
+      "status": 200,
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/novogodnii-otkrytyi-mikrofon-surgut",
+      "passed": true
+    },
+    {
+      "eventPageId": "842b808d-09e5-4738-aa16-fe0d2cbeebc5",
+      "slug": "novogodnii-semeinyi-branch-moskva",
+      "status": 200,
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/novogodnii-semeinyi-branch-moskva",
+      "passed": true
+    },
+    {
+      "eventPageId": "d6b440e3-3b84-48e7-9762-3749278539a4",
+      "slug": "novogodnii-utrennik-1-nizhniy-novgorod-2",
+      "status": 200,
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/novogodnii-utrennik-1-nizhniy-novgorod-2",
+      "passed": true
+    },
+    {
+      "eventPageId": "7b1e9486-600c-4b31-8dbb-426822f066f0",
+      "slug": "novogodnyaya-skazka-v-peterburge-vechernyaya-avtobusnaya-ekskursiya-po-prazdnichnomu-gorodu-sankt-peterburg",
+      "status": 200,
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/novogodnyaya-skazka-v-peterburge-vechernyaya-avtobusnaya-ekskursiya-po-prazdnichnomu-gorodu-sankt-peterburg",
+      "passed": true
+    },
+    {
+      "eventPageId": "b755da6e-1f60-4140-b2db-3da04deec00f",
+      "slug": "novyi-god-v-dome-muzyki-smolensk",
+      "status": 200,
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/novyi-god-v-dome-muzyki-smolensk",
+      "passed": true
+    },
+    {
+      "eventPageId": "5fce8389-c935-4fea-ad1b-21b0935e331a",
+      "slug": "prednovogodnii-bal-moskva",
+      "status": 200,
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/prednovogodnii-bal-moskva",
+      "passed": true
+    },
+    {
+      "eventPageId": "82f33a24-327e-4c81-b1e7-a28efffb904f",
+      "slug": "rozhdestvenskaya-kvest-progulka-s-veduschim-moskva-ya-lyublyu-tebya-moskva",
+      "status": 200,
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/rozhdestvenskaya-kvest-progulka-s-veduschim-moskva-ya-lyublyu-tebya-moskva",
+      "passed": true
+    },
+    {
+      "eventPageId": "7e97f489-97fa-4d64-bb3f-5b55d553997f",
+      "slug": "rozhdestvenskie-istorii-pri-svechah-moskva",
+      "status": 200,
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/rozhdestvenskie-istorii-pri-svechah-moskva",
+      "passed": true
+    },
+    {
+      "eventPageId": "55dc58f6-21e1-4cb6-9033-cc6df10f90b1",
+      "slug": "rozhdestvenskii-dzhaz-pri-svechah-v-atmosfere-starinnogo-evropeiskogo-teatra-moskva",
+      "status": 200,
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/rozhdestvenskii-dzhaz-pri-svechah-v-atmosfere-starinnogo-evropeiskogo-teatra-moskva",
+      "passed": true
+    },
+    {
+      "eventPageId": "41e1bf8c-341f-40d2-9846-871a21a89c5a",
+      "slug": "rozhdestvenskii-dzhaz-pri-svechah-v-atmosfere-starinnogo-evropeiskogo-teatra-s-ani-minasi-jazz-qui-moskva",
+      "status": 200,
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/rozhdestvenskii-dzhaz-pri-svechah-v-atmosfere-starinnogo-evropeiskogo-teatra-s-ani-minasi-jazz-qui-moskva",
+      "passed": true
+    },
+    {
+      "eventPageId": "13aece39-c474-47d3-a0bc-efa48442205e",
+      "slug": "rozhdestvenskii-festival-serenada-uhodyaschemu-godu-naberezhnye-chelny",
+      "status": 200,
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/rozhdestvenskii-festival-serenada-uhodyaschemu-godu-naberezhnye-chelny",
+      "passed": true
+    },
+    {
+      "eventPageId": "7cfcb082-3590-4368-b16c-c2a404ff687e",
+      "slug": "rozhdestvenskii-koncert-nikolaya-volkova-spb-sankt-peterburg",
+      "status": 200,
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/rozhdestvenskii-koncert-nikolaya-volkova-spb-sankt-peterburg",
+      "passed": true
+    },
+    {
+      "eventPageId": "5ae34435-c9bd-4fd5-bdab-4b86a0654c44",
+      "slug": "vstrecha-novogo-goda-2027-avtobusnaya-ekskursiya-s-furshetom-i-podarkami-sankt-peterburg",
+      "status": 200,
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/vstrecha-novogo-goda-2027-avtobusnaya-ekskursiya-s-furshetom-i-podarkami-sankt-peterburg",
+      "passed": true
+    },
+    {
+      "eventPageId": "3acd436e-fe93-405b-8d9c-88456f90dd33",
+      "slug": "ya-idu-tebe-navstrechu-novogodnii-uzhin-koncert-valerii-yuschenko-eks-solist-sinyaya-ptica-sankt-peterburg-2",
+      "status": 200,
+      "robots": "index, follow",
+      "canonical": "https://daibilet.ru/events/ya-idu-tebe-navstrechu-novogodnii-uzhin-koncert-valerii-yuschenko-eks-solist-sinyaya-ptica-sankt-peterburg-2",
+      "passed": true
+    }
+  ]
+}
