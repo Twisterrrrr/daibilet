@@ -634,6 +634,46 @@
 .priceInlineInput input:focus { border-color: #7e96b8; outline: 2px solid rgb(11 27 58 / 10%); }
 .priceInlineInput input::placeholder { color: var(--muted); opacity: 1; }
 .priceControlsMobile { display: none; }
+
+/* Mobile: keep primary filters in view and bring them back on demand. */
+.heroCitiesDesktop { display: flex; width: 100%; align-items: center; flex-wrap: wrap; gap: 8px; }
+.heroCitiesMobile { display: none; }
+.floatingFiltersButton { display: none; }
+.activeCity { padding: 0; border: 0; background: transparent; color: var(--ink2); font: inherit; font-weight: 600; cursor: pointer; }
+.activeCity:hover { text-decoration: underline; }
+
+@media (max-width: 899px) {
+  .heroCitiesDesktop { display: none; }
+  .heroCitiesMobile { display: flex; width: 100%; align-items: center; flex-wrap: wrap; gap: 7px; }
+  .filters { position: relative; top: auto; }
+  .filtersContentCollapsed { display: block; }
+  .floatingFiltersButton {
+    position: fixed;
+    z-index: 55;
+    bottom: calc(14px + env(safe-area-inset-bottom, 0px));
+    left: 50%;
+    display: inline-flex;
+    min-height: 48px;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+    padding: 0 20px;
+    border: 0;
+    border-radius: 999px;
+    background: var(--brand-yellow);
+    box-shadow: 0 4px 18px rgb(0 0 0 / 22%);
+    color: #111827;
+    font-size: 15px;
+    font-weight: 700;
+    white-space: nowrap;
+    transform: translateX(-50%);
+  }
+  .floatingFiltersButton b { display: inline-flex; min-width: 20px; height: 20px; align-items: center; justify-content: center; border-radius: 50%; background: rgb(0 0 0 / 9%); font-size: 12px; }
+}
+
+@media (max-width: 639px) {
+  .heroCityMetaSuffix { display: none; }
+}
 @media (max-width: 899px) {
   .returnLink { display: none; }
   .desktopFilterPanel { display: none; }

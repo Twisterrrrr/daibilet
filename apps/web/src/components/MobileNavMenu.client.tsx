@@ -61,31 +61,48 @@ export function MobileNavLayer({
 }: MobileNavMenuProps & { id: string }) {
   const pathname = usePathname();
   const inputRef = useRef<HTMLInputElement>(null);
+  const previousBodyOverflow = useRef<string | null>(null);
 
   useEffect(() => {
     const input = inputRef.current;
     if (!input) return;
     const syncOverflow = () => {
-      document.body.style.overflow = input.checked ? 'hidden' : '';
+      if (input.checked) {
+        if (previousBodyOverflow.current === null) previousBodyOverflow.current = document.body.style.overflow;
+        document.body.style.overflow = 'hidden';
+      } else if (previousBodyOverflow.current !== null) {
+        document.body.style.overflow = previousBodyOverflow.current;
+        previousBodyOverflow.current = null;
+      }
+    };
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key !== 'Escape' || !input.checked) return;
+      input.checked = false;
+      input.dispatchEvent(new Event('change', { bubbles: true }));
     };
     syncOverflow();
     input.addEventListener('change', syncOverflow);
+    document.addEventListener('keydown', closeOnEscape);
     return () => {
       input.removeEventListener('change', syncOverflow);
-      document.body.style.overflow = '';
+      document.removeEventListener('keydown', closeOnEscape);
+      if (previousBodyOverflow.current !== null) document.body.style.overflow = previousBodyOverflow.current;
     };
   }, []);
 
   const close = () => {
-    if (inputRef.current) inputRef.current.checked = false;
-    document.body.style.overflow = '';
+    const input = inputRef.current;
+    if (input) {
+      input.checked = false;
+      input.dispatchEvent(new Event('change', { bubbles: true }));
+    }
   };
 
   return (
     <div className="lg:hidden">
       <input ref={inputRef} id={id} type="checkbox" className="peer sr-only" />
       <div
-        className="pointer-events-none invisible fixed inset-0 z-[60] opacity-0 transition-opacity duration-150 peer-checked:pointer-events-auto peer-checked:visible peer-checked:opacity-100"
+        className="pointer-events-none invisible fixed inset-0 z-[100] flex items-stretch opacity-0 transition-opacity duration-150 peer-checked:pointer-events-auto peer-checked:visible peer-checked:opacity-100"
         role="dialog"
         aria-modal="true"
         aria-label="Мобильная навигация"
@@ -95,7 +112,7 @@ export function MobileNavLayer({
           aria-label="Закрыть меню"
           className="absolute inset-0 cursor-pointer bg-slate-900/45 backdrop-blur-[2px]"
         />
-        <aside className="relative flex h-full w-[min(20rem,88vw)] flex-col bg-white shadow-card-hover">
+        <aside className="relative flex h-[100dvh] max-h-full max-w-full shrink-0 flex-col overflow-hidden bg-white shadow-card-hover" style={{ width: 'min(20rem, 88vw)' }}>
           <div className="flex items-center justify-between px-4 py-4">
             <Link
               href="/"
