@@ -447,8 +447,10 @@ export function NewYearUxPreview({
   const [viewMode, setViewMode] = useState<'list' | 'cards'>('list');
   const [heroVisibleGeoCount, setHeroVisibleGeoCount] = useState(8);
   const [mobileHeroCitiesExpanded, setMobileHeroCitiesExpanded] = useState(false);
+  const [mobileHeroVisibleCityCount, setMobileHeroVisibleCityCount] = useState(3);
   const heroCitiesRef = useRef<HTMLDivElement>(null);
   const heroGeoMeasureRef = useRef<HTMLDivElement>(null);
+  const heroMobileGeoMeasureRef = useRef<HTMLDivElement>(null);
   const filtersRef = useRef<HTMLElement>(null);
   const [showFloatingFilters, setShowFloatingFilters] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -734,18 +736,45 @@ export function NewYearUxPreview({
   ].filter((item, index, list) => list.findIndex((candidate) => candidate.name === item.name) === index);
   const mobileCityOptions = orderedCities.filter((item) => item.name && item.name !== 'Вся Россия' && item.count > 0);
   const selectedMobileCity = city !== 'Вся Россия' ? mobileCityOptions.find((item) => item.name === city) : undefined;
-  const mobileTopCities = mobileCityOptions.slice(0, 3);
-  if (selectedMobileCity && !mobileTopCities.some((item) => item.name === selectedMobileCity.name)) mobileTopCities.splice(2, 1, selectedMobileCity);
+  const prioritizedMobileCityOptions = selectedMobileCity
+    ? [selectedMobileCity, ...mobileCityOptions.filter((item) => item.name !== selectedMobileCity.name)]
+    : mobileCityOptions;
+  const mobileTopCities = prioritizedMobileCityOptions.slice(0, mobileHeroVisibleCityCount);
   const featuredMobileCityNames = new Set(mobileTopCities.map((item) => item.name));
   const hiddenMobileCityOptions = mobileCityOptions.filter((item) => !featuredMobileCityNames.has(item.name));
+  const mobileGeoOptions = [...(allGeoOption ? [allGeoOption] : []), ...prioritizedMobileCityOptions.map((item) => ({ ...item, geoKind: 'city' as const }))];
   const featuredGeoOptions = orderedGeoOptions.slice(0, heroVisibleGeoCount);
   const hiddenGeoOptions = orderedGeoOptions.slice(heroVisibleGeoCount);
   useEffect(() => {
     const container = heroCitiesRef.current;
     const measure = heroGeoMeasureRef.current;
-    if (!container || !measure) return;
+    const mobileMeasure = heroMobileGeoMeasureRef.current;
+    if (!container || !measure || !mobileMeasure) return;
     const fitInTwoRows = () => {
       const availableWidth = container.clientWidth;
+      if (window.matchMedia('(max-width: 899px)').matches) {
+        const mobileChips = Array.from(mobileMeasure.children) as HTMLElement[];
+        const gap = Number.parseFloat(getComputedStyle(mobileMeasure).columnGap) || 0;
+        let visible = mobileChips.length;
+        while (visible > 1) {
+          let rows = 1;
+          let rowWidth = 0;
+          for (const chip of mobileChips.slice(0, visible)) {
+            const width = chip.getBoundingClientRect().width;
+            if (rowWidth && rowWidth + gap + width > availableWidth) {
+              rows++;
+              rowWidth = width;
+            } else {
+              rowWidth += (rowWidth ? gap : 0) + width;
+            }
+          }
+          if (rows <= 2) break;
+          visible--;
+        }
+        const cityCount = Math.max(0, visible - (allGeoOption ? 1 : 0));
+        setMobileHeroVisibleCityCount((current) => current === cityCount ? current : cityCount);
+        return;
+      }
       const chips = Array.from(measure.children).slice(0, orderedGeoOptions.length) as HTMLElement[];
       const more = measure.children[orderedGeoOptions.length] as HTMLElement | undefined;
       const gap = Number.parseFloat(getComputedStyle(measure).columnGap) || 0;
@@ -764,7 +793,7 @@ export function NewYearUxPreview({
         }
         return rows;
       };
-      const desktopLimit = window.matchMedia('(min-width: 900px)').matches ? 8 : orderedGeoOptions.length;
+      const desktopLimit = 8;
       let visible = Math.min(orderedGeoOptions.length, desktopLimit);
       if (rowsFor(visible, false) > 2) {
         visible = 0;
@@ -778,7 +807,7 @@ export function NewYearUxPreview({
     const observer = new ResizeObserver(fitInTwoRows);
     observer.observe(container);
     return () => observer.disconnect();
-  }, [orderedGeoOptions.map((item) => `${item.name}:${item.count}`).join('|')]);
+  }, [orderedGeoOptions.map((item) => `${item.name}:${item.count}`).join('|'), mobileGeoOptions.map((item) => `${item.name}:${item.count}`).join('|')]);
   useEffect(() => {
     let previousY = window.scrollY;
     const updateFloatingButton = () => {
@@ -1006,8 +1035,8 @@ export function NewYearUxPreview({
           </nav>
           <h1 className={styles.title}>Новый год <span className={styles.titleYear}>2027</span> в {region ? resolveCityCases(region).prepositional || `регионе «${region}»` : cityPrepositional || 'России'}:<br className={styles.titleBreak} /> мероприятия, афиша и билеты</h1>
           <p className={`${styles.lead} ${styles.leadDesktop}`}>{heroLocality
-            ? `Новогодние концерты, спектакли, детские ёлки, экскурсии и праздничные программы ${heroLocality}. Выбирайте даты и форматы, чтобы найти подходящее событие.`
-            : 'Новогодние праздники — отличный повод выбраться из дома, провести время с близкими или отправиться в небольшое путешествие. На этой странице собраны праздничные концерты, спектакли, детские ёлки, экскурсии и развлекательные программы в разных городах России. Выбирайте интересующие даты, сравнивайте мероприятия и находите подходящий вариант для всей семьи или компании друзей.'}</p>
+            ? `Новогодние праздники - отличный повод выбраться из дома, провести время с близкими или отправиться в небольшое путешествие. На этой странице собраны праздничные концерты, спектакли, детские ёлки, экскурсии и развлекательные программы ${heroLocality}. Выбирайте интересующие даты, сравнивайте мероприятия и находите подходящий вариант для всей семьи или компании друзей.`
+            : 'Новогодние праздники - отличный повод выбраться из дома, провести время с близкими или отправиться в небольшое путешествие. На этой странице собраны праздничные концерты, спектакли, детские ёлки, экскурсии и развлекательные программы в разных городах России. Выбирайте интересующие даты, сравнивайте мероприятия и находите подходящий вариант для всей семьи или компании друзей.'}</p>
           <p className={`${styles.lead} ${styles.leadMobile}`}>{heroLocality
             ? `Новогодние концерты, спектакли, детские ёлки, экскурсии и праздничные программы ${heroLocality}. Выбирайте даты и подходящие мероприятия.`
             : 'Новогодние концерты, спектакли, детские ёлки, экскурсии и праздничные программы по всей России. Выбирайте города, даты и подходящие мероприятия.'}</p>
@@ -1035,14 +1064,17 @@ export function NewYearUxPreview({
               {mobileTopCities.map((item) => renderGeoChip({ ...item, geoKind: 'city' }))}
               {hiddenMobileCityOptions.length ? <>
                 {mobileHeroCitiesExpanded ? hiddenMobileCityOptions.map((item) => renderGeoChip({ ...item, geoKind: 'city' })) : null}
-                <button type="button" className={`${styles.heroCityChip} ${styles.heroMoreButton}`} aria-expanded={mobileHeroCitiesExpanded} onClick={() => setMobileHeroCitiesExpanded((expanded) => !expanded)}>
+                <button type="button" className={`${styles.heroCityChip} ${styles.heroMoreButton} ${styles.heroMobileMoreButton}`} aria-expanded={mobileHeroCitiesExpanded} onClick={() => setMobileHeroCitiesExpanded((expanded) => !expanded)}>
                   {mobileHeroCitiesExpanded ? 'Свернуть ↑' : `Ещё ${hiddenMobileCityOptions.length} ${pluralRu(hiddenMobileCityOptions.length, ['город', 'города', 'городов'])} ↓`}
                 </button>
               </> : null}
             </div>
             <div ref={heroGeoMeasureRef} className={styles.heroGeoMeasure} aria-hidden="true">
-              {orderedGeoOptions.map((item) => <span key={`measure:${item.geoKind}:${item.name}`} className={styles.heroCityChip}><span>{item.name}</span><b>{item.count}</b></span>)}
+              {orderedGeoOptions.map((item) => <span key={`measure:${item.geoKind}:${item.name}`} className={styles.heroCityChip}><span className={styles.heroCityName}>{item.name}</span><b className={styles.heroCityCount}>{item.count}</b></span>)}
               <span className={`${styles.heroCityChip} ${styles.heroMoreButton}`}>Ещё {orderedGeoOptions.length} ↓</span>
+            </div>
+            <div ref={heroMobileGeoMeasureRef} className={`${styles.heroGeoMeasure} ${styles.heroGeoMeasureMobile}`} aria-hidden="true">
+              {mobileGeoOptions.map((item) => <span key={`mobile-measure:${item.geoKind}:${item.name}`} className={styles.heroCityChip}><span className={styles.heroCityName}>{item.name}</span><b className={styles.heroCityCount}>{item.count}</b></span>)}
             </div>
           </div>
           </div>

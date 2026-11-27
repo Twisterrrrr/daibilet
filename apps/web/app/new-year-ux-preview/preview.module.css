@@ -141,7 +141,7 @@
 .activeBar { display: flex; align-items: center; flex-wrap: wrap; gap: 7px; margin: 0 0 8px; padding: 8px 11px; border: 1px solid #c9ddff; border-radius: 8px; background: var(--accent-soft); color: var(--accent-dark); font-size: 13px; }
 .activeDot { width: 5px; height: 5px; border-radius: 50%; background: var(--accent); }
 .activeText { font-weight: 700; }
-.activeCity { margin-left: auto; color: var(--ink2); font-weight: 600; }
+.activeCity { color: var(--ink2); font-weight: 600; }
 
 .list { overflow: hidden; margin-bottom: 24px; border: 1px solid var(--line); border-radius: 14px; background: #fff; }
 .row { display: grid; grid-template-columns: 76px minmax(0, 1fr) 100px 90px max-content; align-items: center; gap: 12px; padding: 11px 12px; border-bottom: 1px solid var(--line2); content-visibility: auto; contain-intrinsic-size: auto 60px; cursor: pointer; }
@@ -418,11 +418,12 @@
 .heroCities { position: relative; display: flex; width: 100%; align-items: center; flex-wrap: wrap; gap: 8px; margin-top: 17px; }
 .heroCityChip { display: inline-flex; min-height: 32px; align-items: center; gap: 7px; padding: 0 12px; border: 1px solid rgb(255 255 255 / 27%); border-radius: 999px; background: rgb(255 255 255 / 8%); color: #fff; font-size: 13px; font-weight: 550; white-space: nowrap; }
 .heroCityChip:hover, .heroCityChipActive { border-color: var(--brand-yellow); background: var(--brand-yellow); color: #111827; }
-.heroCityName { line-height: 1.1; }
-.heroCityCount { display: inline-flex; align-items: center; color: currentColor; font-size: 11px; font-weight: 700; line-height: 1; opacity: .68; }
+.heroCityName { display: inline-flex; height: 1em; align-items: center; line-height: 1; }
+.heroCityCount { display: inline-flex; height: 1em; align-self: center; align-items: center; justify-content: center; color: currentColor; font-size: 11px; font-weight: 700; font-variant-numeric: tabular-nums; line-height: 1; opacity: .68; }
 .heroMoreButton { border-style: dashed; background: transparent; cursor: pointer; }
 .heroGeoMeasure { position: absolute; top: 0; left: -10000px; display: flex; width: 100%; align-items: center; flex-wrap: wrap; gap: 8px; visibility: hidden; pointer-events: none; }
 .heroGeoMeasure .heroCityChip { flex: 0 0 auto; }
+.heroGeoMeasureMobile { display: none; }
 .filters { position: sticky; top: 0; }
 .desktopDropdowns { display: flex; align-items: center; gap: 8px; padding-bottom: 11px; overflow-x: auto; }
 .desktopFilterField { flex: 0 0 auto; }
@@ -645,6 +646,8 @@
 @media (max-width: 899px) {
   .heroCitiesDesktop { display: none; }
   .heroCitiesMobile { display: flex; width: 100%; align-items: center; flex-wrap: wrap; gap: 7px; }
+  .heroCitiesMobile .heroMobileMoreButton { width: 100%; flex: 0 0 100%; justify-content: center; box-sizing: border-box; }
+  .heroGeoMeasureMobile { display: flex; }
   .filters { position: relative; top: auto; }
   .filtersContentCollapsed { display: block; }
   .floatingFiltersButton {
