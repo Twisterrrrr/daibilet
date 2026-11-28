@@ -13,6 +13,7 @@
  *   Pair API with DAIBILET_CATALOG_REBUILD_MODE=off
  */
 import path from 'node:path';
+import { statSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
 const rootDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -31,14 +32,19 @@ async function main() {
   const { getPublicCatalogSessions, clearPublicCatalogDtoCache } = await import(
     '../apps/backend/src/public-catalog.dto.ts'
   );
-  const { loadPublicCatalogDiskCache, resolvePublicCatalogDiskCachePath } = await import(
+  const { resolvePublicCatalogDiskCachePath } = await import(
     '../apps/backend/src/public-catalog-disk-cache.ts'
   );
 
   clearPublicCatalogDtoCache();
   const sessions = await getPublicCatalogSessions(true, { hydrateSlots: false });
   const diskPath = resolvePublicCatalogDiskCachePath();
-  const disk = loadPublicCatalogDiskCache();
+  let diskCacheBytes = null;
+  try {
+    diskCacheBytes = statSync(diskPath).size;
+  } catch (error) {
+    if (error?.code !== 'ENOENT') throw error;
+  }
   console.log(
     JSON.stringify({
       ok: true,
@@ -46,8 +52,7 @@ async function main() {
       sessions: sessions.length,
       elapsedMs: Date.now() - startedAt,
       diskCache: diskPath,
-      diskVersion: disk?.version ?? null,
-      hasIndexes: Boolean(disk?.indexes),
+      diskCacheBytes,
     }),
   );
 }

@@ -98,7 +98,6 @@ html[data-nav-pending='1'] {
       'Noto Sans', 'Liberation Sans', sans-serif;
     --site-header-height: 4rem;
     /** Content column: 1280px on ordinary 16:9 desktop; 1600px on 21:9 below. */
-  }
     --container-page-max: 80rem;
     /* Compact equal gaps; ultrawide must not inflate menu into a sparse strip. */
     --header-menu-gap: 0.75rem;
@@ -147,6 +146,7 @@ html[data-nav-pending='1'] {
       linear-gradient(150deg, oklch(0.16 0.05 280), oklch(0.26 0.08 35));
     --party-hero-glow: oklch(0.72 0.14 40 / 0.1);
   }
+}
 
   /* Ultrawide 21:9: give the column a bit more room without stretching 16:9 desktop. */
   @media (min-aspect-ratio: 21/9) {
