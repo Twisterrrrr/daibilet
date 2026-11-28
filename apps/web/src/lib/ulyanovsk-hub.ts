@@ -1,0 +1,166 @@
+/* Ulyanovsk city hub editorial data. */
+import type { CityDayRoutePreset, CityMustSeeItem, CitySuburbItem } from './cityInfo.ts';
+import { transliterateSlug } from './routes.ts';
+
+export const ULYANOVSK_SUBURBS: CitySuburbItem[] = [
+  {
+    name: 'Геопарк «Ундория»',
+    desc: 'Однодневная поездка к палеонтологическим экспозициям, минеральным источникам и геологическим обнажениям на берегу Волги.',
+    address: 'Ульяновский район, село Ундоры', dayRouteId: 'ulyanovsk-suburb-undory', imageUrl: '/images/venues/ulyanovsk/undory-card.jpg',
+    latitude: 54.607421, longitude: 48.391214, visitMinutes: 'полдня',
+    travelVector: 'Автобус или автомобиль',
+    travelVectorBlurb: 'Сверьте расписание маршрутки № 111 и режим выбранных объектов перед поездкой. Палеонтологический заказник посещайте по правилам охраняемой территории.',
+    places: [
+      { name: 'Ундоровский палеонтологический музей', desc: 'Экспозиция морских рептилий и находок из местных юрских отложений.', imageUrl: '/images/venues/ulyanovsk/suburb-undory-paleontology-generated.jpg', dayRouteId: 'ulyanovsk-undory-paleontology-museum', latitude: 54.607421, longitude: 48.391214 },
+      { name: 'Минеральный источник № 1', desc: 'Бювет у курортной зоны Ундор; уточните доступ и режим работы на месте.', imageUrl: '/images/venues/ulyanovsk/suburb-undory-mineral-spring-generated.jpg', latitude: 54.59945, longitude: 48.412117 },
+      { name: 'Малиновый овраг', desc: 'Геологический разрез на территории геопарка; посещение природных обнажений планируйте с учётом правил заказника.', imageUrl: '/images/venues/ulyanovsk/suburb-undory-malinovy-ovrag-generated.jpg' },
+      { name: 'Долина кристаллов', desc: 'Геологический участок, который посещают в составе экскурсионного маршрута по Ундории.', imageUrl: '/images/venues/ulyanovsk/suburb-undory-dolina-kristallov-generated.jpg' },
+      { name: 'Городищенский разрез и залив', desc: 'Палеонтологические и геологические объекты на берегу водохранилища; не собирайте окаменелости без разрешения.', imageUrl: '/images/venues/ulyanovsk/suburb-undory-gorodishchenskiy-razrez-generated.jpg' },
+      { name: 'Санаторный парк в Ундорах', desc: 'Аллеи курортной зоны рядом с санаториями и источниками.', imageUrl: '/images/venues/ulyanovsk/suburb-undory-sanatorny-park-generated.jpg' },
+    ],
+  },
+  {
+    name: 'Национальный парк «Сенгилеевские горы»',
+    desc: 'Охраняемая природная территория с меловыми склонами, степями и маркированными экотропами.',
+    address: 'Сенгилеевский район, Ульяновская область', dayRouteId: 'ulyanovsk-suburb-sengileevskie-gory', imageUrl: '/images/venues/ulyanovsk/arbuginskaya-gora-card.jpg',
+    latitude: 54.020541, longitude: 48.59121, visitMinutes: 'полдня или день',
+    travelVector: 'Автомобиль; междугородний автобус до района парка',
+    travelVectorBlurb: 'До выезда оформите разрешение на сайте национального парка и уточните открытые маршруты. Не сходите с тропы, не собирайте камни и окаменелости.',
+    places: [
+      { name: 'Экотропа «По следам сурка»', desc: 'Маршрут национального парка; сезон работы и условия посещения уточняйте у администрации.', imageUrl: '/images/venues/ulyanovsk/suburb-sengiley-marmot-trail-generated.jpg' },
+      { name: 'Арбугинская гора', desc: 'Видовая точка над волжским ландшафтом; координаты относятся к ориентиру направления.', imageUrl: '/images/venues/ulyanovsk/suburb-arbuginskaya-gora-generated.jpg', dayRouteId: 'ulyanovsk-arbuginskaya-gora-poi', latitude: 54.020541, longitude: 48.59121 },
+      { name: 'Экотропа «Шиловская лесостепь»', desc: 'Официально оборудованный маршрут национального парка; перед визитом проверьте доступность.', imageUrl: '/images/venues/ulyanovsk/suburb-shilovskaya-forest-steppe-generated.jpg' },
+      { name: 'Маршрут «Волжский берег»', desc: 'Природный маршрут парка вдоль берега; конкретный участок и вход согласуйте с парком.', imageUrl: '/images/venues/ulyanovsk/suburb-volzhskiy-bereg-generated.jpg' },
+      { name: 'Меловые склоны и смотровые площадки', desc: 'Чувствительные природные участки: передвигайтесь по разрешённым тропам.', imageUrl: '/images/venues/ulyanovsk/suburb-melovye-sklony-generated.jpg' },
+    ],
+  },
+  {
+    name: 'Никольская гора и Сурское',
+    desc: 'Поездка в районный посёлок к паломническим местам и краеведческим объектам; точную последовательность остановок лучше согласовать на месте.',
+    address: 'р.п. Сурское, Ульяновская область', dayRouteId: 'ulyanovsk-suburb-surskoe', imageUrl: '/images/venues/ulyanovsk/nikolskaya-gora-surskoe-card.jpg',
+    latitude: 54.48421, longitude: 46.721241, visitMinutes: 'полдня',
+    travelVector: 'Междугородний автобус или автомобиль',
+    travelVectorBlurb: 'Расписание и режим посещения часовни уточните перед выездом. Указанная точка — ориентир посёлка, а не точная координата входа на природный объект.',
+    places: [
+      { name: 'Никольская гора', desc: 'Местная возвышенность и ориентир поездки; доступные подходы уточняйте в Сурском.', imageUrl: '/images/venues/ulyanovsk/suburb-nikolskaya-gora-generated.jpg' },
+      { name: 'Часовня Николая Чудотворца', desc: 'Паломнический объект; соблюдайте действующие правила посещения.', imageUrl: '/images/venues/ulyanovsk/suburb-chapel-nikolaya-chudotvortsa-generated.jpg' },
+      { name: 'Источники у Никольской горы', desc: 'Родники и купель, если доступны; не употребляйте воду без проверки её пригодности.', imageUrl: '/images/venues/ulyanovsk/suburb-springs-nikolskaya-gora-generated.jpg' },
+      { name: 'Историко-краеведческий музей Сурского', desc: 'Местная история района; проверьте часы работы заранее.', imageUrl: '/images/venues/ulyanovsk/suburb-surskoe-local-museum-generated.jpg' },
+    ],
+  },
+  {
+    name: 'Юловский пруд и бор',
+    desc: 'Природная поездка в Инзенский район к лесному водоёму и сосновому бору.',
+    address: 'Инзенский район, село Юлово', dayRouteId: 'ulyanovsk-suburb-yulovo', imageUrl: '/images/venues/ulyanovsk/yulovskiy-prud-card.jpg',
+    latitude: 53.945121, longitude: 46.512412, visitMinutes: 'полдня',
+    travelVector: 'Автомобиль',
+    travelVectorBlurb: 'Проверьте дорожные условия, доступность берега и действующие правила посещения перед выездом. На природной территории не сходите на сплавины и заболоченные участки.',
+    places: [
+      { name: 'Берег Юловского пруда', desc: 'Основной ориентир прогулки; оборудованность пляжа и купание требуют проверки на месте.', imageUrl: '/images/venues/ulyanovsk/suburb-yulovskiy-prud-shore-generated.jpg', dayRouteId: 'ulyanovsk-yulovskiy-prud', latitude: 53.945121, longitude: 46.512412 },
+      { name: 'Сосновый бор', desc: 'Лесная прогулка по существующим дорогам и тропам.', imageUrl: '/images/venues/ulyanovsk/suburb-yulovskiy-pine-forest-generated.jpg' },
+      { name: 'Плотина у пруда', desc: 'Гидротехническое сооружение — осматривать только с безопасных доступных подходов.', imageUrl: '/images/venues/ulyanovsk/suburb-yulovskiy-dam-generated.jpg' },
+      { name: 'Лесные поляны у Юлова', desc: 'Места для отдыха без оборудованного сервиса; увозите мусор с собой.', imageUrl: '/images/venues/ulyanovsk/suburb-yulovskiy-forest-glade-generated.jpg' },
+    ],
+  },
+];
+
+const routeStop = (name: string, visitMinutes: number, desc: string, locationSlug?: string, venueSlug?: string) => ({ name, dayRouteId: `ulyanovsk-place-${transliterateSlug(name)}`, ...(locationSlug ? { locationSlug } : {}), ...(venueSlug ? { venueSlug } : {}), visitMinutes, desc });
+
+export const ULYANOVSK_DAY_ROUTE_PRESETS: CityDayRoutePreset[] = [
+  {
+    id: 'ulyanovsk-historic-center', title: 'Симбирск и Новый Венец', description: 'Пеший день по историческому центру, литературным местам и панораме Волги.', timingNote: 'Оставьте запас времени на музеи: режим работы и доступность экспозиций различаются.',
+    stops: [
+      routeStop('Памятник Богдану Хитрово', 15, 'Монумент основателю Симбирска.'),
+      routeStop('Ленинский мемориал', 60, 'Мемориальный комплекс и музейные пространства.', 'ulyanovsk-leninskiy-memorial'),
+      routeStop('Дом-памятник И. А. Гончарову', 30, 'Историческое здание с башней и часами.'),
+      routeStop('Памятник букве «Ё»', 10, 'Гранитная стела на Новом Венце.', 'ulyanovsk-pamyatnik-bukve-e'),
+      routeStop('Бульвар Новый Венец', 40, 'Пешеходный бульвар и вид на Волгу.', 'ulyanovsk-bul-var-novyy-venets'),
+      routeStop('Здание Дворянского собрания', 20, 'Историческое здание областной библиотеки.'),
+      routeStop('Памятник В. И. Ленину', 15, 'Монумент на площади Ленина.'),
+      routeStop('Парк «Владимирский сад»', 30, 'Небольшая прогулка среди исторической застройки.'),
+      routeStop('Ресторан «Обломов»', 90, 'Гастрономическая остановка; наличие и часы проверьте перед визитом.'),
+    ],
+  },
+  {
+    id: 'ulyanovsk-museum-quarter', title: 'Музейный Симбирск', description: 'Музеи и архитектурные памятники центральных кварталов.', timingNote: 'Проверьте выходные дни музеев и возможность входа в действующие религиозные здания.', coverImageUrl: '/images/venues/ulyanovsk/ulyanovsk-museum-simbirsk-route-generated.jpg',
+    stops: [
+      routeStop('Музей «Симбирская фотография»', 30, 'Музей истории фотографии.'),
+      routeStop('Лютеранская церковь Святой Марии (Кирха)', 20, 'Историческая кирха; внутренний осмотр зависит от расписания.'),
+      routeStop('Музей «Мелочная лавка»', 40, 'Музейная экспозиция о торговле XIX века.'),
+      routeStop('Музей «Пожарная охрана Симбирска-Ульяновска»', 45, 'История пожарного дела в городе.'),
+      routeStop('Музей-салон камня «Симбирцит»', 30, 'Местный минерал и изделия из него.'),
+      routeStop('Музей «Градостроительство и архитектура Симбирска-Ульяновска»', 40, 'История городской застройки.'),
+      routeStop('Здание Крестьянского поземельного банка', 15, 'Исторический фасад; уточните доступ внутрь.'),
+      routeStop('Музей «Симбирская засечная черта»', 35, 'Музей под открытым небом.'),
+      routeStop('Корчма «Гопак»', 60, 'Перерыв на еду; проверьте актуальное расписание.'),
+    ],
+  },
+];
+
+const mainPlace = (name: string, desc: string, mustSeeFilter: CityMustSeeItem['mustSeeFilter'], address: string, latitude: number, longitude: number, locationSlug?: string, venueSlug?: string, visitMinutes = 20, dayRouteId?: string, imageUrl?: string, imageCredit?: CityMustSeeItem['imageCredit']): CityMustSeeItem => ({ name, desc, mustSeeFilter, address, latitude, longitude, visitMinutes, dayRouteId: dayRouteId || `ulyanovsk-place-${transliterateSlug(name)}`, ...(imageUrl ? { imageUrl } : {}), ...(imageCredit ? { imageCredit } : {}), ...(locationSlug ? { locationSlug } : {}), ...(venueSlug ? { venueSlug } : {}) });
+
+export const ULYANOVSK_MUST_SEE: CityMustSeeItem[] = [
+  mainPlace('Памятник букве «Ё»', 'Гранитная стела на бульваре Новый Венец напоминает о связи Симбирска с историей русской буквы.', 'main', 'бульвар Новый Венец, 3', 54.3156, 48.4064, 'ulyanovsk-pamyatnik-bukve-e', undefined, 15, undefined, '/images/venues/ulyanovsk/pamyatnik-bukve-e-commons.jpg', { author: 'Vadim Indeikin', sourceUrl: 'https://commons.wikimedia.org/wiki/File:%D0%81-%D1%81%D0%BE%D0%B1%D0%B0%D0%BA%D0%B0_%D0%BE%D0%BA%D0%BE%D0%BB%D0%BE_%D0%81-%D0%B1%D1%83%D0%BA%D0%B2%D1%8B._%D0%A3%D0%BB%D1%8C%D1%8F%D0%BD%D0%BE%D0%B2%D1%81%D0%BA._%D0%9D%D0%BE%D1%8F%D0%B1%D1%80%D1%8C_2013_-_panoramio.jpg', license: 'CC BY-SA 3.0', licenseUrl: 'https://creativecommons.org/licenses/by-sa/3.0/' }),
+  mainPlace('Памятник В. И. Ленину', 'Монумент работы Матвея Манизера на площади Ленина.', 'monument', 'площадь Ленина', 54.316812, 48.405466, undefined, undefined, 15),
+  mainPlace('Памятник Н. М. Карамзину', 'Монумент историку с фигурой музы Клио в сквере его имени.', 'monument', 'сквер Карамзина', 54.314987, 48.403561, undefined, undefined, 15),
+  mainPlace('Памятник И. А. Гончарову', 'Бронзовая скульптура писателя в историческом центре.', 'monument', 'ул. Гончарова, 16', 54.314051, 48.397632, undefined, undefined, 15),
+  mainPlace('Памятник Богдану Хитрово', 'Конный монумент основателю Симбирска.', 'main', 'площадь 100-летия со дня рождения В. И. Ленина', 54.319762, 48.407421, undefined, undefined, 15, undefined, '/images/venues/ulyanovsk/pamyatnik-bogdanu-khitrovo-card.jpg', { author: 'Vadim Indeikin', sourceUrl: 'https://commons.wikimedia.org/wiki/File:%D0%9F%D0%B0%D0%BC%D1%8F%D1%82%D0%BD%D0%B8%D0%BA_%D0%BE%D1%81%D0%BD%D0%BE%D0%B2%D0%B0%D1%82%D0%B5%D0%BB%D1%8E_%D0%A1%D0%B8%D0%9D%D0%B1%D0%B8%D1%80%D1%81%D0%BA%D0%B0_%D0%91%D0%BE%D0%B3%D0%B4%D0%B0%D0%BD%D1%83_%D0%A5%D0%B8%D1%82%D1%80%D0%BE%D0%B2%D0%BE..jpg', license: 'CC BY-SA 3.0', licenseUrl: 'https://creativecommons.org/licenses/by-sa/3.0/' }),
+  mainPlace('Диван Обломова', 'Литературный арт-объект, посвящённый герою романа Гончарова.', 'monument', 'ул. Гончарова, 16', 54.314227, 48.397561, undefined, undefined, 10),
+  mainPlace('Тапочки Обломова', 'Небольшая скульптура рядом с диваном Обломова.', 'monument', 'ул. Гончарова, 16', 54.314299, 48.397758, undefined, undefined, 10),
+  mainPlace('Памятник рублю', 'Металлический арт-объект в форме монеты.', 'monument', 'ул. Спасская, 19', 54.318465, 48.404552, undefined, undefined, 10),
+  mainPlace('Памятник Валентине Леонтьевой', 'Скульптура телеведущей в городском сквере.', 'monument', 'ул. Гончарова, 14', 54.3142, 48.3975, undefined, undefined, 15),
+  mainPlace('Памятник учителю', 'Скульптура у здания педагогического университета.', 'monument', 'площадь Ленина, 4/5', 54.315579, 48.404981, undefined, undefined, 10),
+  mainPlace('Скульптурная композиция «Мальчик с флейтой»', 'Камерный уличный арт-объект на улице Федерации.', 'monument', 'ул. Федерации, 7', 54.316824, 48.395721, undefined, undefined, 10),
+  mainPlace('Памятник камнерезу', 'Скульптура посвящена местной традиции обработки симбирцита.', 'monument', 'ул. Марата, 25', 54.312154, 48.390812, undefined, undefined, 10),
+  mainPlace('Здание Дворянского собрания', 'Историческое здание областной научной библиотеки.', 'houses', 'бульвар Новый Венец, 5', 54.316982, 48.404456, undefined, undefined, 20),
+  mainPlace('Дом-памятник И. А. Гончарову', 'Здание краеведческого музея на Новом Венце, построенное как памятник писателю.', 'main', 'бульвар Новый Венец, 3/4', 54.318454, 48.405784, undefined, undefined, 20, undefined, '/images/venues/ulyanovsk/muzey-goncharova-card.jpg', { author: 'Vadimgimov', sourceUrl: 'https://commons.wikimedia.org/wiki/File:Ulyanovsk_Dom_Goncharova.jpg', license: 'CC BY-SA 4.0', licenseUrl: 'https://creativecommons.org/licenses/by-sa/4.0/' }),
+  mainPlace('Дом, где родился В. И. Ленин', 'Деревянный флигель усадьбы Ульяновых на территории мемориального комплекса.', 'main', 'площадь Ленина, 1', 54.318854, 48.405102, 'ulyanovsk-muzey-zapovednik-rodina-v-i-lenina', undefined, 30, undefined, '/images/venues/ulyanovsk/muzey-kvartira-ulianovyh-card.jpg', { author: 'Sergey M R', sourceUrl: 'https://commons.wikimedia.org/wiki/File:%D0%94%D0%BE%D0%BC-%D0%BC%D1%83%D0%B7%D0%B5%D0%B9_%D0%9B%D0%B5%D0%BD%D0%B8%D0%BD%D0%B0_%281%29_%28%D0%A3%D0%BB%D1%8C%D1%8F%D0%BD%D0%BE%D0%B2%D1%81%D0%BA%29.jpg', license: 'CC BY-SA 4.0', licenseUrl: 'https://creativecommons.org/licenses/by-sa/4.0/' }),
+  mainPlace('Здание Общества взаимного кредита', 'Исторический доходный дом на улице Гончарова.', 'houses', 'ул. Гончарова, 48/2', 54.317541, 48.399991, undefined, undefined, 15),
+  mainPlace('Дом архитектора Ф. О. Ливчака', 'Особняк архитектора с декоративными фасадными панно.', 'houses', 'ул. Архитектора Ливчака, 4', 54.315124, 48.38421, undefined, undefined, 20),
+  mainPlace('Здание Симбирской мужской классической гимназии', 'Историческое здание мужской гимназии.', 'houses', 'ул. Спасская, 18', 54.314652, 48.401121, undefined, undefined, 20),
+  mainPlace('Здание Крестьянского поземельного банка', 'Историческое здание банка с выразительным фасадом.', 'houses', 'ул. Льва Толстого, 42', 54.3098, 48.3935, undefined, undefined, 15),
+  mainPlace('Дом купца Шатрова', 'Купеческий особняк в исторической части города.', 'houses', 'ул. Гимова, 3', 54.316021, 48.403564, undefined, undefined, 20),
+  mainPlace('Кинотеатр «Художественный»', 'Историческое здание электротеатра на улице Гончарова.', 'houses', 'ул. Гончарова, 24', 54.314541, 48.398012, undefined, undefined, 15),
+  mainPlace('Чугунный фонтан у драматического театра', 'Исторический фонтан у театрального квартала.', 'views', 'ул. Спасская, 12А', 54.31341, 48.39912, undefined, undefined, 10),
+  mainPlace('Музей гражданской авиации', 'Открытая экспозиционная площадка отраслевого музея; график и проезд проверяйте перед визитом.', 'main', 'ул. Авиационная, 20а', 54.291146, 48.233563, undefined, 'ulyanovsk-golovnoy-muzey-istorii-grazhdanskoy-aviatsii', 120, undefined, '/images/venues/ulyanovsk/aviation-museum-commons.jpg', { author: 'The Krasnoyarsk National and Cultural Autonomy of the Chuvash People', sourceUrl: 'https://commons.wikimedia.org/wiki/File:The_museum_of_aviation_in_the_city_of_Ulyanovsk,_Russia._-_49843088838.jpg', license: 'CC BY 2.0', licenseUrl: 'https://creativecommons.org/licenses/by/2.0/' }),
+  mainPlace('Ленинский мемориал', 'Мемориальный комплекс и музейные пространства на площади Ленина.', 'main', 'площадь Ленина, 1', 54.319579, 48.406067, 'ulyanovsk-leninskiy-memorial', undefined, 60, undefined, '/images/venues/ulyanovsk/leninskiy-memorial-commons.jpg', { author: 'Vadimgimov', sourceUrl: 'https://commons.wikimedia.org/wiki/File:Ulyanovsk_Leninskiy_memorial.jpg', license: 'CC BY-SA 4.0', licenseUrl: 'https://creativecommons.org/licenses/by-sa/4.0/' }),
+  mainPlace('Историко-мемориальный центр-музей И. А. Гончарова', 'Музей писателя в доме его родителей.', 'museum', 'ул. Гончарова, 20', 54.31421, 48.397984, undefined, undefined, 60),
+  mainPlace('Музей «Симбирская засечная черта»', 'Экспозиция под открытым небом с реконструированным участком оборонительной линии.', 'museum', 'ул. Льва Толстого, 43а', 54.309012, 48.392101, undefined, undefined, 45),
+  mainPlace('Музей «Мелочная лавка»', 'Музейная реконструкция городской торговли XIX века.', 'museum', 'ул. Ленина, 76', 54.311102, 48.391241, undefined, undefined, 45),
+  mainPlace('Музей «Пожарная охрана Симбирска-Ульяновска»', 'Экспозиция об истории пожарного дела в городе.', 'museum', 'ул. Ленина, 43', 54.30821, 48.386124, undefined, undefined, 45),
+  mainPlace('Музей-салон камня «Симбирцит»', 'Музейная экспозиция о местном минерале и изделиях из него.', 'museum', 'ул. Марата, 25/1', 54.312, 48.3905, undefined, undefined, 45),
+  mainPlace('Ульяновский областной художественный музей', 'Коллекция искусства в историческом центре.', 'museum', 'бульвар Новый Венец, 3/4', 54.31821, 48.40581, undefined, undefined, 90),
+  mainPlace('Музей «Градостроительство и архитектура Симбирска-Ульяновска»', 'Экспозиция об истории застройки и архитектуре города.', 'museum', 'ул. Льва Толстого, 24', 54.310541, 48.393412, undefined, undefined, 45),
+  mainPlace('Музей «Симбирская фотография»', 'Небольшой музей истории фотографии в Симбирске.', 'museum', 'ул. Энгельса, 1Б', 54.312451, 48.39312, undefined, undefined, 45),
+  mainPlace('Спасо-Вознесенский кафедральный собор', 'Кафедральный собор в исторической части города.', 'temple', 'ул. Ульяновская, 2', 54.307441, 48.376538, undefined, undefined, 30, undefined, '/images/venues/ulyanovsk/spaso-voznesenskiy-sobor.jpg'),
+  mainPlace('Свято-Богородице-Неопалимовский храм', 'Православный храм на улице Верхнеполевой.', 'temple', 'ул. Верхняя Полевая, 26', 54.3135, 48.388, undefined, undefined, 25),
+  mainPlace('Воскресенско-Германовский собор', 'Православный собор в Ульяновске.', 'temple', 'пер. Гоголя, 11', 54.329438, 48.400934, undefined, undefined, 25),
+  mainPlace('Храм Святого Равноапостольного Князя Владимира', 'Православный храм в северной части города.', 'temple', 'ул. Волжская, 50А', 54.354124, 48.461241, undefined, undefined, 25),
+  mainPlace('Лютеранская церковь Святой Марии (Кирха)', 'Историческая кирха; уточните возможность осмотра интерьера.', 'temple', 'ул. Ленина, 100', 54.31421, 48.395121, undefined, undefined, 25),
+  mainPlace('Бульвар Новый Венец', 'Пешеходная эспланада на высоком берегу Волги с панорамными видами.', 'main', 'бульвар Новый Венец', 54.318124, 48.405412, 'ulyanovsk-bul-var-novyy-venets', undefined, 40, undefined, '/images/venues/ulyanovsk/bul-var-novyy-venets-generated.jpg'),
+  mainPlace('Парк «Владимирский сад»', 'Исторический городской сад с прогулочными аллеями.', 'park', 'ул. Гончарова, 18', 54.3148, 48.3975, undefined, undefined, 30),
+  mainPlace('Парк Победы', 'Большой парк с мемориальной аллеей и экспозицией военной техники.', 'park', 'ул. Юности, 2', 54.312, 48.365, undefined, undefined, 60),
+  mainPlace('Сквер Карамзина', 'Зелёный сквер рядом с историческими зданиями центра.', 'park', 'сквер Карамзина', 54.315, 48.4036, undefined, undefined, 20),
+  mainPlace('Набережная у ТРЦ «Аквамолл» (река Свияга)', 'Прогулочная зона на берегу Свияги; наличие сезонных развлечений уточняйте на месте.', 'views', 'Московское шоссе, 108', 54.307, 48.359, undefined, undefined, 30),
+  mainPlace('Парк имени Александра Матросова', 'Небольшой городской парк с аллеями и площадками для отдыха.', 'park', 'ул. Розы Люксембург, 25', 54.318, 48.4, undefined, undefined, 40),
+  mainPlace('Ресторан «Обломов»', 'Заведение в историческом центре; меню, адрес и часы работы перепроверьте перед посещением.', 'gastro', 'ул. Спасская, 19/9', 54.316124, 48.402451, undefined, undefined, 60),
+  mainPlace('Корчма «Гопак»', 'Ресторан домашней кухни; проверьте актуальные часы работы.', 'gastro', 'ул. Федерации, 11', 54.317541, 48.395412, undefined, undefined, 60),
+  mainPlace('Ресторан «Другие Рестораны» (Top Hop)', 'Бар и ресторан на улице Федерации; проверьте текущий формат заведения.', 'gastro', 'ул. Федерации, 4а', 54.31612, 48.396124, undefined, undefined, 60),
+  mainPlace('Кафе «Вольсов»', 'Кофейня в центре, названная в честь архитектора Фёдора Вольсова; проверьте актуальность заведения.', 'gastro', 'ул. Гончарова, 13', 54.313124, 48.395854, undefined, undefined, 45),
+  mainPlace('Ульяновский драматический театр имени И. А. Гончарова', 'Главная драматическая сцена города; расписание спектаклей публикует театр.', 'creative', 'ул. Спасская, 12А', 54.313541, 48.399541, undefined, undefined, 120),
+  mainPlace('Ульяновский областной театр кукол имени В. А. Леонтьевой', 'Театр кукол в исторической части города; проверьте афишу.', 'creative', 'ул. Гончарова, 10', 54.311541, 48.394512, undefined, undefined, 90),
+  mainPlace('Ульяновский молодёжный театр', 'Театральная площадка на улице Железной Дивизии.', 'creative', 'ул. Железной Дивизии, 6', 54.308741, 48.39412, undefined, undefined, 90),
+];
+
+export const ULYANOVSK_FAQ: Array<{ q: string; a: string }> = [
+  { q: 'Сколько дней заложить на Ульяновск?', a: 'На исторический центр и главные музеи удобно заложить один полный день. Для музея гражданской авиации и поездки за город лучше добавить отдельный день.' },
+  { q: 'Где смотреть на Волгу?', a: 'Один из удобных городских видов открывается с бульвара Новый Венец. Береговые прогулки и доступ к отдельным участкам зависят от сезона и состояния набережной.' },
+  { q: 'В музее авиации можно попасть внутрь самолётов?', a: 'Доступ внутрь отдельных бортов зависит от сезона, расписания и формата посещения; экскурсию и возможность зайти в самолёт лучше заранее подтвердить у музея. Доступ в Ту-144 может быть закрыт. Даже осмотр открытой экспозиции занимает время: заложите не менее 1,5–2 часов и уточните действующие правила посещения перед поездкой.' },
+  { q: 'Императорский мост часто стоит в пробках? Как его объехать?', a: 'На мосту возможны заторы, особенно при дорожных работах и ограничениях движения. Перед поездкой проверьте актуальную дорожную обстановку и схему объезда: маршрут через Президентский мост может быть длиннее, но иногда экономит время. Не закладывайте фиксированное время в пути без проверки навигатора.' },
+  { q: 'Что выбрать для прогулки по воде — Волгу или Свиягу?', a: 'Это разные форматы. Прогулки по Свияге обычно короче и зависят от сезона и работы причала у «Аквамолла». Рейсы по Волге отправляются от Речного порта и позволяют увидеть город и широкую акваторию. Расписание, продолжительность и цены уточняйте у перевозчиков в день поездки.' },
+  { q: 'Можно ли самостоятельно ехать в Сенгилеевские горы?', a: 'Можно посещать только открытые для гостей маршруты и с оформленным разрешением, если оно требуется. Проверьте действующие правила национального парка перед выездом.' },
+  { q: 'Где попробовать судака без дорогого туристического чека?', a: 'Ищите судака в меню городских кафе и ресторанов, сравнивая порции и цены перед заказом. Меню, наличие блюда и стоимость меняются; названия заведений и цены из старых подборок лучше перепроверить перед визитом.' },
+  { q: 'Стоит ли включать в маршрут местные истории об аномальных зонах и призраках?', a: 'Такие рассказы относятся к городскому фольклору и не подтверждены как факты. Если вам интересны легенды, воспринимайте их как тему для атмосферной прогулки, а маршрут выбирайте по доступности и реальным достопримечательностям.' },
+];
+
+export const ULYANOVSK_TRAVEL = 'В Ульяновск можно приехать поездом или самолётом; актуальные маршруты и расписание проверяйте у перевозчиков. Музей гражданской авиации расположен на улице Авиационной, 20а и имеет отдельный график работы. Для поездок в Ундоры и национальный парк заранее уточните транспорт, доступность маршрутов и правила посещения.';

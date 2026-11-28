@@ -1,0 +1,30 @@
+{
+  "eventId": "evt_6ad9a21e4e01e161b748603a",
+  "eventTitle": "Ислам Итляшев - 22 января в Ярославле",
+  "eventPageId": "8f049632-a752-43b4-bf41-c8b7b26d1457",
+  "eventPageSlug": "islam-itlyashev-22-yanvarya-v-yaroslavle-yaroslavl",
+  "archiveStatus": "UNUSED_ORIGINAL_SOURCE",
+  "retrievedAt": "2026-11-05",
+  "originalDescription": null,
+  "previousEventOverride": "",
+  "previousEventPageContent": {
+    "sections": []
+  },
+  "verifiedCurrentData": {
+    "city": "Ярославль",
+    "venue": "Китайский Летчик Джао Да",
+    "address": "Крестьянский пр., 7",
+    "sessions": [
+      {
+        "start": "2027-01-22T17:00:00",
+        "end": "2027-01-22T19:00:00",
+        "price": 2000
+      }
+    ],
+    "activeOfferCount": "4",
+    "priceFromRub": 2000,
+    "ageLimit": "0"
+  },
+  "mainTextChars": 975,
+  "previousEffectiveChars": 0
+}

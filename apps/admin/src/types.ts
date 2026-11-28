@@ -54,6 +54,7 @@ export type AdminEventRow = {
     canonicalPath?: string | null;
     isIndexable?: boolean | null;
     editorStatus?: string | null;
+    mergeGroupKey?: string | null;
   };
   tags: string[];
   landingHits: string[];
@@ -78,6 +79,7 @@ export type AdminVenueRow = {
   id: string;
   name: string;
   title?: string;
+  editorialTitle?: string | null;
   slug?: string;
   city: string;
   address?: string | null;
@@ -100,6 +102,7 @@ export type AdminVenueRow = {
 
 export type AdminVenueDetail = Omit<AdminVenueRow, 'name' | 'proposedKind' | 'reason' | 'events'> & {
   title: string;
+  editorialTitle?: string | null;
   kind: string;
   pageStatus: string;
   events: Array<{
@@ -220,7 +223,15 @@ export type AdminLandingDetail = {
     cities: number;
     priceFrom?: number | null;
   };
+  page?: number;
+  pages?: number;
+  limit?: number;
+  total?: number;
   events: AdminLandingEvent[];
+  excludedPage?: number;
+  excludedPages?: number;
+  excludedLimit?: number;
+  excludedTotal?: number;
   excludedEvents: AdminLandingEvent[];
 };
 

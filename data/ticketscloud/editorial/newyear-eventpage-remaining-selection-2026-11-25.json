@@ -1,0 +1,794 @@
+{
+  "generatedFrom": "newyear-eventpage-december-eligible-2026-11-25.csv",
+  "pages": [
+    {
+      "id": "5557b16d-8a33-447a-b54e-9e2b8e44fc90",
+      "slug": "novogodnyaya-elka-dlya-samyh-malenkih-sankt-peterburg",
+      "title": "Новогодняя ёлка для самых маленьких",
+      "city": "Санкт-Петербург",
+      "venue": "Циферблат на Мойке",
+      "workUnit": "page:5557b16d-8a33-447a-b54e-9e2b8e44fc90",
+      "eventIds": [
+        "evt_6b01c86427b0173ccda4ac05",
+        "evt_6b01c86627b0173ccda4ac12",
+        "evt_6b01c86627b0173ccda4ac1f",
+        "evt_6b01c86727b0173ccda4ac2c",
+        "evt_6b01c86727b0173ccda4ac39",
+        "evt_6b01c86827b0173ccda4ac46",
+        "evt_6b01c86827b0173ccda4ac53",
+        "evt_6b01c86927b0173ccda4ac60",
+        "evt_6b01c86a27b0173ccda4ac6d"
+      ],
+      "selectedSlotCount": 9
+    },
+    {
+      "id": "53106f8c-16e4-47a4-bada-127cf8ae7d51",
+      "slug": "kreativnyi-master-klass-po-sozdaniyu-novogodnego-venka-sankt-peterburg",
+      "title": "Креативный мастер-класс по созданию новогоднего венка",
+      "city": "Санкт-Петербург",
+      "venue": "Cookforia Комендантский проспект",
+      "workUnit": "page:53106f8c-16e4-47a4-bada-127cf8ae7d51",
+      "eventIds": [
+        "evt_6aff048423c2d862dfc660a7"
+      ],
+      "selectedSlotCount": 1
+    },
+    {
+      "id": "ad6980d5-6a3a-47b9-a5af-2755ed6c040e",
+      "slug": "novogodnii-korporativ-dlya-predprinimatelei-inache-sankt-peterburg",
+      "title": "Новогодний корпоратив для предпринимателей «ИНАЧЕ»",
+      "city": "Санкт-Петербург",
+      "venue": "ресторан «Антресоль и Перец»",
+      "workUnit": "page:ad6980d5-6a3a-47b9-a5af-2755ed6c040e",
+      "eventIds": [
+        "evt_6af5ef8cb48efe3e5ac0339a"
+      ],
+      "selectedSlotCount": 1
+    },
+    {
+      "id": "a29bd898-27d7-4d50-9af8-0199aee6a6c0",
+      "slug": "kvartet-alekseya-popova-spb-moskva-christmas-jazz-moskva",
+      "title": "КВАРТЕТ АЛЕКСЕЯ ПОПОВА (СПБ/МОСКВА): «CHRISTMAS JAZZ»",
+      "city": "Москва",
+      "venue": "Клуб Алексея Козлова",
+      "workUnit": "page:a29bd898-27d7-4d50-9af8-0199aee6a6c0",
+      "eventIds": [
+        "evt_6af4a188d77b7b9250121f0a"
+      ],
+      "selectedSlotCount": 1
+    },
+    {
+      "id": "d7785496-aac7-481f-ab80-41bed9b4ab24",
+      "slug": "16-12-christmas-party-big-ben-tver",
+      "title": "16.12 Christmas Party @ Big Ben",
+      "city": "Тверь",
+      "venue": "Клуб Биг Бен",
+      "workUnit": "page:d7785496-aac7-481f-ab80-41bed9b4ab24",
+      "eventIds": [
+        "evt_6ad9c7ca169ab3389b627a62"
+      ],
+      "selectedSlotCount": 1
+    },
+    {
+      "id": "1dbe4c0f-9b88-4f74-b16c-152bcabe6cb8",
+      "slug": "novyi-god-s-kotyatami-barnaul",
+      "title": "Новый год с Котятами",
+      "city": "Барнаул",
+      "venue": "Беби театр",
+      "workUnit": "page:1dbe4c0f-9b88-4f74-b16c-152bcabe6cb8",
+      "eventIds": [
+        "evt_6b007bef8e453b4d9fa4ac05",
+        "evt_6b007bf08e453b4d9fa4ac1c",
+        "evt_6b007bf18e453b4d9fa4ac33",
+        "evt_6b007bf28e453b4d9fa4ac4a",
+        "evt_6b007bf38e453b4d9fa4ac61"
+      ],
+      "selectedSlotCount": 5
+    },
+    {
+      "id": "69bd099f-0504-4d6d-a583-e9dcf3722237",
+      "slug": "tango-v-parizhe-rozhdestvo-kaliningrad",
+      "title": "Танго в Париже. Рождество",
+      "city": "Калининград",
+      "venue": "Театр Николая Захарова",
+      "workUnit": "page:69bd099f-0504-4d6d-a583-e9dcf3722237",
+      "eventIds": [
+        "evt_6af3200de12c16ed8de8a452"
+      ],
+      "selectedSlotCount": 1
+    },
+    {
+      "id": "73aa67a2-7c2e-47f8-844f-446f6e27d384",
+      "slug": "novogodnii-prazdnik-dlya-malyshei-v-gosti-k-dedu-morozu-i-snegurochke-sankt-peterburg",
+      "title": "Новогодний праздник для малышей «В гости к Деду Морозу и Снегурочке»",
+      "city": "Санкт-Петербург",
+      "venue": "Cookforia Комендантский проспект",
+      "workUnit": "page:73aa67a2-7c2e-47f8-844f-446f6e27d384",
+      "eventIds": [
+        "evt_6aff169baf3196ef30167163"
+      ],
+      "selectedSlotCount": 1
+    },
+    {
+      "id": "673c189f-29ab-49c6-a8a8-e3b96c5624e8",
+      "slug": "spokanki-christmas-time-moskva",
+      "title": "SPOKANKI: «CHRISTMAS TIME!»",
+      "city": "Москва",
+      "venue": "Клуб Алексея Козлова",
+      "workUnit": "page:673c189f-29ab-49c6-a8a8-e3b96c5624e8",
+      "eventIds": [
+        "evt_6ae38e066ad507045106a8cd"
+      ],
+      "selectedSlotCount": 1
+    },
+    {
+      "id": "34b6034f-185a-47a3-b8ce-f42320074f97",
+      "slug": "rozalia-novogodnie-koncerty-zhivoi-zvuk-moskva",
+      "title": "Rozalia - Новогодние концерты. Живой звук! Москва",
+      "city": "Москва",
+      "venue": "Клуб «Правда»",
+      "workUnit": "page:34b6034f-185a-47a3-b8ce-f42320074f97",
+      "eventIds": [
+        "evt_6b029b8c92284eea93b8047e"
+      ],
+      "selectedSlotCount": 1
+    },
+    {
+      "id": "8afdc2d5-9c96-4ab3-bf6b-51cf9b053cc4",
+      "slug": "novogodnee-predstavlenie-vse-delo-v-shlyape-po-skazke-n-kurtog-prazdnik-pylelupov-moskva",
+      "title": "Новогоднее представление \"Все дело в шляпе\" по сказке Н.Куртог \"Праздник пылелупов\"",
+      "city": "Москва",
+      "venue": "Арт театр на Ленинском",
+      "workUnit": "page:8afdc2d5-9c96-4ab3-bf6b-51cf9b053cc4",
+      "eventIds": [
+        "evt_6af5f5282110d7937c1cc597"
+      ],
+      "selectedSlotCount": 1
+    },
+    {
+      "id": "126f0c85-61f4-4905-8fdf-526b80071235",
+      "slug": "novogodnie-petrovskie-vecherki-moskva",
+      "title": "Новогодние Петровские вечёрки",
+      "city": "Москва",
+      "venue": "Театр Вкуса и Петровский деревенский театр",
+      "workUnit": "page:126f0c85-61f4-4905-8fdf-526b80071235",
+      "eventIds": [
+        "evt_6ae1d6b48a5ad1c9663f8e91"
+      ],
+      "selectedSlotCount": 1
+    },
+    {
+      "id": "fc05aea7-a29b-489e-9de3-58a63b45e7d5",
+      "slug": "marina-shakleina-i-shabadobo-dzhaz-bend-moskva",
+      "title": "Марина Шаклеина и ШаБаДоБо Джаз Бэнд",
+      "city": "Москва",
+      "venue": "Джем Клуб / Jam Club",
+      "workUnit": "page:fc05aea7-a29b-489e-9de3-58a63b45e7d5",
+      "eventIds": [
+        "evt_6aab95d52eb6545e39791689"
+      ],
+      "selectedSlotCount": 1
+    },
+    {
+      "id": "1660e625-3f41-4c03-80c3-d71bda527578",
+      "slug": "novogodnee-cirkovoe-shou-liliputki-sofii-arzamas",
+      "title": "Новогоднее цирковое шоу Лилипутки Софии",
+      "city": "Арзамас",
+      "venue": "ДК \"Ритм\"",
+      "workUnit": "page:1660e625-3f41-4c03-80c3-d71bda527578",
+      "eventIds": [
+        "evt_6af9f8988378f64d925ddd41"
+      ],
+      "selectedSlotCount": 1
+    },
+    {
+      "id": "80fa5ec5-ea7b-43e5-ace6-98e505e9f6d4",
+      "slug": "shrek-rave-new-year-25-dekabrya-nirvana-ekaterinburg",
+      "title": "Shrek Rave: New Year | 25 декабря | Нирвана",
+      "city": "Екатеринбург",
+      "venue": "Нирвана",
+      "workUnit": "page:80fa5ec5-ea7b-43e5-ace6-98e505e9f6d4",
+      "eventIds": [
+        "evt_6afb1106377c330a2bb2ab2b"
+      ],
+      "selectedSlotCount": 1
+    },
+    {
+      "id": "87952c03-6c93-4ebe-b046-9a11b5503121",
+      "slug": "bogemnyi-art-branch-svetskie-tusovki-v-carskoi-rossii-vypusk-novogodnii-sankt-peterburg",
+      "title": "Богемный арт-бранч: «Светские тусовки в царской России: выпуск новогодний»",
+      "city": "Санкт-Петербург",
+      "venue": "Goose Goose",
+      "workUnit": "page:87952c03-6c93-4ebe-b046-9a11b5503121",
+      "eventIds": [
+        "evt_6afa92e4cb8fdd2a5d82ceea"
+      ],
+      "selectedSlotCount": 1
+    },
+    {
+      "id": "d23c8b7a-0638-4217-9d7a-8346cdd039e1",
+      "slug": "po-sledam-snegurochki-muzykalnaya-skazka-s-lyubimyli-blogerami-bataysk",
+      "title": "\"По следам Снегурочки\" Музыкальная сказка с любимыли блогерами",
+      "city": "Батайск",
+      "venue": "ГКДЦ",
+      "workUnit": "page:d23c8b7a-0638-4217-9d7a-8346cdd039e1",
+      "eventIds": [
+        "evt_6aface469c2ccfe7dd4cc42f",
+        "evt_6afb0cada6823964e28ca588"
+      ],
+      "selectedSlotCount": 2
+    },
+    {
+      "id": "a3ed56cb-6016-4ea6-a5c1-6de5bf9db56f",
+      "slug": "novogodnyaya-elka-dlya-vzroslyh-sankt-peterburg",
+      "title": "Новогодняя Ёлка для взрослых",
+      "city": "Санкт-Петербург",
+      "venue": "Театр Парнас",
+      "workUnit": "page:a3ed56cb-6016-4ea6-a5c1-6de5bf9db56f",
+      "eventIds": [
+        "evt_6b051b6b23243ecbb627e9b8",
+        "evt_6b051c75e38c177230ee631a"
+      ],
+      "selectedSlotCount": 2
+    },
+    {
+      "id": "d37cbc16-d062-4822-8f09-5c9679edcac7",
+      "slug": "hz-zabeiskaya-elka-moskva",
+      "title": "ХЗ - \"Забейская Ёлка\"",
+      "city": "Москва",
+      "venue": "Клуб \"GLASTONBERRY\"",
+      "workUnit": "page:d37cbc16-d062-4822-8f09-5c9679edcac7",
+      "eventIds": [
+        "evt_6af69953be9cc71999b348b3"
+      ],
+      "selectedSlotCount": 1
+    },
+    {
+      "id": "b0b67738-c33d-4d32-a359-3ee2a1296ecd",
+      "slug": "molodost-prostit-gorko-moskva",
+      "title": "Молодость простит! Горько!",
+      "city": "Москва",
+      "venue": "Урбан",
+      "workUnit": "page:b0b67738-c33d-4d32-a359-3ee2a1296ecd",
+      "eventIds": [
+        "evt_6aeb3769a5aa0d05704b926b"
+      ],
+      "selectedSlotCount": 1
+    },
+    {
+      "id": "7f9aea98-3981-4bbf-9579-6c73a5fa6059",
+      "slug": "vay-muzykalnoe-loto-novogodnyaya-sbornaya-elka-russkoe-90-e-i-00-e-samara-2",
+      "title": "Ваy Музыкальное лото. Новогодняя сборная ёлка. Русское 90-е и 00-е.",
+      "city": "Самара",
+      "venue": "Максимилианс",
+      "workUnit": "page:7f9aea98-3981-4bbf-9579-6c73a5fa6059",
+      "eventIds": [
+        "evt_6afd6008d533c21754d0938b"
+      ],
+      "selectedSlotCount": 1
+    },
+    {
+      "id": "7e1358b4-e57b-484b-af1d-01b5f136700c",
+      "slug": "27-dekabrya-new-year-party-cheboksary",
+      "title": "27 Декабря — New Year Party",
+      "city": "Чебоксары",
+      "venue": "SK BAR клуб",
+      "workUnit": "page:7e1358b4-e57b-484b-af1d-01b5f136700c",
+      "eventIds": [
+        "evt_6af35cb7275ce5922c1b2107"
+      ],
+      "selectedSlotCount": 1
+    },
+    {
+      "id": "31a1fc06-f6cb-4bd1-8625-c7edcbd0cf43",
+      "slug": "novogodnyaya-grimerka-ekaterinburg",
+      "title": "Новогодняя Гримерка",
+      "city": "Екатеринбург",
+      "venue": "StandUp Spot",
+      "workUnit": "page:31a1fc06-f6cb-4bd1-8625-c7edcbd0cf43",
+      "eventIds": [
+        "evt_6afebbac859913246a479cc8"
+      ],
+      "selectedSlotCount": 1
+    },
+    {
+      "id": "b3ba4319-a8fa-47ba-9de9-8fa6a883b70e",
+      "slug": "aleks-abra-christmas-in-new-york-novogodnii-dzhaz-s-yumorom-moskva",
+      "title": "Алекс Абра: \"Christmas in New York. Новогодний джаз с юмором.\"",
+      "city": "Москва",
+      "venue": "Джем Клуб / Jam Club",
+      "workUnit": "page:b3ba4319-a8fa-47ba-9de9-8fa6a883b70e",
+      "eventIds": [
+        "evt_6b041a774f5f1664530a78be"
+      ],
+      "selectedSlotCount": 1
+    },
+    {
+      "id": "446b8dc7-1996-474b-bc55-83132cdc062b",
+      "slug": "loud-boyz-2027-new-year-x-winline-x-yauza-place-moskva",
+      "title": "LOUD BOYZ 2027 NEW YEAR X WINLINE X YAUZA PLACE",
+      "city": "Москва",
+      "venue": "Yauza",
+      "workUnit": "page:446b8dc7-1996-474b-bc55-83132cdc062b",
+      "eventIds": [
+        "evt_6af1ce5ea7280ee86d0f6a02"
+      ],
+      "selectedSlotCount": 1
+    },
+    {
+      "id": "6c7d9d59-5ec5-4a3c-8509-24560dd4598f",
+      "slug": "novogodnyaya-noch-2027-dzhoker-sochi",
+      "title": "НОВОГОДНЯЯ НОЧЬ 2027 | Джокер",
+      "city": "Сочи",
+      "venue": "Треугольник рок-бар",
+      "workUnit": "page:6c7d9d59-5ec5-4a3c-8509-24560dd4598f",
+      "eventIds": [
+        "evt_6afc45664936c8bab0fee512"
+      ],
+      "selectedSlotCount": 1
+    },
+    {
+      "id": "707b6e7d-7098-48e2-8833-5786a31d67dc",
+      "slug": "novyi-god-v-krugu-svoih-t-s-lounge-balashiha",
+      "title": "Новый год в кругу своих — T&S Lounge, Балашиха",
+      "city": "Балашиха",
+      "venue": "T&S Lounge Балашиха",
+      "workUnit": "page:707b6e7d-7098-48e2-8833-5786a31d67dc",
+      "eventIds": [
+        "evt_6b042a70bccf2ba2acffda4f"
+      ],
+      "selectedSlotCount": 1
+    },
+    {
+      "id": "8bd5162a-5323-4187-a640-ef72243404b9",
+      "slug": "novyi-god-v-krugu-svoih-t-s-lounge-krasnogorsk",
+      "title": "Новый год в кругу своих — T&S Lounge, Красногорск",
+      "city": "Красногорск",
+      "venue": "ТЦ \"Парк\"",
+      "workUnit": "page:8bd5162a-5323-4187-a640-ef72243404b9",
+      "eventIds": [
+        "evt_6aff194284917c9f733ce8c8"
+      ],
+      "selectedSlotCount": 1
+    },
+    {
+      "id": "69786840-ca33-4a21-95d3-244843f12793",
+      "slug": "ot-vinta-new-year-27-moskva",
+      "title": "ОТ ВИНТА! NEW YEAR'27",
+      "city": "Москва",
+      "venue": "Орбита",
+      "workUnit": "page:69786840-ca33-4a21-95d3-244843f12793",
+      "eventIds": [
+        "evt_6afff9bad402fc61ec6349b7"
+      ],
+      "selectedSlotCount": 1
+    },
+    {
+      "id": "100558e0-5ae1-404a-a399-e78a105a600e",
+      "slug": "novyi-god-v-dzhem-klub-myuzik-moskva",
+      "title": "НОВЫЙ ГОД В ДЖЕМ КЛУБ МЬЮЗИК!",
+      "city": "Москва",
+      "venue": "Джем Клуб / Jam Club",
+      "workUnit": "page:100558e0-5ae1-404a-a399-e78a105a600e",
+      "eventIds": [
+        "evt_6af7014caa73e5050ee5d248"
+      ],
+      "selectedSlotCount": 1
+    },
+    {
+      "id": "0f9e3cf8-82ca-413c-8b05-668a5025d2d2",
+      "slug": "novyi-god-s-arsenalom-moskva",
+      "title": "НОВЫЙ ГОД С «АРСЕНАЛОМ»!",
+      "city": "Москва",
+      "venue": "Клуб Алексея Козлова",
+      "workUnit": "page:0f9e3cf8-82ca-413c-8b05-668a5025d2d2",
+      "eventIds": [
+        "evt_6b00624978f6181299b23106"
+      ],
+      "selectedSlotCount": 1
+    },
+    {
+      "id": "9150cf73-3d1f-4ec1-a461-0960c104c1fc",
+      "slug": "novyi-god-so-starymi-druzyami-2027-sankt-peterburg",
+      "title": "Новый год со старыми друзьями 2027",
+      "city": "Санкт-Петербург",
+      "venue": "Культурный центр «Сердце»",
+      "workUnit": "page:9150cf73-3d1f-4ec1-a461-0960c104c1fc",
+      "eventIds": [
+        "evt_6ae254606772ba3ab307aabc"
+      ],
+      "selectedSlotCount": 1
+    },
+    {
+      "id": "7007db6c-73d9-4bc4-b1ae-bfdec6744200",
+      "slug": "novyi-god-v-maltiiskoi-kapelle-organnyi-koncert-pri-svechah-sankt-peterburg",
+      "title": "Новый год в Мальтийской капелле. Органный концерт при свечах",
+      "city": "Санкт-Петербург",
+      "venue": "Мальтийская Капелла Воронцовского дворца",
+      "workUnit": "page:7007db6c-73d9-4bc4-b1ae-bfdec6744200",
+      "eventIds": [
+        "evt_6b056c6876ee94c2ebf57823"
+      ],
+      "selectedSlotCount": 1
+    },
+    {
+      "id": "2e805c87-1334-42b8-9ab9-f713b417f8ed",
+      "slug": "landyshi-novogodnii-koncert-sankt-peterburg",
+      "title": "Ландыши - новогодний концерт",
+      "city": "Санкт-Петербург",
+      "venue": "ZOCCOLO 2.0",
+      "workUnit": "page:2e805c87-1334-42b8-9ab9-f713b417f8ed",
+      "eventIds": [
+        "evt_6b05ad36f8a60b442b06cc0b"
+      ],
+      "selectedSlotCount": 1
+    },
+    {
+      "id": "22795aec-6082-4245-aced-f597fec0a7f0",
+      "slug": "novyi-god-v-maltiiskoi-kapelle-istoricheskii-organ-v-maltiiskoi-kapelle-sankt-peterburg",
+      "title": "Новый год в Мальтийской капелле. Исторический орган в Мальтийской капелле",
+      "city": "Санкт-Петербург",
+      "venue": "Мальтийская Капелла Воронцовского дворца",
+      "workUnit": "page:22795aec-6082-4245-aced-f597fec0a7f0",
+      "eventIds": [
+        "evt_6b056f627f8803736e51ed34",
+        "evt_6b05833cc2688a2a2100d996"
+      ],
+      "selectedSlotCount": 2
+    },
+    {
+      "id": "e8cf5836-941a-4151-b7b6-743d17c3effd",
+      "slug": "dzhaz-kabare-novogodnyaya-noch-burlesk-shou-v-soprovozhdenii-zhivogo-dzhaza-18-moskva",
+      "title": "«Джаз Кабаре. Новогодняя ночь»:Бурлеск-шоу в сопровождении живого джаза! 18+",
+      "city": "Москва",
+      "venue": "БАУНС",
+      "workUnit": "page:e8cf5836-941a-4151-b7b6-743d17c3effd",
+      "eventIds": [
+        "evt_6afe0fecddc6d4b70ffaed58",
+        "evt_6afe1cd556bb8a0561f74cfb",
+        "evt_6aff64abfb34a52b5855f3d7"
+      ],
+      "selectedSlotCount": 3
+    },
+    {
+      "id": "a756a75a-7a30-4d60-a134-daeda2041447",
+      "slug": "chaikovskii-pri-svechah-rozhdestvenskii-koncert-muzyki-i-baleta-pri-svechah-v-istoricheskom-osobnyake-moskva",
+      "title": "«Чайковский при свечах»: Рождественский концерт музыки и балета при свечах в историческом особняке.",
+      "city": "Москва",
+      "venue": "Дом Культуры FAKTURA#1913",
+      "workUnit": "page:a756a75a-7a30-4d60-a134-daeda2041447",
+      "eventIds": [
+        "evt_6afe21603853fd085ab9a06b",
+        "evt_6afe2394d05e99ad21f37078"
+      ],
+      "selectedSlotCount": 2
+    },
+    {
+      "id": "9ed22b1f-3047-4f67-a255-1a569b7313b1",
+      "slug": "tribyut-shou-kak-v-staroi-skazke-tver",
+      "title": "ТРИБЬЮТ - ШОУ \"КАК В СТАРОЙ СКАЗКЕ\"",
+      "city": "Тверь",
+      "venue": "Клуб Биг Бен",
+      "workUnit": "page:9ed22b1f-3047-4f67-a255-1a569b7313b1",
+      "eventIds": [
+        "evt_6af30c48eb9462e0dbe2d719"
+      ],
+      "selectedSlotCount": 1
+    },
+    {
+      "id": "34c32fff-90af-4671-ba0e-b104b0d8d316",
+      "slug": "ravanna-novogodnii-koncert-sankt-peterburg",
+      "title": "Ravanna. Новогодний концерт.",
+      "city": "Санкт-Петербург",
+      "venue": "РАССВЕТ",
+      "workUnit": "tour:Ravanna. Новогодний концерт.",
+      "eventIds": [
+        "evt_6aec41acff7cae1fd45efd61"
+      ],
+      "selectedSlotCount": 1
+    },
+    {
+      "id": "74544252-ef11-42a0-a4b9-c3adcbfff0cc",
+      "slug": "cirk-novogodnii-karnaval-v-g-fokino-bryansk",
+      "title": "Цирк \"Новогодний Карнавал\" в г.Фокино",
+      "city": "Брянск",
+      "venue": "Цирк \"Новогодний Карнавал\" в г.Фокино",
+      "workUnit": "page:74544252-ef11-42a0-a4b9-c3adcbfff0cc",
+      "eventIds": [
+        "evt_6af9910d5b96c31525bf4453",
+        "evt_6af991430fd865d6a501589f",
+        "evt_6af99162a2294144804df91b"
+      ],
+      "selectedSlotCount": 3
+    },
+    {
+      "id": "f02d05a5-b69a-4ab1-abae-6756e7368533",
+      "slug": "kino-pod-elkoi-koncert-pri-svechah-volzhsk",
+      "title": "Кино под елкой. Концерт при свечах.",
+      "city": "Волжск",
+      "venue": "МУ ГЦК",
+      "workUnit": "page:f02d05a5-b69a-4ab1-abae-6756e7368533",
+      "eventIds": [
+        "evt_6af316227c7d66194662e868"
+      ],
+      "selectedSlotCount": 1
+    },
+    {
+      "id": "96212fc7-9fa4-4c80-a657-8fd077b52741",
+      "slug": "chaikovskii-pri-svechah-rozhdestvenskii-koncert-muzyki-i-baleta-pri-svechah-moskva",
+      "title": "«Чайковский при свечах»: Рождественский концерт музыки и балета при свечах!",
+      "city": "Москва",
+      "venue": "БАУНС",
+      "workUnit": "page:96212fc7-9fa4-4c80-a657-8fd077b52741",
+      "eventIds": [
+        "evt_6afe1fe1c29e40211cae38cc",
+        "evt_6aff64d566867d3e78eba82b"
+      ],
+      "selectedSlotCount": 2
+    },
+    {
+      "id": "946ac0ab-c058-46c3-acb0-f2d2f091b045",
+      "slug": "ravanna-novogodnii-koncert-moskva",
+      "title": "Ravanna. Новогодний концерт.",
+      "city": "Москва",
+      "venue": "Свобода",
+      "workUnit": "tour:Ravanna. Новогодний концерт.",
+      "eventIds": [
+        "evt_6af8250659aabb65e7685145"
+      ],
+      "selectedSlotCount": 1
+    },
+    {
+      "id": "8fabf78e-040f-453c-801f-707208bc151c",
+      "slug": "lihoradka-charlstona-novogodnii-uzhin-koncert-za-stolikami-sankt-peterburg",
+      "title": "«Лихорадка Чарльстона» новогодний ужин-концерт за столиками",
+      "city": "Санкт-Петербург",
+      "venue": "Дом Шрёдера",
+      "workUnit": "page:8fabf78e-040f-453c-801f-707208bc151c",
+      "eventIds": [
+        "evt_6af602bf7c5cf69109ac9cb0"
+      ],
+      "selectedSlotCount": 1
+    },
+    {
+      "id": "5964240e-024e-4807-b8d7-4e4f6e231f89",
+      "slug": "novogodnee-tango-ansambl-remolino-sankt-peterburg",
+      "title": "Новогоднее Танго. Ансамбль REMOLINO",
+      "city": "Санкт-Петербург",
+      "venue": "Мальтийская Капелла Воронцовского дворца",
+      "workUnit": "page:5964240e-024e-4807-b8d7-4e4f6e231f89",
+      "eventIds": [
+        "evt_6afde9fee0e26a1dee1c4549"
+      ],
+      "selectedSlotCount": 1
+    },
+    {
+      "id": "6604230f-6b1b-4be6-9f87-515d93f346e3",
+      "slug": "05-01-27-gudtaims-novogodnii-yaroslavl",
+      "title": "05.01.27 - ГУДТАЙМС. Новогодний @ Ярославль",
+      "city": "Ярославль",
+      "venue": "Китайский Летчик Джао Да",
+      "workUnit": "page:6604230f-6b1b-4be6-9f87-515d93f346e3",
+      "eventIds": [
+        "evt_6b00a621c143caaec3daee84"
+      ],
+      "selectedSlotCount": 1
+    },
+    {
+      "id": "1c1318bb-24dc-4c46-b5af-d2345f54d5b8",
+      "slug": "na-rozhdestvo-v-tulu-6-yanvarya-2027-iz-kurska-kursk",
+      "title": "На Рождество в Тулу 6 января 2027 | из Курска",
+      "city": "Курск",
+      "venue": "Лаборатория Путешествий | Курск",
+      "workUnit": "page:1c1318bb-24dc-4c46-b5af-d2345f54d5b8",
+      "eventIds": [
+        "evt_6afc17ace0d5bde641f0f28d"
+      ],
+      "selectedSlotCount": 1
+    },
+    {
+      "id": "ff75b788-5164-423e-a283-cb4ec8462721",
+      "slug": "ekskursionnyi-tur-rozhdestvenskaya-moskva-7-yanvarya-2027-iz-kurska-kursk",
+      "title": "Экскурсионный тур \"Рождественская Москва\" 7 января 2027 | из Курска",
+      "city": "Курск",
+      "venue": "Лаборатория Путешествий | Курск",
+      "workUnit": "page:ff75b788-5164-423e-a283-cb4ec8462721",
+      "eventIds": [
+        "evt_6afdd46891a8f98cf3f6c2d2"
+      ],
+      "selectedSlotCount": 1
+    },
+    {
+      "id": "4f82dd1b-0485-443d-b147-5e9e3d0fdd6a",
+      "slug": "schelkunchik-novogodnyaya-muzykalnaya-skazka-s-pesochnoi-animaciei-moskva-3",
+      "title": "Щелкунчик. Новогодняя музыкальная сказка с песочной анимацией",
+      "city": "Москва",
+      "venue": "Пространство ASnova",
+      "workUnit": "page:4f82dd1b-0485-443d-b147-5e9e3d0fdd6a",
+      "eventIds": [
+        "evt_6b04aa94635287acdf01bbaa"
+      ],
+      "selectedSlotCount": 1
+    },
+    {
+      "id": "c90ee85a-0a06-407d-b711-4106e95a076f",
+      "slug": "melodii-rozhdestva-zhenskii-hor-sankt-peterburgskoi-mitropolii-sankt-peterburg",
+      "title": "Мелодии Рождества. Женский хор Санкт-Петербургской Митрополии",
+      "city": "Санкт-Петербург",
+      "venue": "Мальтийская Капелла Воронцовского дворца",
+      "workUnit": "page:c90ee85a-0a06-407d-b711-4106e95a076f",
+      "eventIds": [
+        "evt_6afde1acc573321c23c59e71"
+      ],
+      "selectedSlotCount": 1
+    },
+    {
+      "id": "f206ceb9-a149-4eeb-8895-d23b11c161f5",
+      "slug": "novogodnyaya-rok-akustika-ot-gr-akura-tver",
+      "title": "Новогодняя рок-акустика от гр. АКУРА",
+      "city": "Тверь",
+      "venue": "Клуб Биг Бен",
+      "workUnit": "page:f206ceb9-a149-4eeb-8895-d23b11c161f5",
+      "eventIds": [
+        "evt_6afb503ecf3ec1c5f687e980"
+      ],
+      "selectedSlotCount": 1
+    },
+    {
+      "id": "8c7a7297-4cdc-4b04-91c0-79ea37104f82",
+      "slug": "novogodnee-burlishou-moskva",
+      "title": "НОВОГОДНЕЕ БУРЛИШОУ",
+      "city": "Москва",
+      "venue": "Дом винтажной музыки",
+      "workUnit": "page:8c7a7297-4cdc-4b04-91c0-79ea37104f82",
+      "eventIds": [
+        "evt_6b01689295e03aa1b6e8b194"
+      ],
+      "selectedSlotCount": 1
+    },
+    {
+      "id": "ffb0f13c-e262-4685-96ec-7013c3f4a4d3",
+      "slug": "avtorskii-koncert-rvi-meha-orkestra-rozhdestvenskii-koncert-moskva",
+      "title": "Авторский концерт Рви Меха - Оркестра! - Рождественский концерт",
+      "city": "Москва",
+      "venue": "StereoPeople",
+      "workUnit": "tour:Авторский концерт Рви Меха - Оркестра! - Рождественский концерт",
+      "eventIds": [
+        "evt_6aba52fc20e2958cff63e2ac"
+      ],
+      "selectedSlotCount": 1
+    },
+    {
+      "id": "5f86fdec-2cdd-4dcd-85d4-94a170af26f0",
+      "slug": "avtorskii-koncert-rvi-meha-orkestra-rozhdestvenskii-koncert-sankt-peterburg",
+      "title": "Авторский концерт Рви Меха - Оркестра! - Рождественский концерт",
+      "city": "Санкт-Петербург",
+      "venue": "бар-ресторан Douglas (Дуглас)",
+      "workUnit": "tour:Авторский концерт Рви Меха - Оркестра! - Рождественский концерт",
+      "eventIds": [
+        "evt_6aba5260bb6923606f282b3f"
+      ],
+      "selectedSlotCount": 1
+    },
+    {
+      "id": "f8da2b0c-115b-4a59-b95f-c92fa81de083",
+      "slug": "boris-kuzmin-akustika-moskva",
+      "title": "Борис Кузьмин - акустика",
+      "city": "Москва",
+      "venue": "Мо[три]",
+      "workUnit": "tour:Борис Кузьмин — акустический тур, январь 2027",
+      "eventIds": [
+        "evt_6af5b609ec9eac308745853c"
+      ],
+      "selectedSlotCount": 1
+    },
+    {
+      "id": "1120042f-dda1-4a67-80ac-36a4dcf9d5fa",
+      "slug": "boris-kuzmin-akustika-sankt-peterburg",
+      "title": "Борис Кузьмин - акустика",
+      "city": "Санкт-Петербург",
+      "venue": "Ящик",
+      "workUnit": "tour:Борис Кузьмин — акустический тур, январь 2027",
+      "eventIds": [
+        "evt_6af5c46cc4573c46d7b7a6c3"
+      ],
+      "selectedSlotCount": 1
+    },
+    {
+      "id": "7ec96f1a-5c75-4a37-8da3-0684ca657835",
+      "slug": "07-01-2027-volgograd-kostya-kulyasov-i-gruppa-animaciya-animaciya-online-volgograd",
+      "title": "07.01.2027 / Волгоград /Костя Кулясов и группа АнимациЯ /animaciya.online",
+      "city": "Волгоград",
+      "venue": "Ferrum Rock'n'Roll Club",
+      "workUnit": "tour:Костя Кулясов и группа «АнимациЯ» — новогодний тур 2027",
+      "eventIds": [
+        "evt_6a86c1c56de2a61d5b879dc8"
+      ],
+      "selectedSlotCount": 1
+    },
+    {
+      "id": "c8308752-eba5-40b0-b306-949fb2f8c9f2",
+      "slug": "05-01-2027-voronezh-kostya-kulyasov-i-gruppa-animaciya-animaciya-online-voronezh",
+      "title": "05.01.2027 / Воронеж /Костя Кулясов и группа АнимациЯ /animaciya.online",
+      "city": "Воронеж",
+      "venue": "Клуб \"12\"",
+      "workUnit": "tour:Костя Кулясов и группа «АнимациЯ» — новогодний тур 2027",
+      "eventIds": [
+        "evt_6a86b407acd3c3e993e10684"
+      ],
+      "selectedSlotCount": 1
+    },
+    {
+      "id": "ed393a4f-57d8-4234-94e3-68c78a37bf20",
+      "slug": "09-01-2027-krasnodar-kostya-kulyasov-i-gruppa-animaciya-animaciya-online-krasnodar",
+      "title": "09.01.2027 / Краснодар /Костя Кулясов и группа АнимациЯ /animaciya.online",
+      "city": "Краснодар",
+      "venue": "The Rock Bar",
+      "workUnit": "tour:Костя Кулясов и группа «АнимациЯ» — новогодний тур 2027",
+      "eventIds": [
+        "evt_6a870ff865ff9e7f799ad749"
+      ],
+      "selectedSlotCount": 1
+    },
+    {
+      "id": "3d154877-b5b2-4195-804a-3a7c34b25c7d",
+      "slug": "08-01-2027-rostov-na-donu-kostya-kulyasov-i-gruppa-animaciya-animaciya-online-rostov-na-donu",
+      "title": "08.01.2027 / Ростов-на- Дону /Костя Кулясов и группа АнимациЯ /animaciya.online",
+      "city": "Ростов-на-Дону",
+      "venue": "Клуб \"МЁД\"",
+      "workUnit": "tour:Костя Кулясов и группа «АнимациЯ» — новогодний тур 2027",
+      "eventIds": [
+        "evt_6a86d2585355dfa58d0dccb3"
+      ],
+      "selectedSlotCount": 1
+    },
+    {
+      "id": "edfca57c-bc4d-460b-a241-a90f6866402a",
+      "slug": "06-01-2027-tambov-kostya-kulyasov-i-gruppa-animaciya-animaciya-online-tambov",
+      "title": "06.01.2027 / Тамбов /Костя Кулясов и группа АнимациЯ /animaciya.online",
+      "city": "Тамбов",
+      "venue": "H2O ArtHall",
+      "workUnit": "tour:Костя Кулясов и группа «АнимациЯ» — новогодний тур 2027",
+      "eventIds": [
+        "evt_6a86cb6c13e99f7584987d28"
+      ],
+      "selectedSlotCount": 1
+    },
+    {
+      "id": "dc6ca936-6539-4afa-bf07-1902ee8257f3",
+      "slug": "03-01-2027-tula-kostya-kulyasov-i-gruppa-animaciya-animaciya-online-tula",
+      "title": "03.01.2027 / Тула /Костя Кулясов и группа АнимациЯ /animaciya.online",
+      "city": "Тула",
+      "venue": "Клуб MINI by Concert Hall",
+      "workUnit": "tour:Костя Кулясов и группа «АнимациЯ» — новогодний тур 2027",
+      "eventIds": [
+        "evt_6a86ae46b50bfdaba7ea5c77"
+      ],
+      "selectedSlotCount": 1
+    },
+    {
+      "id": "ac51501a-6d74-47fc-a205-5f2a2835f316",
+      "slug": "nakonechnyi-5-yanvarya-moskva",
+      "title": "Наконечный • 5 января • Москва",
+      "city": "Москва",
+      "venue": "Кафе Пушкарев",
+      "workUnit": "tour:Наконечный — новогодняя акустика, январь 2027",
+      "eventIds": [
+        "evt_6afc5ac09fb99f4a9095e466"
+      ],
+      "selectedSlotCount": 1
+    },
+    {
+      "id": "6b8c3e9f-7880-4750-b53e-c1c76310b749",
+      "slug": "nakonechnyi-4-yanvarya-piter-sankt-peterburg",
+      "title": "Наконечный • 4 января • Питер",
+      "city": "Санкт-Петербург",
+      "venue": "Жабль (экс-The Place)",
+      "workUnit": "tour:Наконечный — новогодняя акустика, январь 2027",
+      "eventIds": [
+        "evt_6afc56c11138c644be192d70"
+      ],
+      "selectedSlotCount": 1
+    }
+  ]
+}

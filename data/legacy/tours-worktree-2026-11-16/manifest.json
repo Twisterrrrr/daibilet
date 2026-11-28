@@ -1,0 +1,216 @@
+{
+  "sourceRoot": "D:\\coding\\tours",
+  "createdAt": "2026-11-16",
+  "trackedPatch": {
+    "path": "tracked-worktree.patch",
+    "sha256": "9804265E7C7E6FF6133C533A6A49A35FE6751AC64E642C856483D439EE4C24ED",
+    "bytes": 87611
+  },
+  "excluded": [
+    ".env and ignored environment files",
+    "токен TEP.txt",
+    "registered nested worktrees under .worktrees"
+  ],
+  "untrackedFiles": [
+    {
+      "path": "AGENTS.md",
+      "bytes": 1295,
+      "sha256": "A765391EB0CE14ED1EE6B555A5D06752A4BB3DFCF2324B1C90C5518F641DA76F"
+    },
+    {
+      "path": "apps/admin/src/components/PdpEditor.tsx",
+      "bytes": 23513,
+      "sha256": "15FA362680F5AB53893596C9954949D4CB36744BE79EB1CCA1BC3075CC7EA45C"
+    },
+    {
+      "path": "apps/backend/src/description-revision-handler.test.ts",
+      "bytes": 0,
+      "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+    },
+    {
+      "path": "apps/backend/src/pdp-documents.js",
+      "bytes": 8684,
+      "sha256": "6029E5359230788A8DC24EBC794CBDD8F3B8888A5F021E44B8E87323F9D5F091"
+    },
+    {
+      "path": "apps/backend/src/pdp-documents.test.js",
+      "bytes": 2987,
+      "sha256": "369F39D7A717EF705E379B5B13DF1CC1247B266E5BA212CA0878A8B9E4EDB521"
+    },
+    {
+      "path": "batch-30-empty-description-rewrites-2026-10-27.md",
+      "bytes": 47301,
+      "sha256": "295BB18B4DD1E162031E94A3EFFEE52E61507D70E85C4B9108D52999A5788A9F"
+    },
+    {
+      "path": "batch-30-empty-descriptions-2026-10-27.md",
+      "bytes": 48592,
+      "sha256": "E2C3D13110148F085521DC09D647E181C75AF5C7C2AFADD2BAA7CBB53CEFC4C0"
+    },
+    {
+      "path": "batch-next-empty-description-2026-10-27.md",
+      "bytes": 2521,
+      "sha256": "45BE5D2F8BB875522108C6040A46E4DA72DC11D4EA46DEB739A066636530640A"
+    },
+    {
+      "path": "data/places/hermitage-editorial.json",
+      "bytes": 13878,
+      "sha256": "5B60AC51E54B2FF5B392E3F0476D34D5EC527E671602606D804271A2A016AC8E"
+    },
+    {
+      "path": "data/places/image-drafts/manifest.json",
+      "bytes": 387,
+      "sha256": "540AE53E8E2B563D24D2017BD6CF52D0AAEF38FCE7895B9FDF077831D43F9F7B"
+    },
+    {
+      "path": "data/places/image-drafts/severny-rechnoy-vokzal.webp",
+      "bytes": 301386,
+      "sha256": "E64AA7879DD784E587489919A86744E2F702F01D21EA6ED487F580413C225AFD"
+    },
+    {
+      "path": "data/places/pdp.json",
+      "bytes": 2544927,
+      "sha256": "81B1C6E7BEA8F6A9F7BF3587CBEB83EB10FEEFF49AA4C1779FF9E8EE6EE969BC"
+    },
+    {
+      "path": "deploy/systemd/daibilet-tc-orders-sync.service",
+      "bytes": 292,
+      "sha256": "2AB084C49F1388D9C90A9629589F0A065F448386FF7E5694186E8435C8C0D49E"
+    },
+    {
+      "path": "deploy/systemd/daibilet-tc-orders-sync.timer",
+      "bytes": 195,
+      "sha256": "7B488DFCFD415B7D473C5E863B195BD2162571A783DECA53AF1D19C13E44DCB0"
+    },
+    {
+      "path": "docs/novogodnyaya-skazka-eventpage-payload-2026-11-04.json",
+      "bytes": 7445,
+      "sha256": "746ABC3365927DEF5DC9CF3B7EE912556A36A041EB10AA079B1299CFD99C4750"
+    },
+    {
+      "path": "docs/novogodnyaya-skazka-production-group-readonly-2026-11-04.json",
+      "bytes": 73990,
+      "sha256": "FCD8C09856E4F2B9192AAC243D4810E4A41C2711F2243A559889D006F65DC48D"
+    },
+    {
+      "path": "docs/novogodnyaya-skazka-production-original-audit-2026-11-04.json",
+      "bytes": 81991,
+      "sha256": "3E38C58942295E7E8DA7B637B407A7DB154D87A0FD3EAC4715AAE0012AA1E3E8"
+    },
+    {
+      "path": "docs/novogodnyaya-skazka-production-readonly-2026-11-04.json",
+      "bytes": 1632,
+      "sha256": "F547E3188D64DD9CE685FDC67E6E551BED28BF7FB2FEEC4319C3A7B0516AF911"
+    },
+    {
+      "path": "docs/novogodnyaya-skazka-production-schedule-readonly-2026-11-04.json",
+      "bytes": 797,
+      "sha256": "BC4ECBFD2F0FCD5521EAAA42AD5A8587254825596ECD0344218240935E066221"
+    },
+    {
+      "path": "docs/novogodnyaya-skazka-source-archive-2026-11-04.json",
+      "bytes": 129267,
+      "sha256": "250599826FCCE3D18E4DC8A73360C3B87BA0A18225FB2DB75E606482F4F54E41"
+    },
+    {
+      "path": "docs/novogodnyaya-skazka-staging-resolver-readonly-2026-11-04.json",
+      "bytes": 4017,
+      "sha256": "7007993275FE8F3328FC214A4535B092E0ABC7A94B4D48514A3601A764E1DBAE"
+    },
+    {
+      "path": "docs/pdp-content.md",
+      "bytes": 7547,
+      "sha256": "2041E2FDA0F6BE1569F3BF0C18D2DC44AD2C87C2ABAFF19B3C8D2430C124FBFF"
+    },
+    {
+      "path": "docs/production-network-and-disk-diagnostics.md",
+      "bytes": 12783,
+      "sha256": "9777850308208798F4EE7EC08528115B27A7ECD36F1EA25B1558D731FC4984E7"
+    },
+    {
+      "path": "docs/rewrite-eventpage-crosswalk-2026-11-04-staging-verified.csv",
+      "bytes": 97167,
+      "sha256": "5173C66C126B409FBD2D7F40CFBF3F1BB6525F4EE28A481808ECEA43000804BC"
+    },
+    {
+      "path": "docs/rewrite-eventpage-crosswalk-2026-11-04.csv",
+      "bytes": 90577,
+      "sha256": "3693E16DC1F639008EE456751C413E61ED5792949197627E190ED38729568914"
+    },
+    {
+      "path": "docs/rewrite-eventpage-staging-verified-2026-11-04.md",
+      "bytes": 6309,
+      "sha256": "11610D48C54715D321B6B82360C2D4F98DF27DFE5F73DD0EB922B72EE5335878"
+    },
+    {
+      "path": "docs/rewrite-source-novogodnyaya-skazka-staging-2026-11-04.json",
+      "bytes": 2102,
+      "sha256": "5D71847AEF7C3EF0610C8BCF83BFEB18B1F01CE4285C0703F8298DA9F61DFBBF"
+    },
+    {
+      "path": "docs/rewrite-source-novogodnyaya-skazka-staging-detail-2026-11-04.json",
+      "bytes": 3172,
+      "sha256": "368EDB4B5CF23AC3B4F674DCA81B58E296327AB2B2F66371B53F533D22163FE0"
+    },
+    {
+      "path": "docs/staging-eventpage-counts-readonly-2026-11-04.json",
+      "bytes": 854,
+      "sha256": "A91A6321BCD2E50362E574FEF072DC87DC0327F1E7AF49F0DE071FC2E71A7026"
+    },
+    {
+      "path": "docs/staging-eventpage-rewrite-readonly-snapshot-2026-11-04.json",
+      "bytes": 1949,
+      "sha256": "711EC3C8D6C7B72D39861A78549F24EFF7648AEE26E096DDCD1BE02F4E15BEA2"
+    },
+    {
+      "path": "packages/db/prisma/migrations/20261014120000_places_from_pdp/migration.sql",
+      "bytes": 906,
+      "sha256": "4D18706A7F7318B0BAE39B3050EF81BE21A8AA7F5DD3527E290CF97DE1CC38C5"
+    },
+    {
+      "path": "packages/db/prisma/migrations/20261014143000_place_transport_subtypes/migration.sql",
+      "bytes": 98,
+      "sha256": "4B653544E1A2F792E45FCBF3F9E24124A37A976536A81826E2BFA3864F7CDBDE"
+    },
+    {
+      "path": "packages/db/prisma/migrations/20261014160000_pier_departures/migration.sql",
+      "bytes": 1458,
+      "sha256": "15C583A49AD1BF0DF5DF56CF24A8E235DFEBE2E739A283242C74D5F2CEA40987"
+    },
+    {
+      "path": "packages/db/prisma/migrations/20261021120000_pdp_documents/migration.sql",
+      "bytes": 1020,
+      "sha256": "594688973B09BA0FBF23F00732B7AF24A788A41C8DB83EB7D88B91776BD6891D"
+    },
+    {
+      "path": "packages/db/scripts/sync-pdp-places.mjs",
+      "bytes": 9407,
+      "sha256": "7CB4A4959E40AB5C5C225BB377BED337C914FFB24CA7BD17D1E381AB41E6AA16"
+    },
+    {
+      "path": "rewrite-eventpage-crosswalk-2026-11-03.csv",
+      "bytes": 112016,
+      "sha256": "FB11F67F33F592C24914C0722289BAEA0EA2B0B3A2DE0F08343EB7307B5DE996"
+    },
+    {
+      "path": "rewrite-map-2026-10-27.md",
+      "bytes": 35029,
+      "sha256": "0D0466B39614701CDFF2ED156491F3A7F5F94059D4D85EC223B3F82688233383"
+    },
+    {
+      "path": "scripts/build-pdp-places.py",
+      "bytes": 11972,
+      "sha256": "471B8F6324A1A36B575F355B139AB955CABE229D67BC1440728131E9736BD739"
+    },
+    {
+      "path": "scripts/lib/tc-order-email.js",
+      "bytes": 6447,
+      "sha256": "38CFCCBD1473A5672433305FB1603EA4BA6E12F3868AFE2301512C0157FF0A01"
+    },
+    {
+      "path": "scripts/seed-hermitage-pdp.mjs",
+      "bytes": 1778,
+      "sha256": "BAFC82A7693C644395AC2323E3888514448DC61B5A07E966D79D0CF2E140D360"
+    }
+  ]
+}

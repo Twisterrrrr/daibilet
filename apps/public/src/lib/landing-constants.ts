@@ -17,6 +17,9 @@ export const LANDING_SLUG_REDIRECTS: Record<string, string> = {
   'spb-bridges-night': CANONICAL_LANDING_SLUGS.bridges,
   bridges_night: CANONICAL_LANDING_SLUGS.bridges,
   'night-bridges': CANONICAL_LANDING_SLUGS.bridges,
+  'den-goroda-moskva': 'moscow-city-day',
+  'den-goroda': 'moscow-city-day',
+  'city-day-moscow': 'moscow-city-day',
 };
 
 export function canonicalLandingSlug(slug: string): string {

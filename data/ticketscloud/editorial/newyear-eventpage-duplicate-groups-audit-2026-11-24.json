@@ -1,0 +1,1212 @@
+{
+  "generatedAt": "2026-11-24T17:50:07.556Z",
+  "selectionPages": 150,
+  "exactIdentityRule": "candidate event title + city + venue; same title alone is not treated as a merge decision",
+  "groupsFound": 27,
+  "groupsWithExactSourceCopy": 19,
+  "groupsRequiringSourceFactReview": 8,
+  "note": "This is an audit only. It does not change EventPage↔Event ID relations, URL, publication, or indexing.",
+  "groups": [
+    {
+      "title": "БЕЛЫМ-БЕЛО",
+      "city": "Волгоград",
+      "venue": "Дом офицеров Волгоградского гарнизона",
+      "evidence": "same-normalized-source-description",
+      "recommendedMaster": {
+        "eventPageId": "0e325c4c-25b1-41d5-a5e1-e8ca91d8cf88",
+        "slug": "belym-belo-volgograd-2",
+        "selectedAs": "4#11"
+      },
+      "selectedPages": [
+        {
+          "eventPageId": "0e325c4c-25b1-41d5-a5e1-e8ca91d8cf88",
+          "slug": "belym-belo-volgograd-2",
+          "selectedAs": "4#11"
+        }
+      ],
+      "candidatePages": [
+        {
+          "eventPageId": "0e325c4c-25b1-41d5-a5e1-e8ca91d8cf88",
+          "slug": "belym-belo-volgograd-2",
+          "eventId": "evt_6afdcbf27ae4c353f9e767fe",
+          "nextSlot": "2027-01-02T08:00:00.000Z",
+          "sourceChars": 483,
+          "priceFrom": 500
+        },
+        {
+          "eventPageId": "9c97d3dd-4097-4504-b7b6-6b780e799f09",
+          "slug": "belym-belo-volgograd",
+          "eventId": "evt_6afe080fea2a1b0f35590bed",
+          "nextSlot": "2027-01-02T11:00:00.000Z",
+          "sourceChars": 483,
+          "priceFrom": 500
+        }
+      ]
+    },
+    {
+      "title": "Джаз в городе К.",
+      "city": "Калининград",
+      "venue": "Стендап-клуб «Локация»",
+      "evidence": "same-normalized-source-description",
+      "recommendedMaster": {
+        "eventPageId": "ce3b1d78-1597-4f50-8dad-969cdaeb2418",
+        "slug": "dzhaz-v-gorode-k-kaliningrad-5",
+        "selectedAs": "4#15"
+      },
+      "selectedPages": [
+        {
+          "eventPageId": "ce3b1d78-1597-4f50-8dad-969cdaeb2418",
+          "slug": "dzhaz-v-gorode-k-kaliningrad-5",
+          "selectedAs": "4#15"
+        }
+      ],
+      "candidatePages": [
+        {
+          "eventPageId": "ce3b1d78-1597-4f50-8dad-969cdaeb2418",
+          "slug": "dzhaz-v-gorode-k-kaliningrad-5",
+          "eventId": "evt_6aeef7ac6e7dc4839b3cbc3c",
+          "nextSlot": "2027-01-02T19:30:00.000Z",
+          "sourceChars": 692,
+          "priceFrom": 790
+        },
+        {
+          "eventPageId": "b089f922-2ca1-46f8-8bf0-976c3ba3b8eb",
+          "slug": "dzhaz-v-gorode-k-kaliningrad-6",
+          "eventId": "evt_6aeef7d43521a45af3d5e4eb",
+          "nextSlot": "2027-01-04T19:30:00.000Z",
+          "sourceChars": 692,
+          "priceFrom": 790
+        }
+      ]
+    },
+    {
+      "title": "Джаз клуб NZ. Новогодний джаз",
+      "city": "Калининград",
+      "venue": "Театр Николая Захарова",
+      "evidence": "same-normalized-source-description",
+      "recommendedMaster": {
+        "eventPageId": "7a8ddcb5-4376-4eb0-a1e6-615bb6a10a20",
+        "slug": "dzhaz-klub-nz-novogodnii-dzhaz-kaliningrad-2",
+        "selectedAs": "1#24"
+      },
+      "selectedPages": [
+        {
+          "eventPageId": "7a8ddcb5-4376-4eb0-a1e6-615bb6a10a20",
+          "slug": "dzhaz-klub-nz-novogodnii-dzhaz-kaliningrad-2",
+          "selectedAs": "1#24"
+        }
+      ],
+      "candidatePages": [
+        {
+          "eventPageId": "7a8ddcb5-4376-4eb0-a1e6-615bb6a10a20",
+          "slug": "dzhaz-klub-nz-novogodnii-dzhaz-kaliningrad-2",
+          "eventId": "evt_6af3213ce12c16ed8de8a4c9",
+          "nextSlot": "2026-12-20T16:00:00.000Z",
+          "sourceChars": 642,
+          "priceFrom": 1200
+        },
+        {
+          "eventPageId": "e6e4cbd0-4a5a-493c-a17e-5d437f35c608",
+          "slug": "dzhaz-klub-nz-novogodnii-dzhaz-kaliningrad",
+          "eventId": "evt_6af44ee7a6acb72f4f9ebc76",
+          "nextSlot": "2026-12-30T17:00:00.000Z",
+          "sourceChars": 642,
+          "priceFrom": 1500
+        }
+      ]
+    },
+    {
+      "title": "Новогодний роман",
+      "city": "Калининград",
+      "venue": "Театр Николая Захарова",
+      "evidence": "same-normalized-source-description",
+      "recommendedMaster": {
+        "eventPageId": "47d1537d-cadb-47f6-bcaf-10544fadcf84",
+        "slug": "novogodnii-roman-kaliningrad-4",
+        "selectedAs": "1#16"
+      },
+      "selectedPages": [
+        {
+          "eventPageId": "47d1537d-cadb-47f6-bcaf-10544fadcf84",
+          "slug": "novogodnii-roman-kaliningrad-4",
+          "selectedAs": "1#16"
+        }
+      ],
+      "candidatePages": [
+        {
+          "eventPageId": "47d1537d-cadb-47f6-bcaf-10544fadcf84",
+          "slug": "novogodnii-roman-kaliningrad-4",
+          "eventId": "evt_6af1e11ab4d44610ffddf0df",
+          "nextSlot": "2026-12-05T16:00:00.000Z",
+          "sourceChars": 324,
+          "priceFrom": 1200
+        },
+        {
+          "eventPageId": "91a7aaae-d33c-40a7-89a2-af438efe0eec",
+          "slug": "novogodnii-roman-kaliningrad-3",
+          "eventId": "evt_6af43ba8ca4e8ab8567af4a9",
+          "nextSlot": "2026-12-26T16:00:00.000Z",
+          "sourceChars": 324,
+          "priceFrom": 1500
+        },
+        {
+          "eventPageId": "d07b594d-3d88-470a-9c61-0ddd7e8cdc07",
+          "slug": "novogodnii-roman-kaliningrad-2",
+          "eventId": "evt_6af43d113516ae0f2c07dbb8",
+          "nextSlot": "2026-12-29T17:00:00.000Z",
+          "sourceChars": 324,
+          "priceFrom": 1500
+        },
+        {
+          "eventPageId": "d51a06b1-d11d-45dd-826b-ec7d96dc4384",
+          "slug": "novogodnii-roman-kaliningrad-5",
+          "eventId": "evt_6afdd5dcfbfad6a4e407007c",
+          "nextSlot": "2027-01-03T16:00:01.000Z",
+          "sourceChars": 324,
+          "priceFrom": 1500
+        },
+        {
+          "eventPageId": "2145963f-dd8c-4cc6-a312-58c3b363ef83",
+          "slug": "novogodnii-roman-kaliningrad-6",
+          "eventId": "evt_6afed4cbd4264d17663f4ec3",
+          "nextSlot": "2027-01-09T16:00:00.000Z",
+          "sourceChars": 324,
+          "priceFrom": 1500
+        }
+      ]
+    },
+    {
+      "title": "Ледовое Шоу \"Щелкунчик\" в Липецке",
+      "city": "Липецк",
+      "venue": "ДС «Звездный»",
+      "evidence": "same-normalized-source-description",
+      "recommendedMaster": {
+        "eventPageId": "37a41022-a1a0-49c3-978b-dc515fc3b8ef",
+        "slug": "ledovoe-shou-schelkunchik-v-lipecke-lipeck-2",
+        "selectedAs": "2#10"
+      },
+      "selectedPages": [
+        {
+          "eventPageId": "37a41022-a1a0-49c3-978b-dc515fc3b8ef",
+          "slug": "ledovoe-shou-schelkunchik-v-lipecke-lipeck-2",
+          "selectedAs": "2#10"
+        }
+      ],
+      "candidatePages": [
+        {
+          "eventPageId": "37a41022-a1a0-49c3-978b-dc515fc3b8ef",
+          "slug": "ledovoe-shou-schelkunchik-v-lipecke-lipeck-2",
+          "eventId": "evt_6afc5e44be4dd0f27dc02149",
+          "nextSlot": "2027-01-06T10:00:00.000Z",
+          "sourceChars": 694,
+          "priceFrom": 1200
+        },
+        {
+          "eventPageId": "b183f66c-1877-4e81-b4ec-af2aa3aa38cd",
+          "slug": "ledovoe-shou-schelkunchik-v-lipecke-lipeck",
+          "eventId": "evt_6afc5e7090428ffe5c881a85",
+          "nextSlot": "2027-01-06T14:00:00.000Z",
+          "sourceChars": 694,
+          "priceFrom": 1200
+        }
+      ]
+    },
+    {
+      "title": "Ледовое шоу Тайна семьи Деда Мороза + Подарок",
+      "city": "Липецк",
+      "venue": "ДС «Звездный»",
+      "evidence": "same-title-city-venue; source-text-varies-review-facts",
+      "recommendedMaster": {
+        "eventPageId": "390041c2-1b96-4435-a9d2-ba741b33f12b",
+        "slug": "ledovoe-shou-taina-semi-deda-moroza-podarok-lipeck",
+        "selectedAs": "2#30"
+      },
+      "selectedPages": [
+        {
+          "eventPageId": "390041c2-1b96-4435-a9d2-ba741b33f12b",
+          "slug": "ledovoe-shou-taina-semi-deda-moroza-podarok-lipeck",
+          "selectedAs": "2#30"
+        }
+      ],
+      "candidatePages": [
+        {
+          "eventPageId": "390041c2-1b96-4435-a9d2-ba741b33f12b",
+          "slug": "ledovoe-shou-taina-semi-deda-moroza-podarok-lipeck",
+          "eventId": "evt_6a7f2c46694f257f6b4953a7",
+          "nextSlot": "2026-12-27T09:00:00.000Z",
+          "sourceChars": 1374,
+          "priceFrom": 1400
+        },
+        {
+          "eventPageId": "7b85e1e4-f1ff-4e77-8bd6-c5dac0353782",
+          "slug": "ledovoe-shou-taina-semi-deda-moroza-podarok-lipeck-2",
+          "eventId": "evt_6a7f4f9c8d30218d646c375f",
+          "nextSlot": "2026-12-27T13:00:00.000Z",
+          "sourceChars": 1201,
+          "priceFrom": 1200
+        }
+      ]
+    },
+    {
+      "title": "12 Ночь",
+      "city": "Москва",
+      "venue": "Центр новой культуры \"Мир искусств\"",
+      "evidence": "same-title-city-venue; source-text-varies-review-facts",
+      "recommendedMaster": {
+        "eventPageId": "cae214f5-aa64-4cd1-8187-1dff27f1143c",
+        "slug": "12-noch-moskva-2",
+        "selectedAs": "5#26"
+      },
+      "selectedPages": [
+        {
+          "eventPageId": "cae214f5-aa64-4cd1-8187-1dff27f1143c",
+          "slug": "12-noch-moskva-2",
+          "selectedAs": "5#26"
+        }
+      ],
+      "candidatePages": [
+        {
+          "eventPageId": "cae214f5-aa64-4cd1-8187-1dff27f1143c",
+          "slug": "12-noch-moskva-2",
+          "eventId": "evt_6a935d58b6bff28606a23c48",
+          "nextSlot": "2027-01-04T15:00:00.000Z",
+          "sourceChars": 1146,
+          "priceFrom": 950
+        },
+        {
+          "eventPageId": "58b29170-e2d1-4dfe-97f0-b2eb5d4c8bb1",
+          "slug": "12-noch-moskva",
+          "eventId": "evt_6a935c026484f5c2317fd832",
+          "nextSlot": "2027-03-20T15:30:00.000Z",
+          "sourceChars": 944,
+          "priceFrom": 950
+        }
+      ]
+    },
+    {
+      "title": "Маша и Витя против «Диких гитар»",
+      "city": "Москва",
+      "venue": "Центральный Дом актера им. А.А. Яблочкиной",
+      "evidence": "same-title-city-venue; source-text-varies-review-facts",
+      "recommendedMaster": {
+        "eventPageId": "f7bb46d5-1703-4b7a-a796-fe5cc3580a08",
+        "slug": "masha-i-vitya-protiv-dikih-gitar-moskva-2",
+        "selectedAs": "5#11"
+      },
+      "selectedPages": [
+        {
+          "eventPageId": "f7bb46d5-1703-4b7a-a796-fe5cc3580a08",
+          "slug": "masha-i-vitya-protiv-dikih-gitar-moskva-2",
+          "selectedAs": "5#11"
+        }
+      ],
+      "candidatePages": [
+        {
+          "eventPageId": "c0757d3d-16f8-467f-82d6-200848ac0ddb",
+          "slug": "masha-i-vitya-protiv-dikih-gitar-moskva",
+          "eventId": "evt_6b0492023b41c376473bd800",
+          "nextSlot": "2026-12-20T08:00:00.000Z",
+          "sourceChars": 1016,
+          "priceFrom": 3500
+        },
+        {
+          "eventPageId": "f7bb46d5-1703-4b7a-a796-fe5cc3580a08",
+          "slug": "masha-i-vitya-protiv-dikih-gitar-moskva-2",
+          "eventId": "evt_6b048dd3615f93c222dc0d0f",
+          "nextSlot": "2026-12-22T08:00:00.000Z",
+          "sourceChars": 1039,
+          "priceFrom": 4000
+        }
+      ]
+    },
+    {
+      "title": "Новогоднее представление \"Все дело в шляпе\" по сказке \"Праздник Пылелупов\"",
+      "city": "Москва",
+      "venue": "Арт театр на Ленинском",
+      "evidence": "same-normalized-source-description",
+      "recommendedMaster": {
+        "eventPageId": "7728a81f-6970-4ac6-95e7-3f729a82ead4",
+        "slug": "novogodnee-predstavlenie-vse-delo-v-shlyape-po-skazke-prazdnik-pylelupov-moskva-4",
+        "selectedAs": "2#13"
+      },
+      "selectedPages": [
+        {
+          "eventPageId": "7728a81f-6970-4ac6-95e7-3f729a82ead4",
+          "slug": "novogodnee-predstavlenie-vse-delo-v-shlyape-po-skazke-prazdnik-pylelupov-moskva-4",
+          "selectedAs": "2#13"
+        }
+      ],
+      "candidatePages": [
+        {
+          "eventPageId": "ff4e420b-df0d-4471-8838-2bd9c8bac9a5",
+          "slug": "novogodnee-predstavlenie-vse-delo-v-shlyape-po-skazke-prazdnik-pylelupov-moskva-5",
+          "eventId": "evt_6af7033433521d8ce07b3da1",
+          "nextSlot": "2026-12-23T12:00:00.000Z",
+          "sourceChars": 310,
+          "priceFrom": 2000
+        },
+        {
+          "eventPageId": "7728a81f-6970-4ac6-95e7-3f729a82ead4",
+          "slug": "novogodnee-predstavlenie-vse-delo-v-shlyape-po-skazke-prazdnik-pylelupov-moskva-4",
+          "eventId": "evt_6af705243e9d2c9081722aa8",
+          "nextSlot": "2026-12-24T09:00:00.000Z",
+          "sourceChars": 310,
+          "priceFrom": 2000
+        },
+        {
+          "eventPageId": "2d978bc7-6655-4176-8e4f-5663144e6632",
+          "slug": "novogodnee-predstavlenie-vse-delo-v-shlyape-po-skazke-prazdnik-pylelupov-moskva-3",
+          "eventId": "evt_6af7064e5b3fc1fd8c0608ce",
+          "nextSlot": "2026-12-24T12:00:00.000Z",
+          "sourceChars": 309,
+          "priceFrom": 2000
+        },
+        {
+          "eventPageId": "e76c055f-4375-4c8f-aee9-e371422075a2",
+          "slug": "novogodnee-predstavlenie-vse-delo-v-shlyape-po-skazke-prazdnik-pylelupov-moskva-7",
+          "eventId": "evt_6af8382181ae652984e50e7a",
+          "nextSlot": "2026-12-28T09:00:00.000Z",
+          "sourceChars": 310,
+          "priceFrom": 2000
+        },
+        {
+          "eventPageId": "e8e6d32d-ce18-4e4a-a4cf-4c7b1d386328",
+          "slug": "novogodnee-predstavlenie-vse-delo-v-shlyape-po-skazke-prazdnik-pylelupov-moskva-6",
+          "eventId": "evt_6af839aa43eb44e2c0ca99f4",
+          "nextSlot": "2026-12-28T12:00:00.000Z",
+          "sourceChars": 310,
+          "priceFrom": 2000
+        }
+      ]
+    },
+    {
+      "title": "ХА!МЫ! Рождественское!",
+      "city": "Новосибирск",
+      "venue": "Кабаре Кафе \"Бродячая Собака\"",
+      "evidence": "same-normalized-source-description",
+      "recommendedMaster": {
+        "eventPageId": "d018a109-0c74-41a8-8679-9fb071fa31b9",
+        "slug": "ha-my-rozhdestvenskoe-novosibirsk",
+        "selectedAs": "1#19"
+      },
+      "selectedPages": [
+        {
+          "eventPageId": "d018a109-0c74-41a8-8679-9fb071fa31b9",
+          "slug": "ha-my-rozhdestvenskoe-novosibirsk",
+          "selectedAs": "1#19"
+        }
+      ],
+      "candidatePages": [
+        {
+          "eventPageId": "d018a109-0c74-41a8-8679-9fb071fa31b9",
+          "slug": "ha-my-rozhdestvenskoe-novosibirsk",
+          "eventId": "evt_6ad4c15068e6b54e4c28fe71",
+          "nextSlot": "2027-01-06T14:30:00.000Z",
+          "sourceChars": 844,
+          "priceFrom": 1300
+        },
+        {
+          "eventPageId": "1ddfb82b-55d2-4833-972e-14a1b0f3f672",
+          "slug": "ha-my-rozhdestvenskoe-novosibirsk-2",
+          "eventId": "evt_6ad4c2b46d74cd0aec980b8b",
+          "nextSlot": "2027-01-07T14:30:00.000Z",
+          "sourceChars": 844,
+          "priceFrom": 1300
+        }
+      ]
+    },
+    {
+      "title": "«Контент завод»",
+      "city": "Омск",
+      "venue": "ТРК Маяк Молл, 3 этаж, Интерактивити Парк ГУГОЛ_BOOM",
+      "evidence": "same-normalized-source-description",
+      "recommendedMaster": {
+        "eventPageId": "64b09661-aa08-4579-8cee-7e466ad9ddc2",
+        "slug": "kontent-zavod-omsk",
+        "selectedAs": "3#25"
+      },
+      "selectedPages": [
+        {
+          "eventPageId": "64b09661-aa08-4579-8cee-7e466ad9ddc2",
+          "slug": "kontent-zavod-omsk",
+          "selectedAs": "3#25"
+        }
+      ],
+      "candidatePages": [
+        {
+          "eventPageId": "64b09661-aa08-4579-8cee-7e466ad9ddc2",
+          "slug": "kontent-zavod-omsk",
+          "eventId": "evt_6acf72e3dfcc25f4b4ff2796",
+          "nextSlot": "2026-12-18T12:00:00.000Z",
+          "sourceChars": 745,
+          "priceFrom": 1600
+        },
+        {
+          "eventPageId": "f65cf32b-4ecf-4bd3-abd9-045e7c5d60a7",
+          "slug": "kontent-zavod-omsk-2",
+          "eventId": "evt_6acf7305f22b1438324e3712",
+          "nextSlot": "2026-12-19T12:00:18.000Z",
+          "sourceChars": 745,
+          "priceFrom": 1600
+        },
+        {
+          "eventPageId": "4dde09a9-b0e7-4342-b9ad-ecce9865e43c",
+          "slug": "kontent-zavod-omsk-3",
+          "eventId": "evt_6acf7323256c5903531a8b26",
+          "nextSlot": "2026-12-20T12:00:00.000Z",
+          "sourceChars": 745,
+          "priceFrom": 1600
+        },
+        {
+          "eventPageId": "85079f45-c2f4-4342-aaa2-fb88b6eebafb",
+          "slug": "kontent-zavod-omsk-4",
+          "eventId": "evt_6acf733aecae28181a34ff0c",
+          "nextSlot": "2026-12-21T12:00:00.000Z",
+          "sourceChars": 745,
+          "priceFrom": 1600
+        },
+        {
+          "eventPageId": "1ff9c1a8-5dec-4931-aaba-97b60ac591d6",
+          "slug": "kontent-zavod-omsk-5",
+          "eventId": "evt_6acf734ff22b1438324e372b",
+          "nextSlot": "2026-12-22T12:00:00.000Z",
+          "sourceChars": 745,
+          "priceFrom": 1600
+        },
+        {
+          "eventPageId": "7f626286-c926-4360-9b45-46e196b72209",
+          "slug": "kontent-zavod-omsk-7",
+          "eventId": "evt_6acf73a4ecae28181a34ff2c",
+          "nextSlot": "2026-12-23T12:00:00.000Z",
+          "sourceChars": 745,
+          "priceFrom": 1600
+        },
+        {
+          "eventPageId": "4745fc15-ae70-418c-a10c-746c660db2f1",
+          "slug": "kontent-zavod-omsk-6",
+          "eventId": "evt_6acf7370b5cf0ae990a2b77c",
+          "nextSlot": "2026-12-24T12:00:00.000Z",
+          "sourceChars": 745,
+          "priceFrom": 1600
+        },
+        {
+          "eventPageId": "8d0b5666-938d-4394-8c0e-1f6fd562a6d4",
+          "slug": "kontent-zavod-omsk-8",
+          "eventId": "evt_6acf73ba6adf652951bcc63f",
+          "nextSlot": "2026-12-25T12:00:00.000Z",
+          "sourceChars": 745,
+          "priceFrom": 1600
+        },
+        {
+          "eventPageId": "9f7bdecb-0ab5-47be-b031-89e4c47fcc75",
+          "slug": "kontent-zavod-omsk-9",
+          "eventId": "evt_6acf73ca256c5903531a8b4f",
+          "nextSlot": "2026-12-26T12:00:00.000Z",
+          "sourceChars": 745,
+          "priceFrom": 1600
+        },
+        {
+          "eventPageId": "f89ad94a-f580-452d-89ac-7d9cd69b3171",
+          "slug": "kontent-zavod-omsk-10",
+          "eventId": "evt_6acf73dab5cf0ae990a2b795",
+          "nextSlot": "2026-12-27T12:00:00.000Z",
+          "sourceChars": 745,
+          "priceFrom": 1600
+        },
+        {
+          "eventPageId": "a39a082d-e59a-4ae9-ad83-7b4d3aa1f4a4",
+          "slug": "kontent-zavod-omsk-11",
+          "eventId": "evt_6acf73eb68adcf849c2c000a",
+          "nextSlot": "2026-12-28T12:00:00.000Z",
+          "sourceChars": 745,
+          "priceFrom": 1600
+        },
+        {
+          "eventPageId": "96a7bf77-4036-427e-82d9-92a6c9735868",
+          "slug": "kontent-zavod-omsk-12",
+          "eventId": "evt_6acf73fd7e0fd57612e7c257",
+          "nextSlot": "2026-12-29T12:00:00.000Z",
+          "sourceChars": 745,
+          "priceFrom": 1600
+        },
+        {
+          "eventPageId": "821d34b3-a332-4dca-8392-7be23e78b7a0",
+          "slug": "kontent-zavod-omsk-13",
+          "eventId": "evt_6acf7413f22b1438324e3772",
+          "nextSlot": "2026-12-30T12:00:00.000Z",
+          "sourceChars": 745,
+          "priceFrom": 1600
+        },
+        {
+          "eventPageId": "de46dec4-85dc-491b-bab5-6742a0c817cd",
+          "slug": "kontent-zavod-omsk-14",
+          "eventId": "evt_6acf756cf22b1438324e3841",
+          "nextSlot": "2027-01-02T12:00:00.000Z",
+          "sourceChars": 745,
+          "priceFrom": 1600
+        },
+        {
+          "eventPageId": "334d22c9-c38c-4c75-b51c-c2cf3de328ed",
+          "slug": "kontent-zavod-omsk-15",
+          "eventId": "evt_6acf76d968adcf849c2c0079",
+          "nextSlot": "2027-01-03T12:00:00.000Z",
+          "sourceChars": 745,
+          "priceFrom": 1600
+        },
+        {
+          "eventPageId": "bcef302a-7c0c-409c-b400-2a3dce6507aa",
+          "slug": "kontent-zavod-omsk-16",
+          "eventId": "evt_6acf76f8f22b1438324e3894",
+          "nextSlot": "2027-01-04T12:00:00.000Z",
+          "sourceChars": 745,
+          "priceFrom": 1600
+        },
+        {
+          "eventPageId": "22e12861-0250-44d2-bf53-c3c9a8b16c9c",
+          "slug": "kontent-zavod-omsk-17",
+          "eventId": "evt_6acf770b7641db2d5f7fc589",
+          "nextSlot": "2027-01-05T12:00:00.000Z",
+          "sourceChars": 745,
+          "priceFrom": 1600
+        },
+        {
+          "eventPageId": "58e4bba6-5ca7-4927-9b9e-9b1259bee393",
+          "slug": "kontent-zavod-omsk-18",
+          "eventId": "evt_6acf772068adcf849c2c0089",
+          "nextSlot": "2027-01-06T12:00:00.000Z",
+          "sourceChars": 745,
+          "priceFrom": 1600
+        }
+      ]
+    },
+    {
+      "title": "Как Дед Мороз на свет появился",
+      "city": "Пенза",
+      "venue": "Театр на Обочине",
+      "evidence": "same-normalized-source-description",
+      "recommendedMaster": {
+        "eventPageId": "818a334c-3a8d-4f0d-bda5-fb10b33650a6",
+        "slug": "kak-ded-moroz-na-svet-poyavilsya-penza-3",
+        "selectedAs": "2#25"
+      },
+      "selectedPages": [
+        {
+          "eventPageId": "818a334c-3a8d-4f0d-bda5-fb10b33650a6",
+          "slug": "kak-ded-moroz-na-svet-poyavilsya-penza-3",
+          "selectedAs": "2#25"
+        }
+      ],
+      "candidatePages": [
+        {
+          "eventPageId": "818a334c-3a8d-4f0d-bda5-fb10b33650a6",
+          "slug": "kak-ded-moroz-na-svet-poyavilsya-penza-3",
+          "eventId": "evt_6afe0bb80c401d2c95bc46f5",
+          "nextSlot": "2027-01-05T10:00:00.000Z",
+          "sourceChars": 527,
+          "priceFrom": 500
+        },
+        {
+          "eventPageId": "cadc0d4c-c7ff-423d-aa3b-3e03a6e54b72",
+          "slug": "kak-ded-moroz-na-svet-poyavilsya-penza",
+          "eventId": "evt_6afe0be00cdc0424838a332c",
+          "nextSlot": "2027-01-07T10:00:00.000Z",
+          "sourceChars": 527,
+          "priceFrom": 500
+        },
+        {
+          "eventPageId": "7fa1f3df-c3e1-4672-965a-ec228545a920",
+          "slug": "kak-ded-moroz-na-svet-poyavilsya-penza-2",
+          "eventId": "evt_6afe0bfd17624389da9c3d19",
+          "nextSlot": "2027-01-10T10:00:00.000Z",
+          "sourceChars": 527,
+          "priceFrom": 500
+        }
+      ]
+    },
+    {
+      "title": "Новоселье",
+      "city": "Пенза",
+      "venue": "Театр на Обочине",
+      "evidence": "same-normalized-source-description",
+      "recommendedMaster": {
+        "eventPageId": "201323d3-aaa3-492e-b2fd-1630face99c7",
+        "slug": "novosele-penza",
+        "selectedAs": "4#10"
+      },
+      "selectedPages": [
+        {
+          "eventPageId": "201323d3-aaa3-492e-b2fd-1630face99c7",
+          "slug": "novosele-penza",
+          "selectedAs": "4#10"
+        }
+      ],
+      "candidatePages": [
+        {
+          "eventPageId": "201323d3-aaa3-492e-b2fd-1630face99c7",
+          "slug": "novosele-penza",
+          "eventId": "evt_6afe0786ea147da8ed77f790",
+          "nextSlot": "2026-12-27T15:00:00.000Z",
+          "sourceChars": 670,
+          "priceFrom": 800
+        },
+        {
+          "eventPageId": "796a1fb4-c744-408e-b462-c6edd6e4f951",
+          "slug": "novosele-penza-2",
+          "eventId": "evt_6afe08740cdc0424838a32dc",
+          "nextSlot": "2027-01-05T15:00:00.000Z",
+          "sourceChars": 670,
+          "priceFrom": 800
+        }
+      ]
+    },
+    {
+      "title": "Тайна Ледяной Звезды",
+      "city": "Пенза",
+      "venue": "Театр на Обочине",
+      "evidence": "same-normalized-source-description",
+      "recommendedMaster": {
+        "eventPageId": "f0d8d601-0382-44dc-ac80-c1f6f14d0632",
+        "slug": "taina-ledyanoi-zvezdy-penza-2",
+        "selectedAs": "4#5"
+      },
+      "selectedPages": [
+        {
+          "eventPageId": "f0d8d601-0382-44dc-ac80-c1f6f14d0632",
+          "slug": "taina-ledyanoi-zvezdy-penza-2",
+          "selectedAs": "4#5"
+        }
+      ],
+      "candidatePages": [
+        {
+          "eventPageId": "f0d8d601-0382-44dc-ac80-c1f6f14d0632",
+          "slug": "taina-ledyanoi-zvezdy-penza-2",
+          "eventId": "evt_6afe0a70cc7a564e274202fc",
+          "nextSlot": "2026-12-26T10:00:00.000Z",
+          "sourceChars": 512,
+          "priceFrom": 500
+        },
+        {
+          "eventPageId": "4a2f6918-fbd5-418c-a685-599cb941afe1",
+          "slug": "taina-ledyanoi-zvezdy-penza",
+          "eventId": "evt_6afe0a900c401d2c95bc46ce",
+          "nextSlot": "2027-01-03T10:00:00.000Z",
+          "sourceChars": 512,
+          "priceFrom": 500
+        }
+      ]
+    },
+    {
+      "title": "Концерт \"Рождественские встречи с ансамблем песни и пляски Донских казаков\"",
+      "city": "Ростов-на-Дону",
+      "venue": "ДК \"Ростсельмаш\"",
+      "evidence": "same-title-city-venue; source-text-varies-review-facts",
+      "recommendedMaster": {
+        "eventPageId": "def8641d-a962-474f-bada-cf7dcbc09f6e",
+        "slug": "koncert-rozhdestvenskie-vstrechi-s-ansamblem-pesni-i-plyaski-donskih-kazakov-rostov-na-donu",
+        "selectedAs": "3#26"
+      },
+      "selectedPages": [
+        {
+          "eventPageId": "def8641d-a962-474f-bada-cf7dcbc09f6e",
+          "slug": "koncert-rozhdestvenskie-vstrechi-s-ansamblem-pesni-i-plyaski-donskih-kazakov-rostov-na-donu",
+          "selectedAs": "3#26"
+        },
+        {
+          "eventPageId": "a6364a75-7c25-4295-bd4e-ef98668ff193",
+          "slug": "koncert-rozhdestvenskie-vstrechi-s-ansamblem-pesni-i-plyaski-donskih-kazakov-rostov-na-donu-2",
+          "selectedAs": "2#11"
+        }
+      ],
+      "candidatePages": [
+        {
+          "eventPageId": "def8641d-a962-474f-bada-cf7dcbc09f6e",
+          "slug": "koncert-rozhdestvenskie-vstrechi-s-ansamblem-pesni-i-plyaski-donskih-kazakov-rostov-na-donu",
+          "eventId": "evt_6ab4f4fc280a49e752f6ef16",
+          "nextSlot": "2027-01-06T14:00:00.000Z",
+          "sourceChars": 1905,
+          "priceFrom": 1000
+        },
+        {
+          "eventPageId": "a6364a75-7c25-4295-bd4e-ef98668ff193",
+          "slug": "koncert-rozhdestvenskie-vstrechi-s-ansamblem-pesni-i-plyaski-donskih-kazakov-rostov-na-donu-2",
+          "eventId": "evt_6ab50fd4caf30b2dc0e5dcf6",
+          "nextSlot": "2027-01-07T14:00:00.000Z",
+          "sourceChars": 1987,
+          "priceFrom": 1000
+        },
+        {
+          "eventPageId": "0bfa8d01-00c2-49ed-bff6-3bee580ec8ca",
+          "slug": "koncert-rozhdestvenskie-vstrechi-s-ansamblem-pesni-i-plyaski-donskih-kazakov-rostov-na-donu-3",
+          "eventId": "evt_6ab5100a9979e820fea71ec6",
+          "nextSlot": "2027-01-08T14:00:00.000Z",
+          "sourceChars": 1758,
+          "priceFrom": 1000
+        }
+      ]
+    },
+    {
+      "title": "Самая зимняя сказка — новогодняя ёлка и спектакль для детей в Самаре",
+      "city": "Самара",
+      "venue": "МТС Live Холл Самара (ех. КРЦ «Звезда»)",
+      "evidence": "same-normalized-source-description",
+      "recommendedMaster": {
+        "eventPageId": "9b8adf9c-e9ab-4d8e-aa1c-5b6f88629691",
+        "slug": "samaya-zimnyaya-skazka-novogodnyaya-elka-i-spektakl-dlya-detei-v-samare-samara-2",
+        "selectedAs": "1#2"
+      },
+      "selectedPages": [
+        {
+          "eventPageId": "9b8adf9c-e9ab-4d8e-aa1c-5b6f88629691",
+          "slug": "samaya-zimnyaya-skazka-novogodnyaya-elka-i-spektakl-dlya-detei-v-samare-samara-2",
+          "selectedAs": "1#2"
+        }
+      ],
+      "candidatePages": [
+        {
+          "eventPageId": "9b8adf9c-e9ab-4d8e-aa1c-5b6f88629691",
+          "slug": "samaya-zimnyaya-skazka-novogodnyaya-elka-i-spektakl-dlya-detei-v-samare-samara-2",
+          "eventId": "evt_6ad86e3b1ea20d70129dfff7",
+          "nextSlot": "2027-01-02T12:00:00.000Z",
+          "sourceChars": 1041,
+          "priceFrom": 450
+        },
+        {
+          "eventPageId": "5b831c1e-dd36-437f-abc8-443b10e9a00d",
+          "slug": "samaya-zimnyaya-skazka-novogodnyaya-elka-i-spektakl-dlya-detei-v-samare-samara-3",
+          "eventId": "evt_6ad87b921ea20d70129e059f",
+          "nextSlot": "2027-01-03T09:30:00.000Z",
+          "sourceChars": 1041,
+          "priceFrom": 450
+        },
+        {
+          "eventPageId": "402c51ee-f0c8-4648-9b87-b0486c4c4949",
+          "slug": "samaya-zimnyaya-skazka-novogodnyaya-elka-i-spektakl-dlya-detei-v-samare-samara-4",
+          "eventId": "evt_6ad87d3315a94059cd59e560",
+          "nextSlot": "2027-01-05T09:30:00.000Z",
+          "sourceChars": 1041,
+          "priceFrom": 450
+        }
+      ]
+    },
+    {
+      "title": "\"В зеркале уходящего года\" Максим Чекмарёв - фортепианный концерт",
+      "city": "Санкт-Петербург",
+      "venue": "Дом Шрёдера",
+      "evidence": "same-normalized-source-description",
+      "recommendedMaster": {
+        "eventPageId": "7de718b8-7fba-4f6d-ad05-dc95245df6f8",
+        "slug": "v-zerkale-uhodyaschego-goda-maksim-chekmarev-fortepiannyi-koncert-sankt-peterburg-2",
+        "selectedAs": "5#10"
+      },
+      "selectedPages": [
+        {
+          "eventPageId": "7de718b8-7fba-4f6d-ad05-dc95245df6f8",
+          "slug": "v-zerkale-uhodyaschego-goda-maksim-chekmarev-fortepiannyi-koncert-sankt-peterburg-2",
+          "selectedAs": "5#10"
+        }
+      ],
+      "candidatePages": [
+        {
+          "eventPageId": "8bd112dd-b238-4bd2-8904-02f387b4682d",
+          "slug": "v-zerkale-uhodyaschego-goda-maksim-chekmarev-fortepiannyi-koncert-sankt-peterburg",
+          "eventId": "evt_6ac3ea1bbd9b39111389ac07",
+          "nextSlot": "2026-12-18T16:00:00.000Z",
+          "sourceChars": 1402,
+          "priceFrom": 800
+        },
+        {
+          "eventPageId": "7de718b8-7fba-4f6d-ad05-dc95245df6f8",
+          "slug": "v-zerkale-uhodyaschego-goda-maksim-chekmarev-fortepiannyi-koncert-sankt-peterburg-2",
+          "eventId": "evt_6ac3eb8f29c9b3dea80670f6",
+          "nextSlot": "2026-12-18T16:00:00.000Z",
+          "sourceChars": 1404,
+          "priceFrom": 800
+        }
+      ]
+    },
+    {
+      "title": "\"Новогодняя опера\" праздничный ужин-концерт за столиками",
+      "city": "Санкт-Петербург",
+      "venue": "Дом Шрёдера",
+      "evidence": "same-title-city-venue; source-text-varies-review-facts",
+      "recommendedMaster": {
+        "eventPageId": "0778182d-b1a8-47e2-9aa5-2d02ecbf4ce7",
+        "slug": "novogodnyaya-opera-prazdnichnyi-uzhin-koncert-za-stolikami-sankt-peterburg",
+        "selectedAs": "5#16"
+      },
+      "selectedPages": [
+        {
+          "eventPageId": "0778182d-b1a8-47e2-9aa5-2d02ecbf4ce7",
+          "slug": "novogodnyaya-opera-prazdnichnyi-uzhin-koncert-za-stolikami-sankt-peterburg",
+          "selectedAs": "5#16"
+        }
+      ],
+      "candidatePages": [
+        {
+          "eventPageId": "0778182d-b1a8-47e2-9aa5-2d02ecbf4ce7",
+          "slug": "novogodnyaya-opera-prazdnichnyi-uzhin-koncert-za-stolikami-sankt-peterburg",
+          "eventId": "evt_6a9ab1c5248817cc9380e931",
+          "nextSlot": "2026-12-31T16:00:00.000Z",
+          "sourceChars": 1805,
+          "priceFrom": 3780
+        },
+        {
+          "eventPageId": "02d88dbc-061b-4f4a-b5f4-a47b15edb794",
+          "slug": "novogodnyaya-opera-prazdnichnyi-uzhin-koncert-za-stolikami-sankt-peterburg-2",
+          "eventId": "evt_6a9ab5751ccfa4118cf7ab02",
+          "nextSlot": "2026-12-31T16:00:00.000Z",
+          "sourceChars": 1991,
+          "priceFrom": 3780
+        },
+        {
+          "eventPageId": "61754eaf-9b7b-4d93-b1ef-594e5142e6c0",
+          "slug": "novogodnyaya-opera-prazdnichnyi-uzhin-koncert-za-stolikami-sankt-peterburg-3",
+          "eventId": "evt_6aa04800ebd0a5a7f86d779a",
+          "nextSlot": "2027-01-03T16:00:00.000Z",
+          "sourceChars": 1803,
+          "priceFrom": 3680
+        },
+        {
+          "eventPageId": "a2a20b20-e007-4494-8940-2c4b5207fe9b",
+          "slug": "novogodnyaya-opera-prazdnichnyi-uzhin-koncert-za-stolikami-sankt-peterburg-4",
+          "eventId": "evt_6ad0c6d2b1923b9bb451562d",
+          "nextSlot": "2027-01-03T16:00:00.000Z",
+          "sourceChars": 1646,
+          "priceFrom": 3760
+        }
+      ]
+    },
+    {
+      "title": "\"Чехов со смаком\" театр-трактир с литературным меню в Доме Шрёдера",
+      "city": "Санкт-Петербург",
+      "venue": "Дом Шрёдера",
+      "evidence": "same-title-city-venue; source-text-varies-review-facts",
+      "recommendedMaster": {
+        "eventPageId": "43ad3464-7d86-4df1-8593-d1f695a5302a",
+        "slug": "chehov-so-smakom-teatr-traktir-s-literaturnym-menyu-v-dome-shredera-sankt-peterburg-4",
+        "selectedAs": "5#17"
+      },
+      "selectedPages": [
+        {
+          "eventPageId": "43ad3464-7d86-4df1-8593-d1f695a5302a",
+          "slug": "chehov-so-smakom-teatr-traktir-s-literaturnym-menyu-v-dome-shredera-sankt-peterburg-4",
+          "selectedAs": "5#17"
+        }
+      ],
+      "candidatePages": [
+        {
+          "eventPageId": "43ad3464-7d86-4df1-8593-d1f695a5302a",
+          "slug": "chehov-so-smakom-teatr-traktir-s-literaturnym-menyu-v-dome-shredera-sankt-peterburg-4",
+          "eventId": "evt_6afade4f2202c63dcbb559ca",
+          "nextSlot": "2026-12-29T16:00:00.000Z",
+          "sourceChars": 1393,
+          "priceFrom": 5000
+        },
+        {
+          "eventPageId": "38a674f6-b62c-4807-b5e3-b9d4c88e631d",
+          "slug": "chehov-so-smakom-teatr-traktir-s-literaturnym-menyu-v-dome-shredera-sankt-peterburg-3",
+          "eventId": "evt_6ad74f5dcac54ec347d0c92f",
+          "nextSlot": "2026-12-29T16:00:00.000Z",
+          "sourceChars": 1296,
+          "priceFrom": 5000
+        }
+      ]
+    },
+    {
+      "title": "«Рождество с Дунаевским» Ирина Алёшина — праздничный концерт за столиками",
+      "city": "Санкт-Петербург",
+      "venue": "Дом Шрёдера",
+      "evidence": "same-normalized-source-description",
+      "recommendedMaster": {
+        "eventPageId": "ef69b295-22b4-430a-abea-1562ffdde56c",
+        "slug": "rozhdestvo-s-dunaevskim-irina-aleshina-prazdnichnyi-koncert-za-stolikami-sankt-peterburg",
+        "selectedAs": "3#20"
+      },
+      "selectedPages": [
+        {
+          "eventPageId": "ef69b295-22b4-430a-abea-1562ffdde56c",
+          "slug": "rozhdestvo-s-dunaevskim-irina-aleshina-prazdnichnyi-koncert-za-stolikami-sankt-peterburg",
+          "selectedAs": "3#20"
+        }
+      ],
+      "candidatePages": [
+        {
+          "eventPageId": "ef69b295-22b4-430a-abea-1562ffdde56c",
+          "slug": "rozhdestvo-s-dunaevskim-irina-aleshina-prazdnichnyi-koncert-za-stolikami-sankt-peterburg",
+          "eventId": "evt_6b047067f76f04b8271eff95",
+          "nextSlot": "2027-01-07T12:00:00.000Z",
+          "sourceChars": 1168,
+          "priceFrom": 2000
+        },
+        {
+          "eventPageId": "93f30283-03a0-4c4b-8d93-2fdd920149b0",
+          "slug": "rozhdestvo-s-dunaevskim-irina-aleshina-prazdnichnyi-koncert-za-stolikami-sankt-peterburg-2",
+          "eventId": "evt_6b047908cf5c8668d3892d04",
+          "nextSlot": "2027-01-07T12:00:00.000Z",
+          "sourceChars": 1168,
+          "priceFrom": 2000
+        }
+      ]
+    },
+    {
+      "title": "Балет \"Щелкунчик\". С обзорной экскурсией по Дворцу (начало экскурсии 18:45, начало балета 20:00)",
+      "city": "Санкт-Петербург",
+      "venue": "Дом ученых им. Горького",
+      "evidence": "same-title-city-venue; source-text-varies-review-facts",
+      "recommendedMaster": {
+        "eventPageId": "659a2702-568f-40bd-8698-168c53189b70",
+        "slug": "balet-schelkunchik-s-obzornoi-ekskursiei-po-dvorcu-nachalo-ekskursii-18-45-nachalo-baleta-20-00-sankt-peterburg-7",
+        "selectedAs": "4#29"
+      },
+      "selectedPages": [
+        {
+          "eventPageId": "659a2702-568f-40bd-8698-168c53189b70",
+          "slug": "balet-schelkunchik-s-obzornoi-ekskursiei-po-dvorcu-nachalo-ekskursii-18-45-nachalo-baleta-20-00-sankt-peterburg-7",
+          "selectedAs": "4#29"
+        }
+      ],
+      "candidatePages": [
+        {
+          "eventPageId": "22829e53-4dfc-4f55-aefe-15c56d605af3",
+          "slug": "balet-schelkunchik-s-obzornoi-ekskursiei-po-dvorcu-nachalo-ekskursii-18-45-nachalo-baleta-20-00-sankt-peterburg-5",
+          "eventId": "evt_6a8c633a5fc59f6d16ef4e8a",
+          "nextSlot": "2026-12-16T15:45:00.000Z",
+          "sourceChars": 1440,
+          "priceFrom": 3000
+        },
+        {
+          "eventPageId": "659a2702-568f-40bd-8698-168c53189b70",
+          "slug": "balet-schelkunchik-s-obzornoi-ekskursiei-po-dvorcu-nachalo-ekskursii-18-45-nachalo-baleta-20-00-sankt-peterburg-7",
+          "eventId": "evt_6b02026d2934b6878e020c8e",
+          "nextSlot": "2027-01-15T15:45:00.000Z",
+          "sourceChars": 1289,
+          "priceFrom": 3000
+        }
+      ]
+    },
+    {
+      "title": "Балет «Щелкунчик»",
+      "city": "Санкт-Петербург",
+      "venue": "КДЦ \"МОСКОВСКИЙ\"",
+      "evidence": "same-title-city-venue; source-text-varies-review-facts",
+      "recommendedMaster": {
+        "eventPageId": "4cca7970-7255-4725-94f7-2c513ea58717",
+        "slug": "balet-schelkunchik-sankt-peterburg-20",
+        "selectedAs": "2#20"
+      },
+      "selectedPages": [
+        {
+          "eventPageId": "4cca7970-7255-4725-94f7-2c513ea58717",
+          "slug": "balet-schelkunchik-sankt-peterburg-20",
+          "selectedAs": "2#20"
+        }
+      ],
+      "candidatePages": [
+        {
+          "eventPageId": "4cca7970-7255-4725-94f7-2c513ea58717",
+          "slug": "balet-schelkunchik-sankt-peterburg-20",
+          "eventId": "evt_6af58bcea88664cc82ff9a2b",
+          "nextSlot": "2026-12-29T15:00:00.000Z",
+          "sourceChars": 853,
+          "priceFrom": 1200
+        },
+        {
+          "eventPageId": "60859866-97fe-4010-b1a1-1f931f15f6ad",
+          "slug": "balet-schelkunchik-sankt-peterburg-2",
+          "eventId": "evt_6a8acfe8477fbf75eefe0377",
+          "nextSlot": "2027-01-16T16:00:00.000Z",
+          "sourceChars": 955,
+          "priceFrom": 1200
+        }
+      ]
+    },
+    {
+      "title": "Бурлеск кабаре шоу МАДАМ БУМ",
+      "city": "Санкт-Петербург",
+      "venue": "Юнити Сенная",
+      "evidence": "same-normalized-source-description",
+      "recommendedMaster": {
+        "eventPageId": "71963c39-6367-4331-8eac-7da8cac8b1ac",
+        "slug": "burlesk-kabare-shou-madam-bum-sankt-peterburg",
+        "selectedAs": "5#2"
+      },
+      "selectedPages": [
+        {
+          "eventPageId": "71963c39-6367-4331-8eac-7da8cac8b1ac",
+          "slug": "burlesk-kabare-shou-madam-bum-sankt-peterburg",
+          "selectedAs": "5#2"
+        }
+      ],
+      "candidatePages": [
+        {
+          "eventPageId": "71963c39-6367-4331-8eac-7da8cac8b1ac",
+          "slug": "burlesk-kabare-shou-madam-bum-sankt-peterburg",
+          "eventId": "evt_6ae9ef0f5b8b99b528b73d45",
+          "nextSlot": "2026-12-01T16:00:00.000Z",
+          "sourceChars": 1029,
+          "priceFrom": 5000
+        },
+        {
+          "eventPageId": "50ec592f-de91-4872-bf55-3e57adfaf2cd",
+          "slug": "burlesk-kabare-shou-madam-bum-sankt-peterburg-2",
+          "eventId": "evt_6afcbdd620dde78e2f25a1c4",
+          "nextSlot": "2027-01-04T16:00:00.000Z",
+          "sourceChars": 1029,
+          "priceFrom": 5000
+        }
+      ]
+    },
+    {
+      "title": "Новогоднее шоу \"Анна и Эльза\" - часть 3.",
+      "city": "Санкт-Петербург",
+      "venue": "МТС Live Холл Санкт-Петербург",
+      "evidence": "same-normalized-source-description",
+      "recommendedMaster": {
+        "eventPageId": "873fb1ca-5d0b-49c0-afb3-5b8e69c92485",
+        "slug": "novogodnee-shou-anna-i-elza-chast-3-sankt-peterburg",
+        "selectedAs": "1#14"
+      },
+      "selectedPages": [
+        {
+          "eventPageId": "873fb1ca-5d0b-49c0-afb3-5b8e69c92485",
+          "slug": "novogodnee-shou-anna-i-elza-chast-3-sankt-peterburg",
+          "selectedAs": "1#14"
+        }
+      ],
+      "candidatePages": [
+        {
+          "eventPageId": "873fb1ca-5d0b-49c0-afb3-5b8e69c92485",
+          "slug": "novogodnee-shou-anna-i-elza-chast-3-sankt-peterburg",
+          "eventId": "evt_6a46c069a30b1356f6ef5518",
+          "nextSlot": "2026-12-27T08:00:00.000Z",
+          "sourceChars": 1362,
+          "priceFrom": 800
+        },
+        {
+          "eventPageId": "2e1a430f-d479-435b-8ddd-0987924663fa",
+          "slug": "elka-novogodnee-lazernoe-shou-morozko-sankt-peterburg",
+          "eventId": "evt_6a46d3abe69bcd72ea61c384",
+          "nextSlot": "2026-12-27T11:30:00.000Z",
+          "sourceChars": 1362,
+          "priceFrom": 800
+        }
+      ]
+    },
+    {
+      "title": "Орган в планетарии. Рождество",
+      "city": "Санкт-Петербург",
+      "venue": "Планетарий 1",
+      "evidence": "same-normalized-source-description",
+      "recommendedMaster": {
+        "eventPageId": "95afb7bb-5e4e-4c5c-9b0f-8d3bb69a50c3",
+        "slug": "organ-v-planetarii-rozhdestvo-sankt-peterburg-3",
+        "selectedAs": "4#21"
+      },
+      "selectedPages": [
+        {
+          "eventPageId": "95afb7bb-5e4e-4c5c-9b0f-8d3bb69a50c3",
+          "slug": "organ-v-planetarii-rozhdestvo-sankt-peterburg-3",
+          "selectedAs": "4#21"
+        }
+      ],
+      "candidatePages": [
+        {
+          "eventPageId": "95afb7bb-5e4e-4c5c-9b0f-8d3bb69a50c3",
+          "slug": "organ-v-planetarii-rozhdestvo-sankt-peterburg-3",
+          "eventId": "evt_6afaced34b54e683b7d1d47e",
+          "nextSlot": "2027-01-06T19:30:00.000Z",
+          "sourceChars": 357,
+          "priceFrom": 3000
+        },
+        {
+          "eventPageId": "bf47d5c2-45b1-42fd-aca1-bbfe5ffd0e75",
+          "slug": "organ-v-planetarii-rozhdestvo-sankt-peterburg-2",
+          "eventId": "evt_6afacf71a02264018d788cb7",
+          "nextSlot": "2027-01-07T19:30:00.000Z",
+          "sourceChars": 357,
+          "priceFrom": 3000
+        }
+      ]
+    },
+    {
+      "title": "Ледовое Шоу \"Щелкунчик\" в Тамбове",
+      "city": "Тамбов",
+      "venue": "ЛДС \"Кристалл\"",
+      "evidence": "same-normalized-source-description",
+      "recommendedMaster": {
+        "eventPageId": "d0ea0e3b-00e7-469c-a034-40c6466218eb",
+        "slug": "ledovoe-shou-schelkunchik-v-tambove-tambov",
+        "selectedAs": "2#9"
+      },
+      "selectedPages": [
+        {
+          "eventPageId": "d0ea0e3b-00e7-469c-a034-40c6466218eb",
+          "slug": "ledovoe-shou-schelkunchik-v-tambove-tambov",
+          "selectedAs": "2#9"
+        }
+      ],
+      "candidatePages": [
+        {
+          "eventPageId": "d0ea0e3b-00e7-469c-a034-40c6466218eb",
+          "slug": "ledovoe-shou-schelkunchik-v-tambove-tambov",
+          "eventId": "evt_6ad96db1d5b1c2fae1f6b2c1",
+          "nextSlot": "2027-01-05T09:00:00.000Z",
+          "sourceChars": 613,
+          "priceFrom": 1200
+        },
+        {
+          "eventPageId": "2b81a815-efd0-422a-9e57-0462cec98d64",
+          "slug": "ledovoe-shou-schelkunchik-v-tambove-tambov-2",
+          "eventId": "evt_6ad9f688e56a91bf9620ef80",
+          "nextSlot": "2027-01-05T12:00:00.000Z",
+          "sourceChars": 613,
+          "priceFrom": 1200
+        }
+      ]
+    },
+    {
+      "title": "Праздник, который всегда с тобой 18+",
+      "city": "Уфа",
+      "venue": "Частный профессиональный театр The TEATR",
+      "evidence": "same-normalized-source-description",
+      "recommendedMaster": {
+        "eventPageId": "4232eb84-7ecc-48f2-b593-00b0cbc4ca51",
+        "slug": "prazdnik-kotoryi-vsegda-s-toboi-18-ufa-3",
+        "selectedAs": "3#30"
+      },
+      "selectedPages": [
+        {
+          "eventPageId": "4232eb84-7ecc-48f2-b593-00b0cbc4ca51",
+          "slug": "prazdnik-kotoryi-vsegda-s-toboi-18-ufa-3",
+          "selectedAs": "3#30"
+        }
+      ],
+      "candidatePages": [
+        {
+          "eventPageId": "4232eb84-7ecc-48f2-b593-00b0cbc4ca51",
+          "slug": "prazdnik-kotoryi-vsegda-s-toboi-18-ufa-3",
+          "eventId": "evt_6aeb47413ede1878a93cc1d4",
+          "nextSlot": "2027-01-05T13:00:00.000Z",
+          "sourceChars": 504,
+          "priceFrom": 2000
+        },
+        {
+          "eventPageId": "f97bb5d6-3d36-4fcd-8675-69e42afe0ca4",
+          "slug": "prazdnik-kotoryi-vsegda-s-toboi-18-ufa-2",
+          "eventId": "evt_6aeb47710ba3f7456ec2170f",
+          "nextSlot": "2027-01-06T13:00:00.000Z",
+          "sourceChars": 504,
+          "priceFrom": 2000
+        },
+        {
+          "eventPageId": "61dc648f-5ad6-4c66-a11e-8cce7d01364e",
+          "slug": "prazdnik-kotoryi-vsegda-s-toboi-18-ufa",
+          "eventId": "evt_6aeb48679a9202548e4b6297",
+          "nextSlot": "2027-01-07T13:00:00.000Z",
+          "sourceChars": 504,
+          "priceFrom": 2000
+        }
+      ]
+    }
+  ]
+}

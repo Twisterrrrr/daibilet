@@ -1,0 +1,610 @@
+{
+  "createdAt": "2026-11-13",
+  "source": "production future-event snapshot, read-only",
+  "groups": [
+    {
+      "key": "anna_asti",
+      "title": "ANNA ASTI - шоу «Царица»",
+      "pageIds": [
+        "0e89916b-f9f4-4626-9bbe-288aa3444337",
+        "3b816506-41c1-4367-972d-07a486ef499d",
+        "7632040e-efaa-42d6-ba17-53c2dd58932a",
+        "95d20c5c-51c0-4007-9ae8-467e6afc3fce",
+        "cba0fb4e-fe37-4fda-a70c-f02c35cd5867",
+        "cd8d9b6d-d61b-4c06-99e1-ab6e59207fac",
+        "d7a18f1c-f1f8-4f3d-91f6-5177b9a5dfbd",
+        "ea2c25aa-4e4f-4135-a029-a1bcf5da4212"
+      ],
+      "pages": [
+        {
+          "eventPageId": "0e89916b-f9f4-4626-9bbe-288aa3444337",
+          "slug": "anna-asti-solnyi-koncert-shou-carica-v-g-vladivostok",
+          "city": "Владивосток",
+          "eventTitle": "ANNA ASTI. Сольный концерт \"ШОУ \"Царица\" в г. Владивосток",
+          "eventId": "evt_69f8eb16ed0e1619e45bc72c",
+          "status": "READY",
+          "isIndexable": true,
+          "hasActiveRewrite": true
+        },
+        {
+          "eventPageId": "3b816506-41c1-4367-972d-07a486ef499d",
+          "slug": "anna-asti-solnyi-koncert-shou-carica-v-g-tula",
+          "city": "Тула",
+          "eventTitle": "ANNA ASTI. Сольный концерт \"ШОУ \"Царица\" в г. Тула",
+          "eventId": "evt_69fd8dd4a7835719e4d9f05e",
+          "status": "READY",
+          "isIndexable": true,
+          "hasActiveRewrite": true
+        },
+        {
+          "eventPageId": "7632040e-efaa-42d6-ba17-53c2dd58932a",
+          "slug": "anna-asti-solnyi-koncert-shou-carica-v-g-voronezh",
+          "city": "Воронеж",
+          "eventTitle": "ANNA ASTI. Сольный концерт \"ШОУ \"Царица\" в г. Воронеж",
+          "eventId": "evt_6a8307af4ee6d470db0da246",
+          "status": "READY",
+          "isIndexable": true,
+          "hasActiveRewrite": true
+        },
+        {
+          "eventPageId": "95d20c5c-51c0-4007-9ae8-467e6afc3fce",
+          "slug": "anna-asti-solnyi-koncert-shou-carica-v-g-ryazan",
+          "city": "Рязань",
+          "eventTitle": "ANNA ASTI. Сольный концерт \"ШОУ \"Царица\" в г. Рязань",
+          "eventId": "evt_69e5f0546f2ef39d67a00eda",
+          "status": "READY",
+          "isIndexable": true,
+          "hasActiveRewrite": true
+        },
+        {
+          "eventPageId": "cba0fb4e-fe37-4fda-a70c-f02c35cd5867",
+          "slug": "anna-asti-solnyi-koncert-shou-carica-v-g-chelyabinsk",
+          "city": "Челябинск",
+          "eventTitle": "ANNA ASTI. Сольный концерт \"ШОУ \"Царица\" в г. Челябинск",
+          "eventId": "evt_6ace72d8e3304bdcce50be32",
+          "status": "READY",
+          "isIndexable": true,
+          "hasActiveRewrite": true
+        },
+        {
+          "eventPageId": "cd8d9b6d-d61b-4c06-99e1-ab6e59207fac",
+          "slug": "anna-asti-solnyi-koncert-shou-carica-v-g-krasnodar",
+          "city": "Краснодар",
+          "eventTitle": "ANNA ASTI. Сольный концерт \"ШОУ \"Царица\" в г. Краснодар",
+          "eventId": "evt_6a2f0b6f45040b5afce38fe4",
+          "status": "READY",
+          "isIndexable": true,
+          "hasActiveRewrite": true
+        },
+        {
+          "eventPageId": "d7a18f1c-f1f8-4f3d-91f6-5177b9a5dfbd",
+          "slug": "anna-asti-solnyi-koncert-shou-carica-v-g-kurgan",
+          "city": "Курган",
+          "eventTitle": "ANNA ASTI. Сольный концерт \"ШОУ \"Царица\" в г. Курган",
+          "eventId": "evt_69fd82eadb42bf5f5966403b",
+          "status": "READY",
+          "isIndexable": true,
+          "hasActiveRewrite": true
+        },
+        {
+          "eventPageId": "ea2c25aa-4e4f-4135-a029-a1bcf5da4212",
+          "slug": "anna-asti-solnyi-koncert-shou-carica-v-g-habarovsk",
+          "city": "Хабаровск",
+          "eventTitle": "ANNA ASTI. Сольный концерт \"ШОУ \"Царица\" в г. Хабаровск",
+          "eventId": "evt_69fa2bd974a803f6a1a427d9",
+          "status": "READY",
+          "isIndexable": true,
+          "hasActiveRewrite": true
+        }
+      ],
+      "pageCount": 8,
+      "cityCount": 8,
+      "activeRewrites": 8,
+      "indexable": 8
+    },
+    {
+      "key": "rain_dance",
+      "title": "В объятиях дождя - танцевальное шоу",
+      "pageIds": [
+        "08c18b93-de50-4425-9b53-119e2eae0f01",
+        "1cf11495-e6d6-4e09-a702-b39b70906350",
+        "20a56d74-eecc-4a9a-ab54-15a83267deb5",
+        "298e5b4d-aff6-45ab-ac17-90b97e59629d",
+        "29e8fc7f-42f6-41d3-8a31-1e7736910187",
+        "35983553-77fc-4c98-90bf-7c5702965226",
+        "46894ae1-e4a0-46b9-aa31-d45f68b32944",
+        "598fc7e8-0587-4cbf-835c-e8186c236198",
+        "81982e23-542d-4ea3-a49b-0b5c16681a2d",
+        "cbaf67ae-81e9-440e-b8c5-feb67f30fbbf",
+        "cd2a54da-9039-4066-9646-866092f33d95",
+        "dd5bb03a-1952-406b-8190-9eb7f0533e58",
+        "e09609a9-da05-4d6b-98fa-73d93220d220",
+        "f6844a5f-fee2-4dbc-bb0e-fca1960b86fd"
+      ],
+      "pages": [
+        {
+          "eventPageId": "08c18b93-de50-4425-9b53-119e2eae0f01",
+          "slug": "v-obyatiyah-dozhdya-tancevalnoe-shou-s-dozhdem-vidnoe",
+          "city": "Видное",
+          "eventTitle": "В ОБЪЯТИЯХ ДОЖДЯ - танцевальное шоу с дождем",
+          "eventId": "evt_6a7ecac3cf1020227eac0a46",
+          "status": "DRAFT",
+          "isIndexable": false,
+          "hasActiveRewrite": false
+        },
+        {
+          "eventPageId": "1cf11495-e6d6-4e09-a702-b39b70906350",
+          "slug": "v-obyatiyah-dozhdya-tancevalnoe-shou-s-dozhdem-samara",
+          "city": "Самара",
+          "eventTitle": "В ОБЪЯТИЯХ ДОЖДЯ - танцевальное шоу с дождем",
+          "eventId": "evt_6add79c1b0d9d1d50b7ca14b",
+          "status": "DRAFT",
+          "isIndexable": false,
+          "hasActiveRewrite": false
+        },
+        {
+          "eventPageId": "20a56d74-eecc-4a9a-ab54-15a83267deb5",
+          "slug": "v-obyatiyah-dozhdya-tancevalnoe-shou-s-dozhdem-bataysk",
+          "city": "Батайск",
+          "eventTitle": "В ОБЪЯТИЯХ ДОЖДЯ - танцевальное шоу с дождем",
+          "eventId": "evt_6abada9da5015085a739d69e",
+          "status": "READY",
+          "isIndexable": true,
+          "hasActiveRewrite": true
+        },
+        {
+          "eventPageId": "298e5b4d-aff6-45ab-ac17-90b97e59629d",
+          "slug": "v-obyatiyah-dozhdya-tancevalnoe-shou-s-dozhdem-osinniki",
+          "city": "Осинники",
+          "eventTitle": "В ОБЪЯТИЯХ ДОЖДЯ - танцевальное шоу с дождем",
+          "eventId": "evt_6a9f7d58b18bb55200e9844c",
+          "status": "DRAFT",
+          "isIndexable": false,
+          "hasActiveRewrite": false
+        },
+        {
+          "eventPageId": "29e8fc7f-42f6-41d3-8a31-1e7736910187",
+          "slug": "v-obyatiyah-dozhdya-tancevalnoe-shou-s-dozhdem-irkutsk",
+          "city": "Иркутск",
+          "eventTitle": "В ОБЪЯТИЯХ ДОЖДЯ - танцевальное шоу с дождем",
+          "eventId": "evt_6aceffe79d8b3138b7b8028d",
+          "status": "DRAFT",
+          "isIndexable": false,
+          "hasActiveRewrite": false
+        },
+        {
+          "eventPageId": "35983553-77fc-4c98-90bf-7c5702965226",
+          "slug": "v-obyatiyah-dozhdya-tancevalnoe-shou-s-dozhdem-fryazino",
+          "city": "Фрязино",
+          "eventTitle": "В ОБЪЯТИЯХ ДОЖДЯ - танцевальное шоу с дождем",
+          "eventId": "evt_6a7d81879a802162ed2db43f",
+          "status": "DRAFT",
+          "isIndexable": false,
+          "hasActiveRewrite": false
+        },
+        {
+          "eventPageId": "46894ae1-e4a0-46b9-aa31-d45f68b32944",
+          "slug": "v-obyatiyah-dozhdya-tancevalnoe-shou-s-dozhdem-lobnya",
+          "city": "Лобня",
+          "eventTitle": "В ОБЪЯТИЯХ ДОЖДЯ - танцевальное шоу с дождем",
+          "eventId": "evt_6ac461a90723cba62ee434eb",
+          "status": "DRAFT",
+          "isIndexable": false,
+          "hasActiveRewrite": false
+        },
+        {
+          "eventPageId": "598fc7e8-0587-4cbf-835c-e8186c236198",
+          "slug": "v-obyatiyah-dozhdya-tancevalnoe-shou-s-dozhdem-kovrov",
+          "city": "Ковров",
+          "eventTitle": "В ОБЪЯТИЯХ ДОЖДЯ - танцевальное шоу с дождем",
+          "eventId": "evt_6acf2ca96b4cacda3dafc825",
+          "status": "DRAFT",
+          "isIndexable": false,
+          "hasActiveRewrite": false
+        },
+        {
+          "eventPageId": "81982e23-542d-4ea3-a49b-0b5c16681a2d",
+          "slug": "v-obyatiyah-dozhdya-tancevalnoe-shou-s-dozhdem-prokopevsk",
+          "city": "Прокопьевск",
+          "eventTitle": "В ОБЪЯТИЯХ ДОЖДЯ - танцевальное шоу с дождем",
+          "eventId": "evt_6a9f72b2ed68f08ba4ec7e66",
+          "status": "READY",
+          "isIndexable": true,
+          "hasActiveRewrite": true
+        },
+        {
+          "eventPageId": "cbaf67ae-81e9-440e-b8c5-feb67f30fbbf",
+          "slug": "v-obyatiyah-dozhdya-tancevalnoe-shou-s-dozhdem-ryazan",
+          "city": "Рязань",
+          "eventTitle": "В ОБЪЯТИЯХ ДОЖДЯ - танцевальное шоу с дождем",
+          "eventId": "evt_6acef8330606a94adec02774",
+          "status": "DRAFT",
+          "isIndexable": false,
+          "hasActiveRewrite": false
+        },
+        {
+          "eventPageId": "cd2a54da-9039-4066-9646-866092f33d95",
+          "slug": "v-obyatiyah-dozhdya-tancevalnoe-shou-s-dozhdem-tver",
+          "city": "Тверь",
+          "eventTitle": "В ОБЪЯТИЯХ ДОЖДЯ - танцевальное шоу с дождем",
+          "eventId": "evt_6acf0d7886b9fafbc7b6bd42",
+          "status": "DRAFT",
+          "isIndexable": false,
+          "hasActiveRewrite": false
+        },
+        {
+          "eventPageId": "dd5bb03a-1952-406b-8190-9eb7f0533e58",
+          "slug": "v-obyatiyah-dozhdya-tancevalnoe-shou-s-dozhdem-rossosh",
+          "city": "Россошь",
+          "eventTitle": "В ОБЪЯТИЯХ ДОЖДЯ - танцевальное шоу с дождем",
+          "eventId": "evt_6acf25398b9976fb2aa2d6ae",
+          "status": "DRAFT",
+          "isIndexable": false,
+          "hasActiveRewrite": false
+        },
+        {
+          "eventPageId": "e09609a9-da05-4d6b-98fa-73d93220d220",
+          "slug": "v-obyatiyah-dozhdya-tancevalnoe-shou-s-dozhdem-belovo",
+          "city": "Белово",
+          "eventTitle": "В ОБЪЯТИЯХ ДОЖДЯ - танцевальное шоу с дождем",
+          "eventId": "evt_6a9e556b94728b0144de2a01",
+          "status": "DRAFT",
+          "isIndexable": false,
+          "hasActiveRewrite": false
+        },
+        {
+          "eventPageId": "f6844a5f-fee2-4dbc-bb0e-fca1960b86fd",
+          "slug": "v-obyatiyah-dozhdya-tancevalnoe-shou-s-dozhdem-voronezh",
+          "city": "Воронеж",
+          "eventTitle": "В ОБЪЯТИЯХ ДОЖДЯ - танцевальное шоу с дождем",
+          "eventId": "evt_6acf1b336653a342420bbd57",
+          "status": "DRAFT",
+          "isIndexable": false,
+          "hasActiveRewrite": false
+        }
+      ],
+      "pageCount": 14,
+      "cityCount": 14,
+      "activeRewrites": 2,
+      "indexable": 2
+    },
+    {
+      "key": "sveta",
+      "title": "Света - большой сольный концерт",
+      "pageIds": [
+        "22056081-8714-4dbf-a06f-044eeb7e1ec9",
+        "2966620b-26f5-4d50-9294-09530727481a",
+        "5eaee4c1-5103-477b-a6f7-89adb4699adb",
+        "6686c1d1-33c3-492d-a815-982a84584c6b",
+        "7cdd4dc8-a09d-4a02-8985-34463e052bcc",
+        "e3ba8d7f-b817-4837-a8bb-b1d22704cff6",
+        "f02eacbe-43c0-4dae-8a3c-2457726a4942"
+      ],
+      "pages": [
+        {
+          "eventPageId": "22056081-8714-4dbf-a06f-044eeb7e1ec9",
+          "slug": "sveta-bolshoi-solnyi-koncert-omsk",
+          "city": "Омск",
+          "eventTitle": "Света. Большой сольный концерт",
+          "eventId": "evt_6a0a2a9d86d5d85983fcf538",
+          "status": "DRAFT",
+          "isIndexable": false,
+          "hasActiveRewrite": false
+        },
+        {
+          "eventPageId": "2966620b-26f5-4d50-9294-09530727481a",
+          "slug": "sveta-bolshoi-solnyi-koncert-surgut",
+          "city": "Сургут",
+          "eventTitle": "Света. Большой сольный концерт",
+          "eventId": "evt_6a0a2a164a9e04ef13e22f6b",
+          "status": "DRAFT",
+          "isIndexable": false,
+          "hasActiveRewrite": false
+        },
+        {
+          "eventPageId": "5eaee4c1-5103-477b-a6f7-89adb4699adb",
+          "slug": "sveta-bolshoi-solnyi-koncert-krasnodar",
+          "city": "Краснодар",
+          "eventTitle": "Света. Большой сольный концерт",
+          "eventId": "evt_6a0a26f221a01d97b31dde32",
+          "status": "READY",
+          "isIndexable": true,
+          "hasActiveRewrite": true
+        },
+        {
+          "eventPageId": "6686c1d1-33c3-492d-a815-982a84584c6b",
+          "slug": "sveta-bolshoi-solnyi-koncert-ryazan",
+          "city": "Рязань",
+          "eventTitle": "Света. Большой сольный концерт",
+          "eventId": "evt_6a0a246239a27964e5bc2267",
+          "status": "READY",
+          "isIndexable": true,
+          "hasActiveRewrite": true
+        },
+        {
+          "eventPageId": "7cdd4dc8-a09d-4a02-8985-34463e052bcc",
+          "slug": "sveta-bolshoi-solnyi-koncert-lipeck",
+          "city": "Липецк",
+          "eventTitle": "Света. Большой сольный концерт",
+          "eventId": "evt_6a0a24eb425f66c9e88b84d1",
+          "status": "DRAFT",
+          "isIndexable": false,
+          "hasActiveRewrite": false
+        },
+        {
+          "eventPageId": "e3ba8d7f-b817-4837-a8bb-b1d22704cff6",
+          "slug": "sveta-bolshoi-solnyi-koncert-voronezh",
+          "city": "Воронеж",
+          "eventTitle": "Света. Большой сольный концерт",
+          "eventId": "evt_6a0a27a8fd33f026a391297f",
+          "status": "DRAFT",
+          "isIndexable": false,
+          "hasActiveRewrite": false
+        },
+        {
+          "eventPageId": "f02eacbe-43c0-4dae-8a3c-2457726a4942",
+          "slug": "sveta-bolshoi-solnyi-koncert-tula",
+          "city": "Тула",
+          "eventTitle": "Света. Большой сольный концерт",
+          "eventId": "evt_6a0a25cffd33f026a3912691",
+          "status": "DRAFT",
+          "isIndexable": false,
+          "hasActiveRewrite": false
+        }
+      ],
+      "pageCount": 7,
+      "cityCount": 7,
+      "activeRewrites": 2,
+      "indexable": 2
+    },
+    {
+      "key": "rock_symphony",
+      "title": "Симфония рока - Акт первый",
+      "pageIds": [
+        "48c818c1-d023-4167-bfd1-8bc3e489fe44",
+        "6a96b975-0578-484d-ae67-0b68f9be0234",
+        "9dd73a25-5a85-4922-98da-7339f96024ee"
+      ],
+      "pages": [
+        {
+          "eventPageId": "48c818c1-d023-4167-bfd1-8bc3e489fe44",
+          "slug": "simfoniya-roka-akt-pervyi-cheboksary",
+          "city": "Чебоксары",
+          "eventTitle": "Симфония рока: Акт первый",
+          "eventId": "evt_6a48f77538bdf7b85c2fa7bf",
+          "status": "READY",
+          "isIndexable": true,
+          "hasActiveRewrite": true
+        },
+        {
+          "eventPageId": "6a96b975-0578-484d-ae67-0b68f9be0234",
+          "slug": "simfoniya-roka-akt-pervyi-volzhsk",
+          "city": "Волжск",
+          "eventTitle": "Симфония рока: Акт первый",
+          "eventId": "evt_6abe4f638e2a1ee5f42ebcc1",
+          "status": "READY",
+          "isIndexable": true,
+          "hasActiveRewrite": true
+        },
+        {
+          "eventPageId": "9dd73a25-5a85-4922-98da-7339f96024ee",
+          "slug": "simfoniya-roka-akt-pervyi-ulyanovsk",
+          "city": "Ульяновск",
+          "eventTitle": "Симфония рока: Акт первый",
+          "eventId": "evt_6a4b8c8aa9413e29dc81751d",
+          "status": "DRAFT",
+          "isIndexable": false,
+          "hasActiveRewrite": false
+        }
+      ],
+      "pageCount": 3,
+      "cityCount": 3,
+      "activeRewrites": 2,
+      "indexable": 2
+    },
+    {
+      "key": "demidov",
+      "title": "Александр Демидов - Рождественский концерт",
+      "pageIds": [
+        "95897e2c-f41b-4197-ae48-f1ae3df5bd35",
+        "da3d4f93-cb47-40a6-ac1e-455dc1578fdc"
+      ],
+      "pages": [
+        {
+          "eventPageId": "95897e2c-f41b-4197-ae48-f1ae3df5bd35",
+          "slug": "aleksandr-demidov-rozhdestvenskii-koncert-moskva",
+          "city": "Москва",
+          "eventTitle": "Александр Демидов. Рождественский концерт",
+          "eventId": "evt_6ac67a069a90e0ef58f42912",
+          "status": "READY",
+          "isIndexable": true,
+          "hasActiveRewrite": true
+        },
+        {
+          "eventPageId": "da3d4f93-cb47-40a6-ac1e-455dc1578fdc",
+          "slug": "aleksandr-demidov-rozhdestvenskii-koncert-sankt-peterburg",
+          "city": "Санкт-Петербург",
+          "eventTitle": "Александр Демидов. Рождественский концерт.",
+          "eventId": "evt_6ab2f0b5b704cb21b99e4cff",
+          "status": "READY",
+          "isIndexable": true,
+          "hasActiveRewrite": true
+        }
+      ],
+      "pageCount": 2,
+      "cityCount": 2,
+      "activeRewrites": 2,
+      "indexable": 2
+    },
+    {
+      "key": "reshetun",
+      "title": "Алексей Решетун - Новый год по судебно-медицински",
+      "pageIds": [
+        "52bbc926-af2c-4607-9383-2f8115b0b383",
+        "cd321ce8-6706-491a-bc76-df931489a9ea"
+      ],
+      "pages": [
+        {
+          "eventPageId": "52bbc926-af2c-4607-9383-2f8115b0b383",
+          "slug": "aleksei-reshetun-novyi-god-po-sudebno-medicinske-moskva",
+          "city": "Москва",
+          "eventTitle": "Алексей Решетун. Новый год по судебно-медицински.",
+          "eventId": "evt_6ac5434089e6a22cd0abf834",
+          "status": "READY",
+          "isIndexable": true,
+          "hasActiveRewrite": true
+        },
+        {
+          "eventPageId": "cd321ce8-6706-491a-bc76-df931489a9ea",
+          "slug": "aleksei-reshetun-novyi-god-po-sudebno-medicinski-sankt-peterburg",
+          "city": "Санкт-Петербург",
+          "eventTitle": "Алексей Решетун. Новый год по судебно-медицински.",
+          "eventId": "evt_6ad686b06556323c5ec0d868",
+          "status": "READY",
+          "isIndexable": true,
+          "hasActiveRewrite": true
+        }
+      ],
+      "pageCount": 2,
+      "cityCount": 2,
+      "activeRewrites": 2,
+      "indexable": 2
+    },
+    {
+      "key": "nigativ",
+      "title": "Нигатив - Все хиты + 44",
+      "pageIds": [
+        "1387b4f6-8afa-41ad-87c8-552abacf7fb9",
+        "a2b48836-287a-46c0-a6dd-20c2ef02b066"
+      ],
+      "pages": [
+        {
+          "eventPageId": "1387b4f6-8afa-41ad-87c8-552abacf7fb9",
+          "slug": "nigativ-vse-hity-44-12-03-27-sankt-peterburg-aurora-concert-hall-sankt-peterburg",
+          "city": "Санкт-Петербург",
+          "eventTitle": "Нигатив. Все хиты + 44 | 12.03.27 | Санкт-Петербург, Aurora Concert Hall",
+          "eventId": "evt_6abd140ddb782c0522c6be57",
+          "status": "READY",
+          "isIndexable": true,
+          "hasActiveRewrite": true
+        },
+        {
+          "eventPageId": "a2b48836-287a-46c0-a6dd-20c2ef02b066",
+          "slug": "nigativ-vse-hity-44-04-03-27-moskva-base-moskva",
+          "city": "Москва",
+          "eventTitle": "Нигатив. Все хиты + 44 | 04.03.27 | Москва, BASE",
+          "eventId": "evt_6aca05407ebf70419a6b98e4",
+          "status": "READY",
+          "isIndexable": true,
+          "hasActiveRewrite": true
+        }
+      ],
+      "pageCount": 2,
+      "cityCount": 2,
+      "activeRewrites": 2,
+      "indexable": 2
+    },
+    {
+      "key": "surdin_semikhatov",
+      "title": "Новый год с Владимиром Сурдиным и Алексеем Семихатовым",
+      "pageIds": [
+        "717b59df-c07e-48a7-8fc2-aac828dc58cf",
+        "f36cd8cf-dc6a-42f5-bf31-d86e9612b526"
+      ],
+      "pages": [
+        {
+          "eventPageId": "717b59df-c07e-48a7-8fc2-aac828dc58cf",
+          "slug": "novyi-god-s-vladimirom-surdinym-i-alekseem-semihatovym-sankt-peterburg",
+          "city": "Санкт-Петербург",
+          "eventTitle": "Новый год! С Владимиром Сурдиным и Алексеем Семихатовым!",
+          "eventId": "evt_6ac9015590383ac485af6c57",
+          "status": "READY",
+          "isIndexable": true,
+          "hasActiveRewrite": true
+        },
+        {
+          "eventPageId": "f36cd8cf-dc6a-42f5-bf31-d86e9612b526",
+          "slug": "novyi-god-s-vladimirom-surdinym-i-alekseem-semihatovym-moskva",
+          "city": "Москва",
+          "eventTitle": "Новый год! С Владимиром Сурдиным и Алексеем Семихатовым!",
+          "eventId": "evt_6ac91efde2b1828475d87dea",
+          "status": "READY",
+          "isIndexable": true,
+          "hasActiveRewrite": true
+        }
+      ],
+      "pageCount": 2,
+      "cityCount": 2,
+      "activeRewrites": 2,
+      "indexable": 2
+    },
+    {
+      "key": "naik_borzov",
+      "title": "Найк Борзов - Большой новогодний концерт",
+      "pageIds": [
+        "a3a383ea-87a8-4b02-805b-7e346e374e19",
+        "b58d977e-c9d2-4e1c-b0ba-2a1105f7153c"
+      ],
+      "pages": [
+        {
+          "eventPageId": "a3a383ea-87a8-4b02-805b-7e346e374e19",
+          "slug": "naik-borzov-bolshoi-novogodnii-koncert-nizhniy-novgorod",
+          "city": "Нижний Новгород",
+          "eventTitle": "Найк Борзов \"Большой Новогодний Концерт\"",
+          "eventId": "evt_6aba79ca9b9732652ace9369",
+          "status": "DRAFT",
+          "isIndexable": false,
+          "hasActiveRewrite": false
+        },
+        {
+          "eventPageId": "b58d977e-c9d2-4e1c-b0ba-2a1105f7153c",
+          "slug": "naik-borzov-bolshoi-novogodnii-koncert-ekaterinburg",
+          "city": "Екатеринбург",
+          "eventTitle": "Найк Борзов \"Большой Новогодний концерт\"",
+          "eventId": "evt_6abe37b0679adb8c18452397",
+          "status": "READY",
+          "isIndexable": true,
+          "hasActiveRewrite": true
+        }
+      ],
+      "pageCount": 2,
+      "cityCount": 2,
+      "activeRewrites": 1,
+      "indexable": 1
+    },
+    {
+      "key": "helvegen",
+      "title": "HELVEGEN - презентация нового альбома",
+      "pageIds": [
+        "1412abfb-be64-4e9f-97b8-babb0e436cbf",
+        "6978ed1d-dfb7-44ad-9fe1-059aa8dd7edd"
+      ],
+      "pages": [
+        {
+          "eventPageId": "1412abfb-be64-4e9f-97b8-babb0e436cbf",
+          "slug": "helvegen-prezentaciya-novogo-alboma-sankt-peterburg",
+          "city": "Санкт-Петербург",
+          "eventTitle": "HELVEGEN. Презентация нового альбома.",
+          "eventId": "evt_69ce823069d25036357a0839",
+          "status": "READY",
+          "isIndexable": true,
+          "hasActiveRewrite": true
+        },
+        {
+          "eventPageId": "6978ed1d-dfb7-44ad-9fe1-059aa8dd7edd",
+          "slug": "helvegen-prezentaciya-novogo-alboma-moskva",
+          "city": "Москва",
+          "eventTitle": "HELVEGEN. Презентация нового альбома.",
+          "eventId": "evt_69ce8519d0b4bfe9ed5811c1",
+          "status": "DRAFT",
+          "isIndexable": false,
+          "hasActiveRewrite": false
+        }
+      ],
+      "pageCount": 2,
+      "cityCount": 2,
+      "activeRewrites": 1,
+      "indexable": 1
+    }
+  ]
+}

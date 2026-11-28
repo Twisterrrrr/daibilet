@@ -1,0 +1,10 @@
+[Unit]
+Description=Sync Ticketscloud orders and send new paid order notifications
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+WorkingDirectory=/opt/daibilet
+EnvironmentFile=/opt/daibilet/.env
+ExecStart=/usr/bin/node /opt/daibilet/scripts/tc-sync-orders.js

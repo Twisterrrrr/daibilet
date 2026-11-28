@@ -1,0 +1,522 @@
+{
+  "summary": {
+    "checkedAt": "2026-11-26T04:46:31.706Z",
+    "total": 85,
+    "status200": 85,
+    "noindex": 85,
+    "stillIndexable": [],
+    "non200": []
+  },
+  "rows": [
+    {
+      "slug": "16-12-christmas-party-big-ben-6ad9c7ca169ab3389b627a62",
+      "status": 200,
+      "robots": "noindex, follow",
+      "canonical": "https://daibilet.ru/events/16-12-christmas-party-big-ben-6ad9c7ca169ab3389b627a62"
+    },
+    {
+      "slug": "03-01-2027-тула-костя-кулясов-и-группа-анимация-animaciya-online-6a86ae46b50bfdaba7ea5c77",
+      "status": 200,
+      "robots": "noindex, follow",
+      "canonical": "https://daibilet.ru/events/03-01-2027-tula-kostya-kulyasov-i-gruppa-animaciya-animaciya-online-6a86ae46b50bfdaba7ea5c77"
+    },
+    {
+      "slug": "06-01-2027-тамбов-костя-кулясов-и-группа-анимация-animaciya-online-6a86cb6c13e99f7584987d28",
+      "status": 200,
+      "robots": "noindex, follow",
+      "canonical": "https://daibilet.ru/events/06-01-2027-tambov-kostya-kulyasov-i-gruppa-animaciya-animaciya-online-6a86cb6c13e99f7584987d28"
+    },
+    {
+      "slug": "05-01-27-гудтаимс-новогоднии-ярославль-6b00a621c143caaec3daee84",
+      "status": 200,
+      "robots": "noindex, follow",
+      "canonical": "https://daibilet.ru/events/05-01-27-gudtaims-novogodnii-yaroslavl-6b00a621c143caaec3daee84"
+    },
+    {
+      "slug": "08-01-2027-ростов-на-дону-костя-кулясов-и-группа-анимация-animaciya-online-6a86d2585355dfa58d0dccb3",
+      "status": 200,
+      "robots": "noindex, follow",
+      "canonical": "https://daibilet.ru/events/08-01-2027-rostov-na-donu-kostya-kulyasov-i-gruppa-animaciya-animaciya-online-6a86d2585355dfa58d0dccb3"
+    },
+    {
+      "slug": "05-01-2027-воронеж-костя-кулясов-и-группа-анимация-animaciya-online-6a86b407acd3c3e993e10684",
+      "status": 200,
+      "robots": "noindex, follow",
+      "canonical": "https://daibilet.ru/events/05-01-2027-voronezh-kostya-kulyasov-i-gruppa-animaciya-animaciya-online-6a86b407acd3c3e993e10684"
+    },
+    {
+      "slug": "07-01-2027-волгоград-костя-кулясов-и-группа-анимация-animaciya-online-6a86c1c56de2a61d5b879dc8",
+      "status": 200,
+      "robots": "noindex, follow",
+      "canonical": "https://daibilet.ru/events/07-01-2027-volgograd-kostya-kulyasov-i-gruppa-animaciya-animaciya-online-6a86c1c56de2a61d5b879dc8"
+    },
+    {
+      "slug": "09-01-2027-краснодар-костя-кулясов-и-группа-анимация-animaciya-online-6a870ff865ff9e7f799ad749",
+      "status": 200,
+      "robots": "noindex, follow",
+      "canonical": "https://daibilet.ru/events/09-01-2027-krasnodar-kostya-kulyasov-i-gruppa-animaciya-animaciya-online-6a870ff865ff9e7f799ad749"
+    },
+    {
+      "slug": "loud-boyz-2027-new-year-x-winline-x-yauza-place-6af1ce5ea7280ee86d0f6a02",
+      "status": 200,
+      "robots": "noindex, follow",
+      "canonical": "https://daibilet.ru/events/loud-boyz-2027-new-year-x-winline-x-yauza-place-6af1ce5ea7280ee86d0f6a02"
+    },
+    {
+      "slug": "27-декабря-new-year-party-6af35cb7275ce5922c1b2107",
+      "status": 200,
+      "robots": "noindex, follow",
+      "canonical": "https://daibilet.ru/events/27-dekabrya-new-year-party-6af35cb7275ce5922c1b2107"
+    },
+    {
+      "slug": "spokanki-christmas-time-6ae38e066ad507045106a8cd",
+      "status": 200,
+      "robots": "noindex, follow",
+      "canonical": "https://daibilet.ru/events/spokanki-christmas-time-6ae38e066ad507045106a8cd"
+    },
+    {
+      "slug": "ravanna-новогоднии-концерт-6af8250659aabb65e7685145",
+      "status": 200,
+      "robots": "noindex, follow",
+      "canonical": "https://daibilet.ru/events/ravanna-novogodnii-koncert-6af8250659aabb65e7685145"
+    },
+    {
+      "slug": "ravanna-новогоднии-концерт-6aec41acff7cae1fd45efd61",
+      "status": 200,
+      "robots": "noindex, follow",
+      "canonical": "https://daibilet.ru/events/ravanna-novogodnii-koncert-6aec41acff7cae1fd45efd61"
+    },
+    {
+      "slug": "авторскии-концерт-рви-меха-оркестра-рождественскии-концерт-6aba5260bb6923606f282b3f",
+      "status": 200,
+      "robots": "noindex, follow",
+      "canonical": "https://daibilet.ru/events/avtorskii-koncert-rvi-meha-orkestra-rozhdestvenskii-koncert-6aba5260bb6923606f282b3f"
+    },
+    {
+      "slug": "rozalia-новогодние-концерты-живои-звук-москва-6b029b8c92284eea93b8047e",
+      "status": 200,
+      "robots": "noindex, follow",
+      "canonical": "https://daibilet.ru/events/rozalia-novogodnie-koncerty-zhivoi-zvuk-moskva-6b029b8c92284eea93b8047e"
+    },
+    {
+      "slug": "shrek-rave-new-year-25-декабря-нирвана-6afb1106377c330a2bb2ab2b",
+      "status": 200,
+      "robots": "noindex, follow",
+      "canonical": "https://daibilet.ru/events/shrek-rave-new-year-25-dekabrya-nirvana-6afb1106377c330a2bb2ab2b"
+    },
+    {
+      "slug": "авторскии-концерт-рви-меха-оркестра-рождественскии-концерт-6aba52fc20e2958cff63e2ac",
+      "status": 200,
+      "robots": "noindex, follow",
+      "canonical": "https://daibilet.ru/events/avtorskii-koncert-rvi-meha-orkestra-rozhdestvenskii-koncert-6aba52fc20e2958cff63e2ac"
+    },
+    {
+      "slug": "алекс-абра-christmas-in-new-york-новогоднии-джаз-с-юмором-6b041a774f5f1664530a78be",
+      "status": 200,
+      "robots": "noindex, follow",
+      "canonical": "https://daibilet.ru/events/aleks-abra-christmas-in-new-york-novogodnii-dzhaz-s-yumorom-6b041a774f5f1664530a78be"
+    },
+    {
+      "slug": "борис-кузьмин-акустика-6af5b609ec9eac308745853c",
+      "status": 200,
+      "robots": "noindex, follow",
+      "canonical": "https://daibilet.ru/events/boris-kuzmin-akustika-6af5b609ec9eac308745853c"
+    },
+    {
+      "slug": "богемныи-арт-бранч-светские-тусовки-в-царскои-россии-выпуск-новогоднии-6afa92e4cb8fdd2a5d82ceea",
+      "status": 200,
+      "robots": "noindex, follow",
+      "canonical": "https://daibilet.ru/events/bogemnyi-art-branch-svetskie-tusovki-v-carskoi-rossii-vypusk-novogodnii-6afa92e4cb8fdd2a5d82ceea"
+    },
+    {
+      "slug": "борис-кузьмин-акустика-6af5c46cc4573c46d7b7a6c3",
+      "status": 200,
+      "robots": "noindex, follow",
+      "canonical": "https://daibilet.ru/events/boris-kuzmin-akustika-6af5c46cc4573c46d7b7a6c3"
+    },
+    {
+      "slug": "креативныи-мастер-класс-по-созданию-новогоднего-венка-6aff048423c2d862dfc660a7",
+      "status": 200,
+      "robots": "noindex, follow",
+      "canonical": "https://daibilet.ru/events/kreativnyi-master-klass-po-sozdaniyu-novogodnego-venka-6aff048423c2d862dfc660a7"
+    },
+    {
+      "slug": "джаз-кабаре-новогодняя-ночь-бурлеск-шоу-в-сопровождении-живого-джаза-18-6afe1cd556bb8a0561f74cfb",
+      "status": 200,
+      "robots": "noindex, follow",
+      "canonical": "https://daibilet.ru/events/dzhaz-kabare-novogodnyaya-noch-burlesk-shou-v-soprovozhdenii-zhivogo-dzhaza-18-6afe1cd556bb8a0561f74cfb"
+    },
+    {
+      "slug": "ваy-музыкальное-лото-новогодняя-сборная-елка-русское-90-е-и-00-е-6afd6008d533c21754d0938b",
+      "status": 200,
+      "robots": "noindex, follow",
+      "canonical": "https://daibilet.ru/events/vay-muzykalnoe-loto-novogodnyaya-sbornaya-elka-russkoe-90-e-i-00-e-6afd6008d533c21754d0938b"
+    },
+    {
+      "slug": "джаз-кабаре-новогодняя-ночь-бурлеск-шоу-в-сопровождении-живого-джаза-18-6afe0fecddc6d4b70ffaed58",
+      "status": 200,
+      "robots": "noindex, follow",
+      "canonical": "https://daibilet.ru/events/dzhaz-kabare-novogodnyaya-noch-burlesk-shou-v-soprovozhdenii-zhivogo-dzhaza-18-6afe0fecddc6d4b70ffaed58"
+    },
+    {
+      "slug": "квартет-алексея-попова-спб-москва-christmas-jazz-6af4a188d77b7b9250121f0a",
+      "status": 200,
+      "robots": "noindex, follow",
+      "canonical": "https://daibilet.ru/events/kvartet-alekseya-popova-spb-moskva-christmas-jazz-6af4a188d77b7b9250121f0a"
+    },
+    {
+      "slug": "джаз-кабаре-новогодняя-ночь-бурлеск-шоу-в-сопровождении-живого-джаза-18-6aff64abfb34a52b5855f3d7",
+      "status": 200,
+      "robots": "noindex, follow",
+      "canonical": "https://daibilet.ru/events/dzhaz-kabare-novogodnyaya-noch-burlesk-shou-v-soprovozhdenii-zhivogo-dzhaza-18-6aff64abfb34a52b5855f3d7"
+    },
+    {
+      "slug": "кино-под-елкои-концерт-при-свечах-6af316227c7d66194662e868",
+      "status": 200,
+      "robots": "noindex, follow",
+      "canonical": "https://daibilet.ru/events/kino-pod-elkoi-koncert-pri-svechah-6af316227c7d66194662e868"
+    },
+    {
+      "slug": "молодость-простит-горько-6aeb3769a5aa0d05704b926b",
+      "status": 200,
+      "robots": "noindex, follow",
+      "canonical": "https://daibilet.ru/events/molodost-prostit-gorko-6aeb3769a5aa0d05704b926b"
+    },
+    {
+      "slug": "лихорадка-чарльстона-новогоднии-ужин-концерт-за-столиками-6af602bf7c5cf69109ac9cb0",
+      "status": 200,
+      "robots": "noindex, follow",
+      "canonical": "https://daibilet.ru/events/lihoradka-charlstona-novogodnii-uzhin-koncert-za-stolikami-6af602bf7c5cf69109ac9cb0"
+    },
+    {
+      "slug": "марина-шаклеина-и-шабадобо-джаз-бэнд-6aab95d52eb6545e39791689",
+      "status": 200,
+      "robots": "noindex, follow",
+      "canonical": "https://daibilet.ru/events/marina-shakleina-i-shabadobo-dzhaz-bend-6aab95d52eb6545e39791689"
+    },
+    {
+      "slug": "ландыши-новогоднии-концерт-6b05ad36f8a60b442b06cc0b",
+      "status": 200,
+      "robots": "noindex, follow",
+      "canonical": "https://daibilet.ru/events/landyshi-novogodnii-koncert-6b05ad36f8a60b442b06cc0b"
+    },
+    {
+      "slug": "мелодии-рождества-женскии-хор-санкт-петербургскои-митрополии-6afde1acc573321c23c59e71",
+      "status": 200,
+      "robots": "noindex, follow",
+      "canonical": "https://daibilet.ru/events/melodii-rozhdestva-zhenskii-hor-sankt-peterburgskoi-mitropolii-6afde1acc573321c23c59e71"
+    },
+    {
+      "slug": "на-рождество-в-тулу-6-января-2027-из-курска-6afc17ace0d5bde641f0f28d",
+      "status": 200,
+      "robots": "noindex, follow",
+      "canonical": "https://daibilet.ru/events/na-rozhdestvo-v-tulu-6-yanvarya-2027-iz-kurska-6afc17ace0d5bde641f0f28d"
+    },
+    {
+      "slug": "наконечныи-5-января-москва-6afc5ac09fb99f4a9095e466",
+      "status": 200,
+      "robots": "noindex, follow",
+      "canonical": "https://daibilet.ru/events/nakonechnyi-5-yanvarya-moskva-6afc5ac09fb99f4a9095e466"
+    },
+    {
+      "slug": "новогоднее-бурлишоу-6b01689295e03aa1b6e8b194",
+      "status": 200,
+      "robots": "noindex, follow",
+      "canonical": "https://daibilet.ru/events/novogodnee-burlishou-6b01689295e03aa1b6e8b194"
+    },
+    {
+      "slug": "наконечныи-4-января-питер-6afc56c11138c644be192d70",
+      "status": 200,
+      "robots": "noindex, follow",
+      "canonical": "https://daibilet.ru/events/nakonechnyi-4-yanvarya-piter-6afc56c11138c644be192d70"
+    },
+    {
+      "slug": "новогоднее-представление-все-дело-в-шляпе-по-сказке-н-куртог-праздник-пылелупов-6af5f5282110d7937c1cc597",
+      "status": 200,
+      "robots": "noindex, follow",
+      "canonical": "https://daibilet.ru/events/novogodnee-predstavlenie-vse-delo-v-shlyape-po-skazke-n-kurtog-prazdnik-pylelupov-6af5f5282110d7937c1cc597"
+    },
+    {
+      "slug": "новогоднее-цирковое-шоу-лилипутки-софии-6af9f8988378f64d925ddd41",
+      "status": 200,
+      "robots": "noindex, follow",
+      "canonical": "https://daibilet.ru/events/novogodnee-cirkovoe-shou-liliputki-sofii-6af9f8988378f64d925ddd41"
+    },
+    {
+      "slug": "новогоднее-танго-ансамбль-remolino-6afde9fee0e26a1dee1c4549",
+      "status": 200,
+      "robots": "noindex, follow",
+      "canonical": "https://daibilet.ru/events/novogodnee-tango-ansambl-remolino-6afde9fee0e26a1dee1c4549"
+    },
+    {
+      "slug": "новогодние-петровские-вечерки-6ae1d6b48a5ad1c9663f8e91",
+      "status": 200,
+      "robots": "noindex, follow",
+      "canonical": "https://daibilet.ru/events/novogodnie-petrovskie-vecherki-6ae1d6b48a5ad1c9663f8e91"
+    },
+    {
+      "slug": "новогоднии-корпоратив-для-предпринимателеи-иначе-6af5ef8cb48efe3e5ac0339a",
+      "status": 200,
+      "robots": "noindex, follow",
+      "canonical": "https://daibilet.ru/events/novogodnii-korporativ-dlya-predprinimatelei-inache-6af5ef8cb48efe3e5ac0339a"
+    },
+    {
+      "slug": "новогодняя-гримерка-6afebbac859913246a479cc8",
+      "status": 200,
+      "robots": "noindex, follow",
+      "canonical": "https://daibilet.ru/events/novogodnyaya-grimerka-6afebbac859913246a479cc8"
+    },
+    {
+      "slug": "новогоднии-праздник-для-малышеи-в-гости-к-деду-морозу-и-снегурочке-6aff169baf3196ef30167163",
+      "status": 200,
+      "robots": "noindex, follow",
+      "canonical": "https://daibilet.ru/events/novogodnii-prazdnik-dlya-malyshei-v-gosti-k-dedu-morozu-i-snegurochke-6aff169baf3196ef30167163"
+    },
+    {
+      "slug": "новогодняя-елка-для-взрослых-6b051c75e38c177230ee631a",
+      "status": 200,
+      "robots": "noindex, follow",
+      "canonical": "https://daibilet.ru/events/novogodnyaya-elka-dlya-vzroslyh-6b051c75e38c177230ee631a"
+    },
+    {
+      "slug": "новогодняя-елка-для-взрослых-6b051b6b23243ecbb627e9b8",
+      "status": 200,
+      "robots": "noindex, follow",
+      "canonical": "https://daibilet.ru/events/novogodnyaya-elka-dlya-vzroslyh-6b051b6b23243ecbb627e9b8"
+    },
+    {
+      "slug": "новогодняя-елка-для-самых-маленьких-6b01c86427b0173ccda4ac05",
+      "status": 200,
+      "robots": "noindex, follow",
+      "canonical": "https://daibilet.ru/events/novogodnyaya-elka-dlya-samyh-malenkih-6b01c86427b0173ccda4ac05"
+    },
+    {
+      "slug": "новогодняя-елка-для-самых-маленьких-6b01c86727b0173ccda4ac2c",
+      "status": 200,
+      "robots": "noindex, follow",
+      "canonical": "https://daibilet.ru/events/novogodnyaya-elka-dlya-samyh-malenkih-6b01c86727b0173ccda4ac2c"
+    },
+    {
+      "slug": "новогодняя-елка-для-самых-маленьких-6b01c86627b0173ccda4ac12",
+      "status": 200,
+      "robots": "noindex, follow",
+      "canonical": "https://daibilet.ru/events/novogodnyaya-elka-dlya-samyh-malenkih-6b01c86627b0173ccda4ac12"
+    },
+    {
+      "slug": "новогодняя-елка-для-самых-маленьких-6b01c86627b0173ccda4ac1f",
+      "status": 200,
+      "robots": "noindex, follow",
+      "canonical": "https://daibilet.ru/events/novogodnyaya-elka-dlya-samyh-malenkih-6b01c86627b0173ccda4ac1f"
+    },
+    {
+      "slug": "новогодняя-елка-для-самых-маленьких-6b01c86727b0173ccda4ac39",
+      "status": 200,
+      "robots": "noindex, follow",
+      "canonical": "https://daibilet.ru/events/novogodnyaya-elka-dlya-samyh-malenkih-6b01c86727b0173ccda4ac39"
+    },
+    {
+      "slug": "новогодняя-ночь-2027-джокер-6afc45664936c8bab0fee512",
+      "status": 200,
+      "robots": "noindex, follow",
+      "canonical": "https://daibilet.ru/events/novogodnyaya-noch-2027-dzhoker-6afc45664936c8bab0fee512"
+    },
+    {
+      "slug": "новогодняя-елка-для-самых-маленьких-6b01c86827b0173ccda4ac46",
+      "status": 200,
+      "robots": "noindex, follow",
+      "canonical": "https://daibilet.ru/events/novogodnyaya-elka-dlya-samyh-malenkih-6b01c86827b0173ccda4ac46"
+    },
+    {
+      "slug": "новогодняя-елка-для-самых-маленьких-6b01c86827b0173ccda4ac53",
+      "status": 200,
+      "robots": "noindex, follow",
+      "canonical": "https://daibilet.ru/events/novogodnyaya-elka-dlya-samyh-malenkih-6b01c86827b0173ccda4ac53"
+    },
+    {
+      "slug": "новогодняя-елка-для-самых-маленьких-6b01c86a27b0173ccda4ac6d",
+      "status": 200,
+      "robots": "noindex, follow",
+      "canonical": "https://daibilet.ru/events/novogodnyaya-elka-dlya-samyh-malenkih-6b01c86a27b0173ccda4ac6d"
+    },
+    {
+      "slug": "новыи-год-в-кругу-своих-t-s-lounge-балашиха-6b042a70bccf2ba2acffda4f",
+      "status": 200,
+      "robots": "noindex, follow",
+      "canonical": "https://daibilet.ru/events/novyi-god-v-krugu-svoih-t-s-lounge-balashiha-6b042a70bccf2ba2acffda4f"
+    },
+    {
+      "slug": "новогодняя-рок-акустика-от-гр-акура-6afb503ecf3ec1c5f687e980",
+      "status": 200,
+      "robots": "noindex, follow",
+      "canonical": "https://daibilet.ru/events/novogodnyaya-rok-akustika-ot-gr-akura-6afb503ecf3ec1c5f687e980"
+    },
+    {
+      "slug": "новыи-год-в-кругу-своих-t-s-lounge-красногорск-6aff194284917c9f733ce8c8",
+      "status": 200,
+      "robots": "noindex, follow",
+      "canonical": "https://daibilet.ru/events/novyi-god-v-krugu-svoih-t-s-lounge-krasnogorsk-6aff194284917c9f733ce8c8"
+    },
+    {
+      "slug": "новогодняя-елка-для-самых-маленьких-6b01c86927b0173ccda4ac60",
+      "status": 200,
+      "robots": "noindex, follow",
+      "canonical": "https://daibilet.ru/events/novogodnyaya-elka-dlya-samyh-malenkih-6b01c86927b0173ccda4ac60"
+    },
+    {
+      "slug": "новыи-год-в-джем-клуб-мьюзик-6af7014caa73e5050ee5d248",
+      "status": 200,
+      "robots": "noindex, follow",
+      "canonical": "https://daibilet.ru/events/novyi-god-v-dzhem-klub-myuzik-6af7014caa73e5050ee5d248"
+    },
+    {
+      "slug": "новыи-год-в-мальтиискои-капелле-историческии-орган-в-мальтиискои-капелле-6b056f627f8803736e51ed34",
+      "status": 200,
+      "robots": "noindex, follow",
+      "canonical": "https://daibilet.ru/events/novyi-god-v-maltiiskoi-kapelle-istoricheskii-organ-v-maltiiskoi-kapelle-6b056f627f8803736e51ed34"
+    },
+    {
+      "slug": "новыи-год-в-мальтиискои-капелле-органныи-концерт-при-свечах-6b056c6876ee94c2ebf57823",
+      "status": 200,
+      "robots": "noindex, follow",
+      "canonical": "https://daibilet.ru/events/novyi-god-v-maltiiskoi-kapelle-organnyi-koncert-pri-svechah-6b056c6876ee94c2ebf57823"
+    },
+    {
+      "slug": "новыи-год-с-котятами-6b007bef8e453b4d9fa4ac05",
+      "status": 200,
+      "robots": "noindex, follow",
+      "canonical": "https://daibilet.ru/events/novyi-god-s-kotyatami-6b007bef8e453b4d9fa4ac05"
+    },
+    {
+      "slug": "новыи-год-в-мальтиискои-капелле-историческии-орган-в-мальтиискои-капелле-6b05833cc2688a2a2100d996",
+      "status": 200,
+      "robots": "noindex, follow",
+      "canonical": "https://daibilet.ru/events/novyi-god-v-maltiiskoi-kapelle-istoricheskii-organ-v-maltiiskoi-kapelle-6b05833cc2688a2a2100d996"
+    },
+    {
+      "slug": "новыи-год-с-арсеналом-6b00624978f6181299b23106",
+      "status": 200,
+      "robots": "noindex, follow",
+      "canonical": "https://daibilet.ru/events/novyi-god-s-arsenalom-6b00624978f6181299b23106"
+    },
+    {
+      "slug": "новыи-год-с-котятами-6b007bf18e453b4d9fa4ac33",
+      "status": 200,
+      "robots": "noindex, follow",
+      "canonical": "https://daibilet.ru/events/novyi-god-s-kotyatami-6b007bf18e453b4d9fa4ac33"
+    },
+    {
+      "slug": "новыи-год-с-котятами-6b007bf08e453b4d9fa4ac1c",
+      "status": 200,
+      "robots": "noindex, follow",
+      "canonical": "https://daibilet.ru/events/novyi-god-s-kotyatami-6b007bf08e453b4d9fa4ac1c"
+    },
+    {
+      "slug": "новыи-год-с-котятами-6b007bf28e453b4d9fa4ac4a",
+      "status": 200,
+      "robots": "noindex, follow",
+      "canonical": "https://daibilet.ru/events/novyi-god-s-kotyatami-6b007bf28e453b4d9fa4ac4a"
+    },
+    {
+      "slug": "новыи-год-с-котятами-6b007bf38e453b4d9fa4ac61",
+      "status": 200,
+      "robots": "noindex, follow",
+      "canonical": "https://daibilet.ru/events/novyi-god-s-kotyatami-6b007bf38e453b4d9fa4ac61"
+    },
+    {
+      "slug": "от-винта-new-year-27-6afff9bad402fc61ec6349b7",
+      "status": 200,
+      "robots": "noindex, follow",
+      "canonical": "https://daibilet.ru/events/ot-vinta-new-year-27-6afff9bad402fc61ec6349b7"
+    },
+    {
+      "slug": "новыи-год-со-старыми-друзьями-2027-6ae254606772ba3ab307aabc",
+      "status": 200,
+      "robots": "noindex, follow",
+      "canonical": "https://daibilet.ru/events/novyi-god-so-starymi-druzyami-2027-6ae254606772ba3ab307aabc"
+    },
+    {
+      "slug": "по-следам-снегурочки-музыкальная-сказка-с-любимыли-блогерами-6aface469c2ccfe7dd4cc42f",
+      "status": 200,
+      "robots": "noindex, follow",
+      "canonical": "https://daibilet.ru/events/po-sledam-snegurochki-muzykalnaya-skazka-s-lyubimyli-blogerami-6aface469c2ccfe7dd4cc42f"
+    },
+    {
+      "slug": "по-следам-снегурочки-музыкальная-сказка-с-любимыли-блрегами-6afb0cada6823964e28ca588",
+      "status": 200,
+      "robots": "noindex, follow",
+      "canonical": "https://daibilet.ru/events/po-sledam-snegurochki-muzykalnaya-skazka-s-lyubimyli-blregami-6afb0cada6823964e28ca588"
+    },
+    {
+      "slug": "трибьют-шоу-как-в-старои-сказке-6af30c48eb9462e0dbe2d719",
+      "status": 200,
+      "robots": "noindex, follow",
+      "canonical": "https://daibilet.ru/events/tribyut-shou-kak-v-staroi-skazke-6af30c48eb9462e0dbe2d719"
+    },
+    {
+      "slug": "танго-в-париже-рождество-6af3200de12c16ed8de8a452",
+      "status": 200,
+      "robots": "noindex, follow",
+      "canonical": "https://daibilet.ru/events/tango-v-parizhe-rozhdestvo-6af3200de12c16ed8de8a452"
+    },
+    {
+      "slug": "цирк-новогоднии-карнавал-в-г-фокино-6af9910d5b96c31525bf4453",
+      "status": 200,
+      "robots": "noindex, follow",
+      "canonical": "https://daibilet.ru/events/cirk-novogodnii-karnaval-v-g-fokino-6af9910d5b96c31525bf4453"
+    },
+    {
+      "slug": "хз-забеиская-елка-6af69953be9cc71999b348b3",
+      "status": 200,
+      "robots": "noindex, follow",
+      "canonical": "https://daibilet.ru/events/hz-zabeiskaya-elka-6af69953be9cc71999b348b3"
+    },
+    {
+      "slug": "цирк-новогоднии-карнавал-в-г-фокино-6af99162a2294144804df91b",
+      "status": 200,
+      "robots": "noindex, follow",
+      "canonical": "https://daibilet.ru/events/cirk-novogodnii-karnaval-v-g-fokino-6af99162a2294144804df91b"
+    },
+    {
+      "slug": "цирк-новогоднии-карнавал-в-г-фокино-6af991430fd865d6a501589f",
+      "status": 200,
+      "robots": "noindex, follow",
+      "canonical": "https://daibilet.ru/events/cirk-novogodnii-karnaval-v-g-fokino-6af991430fd865d6a501589f"
+    },
+    {
+      "slug": "чаиковскии-при-свечах-рождественскии-концерт-музыки-и-балета-при-свечах-6afe1fe1c29e40211cae38cc",
+      "status": 200,
+      "robots": "noindex, follow",
+      "canonical": "https://daibilet.ru/events/chaikovskii-pri-svechah-rozhdestvenskii-koncert-muzyki-i-baleta-pri-svechah-6afe1fe1c29e40211cae38cc"
+    },
+    {
+      "slug": "чаиковскии-при-свечах-рождественскии-концерт-музыки-и-балета-при-свечах-6aff64d566867d3e78eba82b",
+      "status": 200,
+      "robots": "noindex, follow",
+      "canonical": "https://daibilet.ru/events/chaikovskii-pri-svechah-rozhdestvenskii-koncert-muzyki-i-baleta-pri-svechah-6aff64d566867d3e78eba82b"
+    },
+    {
+      "slug": "экскурсионныи-тур-рождественская-москва-7-января-2027-из-курска-6afdd46891a8f98cf3f6c2d2",
+      "status": 200,
+      "robots": "noindex, follow",
+      "canonical": "https://daibilet.ru/events/ekskursionnyi-tur-rozhdestvenskaya-moskva-7-yanvarya-2027-iz-kurska-6afdd46891a8f98cf3f6c2d2"
+    },
+    {
+      "slug": "чаиковскии-при-свечах-рождественскии-концерт-музыки-и-балета-при-свечах-в-историческом-особняке-6afe2394d05e99ad21f37078",
+      "status": 200,
+      "robots": "noindex, follow",
+      "canonical": "https://daibilet.ru/events/chaikovskii-pri-svechah-rozhdestvenskii-koncert-muzyki-i-baleta-pri-svechah-v-istoricheskom-osobnyake-6afe2394d05e99ad21f37078"
+    },
+    {
+      "slug": "щелкунчик-новогодняя-музыкальная-сказка-с-песочнои-анимациеи-6b04aa94635287acdf01bbaa",
+      "status": 200,
+      "robots": "noindex, follow",
+      "canonical": "https://daibilet.ru/events/schelkunchik-novogodnyaya-muzykalnaya-skazka-s-pesochnoi-animaciei-6b04aa94635287acdf01bbaa"
+    },
+    {
+      "slug": "чаиковскии-при-свечах-рождественскии-концерт-музыки-и-балета-при-свечах-в-историческом-особняке-6afe21603853fd085ab9a06b",
+      "status": 200,
+      "robots": "noindex, follow",
+      "canonical": "https://daibilet.ru/events/chaikovskii-pri-svechah-rozhdestvenskii-koncert-muzyki-i-baleta-pri-svechah-v-istoricheskom-osobnyake-6afe21603853fd085ab9a06b"
+    }
+  ]
+}

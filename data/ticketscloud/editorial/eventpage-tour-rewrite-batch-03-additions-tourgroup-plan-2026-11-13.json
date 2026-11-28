@@ -1,0 +1,119 @@
+{
+  "createdAt": "2026-11-13T06:23:23.331Z",
+  "groups": [
+    {
+      "groupNo": 24,
+      "title": "Шура — сольный концерт",
+      "allPageIds": [
+        "76b1bbb7-194e-4e27-b631-0b9e1240bbd0",
+        "5e5abe5b-81a6-47a5-9ec9-a9c800ec8e38",
+        "1084aab6-a968-4a26-868f-7d372a57c0e1",
+        "d905b162-2582-4f9a-a8de-6bd7b4a16d82",
+        "667ba26e-8254-4c78-babe-9881ecf695c8",
+        "ca92ecce-b964-4436-abf6-2c5edee4b072",
+        "5455781c-beee-4771-b49d-734f6065c069",
+        "d66ea080-b39c-40da-8664-d8630ad93eb8",
+        "06383638-fcd2-425e-a444-7ed1358a6347",
+        "8bb69974-f888-45af-8102-497b1aae415a",
+        "fc804ceb-fcd8-4373-9126-33b1b9538bb8",
+        "c91c7f95-53e7-4eff-9293-d1cfc487e988",
+        "9162f02d-c015-40d8-b7f8-ded8a0fbbe24",
+        "4132485f-4a67-42d5-bc77-cbbb08316fe3",
+        "a10bbbdd-8b48-4b89-9526-085e366b3619",
+        "b7b8513d-d6e7-47b9-9413-f8c91a0dfdbf",
+        "58c5b1f0-f928-447a-8058-10aebe5a6050"
+      ],
+      "representativePageIds": [
+        "76b1bbb7-194e-4e27-b631-0b9e1240bbd0",
+        "5e5abe5b-81a6-47a5-9ec9-a9c800ec8e38",
+        "1084aab6-a968-4a26-868f-7d372a57c0e1",
+        "d905b162-2582-4f9a-a8de-6bd7b4a16d82",
+        "667ba26e-8254-4c78-babe-9881ecf695c8",
+        "ca92ecce-b964-4436-abf6-2c5edee4b072",
+        "5455781c-beee-4771-b49d-734f6065c069",
+        "d66ea080-b39c-40da-8664-d8630ad93eb8",
+        "06383638-fcd2-425e-a444-7ed1358a6347",
+        "8bb69974-f888-45af-8102-497b1aae415a",
+        "fc804ceb-fcd8-4373-9126-33b1b9538bb8",
+        "9162f02d-c015-40d8-b7f8-ded8a0fbbe24",
+        "4132485f-4a67-42d5-bc77-cbbb08316fe3",
+        "a10bbbdd-8b48-4b89-9526-085e366b3619",
+        "b7b8513d-d6e7-47b9-9413-f8c91a0dfdbf",
+        "58c5b1f0-f928-447a-8058-10aebe5a6050"
+      ],
+      "extraSameCityPageIds": [
+        "c91c7f95-53e7-4eff-9293-d1cfc487e988"
+      ]
+    },
+    {
+      "groupNo": 25,
+      "title": "МЕГАМОЗГ — концерт в рамках тура",
+      "allPageIds": [
+        "383ccbf2-16de-4ad3-ab71-bae47485cabf",
+        "ac2e4a25-7882-4efb-9d0b-ce78f9022c62",
+        "c30c0fe7-0634-4014-bbce-ac2afcb398fa",
+        "30436488-45c2-4ed5-8bbe-ee6640acf925",
+        "65e9ea33-63d4-43d6-84e6-6fbed942d310",
+        "9c3bf4b1-337f-40c1-94fe-36f24cdcf935",
+        "1b98d70c-35bb-4179-9291-cce317d68960",
+        "a337d28e-5211-470d-9474-fea811f00b3e",
+        "4619f411-541e-442e-a60e-72c20ba24543",
+        "c5c3d11d-6202-45c4-bd20-c33b24f220eb",
+        "1a5c4950-b30e-4a58-9c84-89c1b298307f",
+        "d0b1e715-c3c2-4799-aa22-696961f6da0c",
+        "6c836560-1f39-4550-929f-114d4f2c144c",
+        "35b786ff-0db7-4a0c-850d-21c1882b23de",
+        "f3ccbbb7-10c4-4107-9aee-732c43effa7d",
+        "26b64085-aacf-48d6-b99a-8b7db7902199"
+      ],
+      "representativePageIds": [
+        "383ccbf2-16de-4ad3-ab71-bae47485cabf",
+        "ac2e4a25-7882-4efb-9d0b-ce78f9022c62",
+        "c30c0fe7-0634-4014-bbce-ac2afcb398fa",
+        "30436488-45c2-4ed5-8bbe-ee6640acf925",
+        "65e9ea33-63d4-43d6-84e6-6fbed942d310",
+        "9c3bf4b1-337f-40c1-94fe-36f24cdcf935",
+        "1b98d70c-35bb-4179-9291-cce317d68960",
+        "a337d28e-5211-470d-9474-fea811f00b3e",
+        "4619f411-541e-442e-a60e-72c20ba24543",
+        "c5c3d11d-6202-45c4-bd20-c33b24f220eb",
+        "1a5c4950-b30e-4a58-9c84-89c1b298307f",
+        "d0b1e715-c3c2-4799-aa22-696961f6da0c",
+        "6c836560-1f39-4550-929f-114d4f2c144c",
+        "35b786ff-0db7-4a0c-850d-21c1882b23de",
+        "f3ccbbb7-10c4-4107-9aee-732c43effa7d",
+        "26b64085-aacf-48d6-b99a-8b7db7902199"
+      ],
+      "extraSameCityPageIds": []
+    },
+    {
+      "groupNo": 26,
+      "title": "Call Me Karizma — концерт в рамках тура",
+      "allPageIds": [
+        "25ea05a1-9336-4ad4-9651-5a1b75092dad",
+        "05a6610f-96dd-417a-bd20-49bcd9a71a6e",
+        "cfe0ae1d-47a5-41b6-88b8-c9dc27de17eb",
+        "80578e30-7878-417c-b3bd-40e7327deb0f",
+        "1c31270c-9c15-4141-b841-229d00a43aaa",
+        "d263bc5c-1cc1-4213-a710-f07154b1d227",
+        "288eb250-bd66-45d9-8286-e8e5d5f6f4eb",
+        "677e3f58-a78c-4762-bfaf-dda95771bf85",
+        "b64b8b6e-37dd-4b3a-9ff0-d3c33695b91b",
+        "2bf2acf9-1d06-46c2-9159-6fcf85ab25b5"
+      ],
+      "representativePageIds": [
+        "25ea05a1-9336-4ad4-9651-5a1b75092dad",
+        "05a6610f-96dd-417a-bd20-49bcd9a71a6e",
+        "cfe0ae1d-47a5-41b6-88b8-c9dc27de17eb",
+        "80578e30-7878-417c-b3bd-40e7327deb0f",
+        "1c31270c-9c15-4141-b841-229d00a43aaa",
+        "d263bc5c-1cc1-4213-a710-f07154b1d227",
+        "288eb250-bd66-45d9-8286-e8e5d5f6f4eb",
+        "677e3f58-a78c-4762-bfaf-dda95771bf85",
+        "b64b8b6e-37dd-4b3a-9ff0-d3c33695b91b",
+        "2bf2acf9-1d06-46c2-9159-6fcf85ab25b5"
+      ],
+      "extraSameCityPageIds": []
+    }
+  ]
+}

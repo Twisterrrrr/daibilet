@@ -1,0 +1,575 @@
+{
+  "batch": "B01",
+  "createdAt": "2026-11-10",
+  "source": "Teplohod.info",
+  "usage": "ARCHIVE_ONLY; source and legacy override are not active EventPage content",
+  "eventPageIds": [
+    "e1222fbc-5433-4ce2-95c7-1614a42a60c5",
+    "d9ae76b9-0582-4281-bc9b-412b48ebbb14",
+    "5606c7c0-d517-4ea3-acbf-32c32f4c0a78",
+    "feda2d30-8788-4184-8c7d-299459d620af"
+  ],
+  "groups": [
+    {
+      "candidateKey": "москва|национальный центр «россия»|новогодний концерт для детей, новогодняя ёлка",
+      "mappingState": "ONE_EVENTPAGE",
+      "action": "REWRITE_EXISTING_EVENTPAGE",
+      "city": "Москва",
+      "venue": "Национальный центр «Россия»",
+      "title": "Новогодний концерт для детей, новогодняя ёлка",
+      "eventCount": 1,
+      "eventIds": [
+        "evt_tep_1537"
+      ],
+      "eventSlugs": [
+        "новогоднии-концерт-для-детеи-новогодняя-елка-1537"
+      ],
+      "sourceNames": [
+        "Teplohod.info"
+      ],
+      "activeOfferEventCount": 1,
+      "firstSeasonDate": "2026-12-06 08:00:00",
+      "lastSeasonDate": "2026-12-06 08:00:00",
+      "priceMinRub": 4000,
+      "pageCount": 1,
+      "pages": [
+        {
+          "eventpageId": "d9ae76b9-0582-4281-bc9b-412b48ebbb14",
+          "slug": "novogodnii-koncert-dlya-detei-novogodnyaya-elka-moskva",
+          "title": "Новогодний концерт для детей, новогодняя ёлка",
+          "status": "DRAFT",
+          "isIndexable": false,
+          "publishedAt": null,
+          "linkedEventCount": 1,
+          "sectionCount": 0,
+          "editorialState": "empty",
+          "eventIds": [
+            "evt_tep_1537"
+          ]
+        }
+      ],
+      "unlinkedEventIds": [],
+      "sourceDescriptionMissingCount": 0,
+      "sourceDescriptionMinChars": 1135,
+      "sourceDescriptionMaxChars": 1135,
+      "priorityBatch": "B01"
+    },
+    {
+      "candidateKey": "москва|национальный центр «россия»|новогодний голубой огонек, концерт на корабле",
+      "mappingState": "ONE_EVENTPAGE",
+      "action": "REWRITE_EXISTING_EVENTPAGE",
+      "city": "Москва",
+      "venue": "Национальный центр «Россия»",
+      "title": "Новогодний голубой огонек, концерт на корабле",
+      "eventCount": 1,
+      "eventIds": [
+        "evt_tep_1541"
+      ],
+      "eventSlugs": [
+        "новогоднии-голубои-огонек-концерт-на-корабле-1541"
+      ],
+      "sourceNames": [
+        "Teplohod.info"
+      ],
+      "activeOfferEventCount": 1,
+      "firstSeasonDate": "2026-12-10 16:00:00",
+      "lastSeasonDate": "2026-12-10 16:00:00",
+      "priceMinRub": 6900,
+      "pageCount": 1,
+      "pages": [
+        {
+          "eventpageId": "e1222fbc-5433-4ce2-95c7-1614a42a60c5",
+          "slug": "novogodnii-goluboi-ogonek-koncert-na-korable-moskva",
+          "title": "Новогодний голубой огонек, концерт на корабле",
+          "status": "DRAFT",
+          "isIndexable": false,
+          "publishedAt": null,
+          "linkedEventCount": 1,
+          "sectionCount": 0,
+          "editorialState": "empty",
+          "eventIds": [
+            "evt_tep_1541"
+          ]
+        }
+      ],
+      "unlinkedEventIds": [],
+      "sourceDescriptionMissingCount": 0,
+      "sourceDescriptionMinChars": 1050,
+      "sourceDescriptionMaxChars": 1050,
+      "priorityBatch": "B01"
+    },
+    {
+      "candidateKey": "москва|национальный центр «россия»|новогодний корпоратив 17, 23, 24 и 26 декабря 2026 на теплоходе ривер палас с круизом и развлекательной программой",
+      "mappingState": "ONE_EVENTPAGE",
+      "action": "REWRITE_EXISTING_EVENTPAGE",
+      "city": "Москва",
+      "venue": "Национальный центр «Россия»",
+      "title": "Новогодний корпоратив 17, 23, 24 и 26 декабря 2026 на теплоходе Ривер Палас с круизом и развлекательной программой",
+      "eventCount": 1,
+      "eventIds": [
+        "evt_tep_1276"
+      ],
+      "eventSlugs": [
+        "новогоднии-корпоратив-17-23-и-24-декабря-2026-на-теплоходе-ривер-палас-с-круизом-и-развлекательнои-программои-1276"
+      ],
+      "sourceNames": [
+        "Teplohod.info"
+      ],
+      "activeOfferEventCount": 1,
+      "firstSeasonDate": "2026-12-17 15:00:00",
+      "lastSeasonDate": "2026-12-17 15:00:00",
+      "priceMinRub": 18990,
+      "pageCount": 1,
+      "pages": [
+        {
+          "eventpageId": "5606c7c0-d517-4ea3-acbf-32c32f4c0a78",
+          "slug": "novogodnii-korporativ-17-23-i-24-dekabrya-2026-na-teplohode-river-palas-s-kruizom-i-razvlekatelnoi-programmoi-moskva",
+          "title": "Новогодний корпоратив 17, 23 и 24 декабря 2026 на теплоходе Ривер Палас с круизом и развлекательной программой",
+          "status": "DRAFT",
+          "isIndexable": false,
+          "publishedAt": null,
+          "linkedEventCount": 1,
+          "sectionCount": 0,
+          "editorialState": "empty",
+          "eventIds": [
+            "evt_tep_1276"
+          ]
+        }
+      ],
+      "unlinkedEventIds": [],
+      "sourceDescriptionMissingCount": 0,
+      "sourceDescriptionMinChars": 483,
+      "sourceDescriptionMaxChars": 483,
+      "priorityBatch": "B01"
+    },
+    {
+      "candidateKey": "москва|национальный центр «россия»|новогодний корпоратив 18 и 25 декабря 2026 на теплоходе ривер палас с круизом и развлекательной программой",
+      "mappingState": "ONE_EVENTPAGE",
+      "action": "REWRITE_EXISTING_EVENTPAGE",
+      "city": "Москва",
+      "venue": "Национальный центр «Россия»",
+      "title": "Новогодний корпоратив 18 и 25 декабря 2026 на теплоходе Ривер Палас с круизом и развлекательной программой",
+      "eventCount": 1,
+      "eventIds": [
+        "evt_tep_1259"
+      ],
+      "eventSlugs": [
+        "новогоднии-корпоратив-18-и-25-декабря-2026-на-теплоходе-ривер-палас-с-круизом-и-развлекательнои-программои-1259"
+      ],
+      "sourceNames": [
+        "Teplohod.info"
+      ],
+      "activeOfferEventCount": 1,
+      "firstSeasonDate": "2026-12-18 15:00:00",
+      "lastSeasonDate": "2026-12-18 15:00:00",
+      "priceMinRub": 28500,
+      "pageCount": 1,
+      "pages": [
+        {
+          "eventpageId": "feda2d30-8788-4184-8c7d-299459d620af",
+          "slug": "novogodnii-korporativ-18-i-25-dekabrya-2026-na-teplohode-river-palas-s-kruizom-i-razvlekatelnoi-programmoi-moskva",
+          "title": "Новогодний корпоратив 18 и 25 декабря 2026 на теплоходе Ривер Палас с круизом и развлекательной программой",
+          "status": "DRAFT",
+          "isIndexable": false,
+          "publishedAt": null,
+          "linkedEventCount": 1,
+          "sectionCount": 0,
+          "editorialState": "empty",
+          "eventIds": [
+            "evt_tep_1259"
+          ]
+        }
+      ],
+      "unlinkedEventIds": [],
+      "sourceDescriptionMissingCount": 0,
+      "sourceDescriptionMinChars": 479,
+      "sourceDescriptionMaxChars": 479,
+      "priorityBatch": "B01"
+    }
+  ],
+  "entries": [
+    {
+      "eventId": "evt_tep_1541",
+      "eventSlug": "новогоднии-голубои-огонек-концерт-на-корабле-1541",
+      "title": "Новогодний голубой огонек, концерт на корабле",
+      "city": "Москва",
+      "venue": "Национальный центр «Россия»",
+      "address": "Краснопресненская наб., 14, Москва, Россия, 123100",
+      "eventPageId": "e1222fbc-5433-4ce2-95c7-1614a42a60c5",
+      "eventPageSlug": "novogodnii-goluboi-ogonek-koncert-na-korable-moskva",
+      "sourceDescription": null,
+      "sourceUsage": "UNUSED_ORIGINAL_SOURCE",
+      "legacyOverrideDescription": "«Новогодний голубой огонек» проходит как концерт с живой музыкой на панорамном теплоходе River Palace. Гости размещаются за отдельными столиками и могут выбрать билет с праздничным меню или без питания.\n\n## Особенности\nТрехчасовой концерт на теплоходе\n- Живая музыка\n- Панорамный отапливаемый салон\n- Ледовый класс судна\n- Столики на два, четыре или десять человек\n- Тарифы с новогодним меню и без питания.\n\n## Как выбрать билет\n\nКатегории отличаются вместимостью и расположением столика, а также составом питания. Меню включено только в соответствующие тарифы; для остальных билетов на борту работает ресторан-бар.\n\n## Перед отправлением\n\nПосадка проходит у Национального центра «Россия» на Краснопресненской набережной. Свои продукты, алкоголь и животных приносить нельзя.\n\n## Практическая информация\n\n- Место - Национальный центр «Россия», Москва\n- Адрес - Краснопресненская наб., 14, Москва, Россия, 123100\n- Продолжительность - около 180 минут\n- Билеты - от 6 900 ₽\n\nБилеты продаются онлайн. Оплата на сайте, электронный билет приходит на почту.",
+      "legacyOverrideUsage": "ARCHIVED_LEGACY_COPY; do not overwrite during EventPage rewrite",
+      "sessionSnapshot": [
+        {
+          "id": "sess_tep_688555",
+          "endsAt": "2026-12-10 19:00:00",
+          "startsAt": "2026-12-10 16:00:00",
+          "priceFromRub": 6900
+        },
+        {
+          "id": "sess_tep_688556",
+          "endsAt": "2026-12-11 15:00:00",
+          "startsAt": "2026-12-11 12:00:00",
+          "priceFromRub": 6900
+        },
+        {
+          "id": "sess_tep_688557",
+          "endsAt": "2026-12-11 19:00:00",
+          "startsAt": "2026-12-11 16:00:00",
+          "priceFromRub": 6900
+        },
+        {
+          "id": "sess_tep_688558",
+          "endsAt": "2026-12-12 15:00:00",
+          "startsAt": "2026-12-12 12:00:00",
+          "priceFromRub": 6900
+        },
+        {
+          "id": "sess_tep_662453",
+          "endsAt": "2026-12-13 19:00:00",
+          "startsAt": "2026-12-13 16:00:00",
+          "priceFromRub": 6900
+        },
+        {
+          "id": "sess_tep_662454",
+          "endsAt": "2026-12-16 15:00:00",
+          "startsAt": "2026-12-16 12:00:00",
+          "priceFromRub": 6900
+        },
+        {
+          "id": "sess_tep_662455",
+          "endsAt": "2026-12-16 19:00:00",
+          "startsAt": "2026-12-16 16:00:00",
+          "priceFromRub": 6900
+        },
+        {
+          "id": "sess_tep_662456",
+          "endsAt": "2026-12-19 15:00:00",
+          "startsAt": "2026-12-19 12:00:00",
+          "priceFromRub": 6900
+        },
+        {
+          "id": "sess_tep_662457",
+          "endsAt": "2026-12-19 19:00:00",
+          "startsAt": "2026-12-19 16:00:00",
+          "priceFromRub": 6900
+        },
+        {
+          "id": "sess_tep_688559",
+          "endsAt": "2026-12-20 15:00:00",
+          "startsAt": "2026-12-20 12:00:00",
+          "priceFromRub": 6900
+        },
+        {
+          "id": "sess_tep_662458",
+          "endsAt": "2026-12-21 15:00:00",
+          "startsAt": "2026-12-21 12:00:00",
+          "priceFromRub": 6900
+        },
+        {
+          "id": "sess_tep_662459",
+          "endsAt": "2026-12-21 19:00:00",
+          "startsAt": "2026-12-21 16:00:00",
+          "priceFromRub": 6900
+        },
+        {
+          "id": "sess_tep_688560",
+          "endsAt": "2026-12-27 15:00:00",
+          "startsAt": "2026-12-27 12:00:00",
+          "priceFromRub": 6900
+        },
+        {
+          "id": "sess_tep_662460",
+          "endsAt": "2026-12-30 15:00:00",
+          "startsAt": "2026-12-30 12:00:00",
+          "priceFromRub": 6900
+        },
+        {
+          "id": "sess_tep_662461",
+          "endsAt": "2026-12-30 19:00:00",
+          "startsAt": "2026-12-30 16:00:00",
+          "priceFromRub": 6900
+        },
+        {
+          "id": "sess_tep_688561",
+          "endsAt": "2027-01-02 19:00:00",
+          "startsAt": "2027-01-02 16:00:00",
+          "priceFromRub": 6900
+        }
+      ],
+      "ageLimit": null,
+      "priceFromRub": 6900,
+      "sourceSnapshot": {
+        "id": "evt_tep_1541",
+        "kind": "RECURRING",
+        "slug": "новогоднии-голубои-огонек-концерт-на-корабле-1541",
+        "seoH1": null,
+        "title": "Новогодний голубой огонек, концерт на корабле",
+        "sources": [
+          {
+            "code": "TEPLOHOD",
+            "name": "Teplohod.info",
+            "externalId": "1541",
+            "metaExternalId": null,
+            "sourceUrlRedacted": true
+          }
+        ],
+        "venueId": "venue_tep_1",
+        "imageUrl": "https://cdn.teplohod.info/images/cache/Events/Event1541/320475e712-1.jpg",
+        "seoTitle": null,
+        "cityTitle": "Москва",
+        "venueTitle": "Национальный центр «Россия»",
+        "description": null,
+        "isIndexable": true,
+        "purchaseFlow": "EXTERNAL",
+        "venueAddress": "Краснопресненская наб., 14, Москва, Россия, 123100",
+        "canonicalPath": null,
+        "primaryCityId": "city_tep_1",
+        "supplierTitle": null,
+        "managementMode": "SOURCE_MANAGED",
+        "seoDescription": null,
+        "shortDescription": "Новогодний концерт с живой музыкой на панорамном теплоходе River Palace и билетами с ужином или без питания."
+      }
+    },
+    {
+      "eventId": "evt_tep_1537",
+      "eventSlug": "новогоднии-концерт-для-детеи-новогодняя-елка-1537",
+      "title": "Новогодний концерт для детей, новогодняя ёлка",
+      "city": "Москва",
+      "venue": "Национальный центр «Россия»",
+      "address": "Краснопресненская наб., 14, Москва, Россия, 123100",
+      "eventPageId": "d9ae76b9-0582-4281-bc9b-412b48ebbb14",
+      "eventPageSlug": "novogodnii-koncert-dlya-detei-novogodnyaya-elka-moskva",
+      "sourceDescription": null,
+      "sourceUsage": "UNUSED_ORIGINAL_SOURCE",
+      "legacyOverrideDescription": "Детская новогодняя программа проходит на панорамном теплоходе River Palace. Формат объединяет концерт с ёлкой, речную прогулку и размещение гостей за отдельными столиками.\n\n## Особенности\nТрехчасовая программа на теплоходе\n- Новогодний концерт и ёлка для детей\n- Панорамный отапливаемый салон\n- Ледовый класс судна\n- Места за столиками разной вместимости\n- Тарифы с праздничным обедом и без питания.\n\n## Как выбрать билет\n\nТарифы различаются расположением и вместимостью столика. Питание включено только в билеты, где прямо указан новогодний обед; остальные варианты дают место за выбранным столиком без заявленного меню.\n\n## Перед отправлением\n\nПосадка проходит у Национального центра «Россия» на Краснопресненской набережной. Свой алкоголь и животных на борт приносить нельзя; возрастные условия и правила сопровождения детей нужно проверить перед покупкой.\n\n## Практическая информация\n\n- Место - Национальный центр «Россия», Москва\n- Адрес - Краснопресненская наб., 14, Москва, Россия, 123100\n- Продолжительность - около 180 минут\n- Билеты - от 4 000 ₽\n\nБилеты продаются онлайн. Оплата на сайте, электронный билет приходит на почту.",
+      "legacyOverrideUsage": "ARCHIVED_LEGACY_COPY; do not overwrite during EventPage rewrite",
+      "sessionSnapshot": [
+        {
+          "id": "sess_tep_660616",
+          "endsAt": "2026-12-06 11:00:00",
+          "startsAt": "2026-12-06 08:00:00",
+          "priceFromRub": 4000
+        },
+        {
+          "id": "sess_tep_660617",
+          "endsAt": "2026-12-12 12:00:00",
+          "startsAt": "2026-12-12 09:00:00",
+          "priceFromRub": 4000
+        },
+        {
+          "id": "sess_tep_660618",
+          "endsAt": "2026-12-13 11:00:00",
+          "startsAt": "2026-12-13 08:00:00",
+          "priceFromRub": 4000
+        },
+        {
+          "id": "sess_tep_660619",
+          "endsAt": "2026-12-19 11:00:00",
+          "startsAt": "2026-12-19 08:00:00",
+          "priceFromRub": 4000
+        },
+        {
+          "id": "sess_tep_660620",
+          "endsAt": "2026-12-20 12:00:00",
+          "startsAt": "2026-12-20 09:00:00",
+          "priceFromRub": 4000
+        },
+        {
+          "id": "sess_tep_660621",
+          "endsAt": "2026-12-27 12:00:00",
+          "startsAt": "2026-12-27 09:00:00",
+          "priceFromRub": 4000
+        },
+        {
+          "id": "sess_tep_660623",
+          "endsAt": "2026-12-30 11:00:00",
+          "startsAt": "2026-12-30 08:00:00",
+          "priceFromRub": 4000
+        },
+        {
+          "id": "sess_tep_660624",
+          "endsAt": "2027-01-03 11:00:00",
+          "startsAt": "2027-01-03 08:00:00",
+          "priceFromRub": 4000
+        },
+        {
+          "id": "sess_tep_660625",
+          "endsAt": "2027-01-04 11:00:00",
+          "startsAt": "2027-01-04 08:00:00",
+          "priceFromRub": 4000
+        },
+        {
+          "id": "sess_tep_660626",
+          "endsAt": "2027-01-05 11:00:00",
+          "startsAt": "2027-01-05 08:00:00",
+          "priceFromRub": 4000
+        }
+      ],
+      "ageLimit": null,
+      "priceFromRub": 4000,
+      "sourceSnapshot": {
+        "id": "evt_tep_1537",
+        "kind": "RECURRING",
+        "slug": "новогоднии-концерт-для-детеи-новогодняя-елка-1537",
+        "seoH1": null,
+        "title": "Новогодний концерт для детей, новогодняя ёлка",
+        "sources": [
+          {
+            "code": "TEPLOHOD",
+            "name": "Teplohod.info",
+            "externalId": "1537",
+            "metaExternalId": null,
+            "sourceUrlRedacted": true
+          }
+        ],
+        "venueId": "venue_tep_1",
+        "imageUrl": "https://cdn.teplohod.info/images/cache/Events/Event1537/19ebbab0a8-1.png",
+        "seoTitle": null,
+        "cityTitle": "Москва",
+        "venueTitle": "Национальный центр «Россия»",
+        "description": null,
+        "isIndexable": true,
+        "purchaseFlow": "EXTERNAL",
+        "venueAddress": "Краснопресненская наб., 14, Москва, Россия, 123100",
+        "canonicalPath": null,
+        "primaryCityId": "city_tep_1",
+        "supplierTitle": null,
+        "managementMode": "SOURCE_MANAGED",
+        "seoDescription": null,
+        "shortDescription": "Детский новогодний концерт с ёлкой на панорамном теплоходе River Palace и вариантами билетов с праздничным обедом."
+      }
+    },
+    {
+      "eventId": "evt_tep_1276",
+      "eventSlug": "новогоднии-корпоратив-17-23-и-24-декабря-2026-на-теплоходе-ривер-палас-с-круизом-и-развлекательнои-программои-1276",
+      "title": "Новогодний корпоратив 17, 23, 24 и 26 декабря 2026 на теплоходе Ривер Палас с круизом и развлекательной программой",
+      "city": "Москва",
+      "venue": "Национальный центр «Россия»",
+      "address": "Краснопресненская наб., 14, Москва, Россия, 123100",
+      "eventPageId": "5606c7c0-d517-4ea3-acbf-32c32f4c0a78",
+      "eventPageSlug": "novogodnii-korporativ-17-23-i-24-dekabrya-2026-na-teplohode-river-palas-s-kruizom-i-razvlekatelnoi-programmoi-moskva",
+      "sourceDescription": "<p><strong>Начало мероприятия: 18:00 </strong></p><p>17:30 сбор гостей</p><p>18:00 отправление теплохода</p><p>23:00 окончание мероприятия</p>",
+      "sourceUsage": "UNUSED_ORIGINAL_SOURCE",
+      "legacyOverrideDescription": "«Новогодний корпоратив 17, 23 и 24 декабря 2026 на теплоходе Ривер Палас с круизом и развлекательной программой» - экскурсия в Москве, на площадке «Национальный центр «Россия»»., 14, Москва, Россия, 123100.\n\n## Практическая информация\n\n- Место - Национальный центр «Россия», Москва\n- Адрес - Краснопресненская наб., 14, Москва, Россия, 123100\n- Продолжительность - около 300 минут\n- Билеты - от 18 990 ₽\n\nБилеты продаются онлайн. Оплата на сайте, электронный билет приходит на почту.",
+      "legacyOverrideUsage": "ARCHIVED_LEGACY_COPY; do not overwrite during EventPage rewrite",
+      "sessionSnapshot": [
+        {
+          "id": "sess_tep_674153",
+          "endsAt": "2026-12-17 20:00:00",
+          "startsAt": "2026-12-17 15:00:00",
+          "priceFromRub": 18990
+        },
+        {
+          "id": "sess_tep_674154",
+          "endsAt": "2026-12-23 20:00:00",
+          "startsAt": "2026-12-23 15:00:00",
+          "priceFromRub": 18990
+        },
+        {
+          "id": "sess_tep_674155",
+          "endsAt": "2026-12-24 20:00:00",
+          "startsAt": "2026-12-24 15:00:00",
+          "priceFromRub": 18990
+        },
+        {
+          "id": "sess_tep_688907",
+          "endsAt": "2026-12-26 20:00:00",
+          "startsAt": "2026-12-26 15:00:00",
+          "priceFromRub": 18990
+        }
+      ],
+      "ageLimit": null,
+      "priceFromRub": 18990,
+      "sourceSnapshot": {
+        "id": "evt_tep_1276",
+        "kind": "RECURRING",
+        "slug": "новогоднии-корпоратив-17-23-и-24-декабря-2026-на-теплоходе-ривер-палас-с-круизом-и-развлекательнои-программои-1276",
+        "seoH1": null,
+        "title": "Новогодний корпоратив 17, 23 и 24 декабря 2026 на теплоходе Ривер Палас с круизом и развлекательной программой",
+        "sources": [
+          {
+            "code": "TEPLOHOD",
+            "name": "Teplohod.info",
+            "externalId": "1276",
+            "metaExternalId": null,
+            "sourceUrlRedacted": true
+          }
+        ],
+        "venueId": "venue_tep_1",
+        "imageUrl": "https://cdn.teplohod.info/images/cache/Events/Event1276/dc51f34e41-1.jpg",
+        "seoTitle": null,
+        "cityTitle": "Москва",
+        "venueTitle": "Национальный центр «Россия»",
+        "description": "<p><strong>Начало мероприятия: 18:00 </strong></p><p>17:30 сбор гостей</p><p>18:00 отправление теплохода</p><p>23:00 окончание мероприятия</p>",
+        "isIndexable": true,
+        "purchaseFlow": "EXTERNAL",
+        "venueAddress": "Краснопресненская наб., 14, Москва, Россия, 123100",
+        "canonicalPath": null,
+        "primaryCityId": "city_tep_1",
+        "supplierTitle": null,
+        "managementMode": "SOURCE_MANAGED",
+        "seoDescription": null,
+        "shortDescription": null
+      }
+    },
+    {
+      "eventId": "evt_tep_1259",
+      "eventSlug": "новогоднии-корпоратив-18-и-25-декабря-2026-на-теплоходе-ривер-палас-с-круизом-и-развлекательнои-программои-1259",
+      "title": "Новогодний корпоратив 18 и 25 декабря 2026 на теплоходе Ривер Палас с круизом и развлекательной программой",
+      "city": "Москва",
+      "venue": "Национальный центр «Россия»",
+      "address": "Краснопресненская наб., 14, Москва, Россия, 123100",
+      "eventPageId": "feda2d30-8788-4184-8c7d-299459d620af",
+      "eventPageSlug": "novogodnii-korporativ-18-i-25-dekabrya-2026-na-teplohode-river-palas-s-kruizom-i-razvlekatelnoi-programmoi-moskva",
+      "sourceDescription": "<p><strong>Начало мероприятия:&nbsp;</strong></p><p>17:30 сбор гостей</p><p>18:00 отправление теплохода</p><p>23:00 окончание мероприятия</p>",
+      "sourceUsage": "UNUSED_ORIGINAL_SOURCE",
+      "legacyOverrideDescription": "«Новогодний корпоратив 18 и 25 декабря 2026 на теплоходе Ривер Палас с круизом и развлекательной программой» - экскурсия в Москве, на площадке «Национальный центр «Россия»»., 14, Москва, Россия, 123100.\n\n## Практическая информация\n\n- Место - Национальный центр «Россия», Москва\n- Адрес - Краснопресненская наб., 14, Москва, Россия, 123100\n- Продолжительность - около 300 минут\n- Билеты - от 24 500 ₽\n\nБилеты продаются онлайн. Оплата на сайте, электронный билет приходит на почту.",
+      "legacyOverrideUsage": "ARCHIVED_LEGACY_COPY; do not overwrite during EventPage rewrite",
+      "sessionSnapshot": [
+        {
+          "id": "sess_tep_674151",
+          "endsAt": "2026-12-18 20:00:00",
+          "startsAt": "2026-12-18 15:00:00",
+          "priceFromRub": 28500
+        }
+      ],
+      "ageLimit": null,
+      "priceFromRub": 28500,
+      "sourceSnapshot": {
+        "id": "evt_tep_1259",
+        "kind": "SINGLE",
+        "slug": "новогоднии-корпоратив-18-и-25-декабря-2026-на-теплоходе-ривер-палас-с-круизом-и-развлекательнои-программои-1259",
+        "seoH1": null,
+        "title": "Новогодний корпоратив 18 и 25 декабря 2026 на теплоходе Ривер Палас с круизом и развлекательной программой",
+        "sources": [
+          {
+            "code": "TEPLOHOD",
+            "name": "Teplohod.info",
+            "externalId": "1259",
+            "metaExternalId": null,
+            "sourceUrlRedacted": true
+          }
+        ],
+        "venueId": "venue_tep_1",
+        "imageUrl": "https://cdn.teplohod.info/images/cache/Events/Event1259/ea290ff72a-1.jpg",
+        "seoTitle": null,
+        "cityTitle": "Москва",
+        "venueTitle": "Национальный центр «Россия»",
+        "description": "<p><strong>Начало мероприятия:&nbsp;</strong></p><p>17:30 сбор гостей</p><p>18:00 отправление теплохода</p><p>23:00 окончание мероприятия</p>",
+        "isIndexable": true,
+        "purchaseFlow": "EXTERNAL",
+        "venueAddress": "Краснопресненская наб., 14, Москва, Россия, 123100",
+        "canonicalPath": null,
+        "primaryCityId": "city_tep_1",
+        "supplierTitle": null,
+        "managementMode": "SOURCE_MANAGED",
+        "seoDescription": null,
+        "shortDescription": null
+      }
+    }
+  ],
+  "redactionNote": "Provider source URLs omitted from local archive; source descriptions and stable external IDs are preserved."
+}

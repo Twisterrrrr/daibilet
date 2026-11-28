@@ -1,0 +1,79 @@
+{
+  "city": "novosibirsk",
+  "mustSeeCount": 88,
+  "regen": [
+    {
+      "stem": "berdskie-skaly-serebryanyy-klyuch",
+      "name": "berdskie skaly serebryanyy klyuch",
+      "clusterSize": 2,
+      "keeper": "akvapark"
+    },
+    {
+      "stem": "berdskie-skaly-skala-verblyud",
+      "name": "berdskie skaly skala verblyud",
+      "clusterSize": 2,
+      "keeper": "art-klaster-fabrika"
+    },
+    {
+      "stem": "dom-kupca-mashtakova",
+      "name": "dom kupca mashtakova",
+      "clusterSize": 3,
+      "keeper": "arka-street-art"
+    },
+    {
+      "stem": "iskitim-muzey-siblaga",
+      "name": "iskitim muzey siblaga",
+      "clusterSize": 3,
+      "keeper": "arka-street-art"
+    },
+    {
+      "stem": "koltsovo-akademiya-kofe",
+      "name": "koltsovo akademiya kofe",
+      "clusterSize": 2,
+      "keeper": "katolicheskiy-sobor"
+    },
+    {
+      "stem": "koltsovo-pamyatnik-sandukhchanu",
+      "name": "koltsovo pamyatnik sandukhchanu",
+      "clusterSize": 2,
+      "keeper": "hram-pokrova"
+    },
+    {
+      "stem": "koltsovo-park",
+      "name": "koltsovo park",
+      "clusterSize": 3,
+      "keeper": "datsan-rinchin"
+    },
+    {
+      "stem": "pamyatnik-laboratornoy-myshi-preview",
+      "name": "pamyatnik laboratornoy myshi preview",
+      "clusterSize": 3,
+      "keeper": "datsan-rinchin"
+    },
+    {
+      "stem": "suzun-muzey-monetnyy-dvor",
+      "name": "suzun muzey monetnyy dvor",
+      "clusterSize": 2,
+      "keeper": "skulptura-delovaya-zhenschina"
+    },
+    {
+      "stem": "suzun-pamyatnik-sibirskoy-monete",
+      "name": "suzun pamyatnik sibirskoy monete",
+      "clusterSize": 2,
+      "keeper": "delfiniya"
+    },
+    {
+      "stem": "suzun-tolchelnya",
+      "name": "suzun tolchelnya",
+      "clusterSize": 2,
+      "keeper": "red-line-cover"
+    },
+    {
+      "stem": "suzun-voznesenskaya-tserkov",
+      "name": "suzun voznesenskaya tserkov",
+      "clusterSize": 2,
+      "keeper": "arka-kolokol-mira"
+    }
+  ],
+  "d0": 14
+}

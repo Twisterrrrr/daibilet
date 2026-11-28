@@ -1,0 +1,1200 @@
+{
+  "generatedAt": "2026-11-12",
+  "evidence": "Local apply-result files; no additional production mutation",
+  "totalApplied": 94,
+  "batches": [
+    {
+      "batch": "animaciya-acoustic",
+      "count": 5,
+      "payloadFiles": [
+        "data/ticketscloud/editorial/eventpage-rewrites-2026-11-10-animaciya-acoustic.json"
+      ],
+      "statusCounts": [
+        {
+          "status": "DRAFT",
+          "count": 5
+        }
+      ],
+      "indexableCount": 0,
+      "publishedAtCount": 0,
+      "records": [
+        {
+          "eventId": "evt_6ad5ed5a2525da76d7aef422",
+          "eventPageId": "43d9815d-c4b9-43e9-a95e-75f3684e0711",
+          "slug": "04-02-2027-petropavlovsk-kamchatskii-vse-hity-kostya-kulyasov-gr-animaciya-akustika-animaciya-onlin-petropavlovsk-kamchatskiy",
+          "status": "DRAFT",
+          "indexable": false,
+          "publishedAt": null,
+          "revision": "1->2",
+          "route": "/events/04-02-2027-petropavlovsk-kamchatskii-vse-hity-kostya-kulyasov-gr-animaciya-akustika-animaciya-onlin-petropavlovsk-kamchatskiy",
+          "mainChars": 1131
+        },
+        {
+          "eventId": "evt_6a3677d73e648237552b90ce",
+          "eventPageId": "453a9378-8625-498f-8259-5b6a504d1af9",
+          "slug": "26-11-2026-kostroma-vse-hity-kostya-kulyasov-gr-animaciya-akustika-animaciya-online-kostroma",
+          "status": "DRAFT",
+          "indexable": false,
+          "publishedAt": null,
+          "revision": "1->2",
+          "route": "/events/26-11-2026-kostroma-vse-hity-kostya-kulyasov-gr-animaciya-akustika-animaciya-online-kostroma",
+          "mainChars": 1118
+        },
+        {
+          "eventId": "evt_6ad9f9afbafbc9c8fc4ffd13",
+          "eventPageId": "4a1fdf78-d062-40e9-9774-4417e07f3a81",
+          "slug": "21-02-2027-kerch-vse-hity-kostya-kulyasov-gr-animaciya-akustika-animaciya-online-kerch",
+          "status": "DRAFT",
+          "indexable": false,
+          "publishedAt": null,
+          "revision": "1->2",
+          "route": "/events/21-02-2027-kerch-vse-hity-kostya-kulyasov-gr-animaciya-akustika-animaciya-online-kerch",
+          "mainChars": 1114
+        },
+        {
+          "eventId": "evt_6ad5f448319ea894665f763a",
+          "eventPageId": "4df029c7-5f5a-47c7-b4f4-bc982ff5d928",
+          "slug": "05-02-2027-vladivostok-vse-hity-kostya-kulyasov-gr-animaciya-akustika-animaciya-online-vladivostok",
+          "status": "DRAFT",
+          "indexable": false,
+          "publishedAt": null,
+          "revision": "1->2",
+          "route": "/events/05-02-2027-vladivostok-vse-hity-kostya-kulyasov-gr-animaciya-akustika-animaciya-online-vladivostok",
+          "mainChars": 1123
+        },
+        {
+          "eventId": "evt_6ad5f9a435e881f8eb5e9329",
+          "eventPageId": "68ca925a-1ae5-42b8-bbf8-7113cf0c534d",
+          "slug": "07-02-2027-blagoveschensk-vse-hity-kostya-kulyasov-gr-animaciya-akustika-animaciya-online-blagoveschensk-amurskaya-oblast",
+          "status": "DRAFT",
+          "indexable": false,
+          "publishedAt": null,
+          "revision": "1->2",
+          "route": "/events/07-02-2027-blagoveschensk-vse-hity-kostya-kulyasov-gr-animaciya-akustika-animaciya-online-blagoveschensk-amurskaya-oblast",
+          "mainChars": 1141
+        }
+      ]
+    },
+    {
+      "batch": "animaciya-band",
+      "count": 6,
+      "payloadFiles": [
+        "data/ticketscloud/editorial/eventpage-rewrites-2026-11-10-animaciya-band.json"
+      ],
+      "statusCounts": [
+        {
+          "status": "DRAFT",
+          "count": 6
+        }
+      ],
+      "indexableCount": 0,
+      "publishedAtCount": 0,
+      "records": [
+        {
+          "eventId": "evt_6a79780b77910dcc8bd339de",
+          "eventPageId": "38bb0418-d716-40cd-bf5c-649682e29ad4",
+          "slug": "14-11-2026-novokuzneck-kostya-kulyasov-i-gruppa-animaciya-animaciya-online-novokuzneck",
+          "status": "DRAFT",
+          "indexable": false,
+          "publishedAt": null,
+          "revision": "1->2",
+          "route": "/events/14-11-2026-novokuzneck-kostya-kulyasov-i-gruppa-animaciya-animaciya-online-novokuzneck",
+          "mainChars": 1519
+        },
+        {
+          "eventId": "evt_6a326088034eef6ae27dc6e1",
+          "eventPageId": "487055eb-d3d0-446e-ae8e-2dcf795e10c7",
+          "slug": "12-11-2026-tomsk-kostya-kulyasov-i-gruppa-animaciya-animaciya-online-tomsk",
+          "status": "DRAFT",
+          "indexable": false,
+          "publishedAt": null,
+          "revision": "1->2",
+          "route": "/events/12-11-2026-tomsk-kostya-kulyasov-i-gruppa-animaciya-animaciya-online-tomsk",
+          "mainChars": 1514
+        },
+        {
+          "eventId": "evt_6a3272167bd4ee47709f2610",
+          "eventPageId": "539de031-e65c-4096-91f4-5f54bd9e4764",
+          "slug": "15-11-2026-barnaul-kostya-kulyasov-i-gruppa-animaciya-animaciya-online-barnaul",
+          "status": "DRAFT",
+          "indexable": false,
+          "publishedAt": null,
+          "revision": "1->2",
+          "route": "/events/15-11-2026-barnaul-kostya-kulyasov-i-gruppa-animaciya-animaciya-online-barnaul",
+          "mainChars": 1513
+        },
+        {
+          "eventId": "evt_6a3267e392340fb768e0a097",
+          "eventPageId": "7bb515c8-cb5e-463a-ae2e-1e06753968f6",
+          "slug": "13-11-2026-kemerovo-kostya-kulyasov-i-gruppa-animaciya-animaciya-online-kemerovo",
+          "status": "DRAFT",
+          "indexable": false,
+          "publishedAt": null,
+          "revision": "1->2",
+          "route": "/events/13-11-2026-kemerovo-kostya-kulyasov-i-gruppa-animaciya-animaciya-online-kemerovo",
+          "mainChars": 1519
+        },
+        {
+          "eventId": "evt_6a33acb64259f2497f1de605",
+          "eventPageId": "b12be7df-523d-47da-b31c-88575326a705",
+          "slug": "17-11-2026-abakan-kostya-kulyasov-i-gruppa-animaciya-animaciya-online-abakan",
+          "status": "DRAFT",
+          "indexable": false,
+          "publishedAt": null,
+          "revision": "1->2",
+          "route": "/events/17-11-2026-abakan-kostya-kulyasov-i-gruppa-animaciya-animaciya-online-abakan",
+          "mainChars": 1517
+        },
+        {
+          "eventId": "evt_6a8c82a91ecdee7663cff1ac",
+          "eventPageId": "d4af0955-8b27-4e7a-9b5b-151018fafde1",
+          "slug": "18-11-2026-krasnoyarsk-kostya-kulyasov-i-gruppa-animaciya-animaciya-online-krasnoyarsk",
+          "status": "DRAFT",
+          "indexable": false,
+          "publishedAt": null,
+          "revision": "1->2",
+          "route": "/events/18-11-2026-krasnoyarsk-kostya-kulyasov-i-gruppa-animaciya-animaciya-online-krasnoyarsk",
+          "mainChars": 1515
+        }
+      ]
+    },
+    {
+      "batch": "anna-asti",
+      "count": 7,
+      "payloadFiles": [
+        "data/ticketscloud/editorial/eventpage-rewrites-2026-11-09-anna-asti.json"
+      ],
+      "statusCounts": [
+        {
+          "status": "DRAFT",
+          "count": 7
+        }
+      ],
+      "indexableCount": 0,
+      "publishedAtCount": 0,
+      "records": [
+        {
+          "eventId": "evt_69f8eb16ed0e1619e45bc72c",
+          "eventPageId": "0e89916b-f9f4-4626-9bbe-288aa3444337",
+          "slug": "anna-asti-solnyi-koncert-shou-carica-v-g-vladivostok",
+          "status": "DRAFT",
+          "indexable": false,
+          "publishedAt": null,
+          "revision": "1->2",
+          "route": "/events/anna-asti-solnyi-koncert-shou-carica-v-g-vladivostok",
+          "mainChars": 1574
+        },
+        {
+          "eventId": "evt_6a8307af4ee6d470db0da246",
+          "eventPageId": "7632040e-efaa-42d6-ba17-53c2dd58932a",
+          "slug": "anna-asti-solnyi-koncert-shou-carica-v-g-voronezh",
+          "status": "DRAFT",
+          "indexable": false,
+          "publishedAt": null,
+          "revision": "1->2",
+          "route": "/events/anna-asti-solnyi-koncert-shou-carica-v-g-voronezh",
+          "mainChars": 1587
+        },
+        {
+          "eventId": "evt_6a2f0b6f45040b5afce38fe4",
+          "eventPageId": "cd8d9b6d-d61b-4c06-99e1-ab6e59207fac",
+          "slug": "anna-asti-solnyi-koncert-shou-carica-v-g-krasnodar",
+          "status": "DRAFT",
+          "indexable": false,
+          "publishedAt": null,
+          "revision": "1->2",
+          "route": "/events/anna-asti-solnyi-koncert-shou-carica-v-g-krasnodar",
+          "mainChars": 1564
+        },
+        {
+          "eventId": "evt_69fd82eadb42bf5f5966403b",
+          "eventPageId": "d7a18f1c-f1f8-4f3d-91f6-5177b9a5dfbd",
+          "slug": "anna-asti-solnyi-koncert-shou-carica-v-g-kurgan",
+          "status": "DRAFT",
+          "indexable": false,
+          "publishedAt": null,
+          "revision": "1->2",
+          "route": "/events/anna-asti-solnyi-koncert-shou-carica-v-g-kurgan",
+          "mainChars": 1585
+        },
+        {
+          "eventId": "evt_69e5f0546f2ef39d67a00eda",
+          "eventPageId": "95d20c5c-51c0-4007-9ae8-467e6afc3fce",
+          "slug": "anna-asti-solnyi-koncert-shou-carica-v-g-ryazan",
+          "status": "DRAFT",
+          "indexable": false,
+          "publishedAt": null,
+          "revision": "1->2",
+          "route": "/events/anna-asti-solnyi-koncert-shou-carica-v-g-ryazan",
+          "mainChars": 1566
+        },
+        {
+          "eventId": "evt_69fd8dd4a7835719e4d9f05e",
+          "eventPageId": "3b816506-41c1-4367-972d-07a486ef499d",
+          "slug": "anna-asti-solnyi-koncert-shou-carica-v-g-tula",
+          "status": "DRAFT",
+          "indexable": false,
+          "publishedAt": null,
+          "revision": "1->2",
+          "route": "/events/anna-asti-solnyi-koncert-shou-carica-v-g-tula",
+          "mainChars": 1560
+        },
+        {
+          "eventId": "evt_69fa2bd974a803f6a1a427d9",
+          "eventPageId": "ea2c25aa-4e4f-4135-a029-a1bcf5da4212",
+          "slug": "anna-asti-solnyi-koncert-shou-carica-v-g-habarovsk",
+          "status": "DRAFT",
+          "indexable": false,
+          "publishedAt": null,
+          "revision": "1->2",
+          "route": "/events/anna-asti-solnyi-koncert-shou-carica-v-g-habarovsk",
+          "mainChars": 1567
+        }
+      ]
+    },
+    {
+      "batch": "2026-11-09-six-eventpages",
+      "count": 6,
+      "payloadFiles": [
+        "data/ticketscloud/editorial/eventpage-rewrites-2026-11-09.json"
+      ],
+      "statusCounts": [
+        {
+          "status": "DRAFT",
+          "count": 6
+        }
+      ],
+      "indexableCount": 0,
+      "publishedAtCount": 0,
+      "records": [
+        {
+          "eventId": "evt_6acfd363cbc0880ed1ac87ce",
+          "eventPageId": "d5991ae8-4564-4633-8c4e-46110bbfdc7c",
+          "slug": "hamdam-sabirov-peshta-sankt-peterburg",
+          "status": "DRAFT",
+          "indexable": false,
+          "publishedAt": null,
+          "revision": "1->2",
+          "route": "/events/hamdam-sabirov-peshta-sankt-peterburg",
+          "mainChars": 1415
+        },
+        {
+          "eventId": "evt_6abd140ddb782c0522c6be57",
+          "eventPageId": "1387b4f6-8afa-41ad-87c8-552abacf7fb9",
+          "slug": "nigativ-vse-hity-44-12-03-27-sankt-peterburg-aurora-concert-hall-sankt-peterburg",
+          "status": "DRAFT",
+          "indexable": false,
+          "publishedAt": null,
+          "revision": "1->2",
+          "route": "/events/nigativ-vse-hity-44-12-03-27-sankt-peterburg-aurora-concert-hall-sankt-peterburg",
+          "mainChars": 1374
+        },
+        {
+          "eventId": "evt_6aca05407ebf70419a6b98e4",
+          "eventPageId": "a2b48836-287a-46c0-a6dd-20c2ef02b066",
+          "slug": "nigativ-vse-hity-44-04-03-27-moskva-base-moskva",
+          "status": "DRAFT",
+          "indexable": false,
+          "publishedAt": null,
+          "revision": "1->2",
+          "route": "/events/nigativ-vse-hity-44-04-03-27-moskva-base-moskva",
+          "mainChars": 1346
+        },
+        {
+          "eventId": "evt_6a95740f0ca3c3a0893ffc7b",
+          "eventPageId": "4e6bfd9d-1132-4084-99c3-b213e4fae867",
+          "slug": "trinadcat-karat-arhangelsk-20-dekabrya-ruki-vverh-arhangelsk",
+          "status": "DRAFT",
+          "indexable": false,
+          "publishedAt": null,
+          "revision": "1->2",
+          "route": "/events/trinadcat-karat-arhangelsk-20-dekabrya-ruki-vverh-arhangelsk",
+          "mainChars": 1353
+        },
+        {
+          "eventId": "evt_6aa2f3f0187e252232dd1194",
+          "eventPageId": "eec39022-948c-49e8-9026-4df085dfacd1",
+          "slug": "policeimako-lomovoi-radio-natasha-2026-itogi-moskva",
+          "status": "DRAFT",
+          "indexable": false,
+          "publishedAt": null,
+          "revision": "1->2",
+          "route": "/events/policeimako-lomovoi-radio-natasha-2026-itogi-moskva",
+          "mainChars": 1492
+        },
+        {
+          "eventId": "evt_6a0b732a15569d7fd36c60d5",
+          "eventPageId": "87d20700-666d-46a8-8b9c-9b9b37fc9826",
+          "slug": "pavel-kashin-sankt-peterburg-2",
+          "status": "DRAFT",
+          "indexable": false,
+          "publishedAt": null,
+          "revision": "1->2",
+          "route": "/events/pavel-kashin-sankt-peterburg-2",
+          "mainChars": 1483
+        }
+      ]
+    },
+    {
+      "batch": "eduard-tour",
+      "count": 10,
+      "payloadFiles": [
+        "data/ticketscloud/editorial/eventpage-rewrites-2026-11-09-eduard-tour.json"
+      ],
+      "statusCounts": [
+        {
+          "status": "DRAFT",
+          "count": 10
+        }
+      ],
+      "indexableCount": 0,
+      "publishedAtCount": 0,
+      "records": [
+        {
+          "eventId": "evt_6aaa3c7c653b5c324572a323",
+          "eventPageId": "df365a8c-1536-491e-8b2e-ca3df041929a",
+          "slug": "eduard-husnutdinov-vo-vladimire-2026-vladimir",
+          "status": "DRAFT",
+          "indexable": false,
+          "publishedAt": null,
+          "revision": "1->2",
+          "route": "/events/eduard-husnutdinov-vo-vladimire-2026-vladimir",
+          "mainChars": 1088
+        },
+        {
+          "eventId": "evt_6aaa86440187b3a251a7c3ae",
+          "eventPageId": "b274ac82-977a-452b-aa7f-830ef0bb6fe1",
+          "slug": "eduard-husnutdinov-v-ivanovo-2026-ivanovo",
+          "status": "DRAFT",
+          "indexable": false,
+          "publishedAt": null,
+          "revision": "1->2",
+          "route": "/events/eduard-husnutdinov-v-ivanovo-2026-ivanovo",
+          "mainChars": 1073
+        },
+        {
+          "eventId": "evt_6ab50429050b3c2a5b29766a",
+          "eventPageId": "3bb0a8b1-456b-4048-a50c-5310aaa07ec5",
+          "slug": "eduard-husnutdinov-v-kirove-2026-kirov-kirovskaya-oblast",
+          "status": "DRAFT",
+          "indexable": false,
+          "publishedAt": null,
+          "revision": "1->2",
+          "route": "/events/eduard-husnutdinov-v-kirove-2026-kirov-kirovskaya-oblast",
+          "mainChars": 1086
+        },
+        {
+          "eventId": "evt_6ab51c60c29790d80d56f0da",
+          "eventPageId": "5c249e31-434a-4150-a4b1-9b1b6e6bb538",
+          "slug": "eduard-husnutdinov-v-kostrome-2026-kostroma",
+          "status": "DRAFT",
+          "indexable": false,
+          "publishedAt": null,
+          "revision": "1->2",
+          "route": "/events/eduard-husnutdinov-v-kostrome-2026-kostroma",
+          "mainChars": 1086
+        },
+        {
+          "eventId": "evt_6aa943c1bb9c2e9fe1155822",
+          "eventPageId": "96ff5f52-dd4a-4157-a251-118ba54112b2",
+          "slug": "eduard-husnutdinov-v-moskve-2026-moskva",
+          "status": "DRAFT",
+          "indexable": false,
+          "publishedAt": null,
+          "revision": "1->2",
+          "route": "/events/eduard-husnutdinov-v-moskve-2026-moskva",
+          "mainChars": 1077
+        },
+        {
+          "eventId": "evt_6ab524cda381875b4bdba4bc",
+          "eventPageId": "47b6ac9a-f131-400d-962c-afd3bb5f81d1",
+          "slug": "eduard-husnutdinov-v-permi-2026-perm",
+          "status": "DRAFT",
+          "indexable": false,
+          "publishedAt": null,
+          "revision": "1->2",
+          "route": "/events/eduard-husnutdinov-v-permi-2026-perm",
+          "mainChars": 1070
+        },
+        {
+          "eventId": "evt_6aaaa750f7ae5d9cf34b64de",
+          "eventPageId": "68de109c-7bcd-467d-9b05-bec5e5eef480",
+          "slug": "eduard-husnutdinov-v-tveri-2026-tver",
+          "status": "DRAFT",
+          "indexable": false,
+          "publishedAt": null,
+          "revision": "1->2",
+          "route": "/events/eduard-husnutdinov-v-tveri-2026-tver",
+          "mainChars": 1069
+        },
+        {
+          "eventId": "evt_6aacc8305f1f4d71f386b1b8",
+          "eventPageId": "26a3bcbc-14d0-4e38-8dc6-97edbc234c3e",
+          "slug": "eduard-husnutdinov-v-tule-2026-tula",
+          "status": "DRAFT",
+          "indexable": false,
+          "publishedAt": null,
+          "revision": "1->2",
+          "route": "/events/eduard-husnutdinov-v-tule-2026-tula",
+          "mainChars": 1072
+        },
+        {
+          "eventId": "evt_6ab6393bc8898448c0b7f531",
+          "eventPageId": "63c16a86-077d-4a1a-875f-5eded1f06927",
+          "slug": "eduard-husnutdinov-v-ufe-2026-ufa",
+          "status": "DRAFT",
+          "indexable": false,
+          "publishedAt": null,
+          "revision": "1->2",
+          "route": "/events/eduard-husnutdinov-v-ufe-2026-ufa",
+          "mainChars": 1086
+        },
+        {
+          "eventId": "evt_6aaa9eb507570a2982ad5d06",
+          "eventPageId": "c0a35048-1998-44ad-8a15-95eb838fc124",
+          "slug": "eduard-husnutdinov-v-cherepovce-2026-cherepovec",
+          "status": "DRAFT",
+          "indexable": false,
+          "publishedAt": null,
+          "revision": "1->2",
+          "route": "/events/eduard-husnutdinov-v-cherepovce-2026-cherepovec",
+          "mainChars": 1076
+        }
+      ]
+    },
+    {
+      "batch": "new-year-01a",
+      "count": 10,
+      "payloadFiles": [
+        "data/ticketscloud/editorial/new-year-eventpage-rewrites-batch-01a-2026-11-10.json",
+        "data/teplohod/editorial/new-year-eventpage-rewrites-batch-01a-2026-11-10.json"
+      ],
+      "statusCounts": [
+        {
+          "status": "DRAFT",
+          "count": 10
+        }
+      ],
+      "indexableCount": 0,
+      "publishedAtCount": 0,
+      "records": [
+        {
+          "eventId": "evt_6ae3345f015bfdad6a1f7c7b",
+          "eventPageId": "763a6b32-7cde-45bf-a6a4-760594f4539d",
+          "slug": "schelkunchik-predchuvstvie-volshebstva-muzykalnoe-puteshestvie-v-zimnyuyu-skazku-v-esenin-centre-vecher-moskva",
+          "status": "DRAFT",
+          "indexable": false,
+          "publishedAt": null,
+          "revision": "1->2",
+          "route": "/events/schelkunchik-predchuvstvie-volshebstva-muzykalnoe-puteshestvie-v-zimnyuyu-skazku-v-esenin-centre-vecher-moskva",
+          "mainChars": 769
+        },
+        {
+          "eventId": "evt_6adca05b56fba519ed105419",
+          "eventPageId": "8a80a65c-5c47-40cc-a8fa-f5b9c1b6a98b",
+          "slug": "dzhaz-poemy-novogodnii-koncert-moskva",
+          "status": "DRAFT",
+          "indexable": false,
+          "publishedAt": null,
+          "revision": "1->2",
+          "route": "/events/dzhaz-poemy-novogodnii-koncert-moskva",
+          "mainChars": 949
+        },
+        {
+          "eventId": "evt_6ad7e4bdefc48d634a4cd2d8",
+          "eventPageId": "2ff7cc9c-674e-4bfe-98e1-3017db5933bb",
+          "slug": "schelkunchik-chaikovskii-v-dzhaze-zelenograd",
+          "status": "DRAFT",
+          "indexable": false,
+          "publishedAt": null,
+          "revision": "1->2",
+          "route": "/events/schelkunchik-chaikovskii-v-dzhaze-zelenograd",
+          "mainChars": 1256
+        },
+        {
+          "eventId": "evt_tep_1537",
+          "eventPageId": "d9ae76b9-0582-4281-bc9b-412b48ebbb14",
+          "slug": "novogodnii-koncert-dlya-detei-novogodnyaya-elka-moskva",
+          "status": "DRAFT",
+          "indexable": false,
+          "publishedAt": null,
+          "revision": "1->2",
+          "route": "/events/novogodnii-koncert-dlya-detei-novogodnyaya-elka-moskva",
+          "mainChars": 1290
+        },
+        {
+          "eventId": "evt_tep_1541",
+          "eventPageId": "e1222fbc-5433-4ce2-95c7-1614a42a60c5",
+          "slug": "novogodnii-goluboi-ogonek-koncert-na-korable-moskva",
+          "status": "DRAFT",
+          "indexable": false,
+          "publishedAt": null,
+          "revision": "1->2",
+          "route": "/events/novogodnii-goluboi-ogonek-koncert-na-korable-moskva",
+          "mainChars": 1150
+        },
+        {
+          "eventId": "evt_6ab234e96e3e0971661e5b36",
+          "eventPageId": "2ddb2b3a-fade-40a5-a333-760c7bb6c4f1",
+          "slug": "aleks-abra-sinatra-christmas-rozhdestvenskie-dzhazovoe-shou-moskva",
+          "status": "DRAFT",
+          "indexable": false,
+          "publishedAt": null,
+          "revision": "1->2",
+          "route": "/events/aleks-abra-sinatra-christmas-rozhdestvenskie-dzhazovoe-shou-moskva",
+          "mainChars": 1594
+        },
+        {
+          "eventId": "evt_6ac91efde2b1828475d87dea",
+          "eventPageId": "f36cd8cf-dc6a-42f5-bf31-d86e9612b526",
+          "slug": "novyi-god-s-vladimirom-surdinym-i-alekseem-semihatovym-moskva",
+          "status": "DRAFT",
+          "indexable": false,
+          "publishedAt": null,
+          "revision": "1->2",
+          "route": "/events/novyi-god-s-vladimirom-surdinym-i-alekseem-semihatovym-moskva",
+          "mainChars": 2471
+        },
+        {
+          "eventId": "evt_6ad5ea597f0027048431458d",
+          "eventPageId": "976fd5e0-6964-4cbf-af79-eb02a0f8e560",
+          "slug": "novyi-god-ot-tetoshnoi-repeticiya-tver",
+          "status": "DRAFT",
+          "indexable": false,
+          "publishedAt": null,
+          "revision": "1->2",
+          "route": "/events/novyi-god-ot-tetoshnoi-repeticiya-tver",
+          "mainChars": 1022
+        },
+        {
+          "eventId": "evt_6ad671b7d553b2d1a313d020",
+          "eventPageId": "e088377a-7d9a-43fe-a163-27ebf0a9efc2",
+          "slug": "predchuvstvie-rozhdestva-moskva",
+          "status": "DRAFT",
+          "indexable": false,
+          "publishedAt": null,
+          "revision": "1->2",
+          "route": "/events/predchuvstvie-rozhdestva-moskva",
+          "mainChars": 2396
+        },
+        {
+          "eventId": "evt_6aac17b6c9dd03eb482f7adf",
+          "eventPageId": "a8905fd5-0e19-4b59-8ef4-c4dfee5e4f71",
+          "slug": "rozhdestvo-2000-h-moskva",
+          "status": "DRAFT",
+          "indexable": false,
+          "publishedAt": null,
+          "revision": "1->2",
+          "route": "/events/rozhdestvo-2000-h-moskva",
+          "mainChars": 854
+        }
+      ]
+    },
+    {
+      "batch": "new-year-01b",
+      "count": 10,
+      "payloadFiles": [
+        "data/ticketscloud/editorial/new-year-batch-01b-eventpage-rewrites-2026-11-10.json",
+        "data/teplohod/editorial/new-year-batch-01b-eventpage-rewrites-2026-11-10.json"
+      ],
+      "statusCounts": [
+        {
+          "status": "DRAFT",
+          "count": 10
+        }
+      ],
+      "indexableCount": 0,
+      "publishedAtCount": 0,
+      "records": [
+        {
+          "eventId": "evt_6a75c8d3e66db030c467f7cc",
+          "eventPageId": "729aeebd-96be-4cd1-94cb-90f426a4fd72",
+          "slug": "fizica-antarctic-v-moskve-novogodnii-koncert-moskva",
+          "status": "DRAFT",
+          "indexable": false,
+          "publishedAt": null,
+          "revision": "1->2",
+          "route": "/events/fizica-antarctic-v-moskve-novogodnii-koncert-moskva",
+          "mainChars": 867
+        },
+        {
+          "eventId": "evt_6ac9015590383ac485af6c57",
+          "eventPageId": "717b59df-c07e-48a7-8fc2-aac828dc58cf",
+          "slug": "novyi-god-s-vladimirom-surdinym-i-alekseem-semihatovym-sankt-peterburg",
+          "status": "DRAFT",
+          "indexable": false,
+          "publishedAt": null,
+          "revision": "1->2",
+          "route": "/events/novyi-god-s-vladimirom-surdinym-i-alekseem-semihatovym-sankt-peterburg",
+          "mainChars": 2632
+        },
+        {
+          "eventId": "evt_6aa80e7d4b84407c30797825",
+          "eventPageId": "4162ceeb-f457-47da-8fe3-946617b8213e",
+          "slug": "novogodnie-saundtreki-pri-svechah-s-aso-orkestrom-shou-kotoroe-podarit-vam-chudo-krasnodar",
+          "status": "DRAFT",
+          "indexable": false,
+          "publishedAt": null,
+          "revision": "1->2",
+          "route": "/events/novogodnie-saundtreki-pri-svechah-s-aso-orkestrom-shou-kotoroe-podarit-vam-chudo-krasnodar",
+          "mainChars": 2284
+        },
+        {
+          "eventId": "evt_6ae33ce4c99c815c1dcb3350",
+          "eventPageId": "75cb82cd-37e7-4052-b61e-4df51ae0eae2",
+          "slug": "schelkunchik-predchuvstvie-volshebstva-muzykalnoe-puteshestvie-v-zimnyuyu-skazku-v-buninskoi-muzykaln-moskva",
+          "status": "DRAFT",
+          "indexable": false,
+          "publishedAt": null,
+          "revision": "1->2",
+          "route": "/events/schelkunchik-predchuvstvie-volshebstva-muzykalnoe-puteshestvie-v-zimnyuyu-skazku-v-buninskoi-muzykaln-moskva",
+          "mainChars": 802
+        },
+        {
+          "eventId": "evt_6ab239479d31379f2b65355b",
+          "eventPageId": "cc49b917-2d09-4b33-b2ba-72681e07f297",
+          "slug": "aleks-abra-let-it-snow-rozhdestvenskoe-dzhazovoe-shou-moskva",
+          "status": "DRAFT",
+          "indexable": false,
+          "publishedAt": null,
+          "revision": "1->2",
+          "route": "/events/aleks-abra-let-it-snow-rozhdestvenskoe-dzhazovoe-shou-moskva",
+          "mainChars": 1394
+        },
+        {
+          "eventId": "evt_6ad7b61179df44983db5cebd",
+          "eventPageId": "19d0b78b-3054-44d8-920c-db6ae4eb6f16",
+          "slug": "v-ozhidanii-rozhdestva-organ-i-golosa-pri-svechah-ulyanovsk",
+          "status": "DRAFT",
+          "indexable": false,
+          "publishedAt": null,
+          "revision": "1->2",
+          "route": "/events/v-ozhidanii-rozhdestva-organ-i-golosa-pri-svechah-ulyanovsk",
+          "mainChars": 2067
+        },
+        {
+          "eventId": "evt_6ab2f0b5b704cb21b99e4cff",
+          "eventPageId": "da3d4f93-cb47-40a6-ac1e-455dc1578fdc",
+          "slug": "aleksandr-demidov-rozhdestvenskii-koncert-sankt-peterburg",
+          "status": "DRAFT",
+          "indexable": false,
+          "publishedAt": null,
+          "revision": "1->2",
+          "route": "/events/aleksandr-demidov-rozhdestvenskii-koncert-sankt-peterburg",
+          "mainChars": 2101
+        },
+        {
+          "eventId": "evt_6ad7bd4a84d972d11d6939af",
+          "eventPageId": "c50becf5-8d2e-4bc1-8901-0add82cede4c",
+          "slug": "rozhdestvo-pri-svechah-ot-baha-do-schelkunchika-ulyanovsk",
+          "status": "DRAFT",
+          "indexable": false,
+          "publishedAt": null,
+          "revision": "1->2",
+          "route": "/events/rozhdestvo-pri-svechah-ot-baha-do-schelkunchika-ulyanovsk",
+          "mainChars": 1948
+        },
+        {
+          "eventId": "evt_tep_1276",
+          "eventPageId": "5606c7c0-d517-4ea3-acbf-32c32f4c0a78",
+          "slug": "novogodnii-korporativ-17-23-i-24-dekabrya-2026-na-teplohode-river-palas-s-kruizom-i-razvlekatelnoi-programmoi-moskva",
+          "status": "DRAFT",
+          "indexable": false,
+          "publishedAt": null,
+          "revision": "1->2",
+          "route": "/events/novogodnii-korporativ-17-23-i-24-dekabrya-2026-na-teplohode-river-palas-s-kruizom-i-razvlekatelnoi-programmoi-moskva",
+          "mainChars": 598
+        },
+        {
+          "eventId": "evt_tep_1259",
+          "eventPageId": "feda2d30-8788-4184-8c7d-299459d620af",
+          "slug": "novogodnii-korporativ-18-i-25-dekabrya-2026-na-teplohode-river-palas-s-kruizom-i-razvlekatelnoi-programmoi-moskva",
+          "status": "DRAFT",
+          "indexable": false,
+          "publishedAt": null,
+          "revision": "1->2",
+          "route": "/events/novogodnii-korporativ-18-i-25-dekabrya-2026-na-teplohode-river-palas-s-kruizom-i-razvlekatelnoi-programmoi-moskva",
+          "mainChars": 610
+        }
+      ]
+    },
+    {
+      "batch": "new-year-01c",
+      "count": 10,
+      "payloadFiles": [
+        "data/ticketscloud/editorial/new-year-batch-01c-eventpage-rewrites-2026-11-10.json"
+      ],
+      "statusCounts": [
+        {
+          "status": "DRAFT",
+          "count": 10
+        }
+      ],
+      "indexableCount": 0,
+      "publishedAtCount": 0,
+      "records": [
+        {
+          "eventId": "evt_6a896e543dd7cd2a48e11484",
+          "eventPageId": "c016c8c5-0cda-4f4e-9b7e-05f7ae58b5a6",
+          "slug": "balet-schelkunchik-gatchina",
+          "status": "DRAFT",
+          "indexable": false,
+          "publishedAt": null,
+          "revision": "1->2",
+          "route": "/events/balet-schelkunchik-gatchina",
+          "mainChars": 1500
+        },
+        {
+          "eventId": "evt_6ace27e38566b034b416c33a",
+          "eventPageId": "e73400db-fb9c-4993-ba13-fcbe5d0e1693",
+          "slug": "liza-makeeva-rozhdestvenskie-melodii-nyu-iorka-moskva",
+          "status": "DRAFT",
+          "indexable": false,
+          "publishedAt": null,
+          "revision": "1->2",
+          "route": "/events/liza-makeeva-rozhdestvenskie-melodii-nyu-iorka-moskva",
+          "mainChars": 1355
+        },
+        {
+          "eventId": "evt_6abb9087edf766d2da82bfa1",
+          "eventPageId": "a114eeb2-7fd2-45c7-a26d-8c35f61e1e8b",
+          "slug": "koncert-rozhdestvenskii-dzhaz-moskva",
+          "status": "DRAFT",
+          "indexable": false,
+          "publishedAt": null,
+          "revision": "1->2",
+          "route": "/events/koncert-rozhdestvenskii-dzhaz-moskva",
+          "mainChars": 1215
+        },
+        {
+          "eventId": "evt_6ac60ab78add3abe0cb85905",
+          "eventPageId": "a6eedee6-7009-4aa5-90a8-9860557bcafb",
+          "slug": "novogodnyaya-elka-garri-potter-taina-zapretnogo-lesa-volhov",
+          "status": "DRAFT",
+          "indexable": false,
+          "publishedAt": null,
+          "revision": "1->2",
+          "route": "/events/novogodnyaya-elka-garri-potter-taina-zapretnogo-lesa-volhov",
+          "mainChars": 998
+        },
+        {
+          "eventId": "evt_6ad47bd4abbbcf11c9c4bd9e",
+          "eventPageId": "95a3b8f0-056c-46b0-9ba4-2c7795f34d58",
+          "slug": "schelkunchik-predchuvstvie-volshebstva-muzykalnoe-puteshestvie-v-zimnyuyu-skazku-v-usadbe-kuskovo-moskva",
+          "status": "DRAFT",
+          "indexable": false,
+          "publishedAt": null,
+          "revision": "1->2",
+          "route": "/events/schelkunchik-predchuvstvie-volshebstva-muzykalnoe-puteshestvie-v-zimnyuyu-skazku-v-usadbe-kuskovo-moskva",
+          "mainChars": 639
+        },
+        {
+          "eventId": "evt_6ad011229630e1640215cdad",
+          "eventPageId": "56aa6ed2-593a-4fbe-87d7-f327e30aef64",
+          "slug": "novogodnii-shou-koncert-rostov-na-donu",
+          "status": "DRAFT",
+          "indexable": false,
+          "publishedAt": null,
+          "revision": "1->2",
+          "route": "/events/novogodnii-shou-koncert-rostov-na-donu",
+          "mainChars": 1041
+        },
+        {
+          "eventId": "evt_6a99bbf778043ee36116eb4e",
+          "eventPageId": "675ab4b3-c0fc-48ca-b436-4c5a22191288",
+          "slug": "fizica-antarctic-v-sankt-peterburge-novogodnii-koncert-sankt-peterburg",
+          "status": "DRAFT",
+          "indexable": false,
+          "publishedAt": null,
+          "revision": "1->2",
+          "route": "/events/fizica-antarctic-v-sankt-peterburge-novogodnii-koncert-sankt-peterburg",
+          "mainChars": 942
+        },
+        {
+          "eventId": "evt_6ae2139b87426c82b102e520",
+          "eventPageId": "10303445-4b2b-49f6-b906-4d370793dc1b",
+          "slug": "novogodnyaya-tancploschadka-papina-muzyka-ot-gr-skip-tver",
+          "status": "DRAFT",
+          "indexable": false,
+          "publishedAt": null,
+          "revision": "1->2",
+          "route": "/events/novogodnyaya-tancploschadka-papina-muzyka-ot-gr-skip-tver",
+          "mainChars": 1031
+        },
+        {
+          "eventId": "evt_6ad67aa79401508de03d1b16",
+          "eventPageId": "71d6f0c7-8792-47ab-adcf-f4745980211b",
+          "slug": "aleksei-vodovozov-zdravstvui-novyi-god-moskva",
+          "status": "DRAFT",
+          "indexable": false,
+          "publishedAt": null,
+          "revision": "1->2",
+          "route": "/events/aleksei-vodovozov-zdravstvui-novyi-god-moskva",
+          "mainChars": 1508
+        },
+        {
+          "eventId": "evt_6ac5434089e6a22cd0abf834",
+          "eventPageId": "52bbc926-af2c-4607-9383-2f8115b0b383",
+          "slug": "aleksei-reshetun-novyi-god-po-sudebno-medicinske-moskva",
+          "status": "DRAFT",
+          "indexable": false,
+          "publishedAt": null,
+          "revision": "1->2",
+          "route": "/events/aleksei-reshetun-novyi-god-po-sudebno-medicinske-moskva",
+          "mainChars": 1373
+        }
+      ]
+    },
+    {
+      "batch": "new-year-03a-03c",
+      "count": 30,
+      "payloadFiles": [
+        "data/ticketscloud/editorial/new-year-batch-03a-eventpage-rewrites-2026-11-10.json",
+        "data/teplohod/editorial/new-year-batch-03a-eventpage-rewrites-2026-11-10.json",
+        "data/ticketscloud/editorial/new-year-batch-03b-eventpage-rewrites-2026-11-10.json",
+        "data/ticketscloud/editorial/new-year-batch-03c-eventpage-rewrites-2026-11-10.json",
+        "data/teplohod/editorial/new-year-batch-03c-eventpage-rewrites-2026-11-10.json"
+      ],
+      "statusCounts": [
+        {
+          "status": "READY",
+          "count": 30
+        }
+      ],
+      "indexableCount": 30,
+      "publishedAtCount": 30,
+      "records": [
+        {
+          "eventId": "evt_6ab12ead40211bfa698fb047",
+          "eventPageId": "b8cb77c6-0671-4718-a157-b2eb55601384",
+          "slug": "ladies-of-burlesque-novogodnee-gala-shou-v-muzykalnom-klube-magnus-locus-moskva",
+          "status": "READY",
+          "indexable": true,
+          "publishedAt": "2026-11-10T11:53:20.326Z",
+          "revision": null,
+          "route": null,
+          "mainChars": null
+        },
+        {
+          "eventId": "evt_6a99c23d4439113c339a2144",
+          "eventPageId": "d65c791a-2e85-4efb-8b8e-4030fe706aeb",
+          "slug": "ekskursiya-v-osobnyak-shredera-koncert-novogodnyaya-melodiya-sankt-peterburg",
+          "status": "READY",
+          "indexable": true,
+          "publishedAt": "2026-11-10T11:53:20.64Z",
+          "revision": null,
+          "route": null,
+          "mainChars": null
+        },
+        {
+          "eventId": "evt_6ace441b94e5d842dd83258f",
+          "eventPageId": "c150367c-5ff3-4cdc-9733-69d8b1a4838e",
+          "slug": "celentano-show-italyanskii-novyi-god-moskva",
+          "status": "READY",
+          "indexable": true,
+          "publishedAt": "2026-11-10T11:53:21.025Z",
+          "revision": null,
+          "route": null,
+          "mainChars": null
+        },
+        {
+          "eventId": "evt_6a917901b8a6abb00e53560c",
+          "eventPageId": "c4f864da-e9b3-4df9-a051-485d33c71d4e",
+          "slug": "balet-schelkunchik-sankt-peterburg-3",
+          "status": "READY",
+          "indexable": true,
+          "publishedAt": "2026-11-10T11:53:21.396Z",
+          "revision": null,
+          "route": null,
+          "mainChars": null
+        },
+        {
+          "eventId": "evt_6abc1be98fd931cd1ab5981e",
+          "eventPageId": "5d8d3b79-a5f1-4241-b06f-9f44194c4424",
+          "slug": "organ-v-planetarii-rozhdestvo-sankt-peterburg",
+          "status": "READY",
+          "indexable": true,
+          "publishedAt": "2026-11-10T11:53:21.732Z",
+          "revision": null,
+          "route": null,
+          "mainChars": null
+        },
+        {
+          "eventId": "evt_6ace4633701e99b77512fcda",
+          "eventPageId": "4b9c2a29-c483-46cc-8710-b05384bf7efd",
+          "slug": "novyi-god-so-svetlanoi-zhavoronkovoi-acoustic-soul-moskva",
+          "status": "READY",
+          "indexable": true,
+          "publishedAt": "2026-11-10T11:53:22.066Z",
+          "revision": null,
+          "route": null,
+          "mainChars": null
+        },
+        {
+          "eventId": "evt_6ace47837478368535458a19",
+          "eventPageId": "f84981f5-0a10-4982-b4e7-7a17ef64b311",
+          "slug": "nani-eva-skazochnyi-novyi-god-moskva",
+          "status": "READY",
+          "indexable": true,
+          "publishedAt": "2026-11-10T11:53:22.343Z",
+          "revision": null,
+          "route": null,
+          "mainChars": null
+        },
+        {
+          "eventId": "evt_6ac3630f41275f6f8027784b",
+          "eventPageId": "ac4b121a-e55f-4017-b2ee-f461a0c2d0bd",
+          "slug": "samye-znamenitye-dzhazovye-kompozicii-vseh-vremen-moskva-10",
+          "status": "READY",
+          "indexable": true,
+          "publishedAt": "2026-11-10T11:53:22.563Z",
+          "revision": null,
+          "route": null,
+          "mainChars": null
+        },
+        {
+          "eventId": "evt_6ace44c760331e4c297fc165",
+          "eventPageId": "df0a57c1-0c20-4f2b-9330-475c6b474195",
+          "slug": "aleks-abra-sinatra-christmas-novogodnee-dzhazovoe-shou-moskva",
+          "status": "READY",
+          "indexable": true,
+          "publishedAt": "2026-11-10T11:53:22.776Z",
+          "revision": null,
+          "route": null,
+          "mainChars": null
+        },
+        {
+          "eventId": "evt_6abcf114cdcbcf662313bab1",
+          "eventPageId": "2df760db-137c-45e1-b8d8-3be9c7e096b8",
+          "slug": "novogodnyaya-noch-novyi-god-2027-volgograd",
+          "status": "READY",
+          "indexable": true,
+          "publishedAt": "2026-11-10T11:53:23.012Z",
+          "revision": null,
+          "route": null,
+          "mainChars": null
+        },
+        {
+          "eventId": "evt_6ac76ed0c480670db6243c3c",
+          "eventPageId": "f7bff281-d08a-4a4b-b7da-a563a289eb9b",
+          "slug": "novogodnyaya-noch-novyi-god-2027-volgograd-2",
+          "status": "READY",
+          "indexable": true,
+          "publishedAt": "2026-11-10T11:53:23.259Z",
+          "revision": null,
+          "route": null,
+          "mainChars": null
+        },
+        {
+          "eventId": "evt_6ab0aaacb9c8aa04ad59fc8e",
+          "eventPageId": "fd8d795f-50b0-48d5-9721-8eadceac095f",
+          "slug": "novogodnyaya-noch-v-restorane-timerhan-kazan",
+          "status": "READY",
+          "indexable": true,
+          "publishedAt": "2026-11-10T11:53:23.508Z",
+          "revision": null,
+          "route": null,
+          "mainChars": null
+        },
+        {
+          "eventId": "evt_6ad7284a3cae083479cd9f08",
+          "eventPageId": "2202b172-83c1-4d2b-87dc-d8524ff0fe4c",
+          "slug": "novogodnyaya-noch-v-restorane-saiyar-kazan",
+          "status": "READY",
+          "indexable": true,
+          "publishedAt": "2026-11-10T11:53:23.809Z",
+          "revision": null,
+          "route": null,
+          "mainChars": null
+        },
+        {
+          "eventId": "evt_6adccee1a8cdae9ba5a64e13",
+          "eventPageId": "ff2472d5-aa17-4a38-a03b-5b7159ba467c",
+          "slug": "novogodnyaya-noch-2027-v-nebo-ruftop-g-korolev",
+          "status": "READY",
+          "indexable": true,
+          "publishedAt": "2026-11-10T11:53:24.136Z",
+          "revision": null,
+          "route": null,
+          "mainChars": null
+        },
+        {
+          "eventId": "evt_6ab527cc83153f69a9fe0cd2",
+          "eventPageId": "ff4633bd-1f6b-4645-9e0a-af43f8ec9a3a",
+          "slug": "gde-moi-2008-treff8-ny-moskva",
+          "status": "READY",
+          "indexable": true,
+          "publishedAt": "2026-11-10T11:53:24.367Z",
+          "revision": null,
+          "route": null,
+          "mainChars": null
+        },
+        {
+          "eventId": "evt_6ad927b5b72572149d1b6d0e",
+          "eventPageId": "58a67333-7266-44e1-9b75-7fae3aa393db",
+          "slug": "novogodnyaya-noch-2027-v-soho-rooms-avraam-russo-i-soso-pavliashvili-moskva",
+          "status": "READY",
+          "indexable": true,
+          "publishedAt": "2026-11-10T11:53:24.603Z",
+          "revision": null,
+          "route": null,
+          "mainChars": null
+        },
+        {
+          "eventId": "evt_6ac7b0d5ef2d55f6918ab309",
+          "eventPageId": "8f117697-ce7d-47b7-b642-39da36ff7c0e",
+          "slug": "novogodnyaya-noch-2027-v-arbat-hall-puteshestvie-v-mir-fantazii-moskva",
+          "status": "READY",
+          "indexable": true,
+          "publishedAt": "2026-11-10T11:53:24.928Z",
+          "revision": null,
+          "route": null,
+          "mainChars": null
+        },
+        {
+          "eventId": "evt_6a86ee1c50470c72fc8570b4",
+          "eventPageId": "6f9c6808-86fb-467f-8956-45ad90040e15",
+          "slug": "novogodnyaya-noch-v-restorane-istoriya-sankt-peterburg",
+          "status": "READY",
+          "indexable": true,
+          "publishedAt": "2026-11-10T11:53:25.196Z",
+          "revision": null,
+          "route": null,
+          "mainChars": null
+        },
+        {
+          "eventId": "evt_6a86e994e57975302b351c61",
+          "eventPageId": "b6e08f2f-ad38-4e99-a13a-8390e7f0e68a",
+          "slug": "novogodnyaya-noch-v-restorane-sobytii-aleksandrovskii-park-sankt-peterburg",
+          "status": "READY",
+          "indexable": true,
+          "publishedAt": "2026-11-10T11:53:25.433Z",
+          "revision": null,
+          "route": null,
+          "mainChars": null
+        },
+        {
+          "eventId": "evt_6aac54fc55314e031b192395",
+          "eventPageId": "0da19d53-4397-4795-905e-4b03c8b25ee4",
+          "slug": "novyi-god-2026-2027-sankt-peterburg",
+          "status": "READY",
+          "indexable": true,
+          "publishedAt": "2026-11-10T11:53:25.731Z",
+          "revision": null,
+          "route": null,
+          "mainChars": null
+        },
+        {
+          "eventId": "evt_6ad1d3fbe9ada527f794fe01",
+          "eventPageId": "b1f714b9-cf60-4f09-aecf-534c2e648f9a",
+          "slug": "novyi-god-v-gamme-na-sadovom-moskva",
+          "status": "READY",
+          "indexable": true,
+          "publishedAt": "2026-11-10T11:53:25.939Z",
+          "revision": null,
+          "route": null,
+          "mainChars": null
+        },
+        {
+          "eventId": "evt_6ad4d34db1c46d8759bc4b6f",
+          "eventPageId": "42c20ee1-8c93-428b-adce-a2c923304e9c",
+          "slug": "novogodnie-hity-dlya-tenora-i-royalya-pri-svechah-moskva",
+          "status": "READY",
+          "indexable": true,
+          "publishedAt": "2026-11-10T11:53:26.166Z",
+          "revision": null,
+          "route": null,
+          "mainChars": null
+        },
+        {
+          "eventId": "evt_6a7439a232c0c00095808d62",
+          "eventPageId": "41ad9397-d9ad-47e1-91f1-ba2d776d86cf",
+          "slug": "novogodnii-subbotnii-dzhaz-i-horoshee-nastroenie-moskva",
+          "status": "READY",
+          "indexable": true,
+          "publishedAt": "2026-11-10T11:53:26.51Z",
+          "revision": null,
+          "route": null,
+          "mainChars": null
+        },
+        {
+          "eventId": "evt_6ac6bb08b2aca4fab5c5b971",
+          "eventPageId": "deb774fc-ba91-46f8-bbee-0d302dda2ccd",
+          "slug": "novogodnii-ogonek-so-zvezdami-80-90h-gruppa-karolina-tver",
+          "status": "READY",
+          "indexable": true,
+          "publishedAt": "2026-11-10T11:53:26.906Z",
+          "revision": null,
+          "route": null,
+          "mainChars": null
+        },
+        {
+          "eventId": "evt_69bb12020a78bb64bfcde2aa",
+          "eventPageId": "0efc6881-5bff-4dd5-a32d-97e36e045ed0",
+          "slug": "novogodnyaya-white-diskoteka-90h-moskva",
+          "status": "READY",
+          "indexable": true,
+          "publishedAt": "2026-11-10T11:53:27.115Z",
+          "revision": null,
+          "route": null,
+          "mainChars": null
+        },
+        {
+          "eventId": "evt_6adfa21c948b8bb0619343f3",
+          "eventPageId": "000a3953-4d69-4085-8b6d-ae4354a114d6",
+          "slug": "novogodnii-smo-rodnik-moskva",
+          "status": "READY",
+          "indexable": true,
+          "publishedAt": "2026-11-10T11:53:27.37Z",
+          "revision": null,
+          "route": null,
+          "mainChars": null
+        },
+        {
+          "eventId": "evt_6a65f2a0ccf2c6d0cd493b05",
+          "eventPageId": "ce9a6854-947d-481f-bc82-3788557a627a",
+          "slug": "novogodnii-ogonek-so-zvezdami-80-90h-prazdnichnyi-koncert-ryazan",
+          "status": "READY",
+          "indexable": true,
+          "publishedAt": "2026-11-10T11:53:27.59Z",
+          "revision": null,
+          "route": null,
+          "mainChars": null
+        },
+        {
+          "eventId": "evt_6a9c4c413207bfb65eb48cf9",
+          "eventPageId": "11aad633-cb3a-4e44-9029-b56ea6b79e03",
+          "slug": "ekskursiya-v-osobnyak-shredera-koncert-novogodnii-divertisment-za-stolikami-s-furshetom-sankt-peterburg",
+          "status": "READY",
+          "indexable": true,
+          "publishedAt": "2026-11-10T11:53:27.791Z",
+          "revision": null,
+          "route": null,
+          "mainChars": null
+        },
+        {
+          "eventId": "evt_tep_778",
+          "eventPageId": "ed53eea0-40da-4fd6-a983-71b1dad689e2",
+          "slug": "novogodnyaya-ekskursiya-2027-na-avtobuse-ot-krasnoi-ploschadi",
+          "status": "READY",
+          "indexable": true,
+          "publishedAt": "2026-11-10T11:53:27.966Z",
+          "revision": null,
+          "route": null,
+          "mainChars": null
+        },
+        {
+          "eventId": "evt_tep_1018",
+          "eventPageId": "c85048f7-6d59-4ba1-982e-fbdf4e987c4c",
+          "slug": "novogodnii-poyuschii-avtobus",
+          "status": "READY",
+          "indexable": true,
+          "publishedAt": "2026-11-10T11:53:28.176Z",
+          "revision": null,
+          "route": null,
+          "mainChars": null
+        }
+      ]
+    }
+  ]
+}

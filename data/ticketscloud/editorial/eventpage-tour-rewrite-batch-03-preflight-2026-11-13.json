@@ -1,0 +1,896 @@
+{
+  "mode": "read-only-preflight",
+  "capturedAt": "2026-11-13T05:54:23.749Z",
+  "groups": 23,
+  "pages": 51,
+  "distinctEventIds": 59,
+  "allPageRelationsUnchanged": true,
+  "allRoutesUnchanged": true,
+  "allSourcesAndSlotsUnchanged": true,
+  "copyRulesPass": true,
+  "noIdentityOrCanonicalConflicts": true,
+  "readyBefore": 2,
+  "draftsBefore": 49,
+  "indexableBefore": 2,
+  "existingTourGroups": 65,
+  "tourGroupCandidates": 50,
+  "sameCityPagesNotAssigned": 1,
+  "errors": [],
+  "results": [
+    {
+      "eventPageId": "6ae2a40e-e0a8-4205-a3f9-4ee6b39b40f4",
+      "eventIds": [
+        "evt_6af005516ab6aaefc4cf5d90"
+      ],
+      "slug": "cirk-shou-bravo-g-mcensk",
+      "city": "Мценск",
+      "groupNo": 1,
+      "status": "DRAFT",
+      "indexable": false,
+      "mainChars": 491,
+      "sourceChars": 0,
+      "previousChars": 0,
+      "paragraphCount": 2,
+      "relations": 1,
+      "currentTourGroupId": null
+    },
+    {
+      "eventPageId": "ed61179f-05ed-4150-8002-91254937ca1b",
+      "eventIds": [
+        "evt_6aee28312d5a50f7960e9581"
+      ],
+      "slug": "cirk-shou-bravo-g-miass",
+      "city": "Миасс",
+      "groupNo": 1,
+      "status": "DRAFT",
+      "indexable": false,
+      "mainChars": 491,
+      "sourceChars": 33,
+      "previousChars": 0,
+      "paragraphCount": 2,
+      "relations": 1,
+      "currentTourGroupId": null
+    },
+    {
+      "eventPageId": "e9269026-b520-44ce-889e-19adc9d817b3",
+      "eventIds": [
+        "evt_6aecdce24d62a20740afb2a5"
+      ],
+      "slug": "cirk-shou-bravo-g-zlatoust",
+      "city": "Златоуст",
+      "groupNo": 1,
+      "status": "DRAFT",
+      "indexable": false,
+      "mainChars": 491,
+      "sourceChars": 33,
+      "previousChars": 0,
+      "paragraphCount": 2,
+      "relations": 1,
+      "currentTourGroupId": null
+    },
+    {
+      "eventPageId": "b2f781d4-d5f6-4c3e-ab84-cd4316bacf56",
+      "eventIds": [
+        "evt_6aeccf0e428c5e652135bf06"
+      ],
+      "slug": "cirk-shou-bravo-g-korkino",
+      "city": "Коркино",
+      "groupNo": 1,
+      "status": "DRAFT",
+      "indexable": false,
+      "mainChars": 491,
+      "sourceChars": 33,
+      "previousChars": 0,
+      "paragraphCount": 2,
+      "relations": 1,
+      "currentTourGroupId": null
+    },
+    {
+      "eventPageId": "4002e040-ff8c-4248-93d0-fffd77726604",
+      "eventIds": [
+        "evt_6aec7035b9394373959070bc"
+      ],
+      "slug": "cirk-shou-bravo-g-chebarkul",
+      "city": "Чебаркуль",
+      "groupNo": 1,
+      "status": "DRAFT",
+      "indexable": false,
+      "mainChars": 491,
+      "sourceChars": 33,
+      "previousChars": 0,
+      "paragraphCount": 2,
+      "relations": 1,
+      "currentTourGroupId": null
+    },
+    {
+      "eventPageId": "03818c2a-ced1-4873-afea-d683fb5eae95",
+      "eventIds": [
+        "evt_6adefd3e869e3b4bf676e1e7"
+      ],
+      "slug": "dostoinyi-stendap-naberezhnye-chelny",
+      "city": "Набережные Челны",
+      "groupNo": 2,
+      "status": "DRAFT",
+      "indexable": false,
+      "mainChars": 631,
+      "sourceChars": 164,
+      "previousChars": 0,
+      "paragraphCount": 2,
+      "relations": 1,
+      "currentTourGroupId": null
+    },
+    {
+      "eventPageId": "17215bed-e434-4bd6-b7e0-2008a06d5af3",
+      "eventIds": [
+        "evt_6ab3d7aa0a3f7ab03f330869",
+        "evt_6ab3d7ab0a3f7ab03f330871",
+        "evt_6ab3d7ac0a3f7ab03f330879",
+        "evt_6ab3d7ad0a3f7ab03f330881"
+      ],
+      "slug": "dostoinyi-stendap-kazan",
+      "city": "Казань",
+      "groupNo": 2,
+      "status": "DRAFT",
+      "indexable": false,
+      "mainChars": 631,
+      "sourceChars": 164,
+      "previousChars": 0,
+      "paragraphCount": 2,
+      "relations": 4,
+      "currentTourGroupId": null
+    },
+    {
+      "eventPageId": "b5a98917-4e32-4e1f-9b50-978afc16d79c",
+      "eventIds": [
+        "evt_6ab3d782cc5a0aebe23308f6",
+        "evt_6aa14b11e4b1d69979bf825c",
+        "evt_6aa14b15e4b1d69979bf830c",
+        "evt_6aa14b19e4b1d69979bf83bc",
+        "evt_6ab3d785cc5a0aebe233097a",
+        "evt_6ab3d784cc5a0aebe233094e"
+      ],
+      "slug": "dostoinyi-stendap-kazan-2",
+      "city": "Казань",
+      "groupNo": 2,
+      "status": "DRAFT",
+      "indexable": false,
+      "mainChars": 631,
+      "sourceChars": 164,
+      "previousChars": 0,
+      "paragraphCount": 2,
+      "relations": 6,
+      "currentTourGroupId": null
+    },
+    {
+      "eventPageId": "be4df034-fb72-4267-981c-1a30e3d657d4",
+      "eventIds": [
+        "evt_6aeec0746ea5caff2c63ff19"
+      ],
+      "slug": "cirk-bruno-v-g-ob",
+      "city": "Обь",
+      "groupNo": 3,
+      "status": "DRAFT",
+      "indexable": false,
+      "mainChars": 645,
+      "sourceChars": 283,
+      "previousChars": 0,
+      "paragraphCount": 2,
+      "relations": 1,
+      "currentTourGroupId": null
+    },
+    {
+      "eventPageId": "ccbfe318-3491-4ad3-a602-5ae1fc7b7b87",
+      "eventIds": [
+        "evt_6ae99200c30edbbf395feb3f"
+      ],
+      "slug": "cirk-bruno-v-g-tobolsk",
+      "city": "Тобольск",
+      "groupNo": 3,
+      "status": "DRAFT",
+      "indexable": false,
+      "mainChars": 645,
+      "sourceChars": 283,
+      "previousChars": 0,
+      "paragraphCount": 2,
+      "relations": 1,
+      "currentTourGroupId": null
+    },
+    {
+      "eventPageId": "6d2bbcae-551f-4ec0-949d-544ad683e946",
+      "eventIds": [
+        "evt_6ae5c1bc51b1a49728b5bbd5"
+      ],
+      "slug": "cirk-bruno-v-g-ishim",
+      "city": "Ишим",
+      "groupNo": 3,
+      "status": "DRAFT",
+      "indexable": false,
+      "mainChars": 645,
+      "sourceChars": 283,
+      "previousChars": 0,
+      "paragraphCount": 2,
+      "relations": 1,
+      "currentTourGroupId": null
+    },
+    {
+      "eventPageId": "7c7ef641-85ca-433c-a9b1-bad70de68c38",
+      "eventIds": [
+        "evt_6a08c7315154d6eeda68b59b"
+      ],
+      "slug": "konstantin-butakov-omsk",
+      "city": "Омск",
+      "groupNo": 4,
+      "status": "DRAFT",
+      "indexable": false,
+      "mainChars": 693,
+      "sourceChars": 198,
+      "previousChars": 0,
+      "paragraphCount": 2,
+      "relations": 1,
+      "currentTourGroupId": null
+    },
+    {
+      "eventPageId": "0eb4a499-0dce-4569-9748-aca36a11beb8",
+      "eventIds": [
+        "evt_6aaaed88fcf51bce0db98378"
+      ],
+      "slug": "konstantin-butakov-sankt-peterburg",
+      "city": "Санкт-Петербург",
+      "groupNo": 4,
+      "status": "DRAFT",
+      "indexable": false,
+      "mainChars": 693,
+      "sourceChars": 199,
+      "previousChars": 0,
+      "paragraphCount": 2,
+      "relations": 1,
+      "currentTourGroupId": null
+    },
+    {
+      "eventPageId": "b3b42a30-6777-4e85-93fb-702e28bd893e",
+      "eventIds": [
+        "evt_6a4b8bdd55b5149b79736911"
+      ],
+      "slug": "animaciya-sankt-peterburg",
+      "city": "Санкт-Петербург",
+      "groupNo": 5,
+      "status": "DRAFT",
+      "indexable": false,
+      "mainChars": 1096,
+      "sourceChars": 1074,
+      "previousChars": 0,
+      "paragraphCount": 3,
+      "relations": 1,
+      "currentTourGroupId": null
+    },
+    {
+      "eventPageId": "9f4a3b3b-b9f9-4499-96c2-a63a7ee9b205",
+      "eventIds": [
+        "evt_6a5f1742b5d976d88369a69d"
+      ],
+      "slug": "animaciya-moskva",
+      "city": "Москва",
+      "groupNo": 5,
+      "status": "DRAFT",
+      "indexable": false,
+      "mainChars": 1096,
+      "sourceChars": 1074,
+      "previousChars": 0,
+      "paragraphCount": 3,
+      "relations": 1,
+      "currentTourGroupId": null
+    },
+    {
+      "eventPageId": "d31661d5-8449-46fe-b09f-c7aeb2559eb4",
+      "eventIds": [
+        "evt_6a4bb4527183349db28ca515"
+      ],
+      "slug": "mediomodo-fest-stanislav-drobyshevskii-kirill-domnin-burenok-aleksei-vodovozov-sankt-peterburg",
+      "city": "Санкт-Петербург",
+      "groupNo": 6,
+      "status": "DRAFT",
+      "indexable": false,
+      "mainChars": 4004,
+      "sourceChars": 3845,
+      "previousChars": 0,
+      "paragraphCount": 8,
+      "relations": 1,
+      "currentTourGroupId": null
+    },
+    {
+      "eventPageId": "2c2a1e2f-c92f-4934-8cd7-00c5febca3b0",
+      "eventIds": [
+        "evt_6a4e156830c57197c672db3c"
+      ],
+      "slug": "medio-modo-fest-moskva",
+      "city": "Москва",
+      "groupNo": 6,
+      "status": "DRAFT",
+      "indexable": false,
+      "mainChars": 4086,
+      "sourceChars": 3906,
+      "previousChars": 0,
+      "paragraphCount": 9,
+      "relations": 1,
+      "currentTourGroupId": null
+    },
+    {
+      "eventPageId": "ebf2f74e-7402-424e-88e9-a5eda3abbc33",
+      "eventIds": [
+        "evt_6a85d58ee5c5d68a2d7540f5"
+      ],
+      "slug": "masha-i-medvedi-samara",
+      "city": "Самара",
+      "groupNo": 7,
+      "status": "DRAFT",
+      "indexable": false,
+      "mainChars": 953,
+      "sourceChars": 924,
+      "previousChars": 0,
+      "paragraphCount": 2,
+      "relations": 1,
+      "currentTourGroupId": null
+    },
+    {
+      "eventPageId": "4ae65e1b-1da5-4618-ae51-8c12fdf64eb2",
+      "eventIds": [
+        "evt_6a85dbe99dc070640d0769d5"
+      ],
+      "slug": "masha-i-medvedi-kazan",
+      "city": "Казань",
+      "groupNo": 7,
+      "status": "DRAFT",
+      "indexable": false,
+      "mainChars": 953,
+      "sourceChars": 924,
+      "previousChars": 0,
+      "paragraphCount": 2,
+      "relations": 1,
+      "currentTourGroupId": null
+    },
+    {
+      "eventPageId": "fec2106f-da87-465a-b817-e07faf224bb6",
+      "eventIds": [
+        "evt_6a8973d6da2d1b2080d37039"
+      ],
+      "slug": "artemiziya-i-satarova-solnyi-koncert-moskva",
+      "city": "Москва",
+      "groupNo": 8,
+      "status": "DRAFT",
+      "indexable": false,
+      "mainChars": 818,
+      "sourceChars": 707,
+      "previousChars": 0,
+      "paragraphCount": 2,
+      "relations": 1,
+      "currentTourGroupId": null
+    },
+    {
+      "eventPageId": "87d3abfc-b61c-4085-8c36-3a86f669bd21",
+      "eventIds": [
+        "evt_6a9049876a20214c63002611"
+      ],
+      "slug": "artemiziya-i-satarova-solnyi-koncert-sankt-peterburg",
+      "city": "Санкт-Петербург",
+      "groupNo": 8,
+      "status": "DRAFT",
+      "indexable": false,
+      "mainChars": 818,
+      "sourceChars": 707,
+      "previousChars": 0,
+      "paragraphCount": 2,
+      "relations": 1,
+      "currentTourGroupId": null
+    },
+    {
+      "eventPageId": "521ce655-5147-4f16-b0bf-01800f5a641b",
+      "eventIds": [
+        "evt_6aaccd85a0b9d18fd1ec9ea7"
+      ],
+      "slug": "bessonov-lirika-novosibirsk",
+      "city": "Новосибирск",
+      "groupNo": 9,
+      "status": "DRAFT",
+      "indexable": false,
+      "mainChars": 737,
+      "sourceChars": 613,
+      "previousChars": 0,
+      "paragraphCount": 2,
+      "relations": 1,
+      "currentTourGroupId": null
+    },
+    {
+      "eventPageId": "48b99fcf-a0b7-4ef4-8501-a41d31b12ea0",
+      "eventIds": [
+        "evt_6ac4b630ae2e3c3b68c82c38"
+      ],
+      "slug": "bessonov-lirika-kazan",
+      "city": "Казань",
+      "groupNo": 9,
+      "status": "DRAFT",
+      "indexable": false,
+      "mainChars": 737,
+      "sourceChars": 613,
+      "previousChars": 0,
+      "paragraphCount": 2,
+      "relations": 1,
+      "currentTourGroupId": null
+    },
+    {
+      "eventPageId": "5c39fe8d-a4b1-419c-97c2-8d4abc5ae733",
+      "eventIds": [
+        "evt_6ab25d7cb3ed3399e140a8f1"
+      ],
+      "slug": "konstantin-lem-white-fox-music-rostov-na-donu",
+      "city": "Ростов-на-Дону",
+      "groupNo": 10,
+      "status": "DRAFT",
+      "indexable": false,
+      "mainChars": 1017,
+      "sourceChars": 946,
+      "previousChars": 0,
+      "paragraphCount": 2,
+      "relations": 1,
+      "currentTourGroupId": null
+    },
+    {
+      "eventPageId": "89464ae8-7024-4e79-bbb2-3a42087ca69e",
+      "eventIds": [
+        "evt_6ab3cee64eea62cf8fbc81fd"
+      ],
+      "slug": "konstantin-lem-white-fox-music-krasnodar",
+      "city": "Краснодар",
+      "groupNo": 10,
+      "status": "DRAFT",
+      "indexable": false,
+      "mainChars": 1017,
+      "sourceChars": 946,
+      "previousChars": 0,
+      "paragraphCount": 2,
+      "relations": 1,
+      "currentTourGroupId": null
+    },
+    {
+      "eventPageId": "e9e456cd-a5e9-4728-98a2-a643ee1eb0de",
+      "eventIds": [
+        "evt_6ab5297583153f69a9fe0d43"
+      ],
+      "slug": "stendap-koncert-viktorii-skladchikovoi-povtor-materiala-2026-goda-samara",
+      "city": "Самара",
+      "groupNo": 11,
+      "status": "DRAFT",
+      "indexable": false,
+      "mainChars": 735,
+      "sourceChars": 701,
+      "previousChars": 0,
+      "paragraphCount": 2,
+      "relations": 1,
+      "currentTourGroupId": null
+    },
+    {
+      "eventPageId": "a258cb76-80a4-446a-ba86-da28b6868dc0",
+      "eventIds": [
+        "evt_6add067d17f3645f42c23c85"
+      ],
+      "slug": "stendap-koncert-viktorii-skladchikovoi-povtor-materiala-2026-goda-ryazan",
+      "city": "Рязань",
+      "groupNo": 11,
+      "status": "DRAFT",
+      "indexable": false,
+      "mainChars": 735,
+      "sourceChars": 701,
+      "previousChars": 0,
+      "paragraphCount": 2,
+      "relations": 1,
+      "currentTourGroupId": null
+    },
+    {
+      "eventPageId": "b988135c-a6c8-400a-a69c-57e00f82bc90",
+      "eventIds": [
+        "evt_6abb9aa224b6018b0bb21c0e"
+      ],
+      "slug": "torba-na-kruche-moskva",
+      "city": "Москва",
+      "groupNo": 12,
+      "status": "DRAFT",
+      "indexable": false,
+      "mainChars": 679,
+      "sourceChars": 494,
+      "previousChars": 0,
+      "paragraphCount": 2,
+      "relations": 1,
+      "currentTourGroupId": null
+    },
+    {
+      "eventPageId": "ae9f795d-c6ea-4d20-ac86-302b3b7f160f",
+      "eventIds": [
+        "evt_6abc386674ed056f4f34f840"
+      ],
+      "slug": "torba-na-kruche-sankt-peterburg",
+      "city": "Санкт-Петербург",
+      "groupNo": 12,
+      "status": "DRAFT",
+      "indexable": false,
+      "mainChars": 679,
+      "sourceChars": 494,
+      "previousChars": 0,
+      "paragraphCount": 2,
+      "relations": 1,
+      "currentTourGroupId": null
+    },
+    {
+      "eventPageId": "253aa8a9-76d2-450b-a805-29fa7830fea3",
+      "eventIds": [
+        "evt_6abe85d52386b0e293b95089"
+      ],
+      "slug": "yuliya-kogan-ekaterinburg",
+      "city": "Екатеринбург",
+      "groupNo": 13,
+      "status": "DRAFT",
+      "indexable": false,
+      "mainChars": 673,
+      "sourceChars": 589,
+      "previousChars": 0,
+      "paragraphCount": 2,
+      "relations": 1,
+      "currentTourGroupId": null
+    },
+    {
+      "eventPageId": "98d5ea04-bfac-405f-badb-7bf94046e02f",
+      "eventIds": [
+        "evt_6ac6c25f06f159bf11738ee4"
+      ],
+      "slug": "yuliya-kogan-chelyabinsk",
+      "city": "Челябинск",
+      "groupNo": 13,
+      "status": "DRAFT",
+      "indexable": false,
+      "mainChars": 673,
+      "sourceChars": 589,
+      "previousChars": 0,
+      "paragraphCount": 2,
+      "relations": 1,
+      "currentTourGroupId": null
+    },
+    {
+      "eventPageId": "48506e71-2dd1-4f74-8c89-2e263f6370e7",
+      "eventIds": [
+        "evt_6abfb27efbbbaca107e1fee2"
+      ],
+      "slug": "norma-tale-solnyi-koncert-sankt-peterburg",
+      "city": "Санкт-Петербург",
+      "groupNo": 14,
+      "status": "DRAFT",
+      "indexable": false,
+      "mainChars": 796,
+      "sourceChars": 622,
+      "previousChars": 0,
+      "paragraphCount": 2,
+      "relations": 1,
+      "currentTourGroupId": null
+    },
+    {
+      "eventPageId": "86523635-3eaf-4fa3-808e-93195f7bad94",
+      "eventIds": [
+        "evt_6abfbde480cd2d4930e86fe5"
+      ],
+      "slug": "norma-tale-solnyi-koncert-moskva",
+      "city": "Москва",
+      "groupNo": 14,
+      "status": "DRAFT",
+      "indexable": false,
+      "mainChars": 796,
+      "sourceChars": 676,
+      "previousChars": 0,
+      "paragraphCount": 2,
+      "relations": 1,
+      "currentTourGroupId": null
+    },
+    {
+      "eventPageId": "52bbc926-af2c-4607-9383-2f8115b0b383",
+      "eventIds": [
+        "evt_6ac5434089e6a22cd0abf834"
+      ],
+      "slug": "aleksei-reshetun-novyi-god-po-sudebno-medicinske-moskva",
+      "city": "Москва",
+      "groupNo": 15,
+      "status": "READY",
+      "indexable": true,
+      "mainChars": 1451,
+      "sourceChars": 1279,
+      "previousChars": 1370,
+      "paragraphCount": 3,
+      "relations": 1,
+      "currentTourGroupId": "c429fda0-35a3-4673-8a02-b3929fbbcf85"
+    },
+    {
+      "eventPageId": "cd321ce8-6706-491a-bc76-df931489a9ea",
+      "eventIds": [
+        "evt_6ad686b06556323c5ec0d868"
+      ],
+      "slug": "aleksei-reshetun-novyi-god-po-sudebno-medicinski-sankt-peterburg",
+      "city": "Санкт-Петербург",
+      "groupNo": 15,
+      "status": "READY",
+      "indexable": true,
+      "mainChars": 1451,
+      "sourceChars": 1218,
+      "previousChars": 1318,
+      "paragraphCount": 3,
+      "relations": 1,
+      "currentTourGroupId": "c429fda0-35a3-4673-8a02-b3929fbbcf85"
+    },
+    {
+      "eventPageId": "e1487b06-5891-4fb6-8edf-3c9b13f731e0",
+      "eventIds": [
+        "evt_6ac39ec471aaf2ffe161059a"
+      ],
+      "slug": "palc-solnyi-koncert-moskva",
+      "city": "Москва",
+      "groupNo": 16,
+      "status": "DRAFT",
+      "indexable": false,
+      "mainChars": 633,
+      "sourceChars": 429,
+      "previousChars": 0,
+      "paragraphCount": 2,
+      "relations": 1,
+      "currentTourGroupId": null
+    },
+    {
+      "eventPageId": "17726ece-a5fb-42d7-b73d-cea17df22c8f",
+      "eventIds": [
+        "evt_6ac3a2464addcdaa6023f264"
+      ],
+      "slug": "palc-solnyi-koncert-sankt-peterburg",
+      "city": "Санкт-Петербург",
+      "groupNo": 16,
+      "status": "DRAFT",
+      "indexable": false,
+      "mainChars": 633,
+      "sourceChars": 433,
+      "previousChars": 0,
+      "paragraphCount": 2,
+      "relations": 1,
+      "currentTourGroupId": null
+    },
+    {
+      "eventPageId": "4a556c9a-9aaa-4b25-91c7-1b5ce60a0cc7",
+      "eventIds": [
+        "evt_6ac4d9e766ed9b4f87b5080e"
+      ],
+      "slug": "hity-2000h-karaoke-s-orkestrom-moskva",
+      "city": "Москва",
+      "groupNo": 17,
+      "status": "DRAFT",
+      "indexable": false,
+      "mainChars": 678,
+      "sourceChars": 426,
+      "previousChars": 0,
+      "paragraphCount": 2,
+      "relations": 1,
+      "currentTourGroupId": null
+    },
+    {
+      "eventPageId": "40dd2d16-166b-4b65-86c4-5a4b68b14ed2",
+      "eventIds": [
+        "evt_6ad604ff5dfe9998acc8f624"
+      ],
+      "slug": "hity-2000h-karaoke-s-orkestrom-simferopol",
+      "city": "Симферополь",
+      "groupNo": 17,
+      "status": "DRAFT",
+      "indexable": false,
+      "mainChars": 678,
+      "sourceChars": 426,
+      "previousChars": 0,
+      "paragraphCount": 2,
+      "relations": 1,
+      "currentTourGroupId": null
+    },
+    {
+      "eventPageId": "3345594a-d6d4-4687-97f2-a3a7fe81eb61",
+      "eventIds": [
+        "evt_6ac8c440a9cb6a37cd9d2690"
+      ],
+      "slug": "aleksei-tretyakov-eto-tochno-ikona-nauchno-istoricheskii-vzglyad-na-samye-neobychnye-obrazy-v-ikonop-moskva",
+      "city": "Москва",
+      "groupNo": 18,
+      "status": "DRAFT",
+      "indexable": false,
+      "mainChars": 1582,
+      "sourceChars": 1358,
+      "previousChars": 0,
+      "paragraphCount": 4,
+      "relations": 1,
+      "currentTourGroupId": null
+    },
+    {
+      "eventPageId": "21a9b8fa-d0ac-42ea-b012-2c14c73daab6",
+      "eventIds": [
+        "evt_6ac8ca099766b7066f7926c7"
+      ],
+      "slug": "aleksei-tretyakov-eto-tochno-ikona-nauchno-istoricheskii-vzglyad-na-samye-neobychnye-obrazy-v-ikonop-sankt-peterburg",
+      "city": "Санкт-Петербург",
+      "groupNo": 18,
+      "status": "DRAFT",
+      "indexable": false,
+      "mainChars": 1582,
+      "sourceChars": 1417,
+      "previousChars": 0,
+      "paragraphCount": 4,
+      "relations": 1,
+      "currentTourGroupId": null
+    },
+    {
+      "eventPageId": "9d10cb36-940f-42ae-8503-2c3e594fb27e",
+      "eventIds": [
+        "evt_6ad24c0a7f5775a26bc3b972"
+      ],
+      "slug": "merilin-monro-kak-pautina-na-vetru-orel",
+      "city": "Орёл",
+      "groupNo": 19,
+      "status": "DRAFT",
+      "indexable": false,
+      "mainChars": 840,
+      "sourceChars": 636,
+      "previousChars": 0,
+      "paragraphCount": 3,
+      "relations": 1,
+      "currentTourGroupId": null
+    },
+    {
+      "eventPageId": "027c156e-dc4d-401c-b5f2-e9bd8818b0e0",
+      "eventIds": [
+        "evt_6ae412f8705bbb759f2a6148"
+      ],
+      "slug": "merilin-monro-kak-pautina-na-vetru-moskva",
+      "city": "Москва",
+      "groupNo": 19,
+      "status": "DRAFT",
+      "indexable": false,
+      "mainChars": 840,
+      "sourceChars": 669,
+      "previousChars": 0,
+      "paragraphCount": 3,
+      "relations": 1,
+      "currentTourGroupId": null
+    },
+    {
+      "eventPageId": "9c945e58-7368-4941-a373-62b17312f0f7",
+      "eventIds": [
+        "evt_6ad3dbb8293c1ed1307e134f"
+      ],
+      "slug": "voroth-vorot-lipeck",
+      "city": "Липецк",
+      "groupNo": 20,
+      "status": "DRAFT",
+      "indexable": false,
+      "mainChars": 655,
+      "sourceChars": 434,
+      "previousChars": 0,
+      "paragraphCount": 3,
+      "relations": 1,
+      "currentTourGroupId": null
+    },
+    {
+      "eventPageId": "83cb872c-4333-4735-b1a6-47a4722b3f25",
+      "eventIds": [
+        "evt_6ad3dfdce34758ddc59d2293"
+      ],
+      "slug": "voroth-vorot-voronezh",
+      "city": "Воронеж",
+      "groupNo": 20,
+      "status": "DRAFT",
+      "indexable": false,
+      "mainChars": 662,
+      "sourceChars": 431,
+      "previousChars": 0,
+      "paragraphCount": 3,
+      "relations": 1,
+      "currentTourGroupId": null
+    },
+    {
+      "eventPageId": "963df98d-1f6d-403a-8e5d-39fe0766511e",
+      "eventIds": [
+        "evt_6af2930126752731b4477765"
+      ],
+      "slug": "5-02-zheka-basotskii-sankt-peterburg",
+      "city": "Санкт-Петербург",
+      "groupNo": 21,
+      "status": "DRAFT",
+      "indexable": false,
+      "mainChars": 596,
+      "sourceChars": 391,
+      "previousChars": 0,
+      "paragraphCount": 2,
+      "relations": 1,
+      "currentTourGroupId": null
+    },
+    {
+      "eventPageId": "29d35f16-9d00-4fae-ad54-ab3935e1060e",
+      "eventIds": [
+        "evt_6af29a62a9d77f531be348f3"
+      ],
+      "slug": "6-02-zheka-basotskii-moskva",
+      "city": "Москва",
+      "groupNo": 21,
+      "status": "DRAFT",
+      "indexable": false,
+      "mainChars": 596,
+      "sourceChars": 391,
+      "previousChars": 0,
+      "paragraphCount": 2,
+      "relations": 1,
+      "currentTourGroupId": null
+    },
+    {
+      "eventPageId": "c35e694b-8535-4da7-823d-e22eaac0f1d9",
+      "eventIds": [
+        "evt_6ae9b200910854ee5945c18a"
+      ],
+      "slug": "muzykalnoe-loto-bingo-fm-sankt-peterburg",
+      "city": "Санкт-Петербург",
+      "groupNo": 22,
+      "status": "DRAFT",
+      "indexable": false,
+      "mainChars": 1241,
+      "sourceChars": 1228,
+      "previousChars": 0,
+      "paragraphCount": 4,
+      "relations": 1,
+      "currentTourGroupId": null
+    },
+    {
+      "eventPageId": "8efdeace-e414-401c-b0d2-d17d82680fba",
+      "eventIds": [
+        "evt_6ae9af48c507f90269eb7628"
+      ],
+      "slug": "muzykalnoe-loto-bingo-fm-moskva",
+      "city": "Москва",
+      "groupNo": 22,
+      "status": "DRAFT",
+      "indexable": false,
+      "mainChars": 1241,
+      "sourceChars": 1231,
+      "previousChars": 0,
+      "paragraphCount": 4,
+      "relations": 1,
+      "currentTourGroupId": null
+    },
+    {
+      "eventPageId": "93f6eba8-b2b6-4ce3-a1c8-0299f645fe79",
+      "eventIds": [
+        "evt_6ae5c5448240d60dad0cc9e4"
+      ],
+      "slug": "solnyi-koncert-miroslavy-i-zlaty-bykovyh-v-ekaterinburge-ekaterinburg",
+      "city": "Екатеринбург",
+      "groupNo": 23,
+      "status": "DRAFT",
+      "indexable": false,
+      "mainChars": 631,
+      "sourceChars": 193,
+      "previousChars": 0,
+      "paragraphCount": 2,
+      "relations": 1,
+      "currentTourGroupId": null
+    },
+    {
+      "eventPageId": "14896912-adc4-4f67-8de7-4bbccb604cda",
+      "eventIds": [
+        "evt_6ae5c466bd58c04fb399cbf4"
+      ],
+      "slug": "solnyi-koncert-miroslavy-i-zlaty-bykovyh-v-chelyabinske-chelyabinsk",
+      "city": "Челябинск",
+      "groupNo": 23,
+      "status": "DRAFT",
+      "indexable": false,
+      "mainChars": 631,
+      "sourceChars": 193,
+      "previousChars": 0,
+      "paragraphCount": 2,
+      "relations": 1,
+      "currentTourGroupId": null
+    }
+  ]
+}

@@ -1,0 +1,333 @@
+'use client';
+
+import * as React from 'react';
+import type { Map as LeafletMap, Marker as LeafletMarker, Polyline as LeafletPolyline } from 'leaflet';
+
+import { loadDaibiletLeaflet } from '@/lib/leaflet-daibilet';
+import { formatPublicTitle } from '@/lib/format-public-title';
+
+export type DayRouteMapStop = {
+  id: string;
+  title: string;
+  index: number;
+  latitude: number;
+  longitude: number;
+  kind?: 'place' | 'event' | 'custom';
+};
+
+const MIN_ZOOM = 3;
+const MAX_ZOOM = 18;
+
+/** Wait until the host has a real box - L.map(0×0) leaves gray gutters after grow. */
+async function waitForMapHostSize(
+  node: HTMLElement,
+  isCancelled: () => boolean,
+): Promise<boolean> {
+  for (let i = 0; i < 90; i += 1) {
+    if (isCancelled()) return false;
+    if (node.clientWidth >= 32 && node.clientHeight >= 32) return true;
+    await new Promise<void>((resolve) => {
+      requestAnimationFrame(() => resolve());
+    });
+  }
+  return node.clientWidth > 0 && node.clientHeight > 0;
+}
+
+function syncLeafletSize(map: LeafletMap) {
+  map.invalidateSize({ animate: false, pan: false });
+}
+
+function numberedMarkerHtml(n: number, selected: boolean, title: string, kind: DayRouteMapStop['kind']): string {
+  const label = String(n);
+  const active = selected ? ' is-active' : '';
+  const safeTitle = String(title || '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+  const titleAttr = safeTitle ? ` title="${safeTitle}"` : '';
+  const caption = safeTitle
+    ? `<span class="daibilet-day-pin-label"${titleAttr}>${safeTitle}</span>`
+    : '';
+  return (
+    '<div class="daibilet-day-pin-wrap">' +
+    `<div class="daibilet-day-pin daibilet-day-pin--${kind || 'place'}` +
+    active +
+    '" data-day-map-pin>' +
+    label +
+    '</div>' +
+    caption +
+    '</div>'
+  );
+}
+
+/**
+ * Planner map for /my-day: numbered OSM markers + polyline in stop order.
+ * External Yandex remains for turn-by-turn navigation.
+ */
+export function DayRouteOsmMap({
+  stops,
+  className,
+  selectedStopId = null,
+  onStopClick,
+  layoutKey,
+  fallbackCenter = null,
+  /** When set, centers the map on the focused stop. */
+  panToStopId = null,
+  focusRequestKey = 0,
+}: {
+  stops: DayRouteMapStop[];
+  className?: string;
+  selectedStopId?: string | null;
+  onStopClick?: (stopId: string) => void;
+  /** Bumps Leaflet invalidateSize after container height changes (mobile expand). */
+  layoutKey?: string | number;
+  /** Empty-route preview: city center without markers. */
+  fallbackCenter?: { latitude: number; longitude: number } | null;
+  panToStopId?: string | null;
+  /** Changes for each explicit stop click, including repeated clicks on one stop. */
+  focusRequestKey?: number;
+}) {
+  const containerRef = React.useRef<HTMLDivElement>(null);
+  const mapRef = React.useRef<LeafletMap | null>(null);
+  const markersRef = React.useRef<LeafletMarker[]>([]);
+  const lineRef = React.useRef<LeafletPolyline | null>(null);
+  const onStopClickRef = React.useRef(onStopClick);
+  onStopClickRef.current = onStopClick;
+
+  const stopsKey = stops
+    .map((s) => `${s.id}:${s.index}:${s.title}:${s.latitude.toFixed(5)},${s.longitude.toFixed(5)}`)
+    .join('|');
+
+  React.useEffect(() => {
+    const map = mapRef.current;
+    if (!map) return;
+    const id = window.setTimeout(() => {
+      syncLeafletSize(map);
+    }, 220);
+    return () => window.clearTimeout(id);
+  }, [layoutKey]);
+
+  const centerKey = fallbackCenter
+    ? `${fallbackCenter.latitude.toFixed(5)},${fallbackCenter.longitude.toFixed(5)}`
+    : '';
+
+  React.useEffect(() => {
+    const node = containerRef.current;
+    if (!node) return;
+    if (stops.length === 0 && !fallbackCenter) return;
+
+    let cancelled = false;
+    let resizeObserver: ResizeObserver | null = null;
+
+    void (async () => {
+      const L = await loadDaibiletLeaflet();
+      if (cancelled || !node) return;
+
+      const ready = await waitForMapHostSize(node, () => cancelled);
+      if (cancelled || !ready || !node) return;
+
+      const initialCenter: [number, number] = stops[0]
+        ? [stops[0].latitude, stops[0].longitude]
+        : [fallbackCenter!.latitude, fallbackCenter!.longitude];
+
+      // `let map` stayed LeafletMap | null after the branch assigned it, so the
+      // later setView/fitBounds calls all reported "possibly null" despite the
+      // branch guaranteeing a map. Resolve the nullable read first.
+      const existingMap = mapRef.current;
+      const map: LeafletMap = existingMap ?? L.map(node, {
+        center: initialCenter,
+          zoom: 13,
+          minZoom: MIN_ZOOM,
+          maxZoom: MAX_ZOOM,
+          scrollWheelZoom: true,
+          zoomControl: false,
+          // Arrow keys on the map region cycle route stops (see onKeyDown on container).
+          keyboard: false,
+        });
+        mapRef.current = map;
+
+      // This effect re-runs on stops/selection changes and reuses the map above,
+      // so one-time layers must be gated: unguarded addTo() stacked a zoom
+      // control pair (and a tile layer) per run — 6 controls on the map.
+      if (!existingMap) {
+        // bottomright: MyDayMapAside keeps collapse (left) + fullscreen (top-right).
+        L.control
+          .zoom({
+            position: 'bottomright',
+            zoomInTitle: 'Приблизить',
+            zoomOutTitle: 'Отдалить',
+          })
+          .addTo(map);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          attribution:
+            '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer">OpenStreetMap</a>',
+          maxZoom: MAX_ZOOM,
+        }).addTo(map);
+      }
+
+        resizeObserver = new ResizeObserver(() => {
+          if (mapRef.current) syncLeafletSize(mapRef.current);
+        });
+        resizeObserver.observe(node);
+
+      for (const marker of markersRef.current) marker.remove();
+      markersRef.current = [];
+      if (lineRef.current) {
+        lineRef.current.remove();
+        lineRef.current = null;
+      }
+
+      const latLngs: [number, number][] = [];
+      for (const stop of stops) {
+        const latLng: [number, number] = [stop.latitude, stop.longitude];
+        latLngs.push(latLng);
+        const selected = Boolean(selectedStopId && selectedStopId === stop.id);
+        // Wide box so the caption right of the pin is not clipped by Leaflet iconSize.
+        const icon = L.divIcon({
+          className: 'daibilet-day-route-marker',
+          html: numberedMarkerHtml(
+            stop.index + 1,
+            selected,
+            formatPublicTitle(stop.title) || stop.title,
+            stop.kind,
+          ),
+          iconSize: [200, 40],
+          iconAnchor: [20, 20],
+        });
+        const marker = L.marker(latLng, {
+          icon,
+          title: `${stop.index + 1}. ${formatPublicTitle(stop.title) || stop.title}`,
+          keyboard: true,
+        }).addTo(map);
+        marker.on('click', () => {
+          onStopClickRef.current?.(stop.id);
+        });
+        markersRef.current.push(marker);
+      }
+
+      if (latLngs.length >= 2) {
+        lineRef.current = L.polyline(latLngs, {
+          color: '#0f172a',
+          weight: 3,
+          opacity: 0.75,
+          dashArray: '6 8',
+        }).addTo(map);
+      }
+
+      syncLeafletSize(map);
+      if (latLngs.length === 0 && fallbackCenter) {
+        map.setView([fallbackCenter.latitude, fallbackCenter.longitude], 12, { animate: false });
+      } else if (latLngs.length === 1) {
+        map.setView(latLngs[0], 14, { animate: false });
+      } else {
+        map.fitBounds(L.latLngBounds(latLngs), { padding: [36, 36], maxZoom: 15, animate: false });
+      }
+      requestAnimationFrame(() => {
+        if (mapRef.current) syncLeafletSize(mapRef.current);
+      });
+    })();
+
+    return () => {
+      cancelled = true;
+      resizeObserver?.disconnect();
+    };
+  }, [stopsKey, centerKey]);
+
+  React.useEffect(() => {
+    let cancelled = false;
+    void loadDaibiletLeaflet().then((L) => {
+      if (cancelled) return;
+      markersRef.current.forEach((marker, index) => {
+        const stop = stops[index];
+        if (!stop) return;
+        marker.setIcon(L.divIcon({
+          className: 'daibilet-day-route-marker',
+          html: numberedMarkerHtml(
+            stop.index + 1,
+            Boolean(selectedStopId && selectedStopId === stop.id),
+            formatPublicTitle(stop.title) || stop.title,
+            stop.kind,
+          ),
+          iconSize: [200, 40],
+          iconAnchor: [20, 20],
+        }));
+      });
+    });
+    return () => { cancelled = true; };
+  }, [selectedStopId, stopsKey]);
+
+  React.useEffect(() => {
+    const map = mapRef.current;
+    if (!map || !panToStopId) return;
+    const stop = stops.find((item) => item.id === panToStopId);
+    if (!stop) return;
+
+    const id = window.setTimeout(() => {
+      syncLeafletSize(map);
+      map.flyTo([stop.latitude, stop.longitude], Math.max(map.getZoom(), 16), {
+        animate: true,
+        duration: 0.55,
+      });
+    }, 80);
+    return () => window.clearTimeout(id);
+  }, [panToStopId, stopsKey, layoutKey, focusRequestKey]);
+
+  React.useEffect(() => {
+    return () => {
+      for (const marker of markersRef.current) marker.remove();
+      markersRef.current = [];
+      lineRef.current?.remove();
+      lineRef.current = null;
+      mapRef.current?.remove();
+      mapRef.current = null;
+    };
+  }, []);
+
+  function selectAdjacentStop(delta: -1 | 1) {
+    if (!stops.length) return;
+    const ids = stops.map((stop) => stop.id);
+    let index = selectedStopId ? ids.indexOf(selectedStopId) : 0;
+    if (index < 0) index = 0;
+    const nextIndex = index + delta;
+    if (nextIndex < 0 || nextIndex >= ids.length) return;
+    const nextId = ids[nextIndex];
+    if (nextId) onStopClickRef.current?.(nextId);
+  }
+
+  function onMapKeyDown(event: React.KeyboardEvent<HTMLDivElement>) {
+    if (!stops.length) return;
+    if (
+      event.key !== 'ArrowLeft' &&
+      event.key !== 'ArrowRight' &&
+      event.key !== 'ArrowUp' &&
+      event.key !== 'ArrowDown'
+    ) {
+      return;
+    }
+    event.preventDefault();
+    if (event.key === 'ArrowRight' || event.key === 'ArrowDown') {
+      selectAdjacentStop(1);
+      return;
+    }
+    selectAdjacentStop(-1);
+  }
+
+  if (stops.length === 0 && !fallbackCenter) return null;
+
+  return (
+    <div
+      ref={containerRef}
+      className={`bg-slate-100 ${className || ''}`.trim()}
+      role="region"
+      aria-label="Карта маршрута дня"
+      aria-keyshortcuts="ArrowUp ArrowDown ArrowLeft ArrowRight"
+      data-day-route-map="leaflet"
+      tabIndex={stops.length > 0 ? 0 : undefined}
+      onKeyDown={onMapKeyDown}
+      onPointerDown={() => {
+        containerRef.current?.focus({ preventScroll: true });
+      }}
+    />
+  );
+}

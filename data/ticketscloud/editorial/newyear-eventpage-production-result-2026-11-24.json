@@ -1,0 +1,2652 @@
+{
+  "appliedAt": "2026-11-24T19:05:02.332Z",
+  "database": "daibilet",
+  "sourceArchive": "newyear-eventpage-source-archive-final-2026-11-24.json",
+  "merges": [
+    {
+      "groupKey": "newyear26-g01",
+      "targetPageId": "0e325c4c-25b1-41d5-a5e1-e8ca91d8cf88",
+      "sourcePageIds": [
+        "9c97d3dd-4097-4504-b7b6-6b780e799f09"
+      ],
+      "movedEventCount": 1,
+      "retainedRouteCount": 1
+    },
+    {
+      "groupKey": "newyear26-g02",
+      "targetPageId": "ce3b1d78-1597-4f50-8dad-969cdaeb2418",
+      "sourcePageIds": [
+        "b089f922-2ca1-46f8-8bf0-976c3ba3b8eb"
+      ],
+      "movedEventCount": 1,
+      "retainedRouteCount": 1
+    },
+    {
+      "groupKey": "newyear26-g03",
+      "targetPageId": "7a8ddcb5-4376-4eb0-a1e6-615bb6a10a20",
+      "sourcePageIds": [
+        "e6e4cbd0-4a5a-493c-a17e-5d437f35c608"
+      ],
+      "movedEventCount": 1,
+      "retainedRouteCount": 1
+    },
+    {
+      "groupKey": "newyear26-g04",
+      "targetPageId": "47d1537d-cadb-47f6-bcaf-10544fadcf84",
+      "sourcePageIds": [
+        "91a7aaae-d33c-40a7-89a2-af438efe0eec",
+        "d07b594d-3d88-470a-9c61-0ddd7e8cdc07",
+        "d51a06b1-d11d-45dd-826b-ec7d96dc4384",
+        "2145963f-dd8c-4cc6-a312-58c3b363ef83"
+      ],
+      "movedEventCount": 4,
+      "retainedRouteCount": 4
+    },
+    {
+      "groupKey": "newyear26-g05",
+      "targetPageId": "37a41022-a1a0-49c3-978b-dc515fc3b8ef",
+      "sourcePageIds": [
+        "b183f66c-1877-4e81-b4ec-af2aa3aa38cd"
+      ],
+      "movedEventCount": 1,
+      "retainedRouteCount": 1
+    },
+    {
+      "groupKey": "newyear26-g06",
+      "targetPageId": "390041c2-1b96-4435-a9d2-ba741b33f12b",
+      "sourcePageIds": [
+        "7b85e1e4-f1ff-4e77-8bd6-c5dac0353782"
+      ],
+      "movedEventCount": 1,
+      "retainedRouteCount": 1
+    },
+    {
+      "groupKey": "newyear26-g07",
+      "targetPageId": "cae214f5-aa64-4cd1-8187-1dff27f1143c",
+      "sourcePageIds": [
+        "58b29170-e2d1-4dfe-97f0-b2eb5d4c8bb1"
+      ],
+      "movedEventCount": 1,
+      "retainedRouteCount": 1
+    },
+    {
+      "groupKey": "newyear26-g08",
+      "targetPageId": "f7bb46d5-1703-4b7a-a796-fe5cc3580a08",
+      "sourcePageIds": [
+        "c0757d3d-16f8-467f-82d6-200848ac0ddb"
+      ],
+      "movedEventCount": 2,
+      "retainedRouteCount": 1
+    },
+    {
+      "groupKey": "newyear26-g09",
+      "targetPageId": "7728a81f-6970-4ac6-95e7-3f729a82ead4",
+      "sourcePageIds": [
+        "ff4e420b-df0d-4471-8838-2bd9c8bac9a5",
+        "2d978bc7-6655-4176-8e4f-5663144e6632",
+        "e76c055f-4375-4c8f-aee9-e371422075a2",
+        "e8e6d32d-ce18-4e4a-a4cf-4c7b1d386328"
+      ],
+      "movedEventCount": 4,
+      "retainedRouteCount": 4
+    },
+    {
+      "groupKey": "newyear26-g10",
+      "targetPageId": "d018a109-0c74-41a8-8679-9fb071fa31b9",
+      "sourcePageIds": [
+        "1ddfb82b-55d2-4833-972e-14a1b0f3f672"
+      ],
+      "movedEventCount": 1,
+      "retainedRouteCount": 1
+    },
+    {
+      "groupKey": "newyear26-g11",
+      "targetPageId": "64b09661-aa08-4579-8cee-7e466ad9ddc2",
+      "sourcePageIds": [
+        "f65cf32b-4ecf-4bd3-abd9-045e7c5d60a7",
+        "4dde09a9-b0e7-4342-b9ad-ecce9865e43c",
+        "85079f45-c2f4-4342-aaa2-fb88b6eebafb",
+        "1ff9c1a8-5dec-4931-aaba-97b60ac591d6",
+        "7f626286-c926-4360-9b45-46e196b72209",
+        "4745fc15-ae70-418c-a10c-746c660db2f1",
+        "8d0b5666-938d-4394-8c0e-1f6fd562a6d4",
+        "9f7bdecb-0ab5-47be-b031-89e4c47fcc75",
+        "f89ad94a-f580-452d-89ac-7d9cd69b3171",
+        "a39a082d-e59a-4ae9-ad83-7b4d3aa1f4a4",
+        "96a7bf77-4036-427e-82d9-92a6c9735868",
+        "821d34b3-a332-4dca-8392-7be23e78b7a0",
+        "de46dec4-85dc-491b-bab5-6742a0c817cd",
+        "334d22c9-c38c-4c75-b51c-c2cf3de328ed",
+        "bcef302a-7c0c-409c-b400-2a3dce6507aa",
+        "22e12861-0250-44d2-bf53-c3c9a8b16c9c",
+        "58e4bba6-5ca7-4927-9b9e-9b1259bee393"
+      ],
+      "movedEventCount": 17,
+      "retainedRouteCount": 17
+    },
+    {
+      "groupKey": "newyear26-g12",
+      "targetPageId": "818a334c-3a8d-4f0d-bda5-fb10b33650a6",
+      "sourcePageIds": [
+        "cadc0d4c-c7ff-423d-aa3b-3e03a6e54b72",
+        "7fa1f3df-c3e1-4672-965a-ec228545a920"
+      ],
+      "movedEventCount": 2,
+      "retainedRouteCount": 2
+    },
+    {
+      "groupKey": "newyear26-g13",
+      "targetPageId": "201323d3-aaa3-492e-b2fd-1630face99c7",
+      "sourcePageIds": [
+        "796a1fb4-c744-408e-b462-c6edd6e4f951"
+      ],
+      "movedEventCount": 1,
+      "retainedRouteCount": 1
+    },
+    {
+      "groupKey": "newyear26-g14",
+      "targetPageId": "f0d8d601-0382-44dc-ac80-c1f6f14d0632",
+      "sourcePageIds": [
+        "4a2f6918-fbd5-418c-a685-599cb941afe1"
+      ],
+      "movedEventCount": 1,
+      "retainedRouteCount": 1
+    },
+    {
+      "groupKey": "newyear26-g15",
+      "targetPageId": "def8641d-a962-474f-bada-cf7dcbc09f6e",
+      "sourcePageIds": [
+        "a6364a75-7c25-4295-bd4e-ef98668ff193",
+        "0bfa8d01-00c2-49ed-bff6-3bee580ec8ca"
+      ],
+      "movedEventCount": 2,
+      "retainedRouteCount": 2
+    },
+    {
+      "groupKey": "newyear26-g16",
+      "targetPageId": "9b8adf9c-e9ab-4d8e-aa1c-5b6f88629691",
+      "sourcePageIds": [
+        "5b831c1e-dd36-437f-abc8-443b10e9a00d",
+        "402c51ee-f0c8-4648-9b87-b0486c4c4949"
+      ],
+      "movedEventCount": 2,
+      "retainedRouteCount": 2
+    },
+    {
+      "groupKey": "newyear26-g17",
+      "targetPageId": "7de718b8-7fba-4f6d-ad05-dc95245df6f8",
+      "sourcePageIds": [
+        "8bd112dd-b238-4bd2-8904-02f387b4682d"
+      ],
+      "movedEventCount": 1,
+      "retainedRouteCount": 1
+    },
+    {
+      "groupKey": "newyear26-g18",
+      "targetPageId": "0778182d-b1a8-47e2-9aa5-2d02ecbf4ce7",
+      "sourcePageIds": [
+        "02d88dbc-061b-4f4a-b5f4-a47b15edb794",
+        "61754eaf-9b7b-4d93-b1ef-594e5142e6c0",
+        "a2a20b20-e007-4494-8940-2c4b5207fe9b"
+      ],
+      "movedEventCount": 3,
+      "retainedRouteCount": 3
+    },
+    {
+      "groupKey": "newyear26-g19",
+      "targetPageId": "43ad3464-7d86-4df1-8593-d1f695a5302a",
+      "sourcePageIds": [
+        "38a674f6-b62c-4807-b5e3-b9d4c88e631d"
+      ],
+      "movedEventCount": 1,
+      "retainedRouteCount": 1
+    },
+    {
+      "groupKey": "newyear26-g20",
+      "targetPageId": "ef69b295-22b4-430a-abea-1562ffdde56c",
+      "sourcePageIds": [
+        "93f30283-03a0-4c4b-8d93-2fdd920149b0"
+      ],
+      "movedEventCount": 1,
+      "retainedRouteCount": 1
+    },
+    {
+      "groupKey": "newyear26-g21",
+      "targetPageId": "4cca7970-7255-4725-94f7-2c513ea58717",
+      "sourcePageIds": [
+        "60859866-97fe-4010-b1a1-1f931f15f6ad"
+      ],
+      "movedEventCount": 1,
+      "retainedRouteCount": 1
+    },
+    {
+      "groupKey": "newyear26-g23",
+      "targetPageId": "873fb1ca-5d0b-49c0-afb3-5b8e69c92485",
+      "sourcePageIds": [
+        "2e1a430f-d479-435b-8ddd-0987924663fa"
+      ],
+      "movedEventCount": 1,
+      "retainedRouteCount": 1
+    },
+    {
+      "groupKey": "newyear26-g24",
+      "targetPageId": "95afb7bb-5e4e-4c5c-9b0f-8d3bb69a50c3",
+      "sourcePageIds": [
+        "bf47d5c2-45b1-42fd-aca1-bbfe5ffd0e75"
+      ],
+      "movedEventCount": 1,
+      "retainedRouteCount": 1
+    },
+    {
+      "groupKey": "newyear26-g25",
+      "targetPageId": "d0ea0e3b-00e7-469c-a034-40c6466218eb",
+      "sourcePageIds": [
+        "2b81a815-efd0-422a-9e57-0462cec98d64"
+      ],
+      "movedEventCount": 1,
+      "retainedRouteCount": 1
+    },
+    {
+      "groupKey": "newyear26-g26",
+      "targetPageId": "4232eb84-7ecc-48f2-b593-00b0cbc4ca51",
+      "sourcePageIds": [
+        "f97bb5d6-3d36-4fcd-8675-69e42afe0ca4",
+        "61dc648f-5ad6-4c66-a11e-8cce7d01364e"
+      ],
+      "movedEventCount": 2,
+      "retainedRouteCount": 2
+    },
+    {
+      "groupKey": "newyear26-spb-nutcracker-palace-tour",
+      "targetPageId": "659a2702-568f-40bd-8698-168c53189b70",
+      "sourcePageIds": [
+        "25e93a58-da3e-4d3b-8a22-1bd63ca01b0e",
+        "d9e6e7f4-a60d-4a4e-8e5e-d0b9b8285b41",
+        "bff5df23-9a9c-4982-a476-5273317448c2",
+        "22829e53-4dfc-4f55-aefe-15c56d605af3"
+      ],
+      "movedEventCount": 4,
+      "retainedRouteCount": 4
+    },
+    {
+      "groupKey": "newyear26-moscow-cosmos-corporate",
+      "targetPageId": "5634ab3a-f781-4494-9a1d-d4f0f444a053",
+      "sourcePageIds": [
+        "e7bf3cdd-8cc9-4757-ac2a-5e2f2b3a2ffc",
+        "48f65585-89dc-4ab7-885e-95bbef985cda"
+      ],
+      "movedEventCount": 2,
+      "retainedRouteCount": 2
+    },
+    {
+      "groupKey": "newyear26-moscow-mix-imperatrica",
+      "targetPageId": "9afb6f2c-4aab-4eb8-8c17-b8f593329f19",
+      "sourcePageIds": [
+        "72dd3036-d8cc-471e-aadf-f1fb371a2d91"
+      ],
+      "movedEventCount": 1,
+      "retainedRouteCount": 1
+    }
+  ],
+  "split": {
+    "originalPageId": "47fa7184-09af-407e-a147-98b15c0eca59",
+    "originalSlug": "burlesk-kabare-shou-madam-bum-dzhazovyi-bunt-moskva",
+    "jazzEventIds": [
+      "evt_6a60c8c0644f57a97e9e1408",
+      "evt_6a60c8c7644f57a97e9e150b"
+    ],
+    "winterPageId": "516ab4c6-be63-4726-b886-0a11eba47bd6",
+    "winterSlug": "burlesk-kabare-shou-madam-bum-zimnii-shik-moskva",
+    "winterEventIds": [
+      "evt_6af37af607f03a5dada6f3c9",
+      "evt_6af37af107f03a5dada6f28f",
+      "evt_6aec54b7efe9bcf7c62352ce",
+      "evt_6aec54b3efe9bcf7c62351ad",
+      "evt_6aec54afefe9bcf7c623508c",
+      "evt_6aec54abefe9bcf7c6234f6b",
+      "evt_6aec54a7efe9bcf7c6234e4a",
+      "evt_6aec54a2efe9bcf7c6234d29"
+    ]
+  },
+  "pages": [
+    {
+      "eventPageId": "f6523fff-b317-4b62-be3f-241cf55b6813",
+      "slug": "murakami-belym-belo-sankt-peterburg",
+      "title": "«Белым-бело» — Мураками, Санкт-Петербург",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-24T19:05:02.336Z",
+      "eventIds": [
+        "evt_6ae1a06e6891bdf5380e0a73"
+      ],
+      "summary": "Новогодняя акустическая встреча с группой «Мураками»: знакомые песни, камерное звучание и праздничная программа «Белым-бело».",
+      "revisionCount": 3,
+      "activeRewriteVersion": "2026-11-24-newyear-eventpage-5x30"
+    },
+    {
+      "eventPageId": "9b8adf9c-e9ab-4d8e-aa1c-5b6f88629691",
+      "slug": "samaya-zimnyaya-skazka-novogodnyaya-elka-i-spektakl-dlya-detei-v-samare-samara-2",
+      "title": "«Самая зимняя сказка» — семейный спектакль в Самаре",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-24T19:05:02.336Z",
+      "eventIds": [
+        "evt_6ad86e3b1ea20d70129dfff7",
+        "evt_6ad87d3315a94059cd59e560",
+        "evt_6ad87b921ea20d70129e059f"
+      ],
+      "summary": "Новогодняя программа для всей семьи: интерактивная ёлка, герои русских сказок, спектакль, лазерное шоу и 3D-видеодекорации.",
+      "revisionCount": 4,
+      "activeRewriteVersion": "2026-11-24-newyear-eventpage-5x30"
+    },
+    {
+      "eventPageId": "106d15a0-923a-4d26-95d7-940243b39ce0",
+      "slug": "tradicii-prazdnovaniya-rozhdestva-i-novogo-goda-s-uzhinom-i-degustaciei-igristogo-moskva",
+      "title": "Рождественские традиции и дегустация игристого в Москве",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-24T19:05:02.336Z",
+      "eventIds": [
+        "evt_6afec94900e6413f26370901"
+      ],
+      "summary": "Встреча за праздничным столом: разговор о зимних обычаях, рассказ сомелье, четыре подачи игристого и авторские закуски.",
+      "revisionCount": 3,
+      "activeRewriteVersion": "2026-11-24-newyear-eventpage-5x30"
+    },
+    {
+      "eventPageId": "a5b8a452-b42b-4da2-896a-5052cfaa3078",
+      "slug": "novogodnyaya-elka-snezhnoe-priklyuchenie-ovechek-nizhniy-novgorod",
+      "title": "«Снежное приключение овечек» — новогодняя ёлка для малышей",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-24T19:05:02.336Z",
+      "eventIds": [
+        "evt_6af5eb42b48efe3e5ac032da"
+      ],
+      "summary": "Небольшое интерактивное представление для детей 2–4 лет с овечками, Дедом Морозом, Снегурочкой и мыльным шоу.",
+      "revisionCount": 3,
+      "activeRewriteVersion": "2026-11-24-newyear-eventpage-5x30"
+    },
+    {
+      "eventPageId": "9128454e-1a7f-482f-a1ab-e828326f7174",
+      "slug": "novogodnyaya-elka-na-teplohode-s-interaktivnym-spektaklem-taina-ledyanogo-posoha-moskva-2",
+      "title": "«Тайна ледяного посоха» — новогодняя ёлка на теплоходе",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-24T19:05:02.336Z",
+      "eventIds": [
+        "evt_tep_1575"
+      ],
+      "summary": "Интерактивная зимняя сказка на теплоходе «Императрица»: дети помогают героям спасти праздник, а затем участвуют в ёлке с Дедом Морозом и Снегурочкой.",
+      "revisionCount": 3,
+      "activeRewriteVersion": "2026-11-24-newyear-eventpage-5x30"
+    },
+    {
+      "eventPageId": "a7693f2e-aa36-4a5a-82c9-3f462fb7a152",
+      "slug": "interaktivnaya-elka-v-parke-chudes-galileo-sankt-peterburg",
+      "title": "«Фабрика чуда» — интерактивная ёлка в Петербурге",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-24T19:05:02.336Z",
+      "eventIds": [
+        "evt_6a9817ec587072d403a3fb58",
+        "evt_6a9817ee587072d403a3fb6a",
+        "evt_6a9817f3587072d403a3fba0",
+        "evt_6a9817fc587072d403a3fbfa",
+        "evt_6a9817fe587072d403a3fc0c",
+        "evt_6a981804587072d403a3fc54",
+        "evt_6a9817f1587072d403a3fb8e",
+        "evt_6a9817f7587072d403a3fbc4",
+        "evt_6a9817ff587072d403a3fc1e",
+        "evt_6a9817fa587072d403a3fbe8",
+        "evt_6a981802587072d403a3fc42",
+        "evt_6a981806587072d403a3fc66",
+        "evt_6af4423795fd734484a6f28c",
+        "evt_6af4423895fd734484a6f29e",
+        "evt_6af4423995fd734484a6f2b0",
+        "evt_6af4423a95fd734484a6f2c2",
+        "evt_6af4423b95fd734484a6f2d4",
+        "evt_6af4423c95fd734484a6f2e6",
+        "evt_6af4423c95fd734484a6f2f8"
+      ],
+      "summary": "Командный новогодний маршрут в Парке чудес Галилео: научные опыты, квест, необычные угощения, лабиринты и фотосессия с Дедом Морозом.",
+      "revisionCount": 21,
+      "activeRewriteVersion": "2026-11-24-newyear-eventpage-5x30"
+    },
+    {
+      "eventPageId": "3ec64dd5-70cf-4334-85b4-b228b00c6591",
+      "slug": "interaktivnaya-elka-v-parke-chudes-galileo-samara",
+      "title": "«Фабрика чуда» — интерактивная ёлка в Самаре",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-24T19:05:02.336Z",
+      "eventIds": [
+        "evt_6a97e315d28f5235bc6cb21f",
+        "evt_6a97e317d28f5235bc6cb231",
+        "evt_6a97e31ed28f5235bc6cb28b",
+        "evt_6a97e31cd28f5235bc6cb267",
+        "evt_6a97e31ad28f5235bc6cb255",
+        "evt_6a97e327d28f5235bc6cb2e5",
+        "evt_6a97e319d28f5235bc6cb243",
+        "evt_6a97e31dd28f5235bc6cb279"
+      ],
+      "summary": "Новогодний квест в самарском Парке чудес Галилео с научными опытами, командными заданиями, азотным шоу и праздничным финалом.",
+      "revisionCount": 10,
+      "activeRewriteVersion": "2026-11-24-newyear-eventpage-5x30"
+    },
+    {
+      "eventPageId": "814a8057-05b5-4ebb-9d04-779d45c06a83",
+      "slug": "novogodnii-detskii-bal-snezhnaya-koroleva-sankt-peterburg-4",
+      "title": "Новогодний детский бал «Снежная королева»",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-24T19:05:02.336Z",
+      "eventIds": [
+        "evt_6ae8a2f728d6d474d1763c4f"
+      ],
+      "summary": "Сказка Андерсена в старинном особняке, путешествие Герды за Каем, бал в ледяном замке, подарки и фуршет.",
+      "revisionCount": 3,
+      "activeRewriteVersion": "2026-11-24-newyear-eventpage-5x30"
+    },
+    {
+      "eventPageId": "a7218b7d-9972-4b06-a27b-fd6010771803",
+      "slug": "sofi-gerte-dialog-u-novogodnei-elki-moskva",
+      "title": "Софи Гертье — «Диалог у новогодней ёлки»",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-24T19:05:02.336Z",
+      "eventIds": [
+        "evt_6b005fa1c88606355b6aa9b8"
+      ],
+      "summary": "Авторская джазовая программа, где встречаются советская и американская музыка, зимние мелодии кино и новогодние композиции.",
+      "revisionCount": 3,
+      "activeRewriteVersion": "2026-11-24-newyear-eventpage-5x30"
+    },
+    {
+      "eventPageId": "7b20d7b8-2ee9-4e1a-b540-4ca5da793b10",
+      "slug": "rozhdestvenskii-dzhaz-iz-nyu-iorka-v-moskvu-s-olgoi-stupinoi-b-band-moskva",
+      "title": "«Рождественский джаз из Нью-Йорка в Москву» — Ольга Ступина & B-Band",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-24T19:05:02.336Z",
+      "eventIds": [
+        "evt_6af9ca0bf5f3abbeb294029e"
+      ],
+      "summary": "Рождественские песни на английском и русском в исполнении Ольги Ступиной, виолончелиста Алекса Ермакова и пианистки Татьяны Соколовой.",
+      "revisionCount": 3,
+      "activeRewriteVersion": "2026-11-24-newyear-eventpage-5x30"
+    },
+    {
+      "eventPageId": "7564803e-5d0c-441f-a0e3-a6f241fce4c1",
+      "slug": "art-branch-rozhdestvo-i-novyi-god-tradicii-glavnyh-prazdnikov-v-carskoi-seme-i-iskusstve-sankt-peterburg",
+      "title": "Арт-бранч о Рождестве и Новом годе в царской семье и искусстве",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-24T19:05:02.336Z",
+      "eventIds": [
+        "evt_6afee335b5853da4720d2c48"
+      ],
+      "summary": "Лекция Екатерины Повалкиной об императорских детских праздниках, русских зимних обычаях и том, как Рождество изображали в искусстве.",
+      "revisionCount": 3,
+      "activeRewriteVersion": "2026-11-24-newyear-eventpage-5x30"
+    },
+    {
+      "eventPageId": "c9815ef0-b750-4ab9-803b-70d816338919",
+      "slug": "art-branch-kto-privez-elku-v-peterburg-zimnie-tradicii-stolicy-sankt-peterburg",
+      "title": "«Кто привёз ёлку в Петербург?» — зимние традиции столицы",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-24T19:05:02.336Z",
+      "eventIds": [
+        "evt_6afee70060c9ce33bb1a9f40"
+      ],
+      "summary": "Лекция Марии Персияновой о праздничном Петербурге XVIII–XX веков: от рождественской ели и домашних застолий до маскарадов и народных гуляний.",
+      "revisionCount": 3,
+      "activeRewriteVersion": "2026-11-24-newyear-eventpage-5x30"
+    },
+    {
+      "eventPageId": "9afb6f2c-4aab-4eb8-8c17-b8f593329f19",
+      "slug": "novogodnii-koncert-diskoteka-mix-80-90-h-na-teplohode-imperatrica-moskva",
+      "title": "«Дискотека MIX 80–90-х» на теплоходе «Императрица» — Москва",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-24T19:05:02.336Z",
+      "eventIds": [
+        "evt_6afdb8b888f8a9359c49f905",
+        "evt_6afdb8b988f8a9359c49f999",
+        "evt_tep_1580"
+      ],
+      "summary": "Предновогодний круиз по центру Москвы с живой группой, диджеем, хитами 80-х и 90-х и дискотекой на нижней палубе.",
+      "revisionCount": 5,
+      "activeRewriteVersion": "2026-11-24-newyear-eventpage-5x30"
+    },
+    {
+      "eventPageId": "873fb1ca-5d0b-49c0-afb3-5b8e69c92485",
+      "slug": "novogodnee-shou-anna-i-elza-chast-3-sankt-peterburg",
+      "title": "Новогоднее шоу «Анна и Эльза — часть 3»",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-24T19:05:02.336Z",
+      "eventIds": [
+        "evt_6a46c069a30b1356f6ef5518",
+        "evt_6a46d3abe69bcd72ea61c384"
+      ],
+      "summary": "Продолжение зимней сказки об Эльзе, Снеговике и борьбе с колдуном — с авторской музыкой и лазерным шоу.",
+      "revisionCount": 4,
+      "activeRewriteVersion": "2026-11-24-newyear-eventpage-5x30"
+    },
+    {
+      "eventPageId": "f1b799b3-772a-41f3-8d02-067ad4aa2e22",
+      "slug": "postmodern-jazz-party-happy-new-year-moskva",
+      "title": "Postmodern Band — «Happy New Year!»",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-24T19:05:02.336Z",
+      "eventIds": [
+        "evt_6aedf69b861945999ded4e2a"
+      ],
+      "summary": "Предновогодняя Gatsby-вечеринка с джазовыми версиями русских и зарубежных хитов, интерактивом, конкурсами и юмористическим стендапом.",
+      "revisionCount": 3,
+      "activeRewriteVersion": "2026-11-24-newyear-eventpage-5x30"
+    },
+    {
+      "eventPageId": "47d1537d-cadb-47f6-bcaf-10544fadcf84",
+      "slug": "novogodnii-roman-kaliningrad-4",
+      "title": "«Новогодний роман» — комедия о случайной встрече",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-24T19:05:02.336Z",
+      "eventIds": [
+        "evt_6af1e11ab4d44610ffddf0df",
+        "evt_6afed4cbd4264d17663f4ec3",
+        "evt_6af43ba8ca4e8ab8567af4a9",
+        "evt_6af43d113516ae0f2c07dbb8",
+        "evt_6afdd5dcfbfad6a4e407007c"
+      ],
+      "summary": "Комедия о мужчине и женщине, которые знакомятся в новогоднюю ночь и встречают праздник под музыку и звон бокалов.",
+      "revisionCount": 4,
+      "activeRewriteVersion": "2026-11-24-newyear-eventpage-5x30"
+    },
+    {
+      "eventPageId": "ed4249ff-42d6-45ad-a470-bb4bcc39b2e8",
+      "slug": "novogodnii-jam-session-kemerovo",
+      "title": "Новогодний Jam Session в Кемерове",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-24T19:05:02.336Z",
+      "eventIds": [
+        "evt_6af3eda0093c8e81e57614b7"
+      ],
+      "summary": "Праздничная джазовая встреча местных музыкантов: зимние стандарты и импровизации в живом исполнении.",
+      "revisionCount": 3,
+      "activeRewriteVersion": "2026-11-24-newyear-eventpage-5x30"
+    },
+    {
+      "eventPageId": "39d457c3-a19d-4e16-a289-a1c0942bf426",
+      "slug": "novogodnie-priklyucheniya-mashi-i-medvedya-barnaul",
+      "title": "«Новогодние приключения Маши и Медведя»",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-24T19:05:02.336Z",
+      "eventIds": [
+        "evt_6afffe1d386f03490f25a257",
+        "evt_6afffe1c386f03490f25a240",
+        "evt_6afffe1b386f03490f25a229",
+        "evt_6afffe1a386f03490f25a212",
+        "evt_6afffe19386f03490f25a1fb",
+        "evt_6afffe18386f03490f25a1e4"
+      ],
+      "summary": "Интерактивный праздник с Машей, Медведем и зимними героями: игры, танцы, кукольные персонажи, мастерская и подарки.",
+      "revisionCount": 8,
+      "activeRewriteVersion": "2026-11-24-newyear-eventpage-5x30"
+    },
+    {
+      "eventPageId": "d018a109-0c74-41a8-8679-9fb071fa31b9",
+      "slug": "ha-my-rozhdestvenskoe-novosibirsk",
+      "title": "«ХА!МЫ! Рождественское!» — новосибирская стеб-арт программа",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-24T19:05:02.336Z",
+      "eventIds": [
+        "evt_6ad4c15068e6b54e4c28fe71",
+        "evt_6ad4c2b46d74cd0aec980b8b"
+      ],
+      "summary": "Праздничная подборка новых номеров, миниатюр и классики от артистов новосибирских театров.",
+      "revisionCount": 4,
+      "activeRewriteVersion": "2026-11-24-newyear-eventpage-5x30"
+    },
+    {
+      "eventPageId": "81e3da8a-3a1d-4357-a437-bdf58ccf7f5e",
+      "slug": "betsy-novogodnee-shou-yaroslavl",
+      "title": "Betsy — новогоднее шоу в Ярославле",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-24T19:05:02.336Z",
+      "eventIds": [
+        "evt_6b01da231f25a56ab47285d6"
+      ],
+      "summary": "Концерт Betsy с вирусными хитами «Сигма-бой», «Электрощиток», «Котики» и праздничной песней «Под Новый год».",
+      "revisionCount": 3,
+      "activeRewriteVersion": "2026-11-24-newyear-eventpage-5x30"
+    },
+    {
+      "eventPageId": "4d883e68-be3e-45d0-9f17-76646f2b38e2",
+      "slug": "hot-club-de-russia-christmas-jazz-party-moskva",
+      "title": "Hot Club de Russia — Christmas Jazz Party",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-24T19:05:02.336Z",
+      "eventIds": [
+        "evt_6ae396f2f8be54e6aaf118f3"
+      ],
+      "summary": "Джаз-мануш и рождественская классика в авторских интерпретациях московских музыкантов из Django Friends и Swing Modern Project.",
+      "revisionCount": 3,
+      "activeRewriteVersion": "2026-11-24-newyear-eventpage-5x30"
+    },
+    {
+      "eventPageId": "5b1c81ea-4685-41dd-846d-05bd739451b8",
+      "slug": "novogodnyaya-noch-31-dekabrya-v-peterburge-ded-moroz-podarki-i-furshet-sankt-peterburg",
+      "title": "Новогодняя ночь в Петербурге — автобусная экскурсия, фуршет и встреча на Дворцовой",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-24T19:05:02.336Z",
+      "eventIds": [
+        "evt_6af68bd69256fd5d7653f44f"
+      ],
+      "summary": "Праздничная ночь в городе: автобусный маршрут, рассказы гида, остановки, Дед Мороз и Снегурочка, подарки и встреча Нового 2027 года на Дворцовой площади.",
+      "revisionCount": 3,
+      "activeRewriteVersion": "2026-11-24-newyear-eventpage-5x30"
+    },
+    {
+      "eventPageId": "6bd5de84-9eaa-4d87-ac86-d4ba836a3e4b",
+      "slug": "novogodnii-traktor-barnaul",
+      "title": "«Новогодний трактор» — праздник в Беби-театре",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-24T19:05:02.336Z",
+      "eventIds": [
+        "evt_6b048c24ea567e0df63bd848",
+        "evt_6b048c23ea567e0df63bd831",
+        "evt_6b048c21ea567e0df63bd81a",
+        "evt_6b048c20ea567e0df63bd803"
+      ],
+      "summary": "Детская новогодняя история о тракторе-помощнике Деда Мороза, потерявшемся волшебном посохе и подарках для ребят.",
+      "revisionCount": 6,
+      "activeRewriteVersion": "2026-11-24-newyear-eventpage-5x30"
+    },
+    {
+      "eventPageId": "7a8ddcb5-4376-4eb0-a1e6-615bb6a10a20",
+      "slug": "dzhaz-klub-nz-novogodnii-dzhaz-kaliningrad-2",
+      "title": "«Новогодний джаз» в театре Николая Захарова",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-24T19:05:02.336Z",
+      "eventIds": [
+        "evt_6af3213ce12c16ed8de8a4c9",
+        "evt_6af44ee7a6acb72f4f9ebc76"
+      ],
+      "summary": "Зимние стандарты и праздничные импровизации в исполнении саксофониста Ивана Шевцова, пианиста Константина Осипова и вокалистки Натальи Наумовой.",
+      "revisionCount": 4,
+      "activeRewriteVersion": "2026-11-24-newyear-eventpage-5x30"
+    },
+    {
+      "eventPageId": "b319e9ce-6832-4c21-a306-73a0b47b0056",
+      "slug": "novogodnyaya-elka-bembi-volshebnaya-elochka-nizhniy-novgorod",
+      "title": "«Бемби. Волшебная ёлочка» — праздник для детей 5–7 лет",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-24T19:05:02.336Z",
+      "eventIds": [
+        "evt_6af5f3efafcdb694adc2fb62"
+      ],
+      "summary": "Интерактивная ёлка с двумя оленятами, Дедом Морозом и Снегурочкой, подарком, фотозоной и бумажной дискотекой.",
+      "revisionCount": 3,
+      "activeRewriteVersion": "2026-11-24-newyear-eventpage-5x30"
+    },
+    {
+      "eventPageId": "b8819332-076b-401d-9387-505e4de9d887",
+      "slug": "schelkunchik-muzyka-novogodnei-nochi-organnyi-duet-art-bene-dmitrii-maksimenko-i-anna-vetlugina-moskva",
+      "title": "«Щелкунчик. Музыка новогодней ночи» — органный дуэт ART BENE",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-24T19:05:02.336Z",
+      "eventIds": [
+        "evt_6afd4fd5f8373ad71cb9d170"
+      ],
+      "summary": "Музыка Чайковского, Вивальди и Римского-Корсакова в исполнении органного дуэта Дмитрия Максименко и Анны Ветлугиной при свечах.",
+      "revisionCount": 3,
+      "activeRewriteVersion": "2026-11-24-newyear-eventpage-5x30"
+    },
+    {
+      "eventPageId": "c9d9b567-8978-47a4-88c3-308e7c4683e5",
+      "slug": "sneg-nad-peterburgom-novogodnii-organ-pri-svechah-sankt-peterburg",
+      "title": "«Снег над Петербургом» — новогодний орган при свечах",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-24T19:05:02.336Z",
+      "eventIds": [
+        "evt_6b04977c62f6f7ae5acf95d6"
+      ],
+      "summary": "Концерт Александра Новосёлова на историческом органе Мальтийской капеллы; для желающих предусмотрен вариант билета с экскурсией по Воронцовскому дворцу.",
+      "revisionCount": 3,
+      "activeRewriteVersion": "2026-11-24-newyear-eventpage-5x30"
+    },
+    {
+      "eventPageId": "96089fff-a744-430c-9728-75c6058f4db0",
+      "slug": "novogodnyaya-elka-holodnoe-serdce-nizhniy-novgorod",
+      "title": "«Холодное сердце» — новогодняя ёлка для детей",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-24T19:05:02.336Z",
+      "eventIds": [
+        "evt_6af747201ed2ef800151b20e"
+      ],
+      "summary": "Интерактивное представление с Анной, Эльзой, Кристофом и зимними героями, азотным шоу, подарком и бумажной дискотекой.",
+      "revisionCount": 3,
+      "activeRewriteVersion": "2026-11-24-newyear-eventpage-5x30"
+    },
+    {
+      "eventPageId": "10939e02-ce78-48ce-8f86-bd36fc0faabf",
+      "slug": "novogodnie-hity-pesni-abba-sinatry-i-sovetskogo-kino-pri-svechah-moskva",
+      "title": "Новогодние хиты при свечах: ABBA, Синатра и музыка кино",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-24T19:05:02.336Z",
+      "eventIds": [
+        "evt_6afd9f0002628729dfe15a5a"
+      ],
+      "summary": "Камерный концерт фортепиано и вокала: новогодние песни, эстрадная классика, музыка советского кино и русские народные мотивы.",
+      "revisionCount": 3,
+      "activeRewriteVersion": "2026-11-24-newyear-eventpage-5x30"
+    },
+    {
+      "eventPageId": "efdf38bd-afcc-4f64-9e24-9149a69bc531",
+      "slug": "ezhik-fima-novogodnie-chudesa-sankt-peterburg-4",
+      "title": "«Ёжик Фима. Новогодние чудеса»",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-24T19:05:02.336Z",
+      "eventIds": [
+        "evt_6afc1f39f2f3990c8d15d3a0"
+      ],
+      "summary": "Семейный спектакль о маленьком ёжике, который проснулся зимой и вместе с лесными друзьями готовится встретить Новый год.",
+      "revisionCount": 3,
+      "activeRewriteVersion": "2026-11-24-newyear-eventpage-5x30"
+    },
+    {
+      "eventPageId": "690621a8-f815-4f72-a4bb-e8f9e34b96c6",
+      "slug": "novogodnyaya-elka-supergeroiskaya-elka-nizhniy-novgorod",
+      "title": "«Супергеройская ёлка» — новогодний праздник для детей",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-24T19:05:02.336Z",
+      "eventIds": [
+        "evt_6af89020e57b46c74f60798f"
+      ],
+      "summary": "Интерактивное представление с Человеком-пауком, Суперменом, Бэтменом, Дедом Морозом и Снегурочкой, фотозоной и бумажной дискотекой.",
+      "revisionCount": 3,
+      "activeRewriteVersion": "2026-11-24-newyear-eventpage-5x30"
+    },
+    {
+      "eventPageId": "0e380c7f-46b5-44ee-b74f-46544c01486b",
+      "slug": "kinomuzyka-lyubimye-narodnye-hity-i-novogodnie-pesni-pri-svechah-moskva",
+      "title": "«Киномузыка, народные хиты и новогодние песни при свечах»",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-24T19:05:02.336Z",
+      "eventIds": [
+        "evt_6b00361055f128ee74543e40"
+      ],
+      "summary": "Вокальный концерт в Доме Гоголя: музыка кино и мультфильмов, эстрада и народные песни в аранжировках для голоса, рояля, балалайки и гармони.",
+      "revisionCount": 3,
+      "activeRewriteVersion": "2026-11-24-newyear-eventpage-5x30"
+    },
+    {
+      "eventPageId": "fdc0c5cc-59e7-4a18-bfea-559e814549fa",
+      "slug": "bdo-petra-vostokova-dzhaz-syuita-schelkunchik-moskva",
+      "title": "Большой джазовый оркестр Петра Востокова — сюита «Щелкунчик»",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-24T19:05:02.336Z",
+      "eventIds": [
+        "evt_6b00754d00e90d7e389be2fc"
+      ],
+      "summary": "Рождественская джазовая программа БДО: сюита Дюка Эллингтона по балету Чайковского, зимние стандарты и музыка Гленна Миллера, Бенни Гудмена и Джорджа Гершвина.",
+      "revisionCount": 3,
+      "activeRewriteVersion": "2026-11-24-newyear-eventpage-5x30"
+    },
+    {
+      "eventPageId": "b0344998-1e26-4af6-a635-9d882d7e6870",
+      "slug": "rospis-elochnyh-igrushek-s-vidom-na-isaakii-ot-artvaibs-sankt-peterburg",
+      "title": "Роспись ёлочной игрушки с видом на Исаакий",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-24T19:05:02.336Z",
+      "eventIds": [
+        "evt_6b02d0a249bd35f8bda4ac1f",
+        "evt_6b02d0a149bd35f8bda4ac17",
+        "evt_6b02d0a149bd35f8bda4ac0f",
+        "evt_6b02d0a049bd35f8bda4ac07"
+      ],
+      "summary": "Творческий мастер-класс Артвайбс: расписать винтажную объёмную игрушку акрилом и золотыми деталями, а заодно увидеть зимний Петербург с высоты.",
+      "revisionCount": 6,
+      "activeRewriteVersion": "2026-11-24-newyear-eventpage-5x30"
+    },
+    {
+      "eventPageId": "6de3cce5-8b5b-48a1-85a6-b2cebc793c81",
+      "slug": "malenkaya-elochka-sankt-peterburg",
+      "title": "«Маленькая ёлочка» — спектакль для малышей",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-24T19:05:02.336Z",
+      "eventIds": [
+        "evt_6af995dc186bb7088ec2140a"
+      ],
+      "summary": "Короткая зимняя история о маленьких волшебных человечках, которые помогают устроить новогодний праздник в заснеженном лесу.",
+      "revisionCount": 3,
+      "activeRewriteVersion": "2026-11-24-newyear-eventpage-5x30"
+    },
+    {
+      "eventPageId": "93bef06a-61f3-4c25-bcba-18860b393839",
+      "slug": "novogodnii-ogonek-s-a7-i-russkim-radio-moskva",
+      "title": "«Новогодний огонёк» с А7 и «Русским Радио»",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-24T19:05:02.336Z",
+      "eventIds": [
+        "evt_6af4d8755ca2889fbeb98513"
+      ],
+      "summary": "Большой эстрадный концерт в Барвиха Luxury Village: Филипп Киркоров, Лариса Долина, JONY и другие исполнители с любимыми хитами.",
+      "revisionCount": 3,
+      "activeRewriteVersion": "2026-11-24-newyear-eventpage-5x30"
+    },
+    {
+      "eventPageId": "0ad2e6d7-4696-40b6-a07e-a070d5e5b15b",
+      "slug": "novogodnie-kompozicii-venki-elochki-s-vidom-na-isaakii-ot-artvaibs-sankt-peterburg",
+      "title": "«Новогодние композиции, венки и ёлочки» — мастер-класс Артвайбс",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-24T19:05:02.336Z",
+      "eventIds": [
+        "evt_6b02d2260c0006b66da4ac14",
+        "evt_6b02d2260c0006b66da4ac0c"
+      ],
+      "summary": "Создание праздничного декора из нобилиса, шишек и природных материалов: на выбор венок, композиция со свечой или декоративная ёлочка.",
+      "revisionCount": 4,
+      "activeRewriteVersion": "2026-11-24-newyear-eventpage-5x30"
+    },
+    {
+      "eventPageId": "834e8df6-ead7-4134-98bc-ea4b13ae15a0",
+      "slug": "ledovoe-shou-schelkunchik-v-sterlitamake-sterlitamak-2",
+      "title": "Ледовое шоу «Щелкунчик» — Стерлитамак",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-24T19:05:02.336Z",
+      "eventIds": [
+        "evt_6ad05b5a717268ff820010da"
+      ],
+      "summary": "Сказка Гофмана на льду: фигурное катание, авторская переработка музыки Чайковского, голограммы и лазерные эффекты.",
+      "revisionCount": 3,
+      "activeRewriteVersion": "2026-11-24-newyear-eventpage-5x30"
+    },
+    {
+      "eventPageId": "d0ea0e3b-00e7-469c-a034-40c6466218eb",
+      "slug": "ledovoe-shou-schelkunchik-v-tambove-tambov",
+      "title": "Ледовое шоу «Щелкунчик» — Тамбов",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-24T19:05:02.336Z",
+      "eventIds": [
+        "evt_6ad96db1d5b1c2fae1f6b2c1",
+        "evt_6ad9f688e56a91bf9620ef80"
+      ],
+      "summary": "Гастрольная постановка театра на льду Color-Ice с фигурным катанием, музыкой Чайковского, проекциями, голограммами и лазерными эффектами.",
+      "revisionCount": 5,
+      "activeRewriteVersion": "2026-11-24-newyear-eventpage-5x30"
+    },
+    {
+      "eventPageId": "37a41022-a1a0-49c3-978b-dc515fc3b8ef",
+      "slug": "ledovoe-shou-schelkunchik-v-lipecke-lipeck-2",
+      "title": "Ледовое шоу «Щелкунчик» — Липецк",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-24T19:05:02.336Z",
+      "eventIds": [
+        "evt_6afc5e44be4dd0f27dc02149",
+        "evt_6afc5e7090428ffe5c881a85"
+      ],
+      "summary": "Фигурное катание по сказке Гофмана с авторской музыкой Чайковского, яркими костюмами и мультимедийными эффектами.",
+      "revisionCount": 4,
+      "activeRewriteVersion": "2026-11-24-newyear-eventpage-5x30"
+    },
+    {
+      "eventPageId": "def8641d-a962-474f-bada-cf7dcbc09f6e",
+      "slug": "koncert-rozhdestvenskie-vstrechi-s-ansamblem-pesni-i-plyaski-donskih-kazakov-rostov-na-donu",
+      "title": "«Рождественские встречи» ансамбля Донских казаков",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-24T19:05:02.336Z",
+      "eventIds": [
+        "evt_6ab4f4fc280a49e752f6ef16",
+        "evt_6ab5100a9979e820fea71ec6",
+        "evt_6ab50fd4caf30b2dc0e5dcf6"
+      ],
+      "summary": "Государственный академический ансамбль песни и пляски Донских казаков имени Анатолия Квасова представит в Ростове-на-Дону программу с колядками, обрядовыми песнями, танцами и шуточными сценками.",
+      "revisionCount": 4,
+      "activeRewriteVersion": "2026-11-24-newyear-eventpage-5x30"
+    },
+    {
+      "eventPageId": "93d3f8b0-a45d-44b3-90db-fa93fccdf36d",
+      "slug": "novogodnie-kompozicii-venki-i-elochki-ot-artvaibs-sankt-peterburg",
+      "title": "Новогодние композиции, венки и ёлочки от Artvibes — Санкт-Петербург",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-24T19:05:02.336Z",
+      "eventIds": [
+        "evt_6b02d28744fd381fc02e9b62"
+      ],
+      "summary": "Практический мастер-класс по праздничному декору: участники соберут рождественский венок, композицию со свечой или декоративную ёлочку из природных материалов.",
+      "revisionCount": 3,
+      "activeRewriteVersion": "2026-11-24-newyear-eventpage-5x30"
+    },
+    {
+      "eventPageId": "7728a81f-6970-4ac6-95e7-3f729a82ead4",
+      "slug": "novogodnee-predstavlenie-vse-delo-v-shlyape-po-skazke-prazdnik-pylelupov-moskva-4",
+      "title": "«Всё дело в шляпе» — новогодний спектакль по сказке «Праздник Пылелупов»",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-24T19:05:02.336Z",
+      "eventIds": [
+        "evt_6af705243e9d2c9081722aa8",
+        "evt_6af7064e5b3fc1fd8c0608ce",
+        "evt_6af8382181ae652984e50e7a",
+        "evt_6af839aa43eb44e2c0ca99f4",
+        "evt_6af7033433521d8ce07b3da1"
+      ],
+      "summary": "Музыкальная новогодняя сказка Натали Куртог о дружбе мальчика Пети с загадочными существами; постановку создали режиссёр Павел Альханцев и композитор Александр Гилёв.",
+      "revisionCount": 4,
+      "activeRewriteVersion": "2026-11-24-newyear-eventpage-5x30"
+    },
+    {
+      "eventPageId": "882798dc-0d55-4133-9515-d0ba6a65c2c1",
+      "slug": "ledovoe-shou-schelkunchik-v-novosibirske-novosibirsk-2",
+      "title": "Ледовое шоу «Щелкунчик» — Новосибирск",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-24T19:05:02.336Z",
+      "eventIds": [
+        "evt_6aaa1cd3de61efe8a2d8c28a"
+      ],
+      "summary": "Постановка театра на льду Color-Ice по сказке Гофмана: фигурное катание, музыка Чайковского, костюмы и мультимедийные эффекты.",
+      "revisionCount": 3,
+      "activeRewriteVersion": "2026-11-24-newyear-eventpage-5x30"
+    },
+    {
+      "eventPageId": "f4df6bb8-af83-4971-a796-0f86d72f5f12",
+      "slug": "rospis-elochnyh-igrushek-ot-artvaibs-sankt-peterburg",
+      "title": "Роспись ёлочных игрушек от Artvibes — Санкт-Петербург",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-24T19:05:02.336Z",
+      "eventIds": [
+        "evt_6b02d12e503ac5ac12aac44c"
+      ],
+      "summary": "Творческий мастер-класс, где участники распишут объёмную ёлочную игрушку акриловыми красками и золотыми деталями, а готовую работу заберут домой.",
+      "revisionCount": 3,
+      "activeRewriteVersion": "2026-11-24-newyear-eventpage-5x30"
+    },
+    {
+      "eventPageId": "36ae3a39-cb61-4459-bd5d-491bb12c8a18",
+      "slug": "rock-christmas-metallica-i-scorpions-pri-svechah-akustika-moskva",
+      "title": "Rock Christmas: Metallica и Scorpions при свечах",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-24T19:05:02.336Z",
+      "eventIds": [
+        "evt_6ad718f77d92761488d3ecc3"
+      ],
+      "summary": "Акустическая программа по песням Metallica и Scorpions: вокал, фортепиано, гитара и виолончель в камерном зале при свечах.",
+      "revisionCount": 3,
+      "activeRewriteVersion": "2026-11-24-newyear-eventpage-5x30"
+    },
+    {
+      "eventPageId": "781fb5fe-b901-43d3-9751-5ca9b8eeac39",
+      "slug": "gr-ivan-kaif-novosibirsk",
+      "title": "Иван-Кайф! — концерт в Новосибирске",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-24T19:05:02.336Z",
+      "eventIds": [
+        "evt_6a9422d012f8b075440eafd0"
+      ],
+      "summary": "Новосибирская рок-группа исполнит песни, с которыми связана история коллектива с 1988 года: «По ночному городку», «Катится любовь», «Акутагава-сан» и другие.",
+      "revisionCount": 3,
+      "activeRewriteVersion": "2026-11-24-newyear-eventpage-5x30"
+    },
+    {
+      "eventPageId": "19312d3d-3205-4875-8dd9-04d13b3ba7ab",
+      "slug": "saundtreki-rozhdestva-sankt-peterburg",
+      "title": "«Саундтреки Рождества» — Санкт-Петербург",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-24T19:05:02.336Z",
+      "eventIds": [
+        "evt_6afb4154b8d8cdbee3c3b8d5",
+        "evt_6afb4156b8d8cdbee3c3ba8c"
+      ],
+      "summary": "Ансамбль солистов Оркестра 1703 исполнит музыку из советских и зарубежных фильмов — от «Иронии судьбы» и «Карнавальной ночи» до «Один дома» и «Гарри Поттера».",
+      "revisionCount": 4,
+      "activeRewriteVersion": "2026-11-24-newyear-eventpage-5x30"
+    },
+    {
+      "eventPageId": "62402c14-f3e2-4b3f-94eb-6072d2113274",
+      "slug": "schelkunchik-noch-dzhaza-moskva",
+      "title": "«Щелкунчик: Ночь джаза» — Москва",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-24T19:05:02.336Z",
+      "eventIds": [
+        "evt_6b02db860be3c674c01427be"
+      ],
+      "summary": "Джазовые версии музыки из «Щелкунчика» и новогодних мелодий в исполнении ансамбля с роялем, контрабасом, ударными и саксофоном.",
+      "revisionCount": 3,
+      "activeRewriteVersion": "2026-11-24-newyear-eventpage-5x30"
+    },
+    {
+      "eventPageId": "4cca7970-7255-4725-94f7-2c513ea58717",
+      "slug": "balet-schelkunchik-sankt-peterburg-20",
+      "title": "Балет «Щелкунчик» театра «Сен-Мишель» — Санкт-Петербург",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-24T19:05:02.336Z",
+      "eventIds": [
+        "evt_6af58bcea88664cc82ff9a2b",
+        "evt_6a8acfe8477fbf75eefe0377"
+      ],
+      "summary": "Классическая рождественская сказка в хореографии Михаила Венщикова: Маша, Дроссельмейер, Танец снежинок, Вальс цветов и другие знакомые эпизоды балета.",
+      "revisionCount": 4,
+      "activeRewriteVersion": "2026-11-24-newyear-eventpage-5x30"
+    },
+    {
+      "eventPageId": "fd6d3120-602f-4eae-a3fc-e6fded05f70e",
+      "slug": "schelkunchik-novogodnyaya-muzykalnaya-skazka-s-pesochnoi-animaciei-moskva-2",
+      "title": "«Щелкунчик» — музыкальная сказка с песочной анимацией",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-24T19:05:02.336Z",
+      "eventIds": [
+        "evt_6b04adb6b69ec82898592425"
+      ],
+      "summary": "Сказка Гофмана в исполнении солистов Luminis Artis: музыка Чайковского, актёрская игра и картины песочной анимации.",
+      "revisionCount": 3,
+      "activeRewriteVersion": "2026-11-24-newyear-eventpage-5x30"
+    },
+    {
+      "eventPageId": "a48cdf81-3060-4008-8ded-cc537f2dc986",
+      "slug": "kosmicheskii-dzhaz-novogodnie-hity-sankt-peterburg",
+      "title": "«Космический джаз: новогодние хиты» — Санкт-Петербург",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-24T19:05:02.336Z",
+      "eventIds": [
+        "evt_6afac6a10e0a1534db0b2025"
+      ],
+      "summary": "Spontaneous Jazz Band исполнит рождественскую классику и джазовые стандарты под звёздным куполом Планетария 1.",
+      "revisionCount": 3,
+      "activeRewriteVersion": "2026-11-24-newyear-eventpage-5x30"
+    },
+    {
+      "eventPageId": "6146c7fc-73d6-4892-adc6-0b107122e7e5",
+      "slug": "betsy-novogodnee-shou-moskva",
+      "title": "Betsy — новогоднее шоу в Москве",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-24T19:05:02.336Z",
+      "eventIds": [
+        "evt_6b01df09a4cd1733946f7f18"
+      ],
+      "summary": "Праздничный концерт Betsy с песнями «Сигма-бой», «Электрощиток», «Печалик», «Котики», «Парацетамол» и синглом «Под Новый год».",
+      "revisionCount": 3,
+      "activeRewriteVersion": "2026-11-24-newyear-eventpage-5x30"
+    },
+    {
+      "eventPageId": "6c3a2a6f-8f7f-4fd0-a29b-a09949bb02a9",
+      "slug": "novogodnyaya-noch-v-zavarke-koncert-yasmi-moskva",
+      "title": "Новогодняя ночь в «Заварке» с YASMI",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-24T19:05:02.336Z",
+      "eventIds": [
+        "evt_6afed6f3d4264d17663f4f69"
+      ],
+      "summary": "«Заварка» встретит 2027 год ночной вечеринкой с хедлайнером YASMI, диджеями, ведущими и танцами до утра.",
+      "revisionCount": 3,
+      "activeRewriteVersion": "2026-11-24-newyear-eventpage-5x30"
+    },
+    {
+      "eventPageId": "818a334c-3a8d-4f0d-bda5-fb10b33650a6",
+      "slug": "kak-ded-moroz-na-svet-poyavilsya-penza-3",
+      "title": "«Как Дед Мороз на свет появился» — Пенза",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-24T19:05:02.336Z",
+      "eventIds": [
+        "evt_6afe0bb80c401d2c95bc46f5",
+        "evt_6afe0bfd17624389da9c3d19",
+        "evt_6afe0be00cdc0424838a332c"
+      ],
+      "summary": "Детская сказка о временах, когда на Земле не было зимы, и о том, как разлад между временами года привёл к переменам.",
+      "revisionCount": 4,
+      "activeRewriteVersion": "2026-11-24-newyear-eventpage-5x30"
+    },
+    {
+      "eventPageId": "a67906da-0c9e-4fa8-a12b-938cd782b1e7",
+      "slug": "tutty-frutty-party-koncert-pesen-elvisa-ot-gr-the-great-pretenders-tver",
+      "title": "TUTTY FRUTTY PARTY: песни Элвиса от The Great Pretenders — Тверь",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-24T19:05:02.336Z",
+      "eventIds": [
+        "evt_6af58b8d46d4e23b0209e77a"
+      ],
+      "summary": "The Great Pretenders сыграют песни Элвиса Пресли и рок-н-ролльную классику в стилях рокабилли и буги.",
+      "revisionCount": 3,
+      "activeRewriteVersion": "2026-11-24-newyear-eventpage-5x30"
+    },
+    {
+      "eventPageId": "cb407b7b-8d3e-4d78-9955-f27f7acf9030",
+      "slug": "rozhdestvenskii-organ-pri-svechah-sankt-peterburg-2",
+      "title": "«Рождественский орган при свечах» — Санкт-Петербург",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-24T19:05:02.336Z",
+      "eventIds": [
+        "evt_6ae792b959a4d746a5518ab4",
+        "evt_6ae792bc59a4d746a5518d50"
+      ],
+      "summary": "Праздничная органная программа в Петрикирхе: произведения разных эпох в исполнении петербургских музыкантов при свете свечей.",
+      "revisionCount": 4,
+      "activeRewriteVersion": "2026-11-24-newyear-eventpage-5x30"
+    },
+    {
+      "eventPageId": "9d6a2a66-d627-480c-96b6-433074d384ce",
+      "slug": "muzh-v-novogodnyuyu-ipoteku-kaliningrad",
+      "title": "«Муж в новогоднюю ипотеку» — Калининград",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-24T19:05:02.336Z",
+      "eventIds": [
+        "evt_6af432ae195d862048486909"
+      ],
+      "summary": "Комедия о семейном юбилее, праздничном ужине и неожиданном звонке, который нарушает планы супругов.",
+      "revisionCount": 3,
+      "activeRewriteVersion": "2026-11-24-newyear-eventpage-5x30"
+    },
+    {
+      "eventPageId": "878f0677-cbd7-414e-bd2c-0ebd872b0328",
+      "slug": "novogodnyaya-vecherinka-s-pridurkom-kaliningrad",
+      "title": "«Новогодняя вечеринка с придурком» — Калининград",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-24T19:05:02.336Z",
+      "eventIds": [
+        "evt_6afecc252f62e311ce22f702"
+      ],
+      "summary": "Комедия о необычном ужине, где гости приводят с собой самого нелепого спутника, но в итоге хозяин сам оказывается в неожиданном положении.",
+      "revisionCount": 3,
+      "activeRewriteVersion": "2026-11-24-newyear-eventpage-5x30"
+    },
+    {
+      "eventPageId": "390041c2-1b96-4435-a9d2-ba741b33f12b",
+      "slug": "ledovoe-shou-taina-semi-deda-moroza-podarok-lipeck",
+      "title": "«Тайна семьи Деда Мороза» — ледовое шоу в Липецке",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-24T19:05:02.336Z",
+      "eventIds": [
+        "evt_6a7f2c46694f257f6b4953a7",
+        "evt_6a7f4f9c8d30218d646c375f"
+      ],
+      "summary": "Сказочное ледовое представление с фигурным катанием, световыми эффектами и новогодним сюжетом; детям до пяти лет отдельный билет не нужен, если они сидят со взрослым.",
+      "revisionCount": 4,
+      "activeRewriteVersion": "2026-11-24-newyear-eventpage-5x30"
+    },
+    {
+      "eventPageId": "691bc4e2-a6ba-4cae-a6e5-70bf13981684",
+      "slug": "art-festival-pereryv-krasnoyarsk",
+      "title": "Арт-фестиваль «Перерыв» — Красноярск",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-24T19:05:02.336Z",
+      "eventIds": [
+        "evt_6afd24b5c90be1bcaa04c60d"
+      ],
+      "summary": "Двухдневный фестиваль в Музейном центре «Площадь Мира»: локальный маркет, искусство, книги, диджей-сеты и мастер-классы.",
+      "revisionCount": 3,
+      "activeRewriteVersion": "2026-11-24-newyear-eventpage-5x30"
+    },
+    {
+      "eventPageId": "856202d3-d084-4edd-88fc-8ba677294103",
+      "slug": "kristall-deda-moroza-operaciya-spasenie-naberezhnye-chelny",
+      "title": "«Кристалл Деда Мороза: операция “Спасение”» — Набережные Челны",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-24T19:05:02.336Z",
+      "eventIds": [
+        "evt_6af71511423a468c4dc3b8cc",
+        "evt_6afd9e937aa24bf00025a1c0",
+        "evt_6afd9e937aa24bf00025a1c8",
+        "evt_6afd9e947aa24bf00025a1d0",
+        "evt_6afd9e947aa24bf00025a1d8",
+        "evt_6afd9e957aa24bf00025a1e0",
+        "evt_6afd9e957aa24bf00025a1e8",
+        "evt_6afd9e957aa24bf00025a1f0"
+      ],
+      "summary": "Интерактивная новогодняя история для детей от шести лет: зрители помогают героям вернуть волшебный кристалл и спасти праздник.",
+      "revisionCount": 10,
+      "activeRewriteVersion": "2026-11-24-newyear-eventpage-5x30"
+    },
+    {
+      "eventPageId": "a23d9500-2b54-4c0d-beb1-baa5e7d64f81",
+      "slug": "po-schuchemu-veleniyu-teatralno-cirkovaya-skazka-molokovo",
+      "title": "«По щучьему велению» — театрально-цирковая сказка",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-24T19:05:02.336Z",
+      "eventIds": [
+        "evt_6af047ce353f4e943bd3ec75"
+      ],
+      "summary": "Новогодняя версия русской сказки об Емеле: театральное действие, цирковые номера, животные, загадки Деда Мороза и Снегурочки.",
+      "revisionCount": 3,
+      "activeRewriteVersion": "2026-11-24-newyear-eventpage-5x30"
+    },
+    {
+      "eventPageId": "79979527-59b7-4f0e-bc0a-20a188bf1168",
+      "slug": "snegovik-pochtovik-muzykalnaya-skazka-sofrino",
+      "title": "«Снеговик-Почтовик» — музыкальная сказка",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-24T19:05:02.336Z",
+      "eventIds": [
+        "evt_6af5c50b2277dae6a001431a"
+      ],
+      "summary": "Снеговик отправляется к Деду Морозу за ёлкой; зрителей ждут песни, танцы, сказочные персонажи и подарок каждому ребёнку.",
+      "revisionCount": 3,
+      "activeRewriteVersion": "2026-11-24-newyear-eventpage-5x30"
+    },
+    {
+      "eventPageId": "9cfe6363-018d-40c2-9004-1fd7584f095f",
+      "slug": "03-01-2027-azon-v-podolske-ozdorovitelnyi-koncert-podolsk",
+      "title": "Азон — новогодний концерт в Подольске",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-24T19:05:02.336Z",
+      "eventIds": [
+        "evt_6aedff4b2094a0bb1741a596"
+      ],
+      "summary": "Подмосковная панк-рок-группа Азон начнёт год концертом в клубе «12 АТМ» — с фирменными песнями, сюрпризами и праздничной встречей.",
+      "revisionCount": 3,
+      "activeRewriteVersion": "2026-11-24-newyear-eventpage-5x30"
+    },
+    {
+      "eventPageId": "c91a8e47-d40d-4501-b1d0-9245312e6b26",
+      "slug": "murakami-belym-belo-vladimir",
+      "title": "Мураками — «Белым-бело» во Владимире",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-24T19:05:02.336Z",
+      "eventIds": [
+        "evt_6ae21f2b87178b99e7283dd3"
+      ],
+      "summary": "Новогодний акустический концерт группы Мураками в ресторане-пивоварне «Макс Брой»; знакомые песни прозвучат в особом праздничном формате.",
+      "revisionCount": 3,
+      "activeRewriteVersion": "2026-11-24-newyear-eventpage-5x30"
+    },
+    {
+      "eventPageId": "3731484c-45da-4d5f-8875-3c08a9afca4a",
+      "slug": "12-mesyacev-zelenograd",
+      "title": "«Двенадцать месяцев» — Зеленоград",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-24T19:05:02.336Z",
+      "eventIds": [
+        "evt_6ac76c964fd8df1ec15cffcb"
+      ],
+      "summary": "Музыкальная сказка о девочке, которая отправляется в зимний лес за подснежниками и встречает двенадцать братьев-месяцев.",
+      "revisionCount": 3,
+      "activeRewriteVersion": "2026-11-24-newyear-eventpage-5x30"
+    },
+    {
+      "eventPageId": "ccd6c78e-f61c-4009-927f-e366e11c680f",
+      "slug": "murakami-belym-belo-kazan",
+      "title": "Мураками — «Белым-бело» в Казани",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-24T19:05:02.336Z",
+      "eventIds": [
+        "evt_6ae1ea8675c3a9d4a0c5364e"
+      ],
+      "summary": "Акустическая новогодняя программа группы Мураками в ресторане «Максимилианс»: любимые песни, разговоры между номерами и праздничная встреча.",
+      "revisionCount": 3,
+      "activeRewriteVersion": "2026-11-24-newyear-eventpage-5x30"
+    },
+    {
+      "eventPageId": "34ee76ab-efd4-4c3c-8a85-b062a03d077d",
+      "slug": "prednovogodnee-karaokekamikadze-rostislav-kolpakov-vs-evgenii-egorov-moskva",
+      "title": "КараокеКамикадзе: Ростислав Колпаков vs Евгений Егоров",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-24T19:05:02.336Z",
+      "eventIds": [
+        "evt_6af902e45b7540da8ad267d2"
+      ],
+      "summary": "Юмористическо-вокальный батл артистов мюзиклов Ростислава Колпакова и Евгения Егорова с ведущей Агатой Вавиловой.",
+      "revisionCount": 3,
+      "activeRewriteVersion": "2026-11-24-newyear-eventpage-5x30"
+    },
+    {
+      "eventPageId": "6fb17535-1a82-4192-915f-3bc41051ff86",
+      "slug": "via-sinyaya-ptica-3-yanvarya-yaroslavl-dk-neftyanik-yaroslavl",
+      "title": "ВИА «Синяя птица» — Ярославль",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-24T19:05:02.336Z",
+      "eventIds": [
+        "evt_6a99901b12f342d2be5affee"
+      ],
+      "summary": "Оригинальный состав ВИА «Синяя птица» под управлением Роберта Болотного исполнит «Клён», «Так вот какая ты», «Белый причал» и другие хиты.",
+      "revisionCount": 3,
+      "activeRewriteVersion": "2026-11-24-newyear-eventpage-5x30"
+    },
+    {
+      "eventPageId": "ddc11002-ac5e-4134-9ad0-206852bcb32c",
+      "slug": "murakami-belym-belo-naberezhnye-chelny",
+      "title": "Мураками — «Белым-бело» в Набережных Челнах",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-24T19:05:02.336Z",
+      "eventIds": [
+        "evt_6ae3614d720fef25048e2957"
+      ],
+      "summary": "Новогодний акустический концерт Мураками в ресторане «Максимилианс»: песни группы, разговоры между номерами и встреча с поклонниками.",
+      "revisionCount": 3,
+      "activeRewriteVersion": "2026-11-24-newyear-eventpage-5x30"
+    },
+    {
+      "eventPageId": "d6b7f42d-78d8-474e-94ec-88d98ef54d73",
+      "slug": "tribyut-hautiluc-pompiliuc-ot-gr-novyi-predmet-tver",
+      "title": "«Новый предмет» — трибьют Nautilus Pompilius в Твери",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-24T19:05:02.336Z",
+      "eventIds": [
+        "evt_6af58c47a88664cc82ff9dd2"
+      ],
+      "summary": "Ярославская группа «Новый предмет» исполнит песни Nautilus Pompilius: «Я хочу быть с тобой», «Скованные одной цепью», «Прогулки по воде» и «Тутанхамон».",
+      "revisionCount": 3,
+      "activeRewriteVersion": "2026-11-24-newyear-eventpage-5x30"
+    },
+    {
+      "eventPageId": "5421cf05-be0e-408e-9127-5d1080dc89fe",
+      "slug": "muzyka-pri-svechah-melodii-rozhdestva-sankt-peterburg-3",
+      "title": "«Музыка при свечах. Мелодии Рождества» — Санкт-Петербург",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-24T19:05:02.336Z",
+      "eventIds": [
+        "evt_6a96e2ebdae1b29fbbae31ca"
+      ],
+      "summary": "Орган, рояль, флейта и виолончель прозвучат в старинной Яани Кирик при свете сотен свечей.",
+      "revisionCount": 3,
+      "activeRewriteVersion": "2026-11-24-newyear-eventpage-5x30"
+    },
+    {
+      "eventPageId": "b7e057ae-0cd8-4144-972c-e417ae4b4a1c",
+      "slug": "kto-rezhisser-novogo-goda-moskva",
+      "title": "«Кто режиссёр Нового года?» — Москва",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-24T19:05:02.336Z",
+      "eventIds": [
+        "evt_6ae991b42cdc97c731bd2ced"
+      ],
+      "summary": "Импровизационная комедия Open Theatre: сначала актёры покажут собственные постановки, затем зрители предложат темы для сцен прямо на ходу.",
+      "revisionCount": 3,
+      "activeRewriteVersion": "2026-11-24-newyear-eventpage-5x30"
+    },
+    {
+      "eventPageId": "de9983ee-2da2-4c67-958e-1446601e117d",
+      "slug": "chaikovskii-pri-svechah-rozhdestvenskii-koncert-muzyki-i-baleta-na-panoramnoi-kryshe-moskva-5",
+      "title": "«Чайковский при свечах» — музыка и балет на крыше в Москве",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-24T19:05:02.336Z",
+      "eventIds": [
+        "evt_6ada80eac65b92d93c2a70d1"
+      ],
+      "summary": "Камерный оркестр Gloria исполнит музыку Чайковского, а балерины представят четыре миниатюры на панорамной крыше Omega Rooftop.",
+      "revisionCount": 3,
+      "activeRewriteVersion": "2026-11-24-newyear-eventpage-5x30"
+    },
+    {
+      "eventPageId": "6a2bd4fd-e516-4523-9937-9191048279c3",
+      "slug": "roxette-tribute-love-show-sankt-peterburg",
+      "title": "Roxette Tribute Love Show — Санкт-Петербург",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-24T19:05:02.336Z",
+      "eventIds": [
+        "evt_6aef662b0e512200847829de"
+      ],
+      "summary": "Рождественский трибьют-концерт Roxette с хитами «It Must Have Been Love», «Listen to Your Heart» и «Fading Like a Flower».",
+      "revisionCount": 3,
+      "activeRewriteVersion": "2026-11-24-newyear-eventpage-5x30"
+    },
+    {
+      "eventPageId": "55362241-829e-47ad-a705-2d1a4e212801",
+      "slug": "new-year-s-downtownbeat-band-kaby-ne-bylo-zimy-moskva",
+      "title": "DownTownBeat Band — «Кабы не было зимы»",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-24T19:05:02.336Z",
+      "eventIds": [
+        "evt_6af4a6d04aadeffc98755c38"
+      ],
+      "summary": "Предновогодний сет DownTownBeat Band с музыкой из зимних советских сказок и мультфильмов, после которого начнётся джем-сейшн.",
+      "revisionCount": 3,
+      "activeRewriteVersion": "2026-11-24-newyear-eventpage-5x30"
+    },
+    {
+      "eventPageId": "72791215-c5dc-4828-acae-61c4877cd9fa",
+      "slug": "ekskursiya-v-osobnyak-shredera-koncert-rozhdestvo-s-dunaevskim-za-stolikami-s-furshetom-sankt-peterburg",
+      "title": "Особняк Шрёдера и концерт «Рождество с Дунаевским» — Санкт-Петербург",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-24T19:05:02.336Z",
+      "eventIds": [
+        "evt_6b047d5016a168d8e48a8607"
+      ],
+      "summary": "Экскурсия по особняку Карла Шрёдера, рассказ о династии мастеров фортепиано, концерт Ирины Алёшиной и фуршет за столиками.",
+      "revisionCount": 3,
+      "activeRewriteVersion": "2026-11-24-newyear-eventpage-5x30"
+    },
+    {
+      "eventPageId": "d56851f0-2ef8-40e8-b676-9f4e0b189164",
+      "slug": "ot-mirovyh-hitov-do-lyubimyh-kinolent-novogodnii-vecher-pri-svechah-cimmer-morrikone-tariverdiev-moskva",
+      "title": "«От мировых хитов до любимых кинолент» — Москва",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-24T19:05:02.336Z",
+      "eventIds": [
+        "evt_6afe1e4a33ec963fa91d58a2"
+      ],
+      "summary": "Музыка из голливудских и советских фильмов при свечах: от «Титаника» и «Интерстеллара» до Гайдая, «Карнавала» и «Трёх тополей на Плющихе».",
+      "revisionCount": 3,
+      "activeRewriteVersion": "2026-11-24-newyear-eventpage-5x30"
+    },
+    {
+      "eventPageId": "ef69b295-22b4-430a-abea-1562ffdde56c",
+      "slug": "rozhdestvo-s-dunaevskim-irina-aleshina-prazdnichnyi-koncert-za-stolikami-sankt-peterburg",
+      "title": "«Рождество с Дунаевским» — концерт Ирины Алёшиной",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-24T19:05:02.336Z",
+      "eventIds": [
+        "evt_6b047067f76f04b8271eff95",
+        "evt_6b047908cf5c8668d3892d04"
+      ],
+      "summary": "Песни Исаака и Максима Дунаевских в исполнении Ирины Алёшиной в историческом зале особняка Шрёдера, за столиками с чаем и пирогами.",
+      "revisionCount": 4,
+      "activeRewriteVersion": "2026-11-24-newyear-eventpage-5x30"
+    },
+    {
+      "eventPageId": "0a8ef5fc-c54c-496b-98a8-3f32284b9a05",
+      "slug": "v-svechah-shedevry-klassiki-v-usadbe-derzhavina-sankt-peterburg",
+      "title": "«Шедевры классики в усадьбе Державина» — Санкт-Петербург",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-24T19:05:02.336Z",
+      "eventIds": [
+        "evt_6adb711440dc4956ce2d12c0",
+        "evt_6a5a060dce219e3c72842189",
+        "evt_6a5a0609ce219e3c7284215e",
+        "evt_6a5a0606ce219e3c72842133"
+      ],
+      "summary": "Камерный концерт цикла «В свечах» с музыкой Чайковского, Вивальди, Массне и Рахманинова в парадном зале усадьбы Державина.",
+      "revisionCount": 6,
+      "activeRewriteVersion": "2026-11-24-newyear-eventpage-5x30"
+    },
+    {
+      "eventPageId": "6dd28f9f-c353-47dc-8cbe-7bf82c72f3b9",
+      "slug": "tvorcheskii-master-klass-po-izgotovleniyu-podstavki-iz-gipsa-i-aromaticheskoi-svechi-perm-4",
+      "title": "Мастер-класс по гипсовой подставке и ароматической свече — Пермь",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-24T19:05:02.336Z",
+      "eventIds": [
+        "evt_6ae1ab5dbf0248d47018cdec"
+      ],
+      "summary": "В студии OGONEK участники изготовят гипсовую подставку и ароматическую свечу, выбрав оттенок и аромат.",
+      "revisionCount": 3,
+      "activeRewriteVersion": "2026-11-24-newyear-eventpage-5x30"
+    },
+    {
+      "eventPageId": "b18a9d24-0f20-4ab9-b4d6-e19e1b2e4a1a",
+      "slug": "koncert-extra-time-jazz-band-vidnoe",
+      "title": "Extra-Time Jazz Band — предновогодний концерт в Видном",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-24T19:05:02.336Z",
+      "eventIds": [
+        "evt_6afdb36b98fe700d6daca0b3"
+      ],
+      "summary": "Большой предновогодний концерт Extra-Time Jazz Band с певцом Романом Мачинским и скрипачкой Натальей Кочневой.",
+      "revisionCount": 3,
+      "activeRewriteVersion": "2026-11-24-newyear-eventpage-5x30"
+    },
+    {
+      "eventPageId": "9490ee95-ce1b-4ee7-81a1-66d5b432af8a",
+      "slug": "rok-akustika-po-vashim-zayavkam-smolensk",
+      "title": "«Рок-акустика по вашим заявкам» — Смоленск",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-24T19:05:02.336Z",
+      "eventIds": [
+        "evt_6af271d3ff20317f048530fe"
+      ],
+      "summary": "Предновогодний акустический концерт по заявкам слушателей: на сцене выступят пять музыкантов, включая специального гостя из Минска.",
+      "revisionCount": 3,
+      "activeRewriteVersion": "2026-11-24-newyear-eventpage-5x30"
+    },
+    {
+      "eventPageId": "64b09661-aa08-4579-8cee-7e466ad9ddc2",
+      "slug": "kontent-zavod-omsk",
+      "title": "«Контент завод» — семейная программа в Омске",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-24T19:05:02.336Z",
+      "eventIds": [
+        "evt_6acf72e3dfcc25f4b4ff2796",
+        "evt_6acf734ff22b1438324e372b",
+        "evt_6acf770b7641db2d5f7fc589",
+        "evt_6acf76d968adcf849c2c0079",
+        "evt_6acf7370b5cf0ae990a2b77c",
+        "evt_6acf7323256c5903531a8b26",
+        "evt_6acf772068adcf849c2c0089",
+        "evt_6acf73a4ecae28181a34ff2c",
+        "evt_6acf7413f22b1438324e3772",
+        "evt_6acf733aecae28181a34ff0c",
+        "evt_6acf73ba6adf652951bcc63f",
+        "evt_6acf73fd7e0fd57612e7c257",
+        "evt_6acf73ca256c5903531a8b4f",
+        "evt_6acf73eb68adcf849c2c000a",
+        "evt_6acf76f8f22b1438324e3894",
+        "evt_6acf756cf22b1438324e3841",
+        "evt_6acf7305f22b1438324e3712",
+        "evt_6acf73dab5cf0ae990a2b795"
+      ],
+      "summary": "Трёхчасовая программа в парке «ГУГОЛ_BOOM»: крио-мороженое, AI-квест, VR-шоу, игры и встреча с Дедом Морозом и Снегурочкой.",
+      "revisionCount": 4,
+      "activeRewriteVersion": "2026-11-24-newyear-eventpage-5x30"
+    },
+    {
+      "eventPageId": "f7904ae2-56e8-4479-9d49-eaadda1a76e4",
+      "slug": "hozyaika-mednoi-gory-krasnodar",
+      "title": "«Хозяйка Медной горы» — новогодняя сказка в Краснодаре",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-24T19:05:02.336Z",
+      "eventIds": [
+        "evt_6ab3cabaf87a37ef0b49147c",
+        "evt_6ab3cabdf87a37ef0b491496",
+        "evt_6ab3cac2f87a37ef0b4914bd",
+        "evt_6ab3caccf87a37ef0b4914fe",
+        "evt_6ab3cad1f87a37ef0b491525",
+        "evt_6ab3cabcf87a37ef0b491489",
+        "evt_6ab3cac4f87a37ef0b4914ca",
+        "evt_6ab3cacaf87a37ef0b4914f1",
+        "evt_6ab3cad2f87a37ef0b491532",
+        "evt_6ab3cabff87a37ef0b4914a3",
+        "evt_6ab3cac8f87a37ef0b4914e4",
+        "evt_6ab3cacef87a37ef0b49150b",
+        "evt_6ab3cad5f87a37ef0b49154c",
+        "evt_6ab3cac1f87a37ef0b4914b0",
+        "evt_6ab3cac6f87a37ef0b4914d7",
+        "evt_6ab3cad0f87a37ef0b491518",
+        "evt_6ab3cad4f87a37ef0b49153f",
+        "evt_6acf77eb7b09376546f48386",
+        "evt_6acf77ec7b09376546f48393",
+        "evt_6acf77ed7b09376546f483a0",
+        "evt_6acf77ed7b09376546f483ad",
+        "evt_6acf77ee7b09376546f483c7",
+        "evt_6acf77ee7b09376546f483ba"
+      ],
+      "summary": "Иван и княжна Настенька отправляются спасать Деда Мороза, которого Хозяйка Медной горы заточила в темнице.",
+      "revisionCount": 25,
+      "activeRewriteVersion": "2026-11-24-newyear-eventpage-5x30"
+    },
+    {
+      "eventPageId": "d95ade50-32a2-4092-8ca7-4b933da6ca33",
+      "slug": "dmitrii-dubrov-plotnik82-belgorod-3-01-2027-belgorod",
+      "title": "Дмитрий Дубров / Plotnik82 — концерт в Белгороде",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-24T19:05:02.336Z",
+      "eventIds": [
+        "evt_6af8402664cbc843920d9a3a"
+      ],
+      "summary": "Праздничный концерт Дмитрия Дуброва, бывшего фронтмена Plotnik82: новые песни, хоровое пение, фокусы и живое общение.",
+      "revisionCount": 3,
+      "activeRewriteVersion": "2026-11-24-newyear-eventpage-5x30"
+    },
+    {
+      "eventPageId": "f3768036-6a68-42c4-bf45-fc05b05cb64e",
+      "slug": "moi-2008-rassvet-voronezh",
+      "title": "«Мой 2008» — новогодняя вечеринка в Воронеже",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-24T19:05:02.336Z",
+      "eventIds": [
+        "evt_6afb9778c4217bca422446a6"
+      ],
+      "summary": "Танцевальная ночь с клубными хитами 2008 года и сетами резидентов DISCOTHĖQUE: VEGAS, FRIDRIKH и LEKHEM.",
+      "revisionCount": 3,
+      "activeRewriteVersion": "2026-11-24-newyear-eventpage-5x30"
+    },
+    {
+      "eventPageId": "4232eb84-7ecc-48f2-b593-00b0cbc4ca51",
+      "slug": "prazdnik-kotoryi-vsegda-s-toboi-18-ufa-3",
+      "title": "«Праздник, который всегда с тобой» — Уфа",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-24T19:05:02.336Z",
+      "eventIds": [
+        "evt_6aeb47413ede1878a93cc1d4",
+        "evt_6aeb48679a9202548e4b6297",
+        "evt_6aeb47710ba3f7456ec2170f"
+      ],
+      "summary": "Комедия о сотрудниках, застрявших в офисе во время новогодней метели, и незваных гостях, которые меняют ход ночи.",
+      "revisionCount": 4,
+      "activeRewriteVersion": "2026-11-24-newyear-eventpage-5x30"
+    },
+    {
+      "eventPageId": "3b5d5d63-6927-407e-b4ef-f9452e458677",
+      "slug": "kinouzhin-po-motivam-filma-odin-doma-syktyvkar",
+      "title": "Киноужин «Один дома» — Сыктывкар",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-24T19:05:02.336Z",
+      "eventIds": [
+        "evt_6af8891381e4e864518008cf"
+      ],
+      "summary": "Просмотр фильма «Один дома» в баре SYNDICAT с ужином из шести авторских блюд и четырёх тематических напитков.",
+      "revisionCount": 3,
+      "activeRewriteVersion": "2026-11-24-newyear-eventpage-5x30"
+    },
+    {
+      "eventPageId": "825fa5b5-c6d4-4093-b14b-d2de0a4a369b",
+      "slug": "moi-2008-abrikos-arena-stavropol",
+      "title": "«Мой 2008» — новогодняя вечеринка в Ставрополе",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-24T19:05:02.336Z",
+      "eventIds": [
+        "evt_6af37c62d483217c9469b091"
+      ],
+      "summary": "Ночная вечеринка DISCOTHĖQUE с клубными хитами 2008 года и сетами резидентов VEGAS, FRIDRIKH и LEKHEM.",
+      "revisionCount": 3,
+      "activeRewriteVersion": "2026-11-24-newyear-eventpage-5x30"
+    },
+    {
+      "eventPageId": "66e5b100-35a3-4b49-b554-4352b74fcef4",
+      "slug": "moi-2008-elcin-centr-ekaterinburg-2",
+      "title": "«Мой 2008» — вечеринка DISCOTHĖQUE в Екатеринбурге",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-24T19:05:02.336Z",
+      "eventIds": [
+        "evt_6af372b367a5dab412c2bdd3"
+      ],
+      "summary": "Вечеринка с хитами клубной сцены 2008 года, резидентами DISCOTHĖQUE и ночной программой до четырёх утра.",
+      "revisionCount": 3,
+      "activeRewriteVersion": "2026-11-24-newyear-eventpage-5x30"
+    },
+    {
+      "eventPageId": "236d06b5-08da-4b0b-b25d-0ce1304ffa6b",
+      "slug": "rozhdestvenskii-gala-koncert-solistov-baleta-s-obzornoi-ekskursiei-po-dvorcu-nachalo-ekskursii-17-sankt-peterburg",
+      "title": "Рождественский гала-концерт солистов балета с экскурсией — Санкт-Петербург",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-24T19:05:02.336Z",
+      "eventIds": [
+        "evt_6b0203f32778ef7b021a4bbb"
+      ],
+      "summary": "Театр балета «Сен-Мишель» представит гала-концерт с фрагментами классических постановок и авторской хореографией Михаила Венщикова; перед балетом пройдёт экскурсия по Дворцу.",
+      "revisionCount": 3,
+      "activeRewriteVersion": "2026-11-24-newyear-eventpage-5x30"
+    },
+    {
+      "eventPageId": "f0d8d601-0382-44dc-ac80-c1f6f14d0632",
+      "slug": "taina-ledyanoi-zvezdy-penza-2",
+      "title": "«Тайна Ледяной Звезды» — Пенза",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-24T19:05:02.336Z",
+      "eventIds": [
+        "evt_6afe0a70cc7a564e274202fc",
+        "evt_6afe0a900c401d2c95bc46ce"
+      ],
+      "summary": "Сказка о жителях зимнего леса, которые готовятся встретить Новый год, пока Волк и Снеговик пытаются остановить время.",
+      "revisionCount": 4,
+      "activeRewriteVersion": "2026-11-24-newyear-eventpage-5x30"
+    },
+    {
+      "eventPageId": "11bee14b-a92a-4e2c-a99e-7df5fd71083e",
+      "slug": "kosmofabrika-deda-moroza-volgograd",
+      "title": "«КОСМОфабрика Деда Мороза» — Волгоград",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-24T19:05:02.336Z",
+      "eventIds": [
+        "evt_6adb971235dcaa5d992d12c1",
+        "evt_6adef42c10128ab1f4e3f96f",
+        "evt_6adb971335dcaa5d992d12d1",
+        "evt_6adb971235dcaa5d992d12c9"
+      ],
+      "summary": "Детей приглашают пройти школу эльфов, сделать игрушки и сладости, встретиться с Дедом Морозом и зажечь главную ёлку.",
+      "revisionCount": 6,
+      "activeRewriteVersion": "2026-11-24-newyear-eventpage-5x30"
+    },
+    {
+      "eventPageId": "11f8320b-a1c9-448d-9f9c-11b5a330dd23",
+      "slug": "samvel-ginovyan-solnyi-stendap-koncert-krasnoyarsk-2",
+      "title": "Самвел Гиновян — сольный стендап-концерт",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-24T19:05:02.336Z",
+      "eventIds": [
+        "evt_6aeedb5c6e12f6db8a6ae63b"
+      ],
+      "summary": "Резидент Stand Up на ТНТ Самвел Гиновян привезёт в Красноярск сольный концерт с самоиронией, историями о браке и бытовых парадоксах.",
+      "revisionCount": 3,
+      "activeRewriteVersion": "2026-11-24-newyear-eventpage-5x30"
+    },
+    {
+      "eventPageId": "8b0727bc-8bec-42de-be06-f0a828261d56",
+      "slug": "kinouzhin-po-motivam-filma-grinch-syktyvkar",
+      "title": "Киноужин «Гринч» — Сыктывкар",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-24T19:05:02.336Z",
+      "eventIds": [
+        "evt_6af8871d38c26793329ba7c1"
+      ],
+      "summary": "Просмотр фильма «Гринч» в баре SYNDICAT с ужином из шести авторских блюд и четырёх тематических напитков.",
+      "revisionCount": 3,
+      "activeRewriteVersion": "2026-11-24-newyear-eventpage-5x30"
+    },
+    {
+      "eventPageId": "ef930623-b8e2-4753-8f87-4510a9e27b80",
+      "slug": "rukavichka-deda-moroza-barnaul",
+      "title": "«Рукавичка Деда Мороза» — Барнаул",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-24T19:05:02.336Z",
+      "eventIds": [
+        "evt_6aff435b71d03165c825a1ce",
+        "evt_6b0068ac11ae03a483a4ac05",
+        "evt_6b0068ad11ae03a483a4ac1c"
+      ],
+      "summary": "Утренний спектакль для малышей по русской народной сказке: звери находят рукавичку Деда Мороза и устраивают в ней зимний дом.",
+      "revisionCount": 5,
+      "activeRewriteVersion": "2026-11-24-newyear-eventpage-5x30"
+    },
+    {
+      "eventPageId": "201323d3-aaa3-492e-b2fd-1630face99c7",
+      "slug": "novosele-penza",
+      "title": "«Новоселье» — спектакль в Пензе",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-24T19:05:02.336Z",
+      "eventIds": [
+        "evt_6afe0786ea147da8ed77f790",
+        "evt_6afe08740cdc0424838a32dc"
+      ],
+      "summary": "Семейная комедия о супругах, которые собирают взрослых детей на новогодний праздник, и о старых обидах, всплывающих за общим столом.",
+      "revisionCount": 4,
+      "activeRewriteVersion": "2026-11-24-newyear-eventpage-5x30"
+    },
+    {
+      "eventPageId": "0e325c4c-25b1-41d5-a5e1-e8ca91d8cf88",
+      "slug": "belym-belo-volgograd-2",
+      "title": "«Белым-бело» — Волгоград",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-24T19:05:02.336Z",
+      "eventIds": [
+        "evt_6afdcbf27ae4c353f9e767fe",
+        "evt_6afe080fea2a1b0f35590bed"
+      ],
+      "summary": "Семейная новогодняя программа с белой сказкой и дискотекой у ёлки за полчаса до представления.",
+      "revisionCount": 4,
+      "activeRewriteVersion": "2026-11-24-newyear-eventpage-5x30"
+    },
+    {
+      "eventPageId": "89b121a6-fc61-4cfb-91d2-59a8e32227f5",
+      "slug": "hitoboi-tver",
+      "title": "«Хитобои» — новогодний концерт в Твери",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-24T19:05:02.336Z",
+      "eventIds": [
+        "evt_6af58dde87f7b93d0ab0b004"
+      ],
+      "summary": "Концерт группы «Хитобои» с авторскими песнями, эксцентричной подачей и юмором на бытовые и алкогольные темы.",
+      "revisionCount": 3,
+      "activeRewriteVersion": "2026-11-24-newyear-eventpage-5x30"
+    },
+    {
+      "eventPageId": "552170d3-f838-4915-ace9-ae0d2c547a47",
+      "slug": "lyubimye-hity-90-h-00-h-i-10-h-v-stile-ska-ot-barni-barflai-tver",
+      "title": "Barney Barfly — хиты 1990-х, 2000-х и 2010-х в стиле ska",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-24T19:05:02.336Z",
+      "eventIds": [
+        "evt_6af30df0eb9462e0dbe2d79a"
+      ],
+      "summary": "Тверская группа Barney Barfly сыграет отечественные хиты трёх десятилетий в собственных ska-аранжировках с духовыми, барабанами и живым звуком.",
+      "revisionCount": 3,
+      "activeRewriteVersion": "2026-11-24-newyear-eventpage-5x30"
+    },
+    {
+      "eventPageId": "4ae2f8c5-55d5-4179-b635-8f86209dea64",
+      "slug": "roma-zhelud-nizhniy-novgorod",
+      "title": "Рома Жёлудь — концерт в Нижнем Новгороде",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-24T19:05:02.336Z",
+      "eventIds": [
+        "evt_6aef285ebebff3b98a478083"
+      ],
+      "summary": "Рома Жёлудь выступит с главными хитами, а после концерта проведёт большую встречу Meet & Greet; вечер откроют диджеи.",
+      "revisionCount": 3,
+      "activeRewriteVersion": "2026-11-24-newyear-eventpage-5x30"
+    },
+    {
+      "eventPageId": "ce3b1d78-1597-4f50-8dad-969cdaeb2418",
+      "slug": "dzhaz-v-gorode-k-kaliningrad-5",
+      "title": "«Джаз в городе К.» — Калининград",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-24T19:05:02.336Z",
+      "eventIds": [
+        "evt_6aeef7ac6e7dc4839b3cbc3c",
+        "evt_6aeef7d43521a45af3d5e4eb"
+      ],
+      "summary": "Рождественский джазовый вечер с живым звучанием, мягкими мелодиями и разными настроениями в стендап-клубе «Локация».",
+      "revisionCount": 4,
+      "activeRewriteVersion": "2026-11-24-newyear-eventpage-5x30"
+    },
+    {
+      "eventPageId": "560dc568-1603-4b68-a129-643eac005390",
+      "slug": "novogodnii-ogonek-na-volnah-na-ledokolnom-teplohode-imperatrica-moskva",
+      "title": "«Новогодний огонёк на волнах» на теплоходе «Императрица»",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-24T19:05:02.336Z",
+      "eventIds": [
+        "evt_tep_1576"
+      ],
+      "summary": "Четырёхчасовой предновогодний круиз по центру Москвы соединит банкет «всё включено», концерт, праздничные игры и диско-караоке на ледокольном теплоходе «Императрица».",
+      "revisionCount": 3,
+      "activeRewriteVersion": "2026-11-24-newyear-eventpage-5x30"
+    },
+    {
+      "eventPageId": "3c2a2726-cd44-4ccf-94af-ef1a5e955efd",
+      "slug": "tribyut-mumii-troll-tver",
+      "title": "«Новый предмет» — трибьют «Мумий Троллю» в Твери",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-24T19:05:02.336Z",
+      "eventIds": [
+        "evt_6af58d06241b8d72c04e0679"
+      ],
+      "summary": "Ярославская группа «Новый предмет» исполнит песни «Мумий Тролля» в живой новогодней программе.",
+      "revisionCount": 3,
+      "activeRewriteVersion": "2026-11-24-newyear-eventpage-5x30"
+    },
+    {
+      "eventPageId": "faea121e-8439-4f7f-960a-1ddc765abd05",
+      "slug": "novogodnii-maskarad-voiceup-moskva",
+      "title": "«Новогодний маскарад» VOICEUP — Москва",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-24T19:05:02.336Z",
+      "eventIds": [
+        "evt_6b0163e46a232e1b5bd1b2c6"
+      ],
+      "summary": "Вокалисты VOICEUP выступят с живым бэндом на музыкальном маскараде, где гостям предлагают прийти в эффектных праздничных нарядах.",
+      "revisionCount": 3,
+      "activeRewriteVersion": "2026-11-24-newyear-eventpage-5x30"
+    },
+    {
+      "eventPageId": "dcdc87c7-01f2-4d13-bd19-a587b78cd400",
+      "slug": "chaikovskii-pri-svechah-rozhdestvenskaya-klassika-moskva",
+      "title": "«Чайковский при свечах» — рождественская классика и балет",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-24T19:05:02.336Z",
+      "eventIds": [
+        "evt_6ac90110f13fce158b1da1a2"
+      ],
+      "summary": "Камерный оркестр Gloria исполнит Чайковского, рождественские мелодии и музыку ABBA и Queen; программу дополнят четыре балетные миниатюры.",
+      "revisionCount": 3,
+      "activeRewriteVersion": "2026-11-24-newyear-eventpage-5x30"
+    },
+    {
+      "eventPageId": "237b7f74-ef57-4596-bc2a-21a38516248c",
+      "slug": "rozhdestvenskoe-chudo-folk-koncert-pri-svechah-moskva",
+      "title": "«Рождественское чудо»: фолк-концерт при свечах",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-24T19:05:02.336Z",
+      "eventIds": [
+        "evt_6afe1ce79f27b3b693f38c74"
+      ],
+      "summary": "Проект «Волшебное яблоко» соединит русский фольклор, авторскую музыку и мелодии разных культур; в программе — гусли, вокал, народные напевы и неожиданные музыкальные версии.",
+      "revisionCount": 3,
+      "activeRewriteVersion": "2026-11-24-newyear-eventpage-5x30"
+    },
+    {
+      "eventPageId": "95afb7bb-5e4e-4c5c-9b0f-8d3bb69a50c3",
+      "slug": "organ-v-planetarii-rozhdestvo-sankt-peterburg-3",
+      "title": "Орган в планетарии: «Рождество»",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-24T19:05:02.336Z",
+      "eventIds": [
+        "evt_6afaced34b54e683b7d1d47e",
+        "evt_6afacf71a02264018d788cb7"
+      ],
+      "summary": "Рождественскую программу из произведений Баха, Пёрселла, Моцарта, Генделя и Вивальди исполнят под куполом петербургского планетария.",
+      "revisionCount": 4,
+      "activeRewriteVersion": "2026-11-24-newyear-eventpage-5x30"
+    },
+    {
+      "eventPageId": "4ec3bb3d-9e06-46e2-93d4-d30b354bfa08",
+      "slug": "solo-retro-christmas-moskva",
+      "title": "SOLO: Retro Christmas!",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-24T19:05:02.336Z",
+      "eventIds": [
+        "evt_6abfd6e569234cd261f7c9d0"
+      ],
+      "summary": "Ростислав Колпаков представит театрализованный рождественский концерт с джаз-бэндом, песнями Синатры и Элвиса и хитами из известных музыкальных фильмов.",
+      "revisionCount": 3,
+      "activeRewriteVersion": "2026-11-24-newyear-eventpage-5x30"
+    },
+    {
+      "eventPageId": "d4912434-61e4-4c80-a5ce-b896071a267c",
+      "slug": "gastronomicheskii-vecher-rozhdestvenskii-uzhin-sankt-peterburg",
+      "title": "Рождественский ужин в Cookforia",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-24T19:05:02.336Z",
+      "eventIds": [
+        "evt_6b032d5b740d02c80f3e4c54"
+      ],
+      "summary": "Праздничный ужин в Cookforia построен как последовательность закусок, горячего и десерта; в меню есть брускетты, говядина Веллингтон и яблочный штрудель.",
+      "revisionCount": 3,
+      "activeRewriteVersion": "2026-11-24-newyear-eventpage-5x30"
+    },
+    {
+      "eventPageId": "f0b817e6-6b68-4877-ad44-4e90bbb0c75a",
+      "slug": "rozhdestvenskii-koncert-kompozitora-yulii-kockoi-moskva",
+      "title": "Рождественский концерт Юлии Коцкой",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-24T19:05:02.336Z",
+      "eventIds": [
+        "evt_6b0023f92a557b5f237d1d67"
+      ],
+      "summary": "Пианистка и композитор Юлия Коцкая исполнит авторскую неоклассическую музыку и расскажет о произведениях, вошедших в зимнюю программу.",
+      "revisionCount": 3,
+      "activeRewriteVersion": "2026-11-24-newyear-eventpage-5x30"
+    },
+    {
+      "eventPageId": "32d7069f-5f97-4097-9880-5d0dae6b240b",
+      "slug": "mimohodec-postnovogodnii-kvartirnik-po-rasskazam-slavy-se-sankt-peterburg",
+      "title": "«Мимоходец»: квартирник по рассказам Славы Сэ",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-24T19:05:02.336Z",
+      "eventIds": [
+        "evt_6afac4d127f34d121a13bb05"
+      ],
+      "summary": "Театр «Нити» устроит квартирник по историям Славы Сэ: актёры прочитают рассказы, исполнят романсы и превратят вечер в встречу старых друзей.",
+      "revisionCount": 3,
+      "activeRewriteVersion": "2026-11-24-newyear-eventpage-5x30"
+    },
+    {
+      "eventPageId": "d520ab54-feeb-43c3-862c-9798ae981bcd",
+      "slug": "anatolii-vishnyakov-lider-gruppy-galakticheskaya-federaciya-rozhdestvenskii-koncert-sankt-peterburg",
+      "title": "Рождественский концерт Анатолия Вишнякова",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-24T19:05:02.336Z",
+      "eventIds": [
+        "evt_6abf98a259548edb00f5622b"
+      ],
+      "summary": "Анатолий Вишняков, лидер группы «Галактическая Федерация», представит праздничную концертную программу в КЗ «У Финляндского».",
+      "revisionCount": 3,
+      "activeRewriteVersion": "2026-11-24-newyear-eventpage-5x30"
+    },
+    {
+      "eventPageId": "516ab4c6-be63-4726-b886-0a11eba47bd6",
+      "slug": "burlesk-kabare-shou-madam-bum-zimnii-shik-moskva",
+      "title": "Кабаре «Мадам Бум»: «Зимний шик»",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-24T19:05:02.336Z",
+      "eventIds": [
+        "evt_6af37af607f03a5dada6f3c9",
+        "evt_6af37af107f03a5dada6f28f",
+        "evt_6aec54b7efe9bcf7c62352ce",
+        "evt_6aec54b3efe9bcf7c62351ad",
+        "evt_6aec54afefe9bcf7c623508c",
+        "evt_6aec54abefe9bcf7c6234f6b",
+        "evt_6aec54a7efe9bcf7c6234e4a",
+        "evt_6aec54a2efe9bcf7c6234d29"
+      ],
+      "summary": "Кабаре «Мадам Бум» покажет новогоднюю программу с бурлеск-номерами, живым джазовым вокалом и бокалом игристого для гостей.",
+      "revisionCount": 11,
+      "activeRewriteVersion": "2026-11-24-newyear-eventpage-5x30"
+    },
+    {
+      "eventPageId": "d70e8904-f4e3-42ee-b95e-baf15f8dfa54",
+      "slug": "trio-marii-aksenovoi-snezhnyi-dzhaz-moskva",
+      "title": "«Снежный джаз» — трио Марии Аксёновой",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-24T19:05:02.336Z",
+      "eventIds": [
+        "evt_6afe0e20337eecc3e034e36f"
+      ],
+      "summary": "Трио Марии Аксёновой соединит авторский джаз, зимние песни и мелодии из советского кино; в программе — музыка «Иронии судьбы», «Девчат» и «Пассажира с “Экватора”».",
+      "revisionCount": 3,
+      "activeRewriteVersion": "2026-11-24-newyear-eventpage-5x30"
+    },
+    {
+      "eventPageId": "659a2702-568f-40bd-8698-168c53189b70",
+      "slug": "balet-schelkunchik-s-obzornoi-ekskursiei-po-dvorcu-nachalo-ekskursii-18-45-nachalo-baleta-20-00-sankt-peterburg-7",
+      "title": "«Щелкунчик» с экскурсией по Дворцу: общая страница двух показов",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-24T19:05:02.336Z",
+      "eventIds": [
+        "evt_6b02026d2934b6878e020c8e",
+        "evt_6a8c633a5fc59f6d16ef4e8a",
+        "evt_6a8ad0507ba8fef456692b82",
+        "evt_6b0202e7f906a9682cb2ae2a",
+        "evt_6b0202a45b223bd290ee4e1c"
+      ],
+      "summary": "Театр балета «Сен-Мишель» покажет «Щелкунчика» в Доме учёных; в билет включена экскурсия по парадным интерьерам, а в январе запланированы два сеанса.",
+      "revisionCount": 4,
+      "activeRewriteVersion": "2026-11-24-newyear-eventpage-5x30"
+    },
+    {
+      "eventPageId": "da352105-6bea-41b6-8dcc-51e77db89967",
+      "slug": "rozhdestvenskii-dzhaz-novogodnii-koncert-s-dzhazovoi-zvezdoi-gabriel-biggest-moskva",
+      "title": "«Рождественский джаз» с Габриэль Биггест",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-24T19:05:02.336Z",
+      "eventIds": [
+        "evt_6afe1e4b33ec963fa91d58e2"
+      ],
+      "summary": "Габриэль Биггест и его бэнд сыграют рождественский джаз в концертном зале «Баунс»; в программе заявлены известные праздничные песни.",
+      "revisionCount": 3,
+      "activeRewriteVersion": "2026-11-24-newyear-eventpage-5x30"
+    },
+    {
+      "eventPageId": "ab21800b-3ae8-4429-9711-9340977e5a4a",
+      "slug": "glavnaya-apres-ski-vecherinka-moskvy-moskva",
+      "title": "Главная après-ski вечеринка Москвы",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-24T19:05:02.336Z",
+      "eventIds": [
+        "evt_6aec437a3a8a456e9d6c3e8f"
+      ],
+      "summary": "Зимняя вечеринка на HYPE TERRACE с диджейскими сетами, танцами, игристым и дресс-кодом Slavic Chic / Après-ski.",
+      "revisionCount": 3,
+      "activeRewriteVersion": "2026-11-24-newyear-eventpage-5x30"
+    },
+    {
+      "eventPageId": "71963c39-6367-4331-8eac-7da8cac8b1ac",
+      "slug": "burlesk-kabare-shou-madam-bum-sankt-peterburg",
+      "title": "Кабаре «Мадам Бум»: «Зимний шик» в Петербурге",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-24T19:05:02.336Z",
+      "eventIds": [
+        "evt_6aec4bb143608153ccb73f82",
+        "evt_6aec4baf43608153ccb73ec3",
+        "evt_6aec4bac43608153ccb73e04",
+        "evt_6aec4ba943608153ccb73d45",
+        "evt_6aec484761c1d6c22e234d31",
+        "evt_6ae9ef0f5b8b99b528b73d45",
+        "evt_6ab65658c0826605be4e78b4",
+        "evt_6ab65653c0826605be4e77f5",
+        "evt_6ab6564dc0826605be4e7736",
+        "evt_6afcbdd620dde78e2f25a1c4",
+        "evt_6afcbdda20dde78e2f25a27e",
+        "evt_6afcbdde20dde78e2f25a338"
+      ],
+      "summary": "Новогоднее бурлеск-шоу с живым джазовым вокалом, праздничными костюмами и знакомыми персонажами в ресторане «Юнити».",
+      "revisionCount": 22,
+      "activeRewriteVersion": "2026-11-24-newyear-eventpage-5x30"
+    },
+    {
+      "eventPageId": "5634ab3a-f781-4494-9a1d-d4f0f444a053",
+      "slug": "sbornyi-korporativ-18-dekabrya-2026-v-gostinice-kosmos",
+      "title": "Сборный корпоратив в гостинице «Космос» — Москва",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-24T19:05:02.336Z",
+      "eventIds": [
+        "evt_tep_1051",
+        "evt_tep_1052",
+        "evt_tep_1506"
+      ],
+      "summary": "Новогодний банкет с ведущим, фотографом, вокальным номером, бумажным шоу и дискотекой для небольших компаний.",
+      "revisionCount": 4,
+      "activeRewriteVersion": "2026-11-24-newyear-eventpage-5x30"
+    },
+    {
+      "eventPageId": "056cd437-87c4-4ed7-b048-8f3c99488bbd",
+      "slug": "lomovoi-radio-natasha-itogi-2026-solo-sankt-peterburg",
+      "title": "Ломовой: «Радио Наташа. Итоги 2026» — Санкт-Петербург",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-24T19:05:02.336Z",
+      "eventIds": [
+        "evt_6aba7fcafea9fdf26df7d4c0"
+      ],
+      "summary": "Сатирическое comedy-news-show НЕпоэта Ломового с видеопрограммой, импровизацией и шуточным обзором новостей 2026 года.",
+      "revisionCount": 3,
+      "activeRewriteVersion": "2026-11-24-newyear-eventpage-5x30"
+    },
+    {
+      "eventPageId": "d449b213-7bd3-41a8-b5d7-8fde23e51d1b",
+      "slug": "territoriya-kukol-vystavka-avtorskih-kukol-moskva",
+      "title": "«Территория кукол»: выставка авторских кукол — Москва",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-24T19:05:02.336Z",
+      "eventIds": [
+        "evt_6ae5c75081780e1de1518abe"
+      ],
+      "summary": "Зимняя выставка более чем ста авторов и мастеров: куклы, одежда, мебель, миниатюры, лекции, конкурсы и розыгрыш призов.",
+      "revisionCount": 3,
+      "activeRewriteVersion": "2026-11-24-newyear-eventpage-5x30"
+    },
+    {
+      "eventPageId": "f54d73c7-0c42-49dc-8e11-8bf243f3ef8c",
+      "slug": "rok-hity-mtv-shou-koncert-sankt-peterburg-2",
+      "title": "«Рок-хиты MTV»: шоу-концерт — Санкт-Петербург",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-24T19:05:02.336Z",
+      "eventIds": [
+        "evt_6ae89a1063c125032ff348a3"
+      ],
+      "summary": "Рок-программа по хитам 2000-х от артистов Музыкального театра имени Шаляпина и петербургских рок-музыкантов.",
+      "revisionCount": 3,
+      "activeRewriteVersion": "2026-11-24-newyear-eventpage-5x30"
+    },
+    {
+      "eventPageId": "7f28ebee-428f-4c66-a47c-d29ec99ab230",
+      "slug": "novogodnii-kvartirnik-s-vidom-moskva",
+      "title": "«Новогодний квартирник с видом» — Москва",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-24T19:05:02.336Z",
+      "eventIds": [
+        "evt_6afeef90fa3d28f9c2b6ae58"
+      ],
+      "summary": "Новогодняя ночь в камерном бар-ресторане с видом на Замоскворечье, концертной программой TERRITORY, праздничным меню и танцами.",
+      "revisionCount": 3,
+      "activeRewriteVersion": "2026-11-24-newyear-eventpage-5x30"
+    },
+    {
+      "eventPageId": "83dda865-e0bc-40c7-88cf-11534c805475",
+      "slug": "iogann-shtraus-skazki-venskogo-lesa-orkestr-severnaya-veneciya-sankt-peterburg",
+      "title": "«Иоганн Штраус. Сказки Венского леса» — Санкт-Петербург",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-24T19:05:02.336Z",
+      "eventIds": [
+        "evt_6ad0e50e397b3f39c587fa67"
+      ],
+      "summary": "Оркестр «Северная Венеция» под управлением Эдуарда Томша исполнит в Петрикирхе вальсы и опереточные мелодии Иоганна Штрауса.",
+      "revisionCount": 3,
+      "activeRewriteVersion": "2026-11-24-newyear-eventpage-5x30"
+    },
+    {
+      "eventPageId": "fe8b54cb-43ca-43c4-bde6-e5fe95d14f7c",
+      "slug": "kapella-retro-sun-in-december-moskva",
+      "title": "«Капелла Ретро»: Sun in December — Москва",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-24T19:05:02.336Z",
+      "eventIds": [
+        "evt_6aecf0c4ef1fc312296417bc"
+      ],
+      "summary": "Предновогодний джазовый вечер с Анной Владимировой, Дарьей Захаровой и ансамблем «Капелла Ретро».",
+      "revisionCount": 3,
+      "activeRewriteVersion": "2026-11-24-newyear-eventpage-5x30"
+    },
+    {
+      "eventPageId": "7de718b8-7fba-4f6d-ad05-dc95245df6f8",
+      "slug": "v-zerkale-uhodyaschego-goda-maksim-chekmarev-fortepiannyi-koncert-sankt-peterburg-2",
+      "title": "Максим Чекмарёв: «В зеркале уходящего года» — Санкт-Петербург",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-24T19:05:02.336Z",
+      "eventIds": [
+        "evt_6ac3eb8f29c9b3dea80670f6",
+        "evt_6ac3ea1bbd9b39111389ac07"
+      ],
+      "summary": "Сольный фортепианный концерт Максима Чекмарёва с музыкой Чайковского, Шопена, Листа и других композиторов на старинном рояле Дома Шрёдера.",
+      "revisionCount": 4,
+      "activeRewriteVersion": "2026-11-24-newyear-eventpage-5x30"
+    },
+    {
+      "eventPageId": "f7bb46d5-1703-4b7a-a796-fe5cc3580a08",
+      "slug": "masha-i-vitya-protiv-dikih-gitar-moskva-2",
+      "title": "«Маша и Витя против Диких гитар» — Москва",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-24T19:05:02.336Z",
+      "eventIds": [
+        "evt_6b048ddb615f93c222dc10db",
+        "evt_6b048dda615f93c222dc106f",
+        "evt_6b048dd9615f93c222dc1003",
+        "evt_6b048dd9615f93c222dc0f97",
+        "evt_6b048dd8615f93c222dc0f2b",
+        "evt_6b048dd7615f93c222dc0ebf",
+        "evt_6b048dd6615f93c222dc0e53",
+        "evt_6b048dd5615f93c222dc0de7",
+        "evt_6b048dd4615f93c222dc0d7b",
+        "evt_6b048dd3615f93c222dc0d0f",
+        "evt_6b0492033b41c376473bd863",
+        "evt_6b0492023b41c376473bd800"
+      ],
+      "summary": "Музыкальная новогодняя сказка с рок-бандой, интерактивными играми, песнями Геннадия Гладкова и подарком каждому ребёнку.",
+      "revisionCount": 13,
+      "activeRewriteVersion": "2026-11-24-newyear-eventpage-5x30"
+    },
+    {
+      "eventPageId": "c5732eec-d9c3-499a-9260-984bc4a8fc38",
+      "slug": "nash-novogodnii-vecher-dlya-teh-kto-ne-hochet-byt-odin-i-iskrenne-hochet-otnoshenii-moskva",
+      "title": "Новогодняя встреча для знакомств — Москва",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-24T19:05:02.336Z",
+      "eventIds": [
+        "evt_6aff23cde4288ecc72851cd5"
+      ],
+      "summary": "Вечер 31 декабря для взрослых гостей: ужин, игры-знакомства, встреча Нового года, подарки, диджей, танцы и караоке.",
+      "revisionCount": 3,
+      "activeRewriteVersion": "2026-11-24-newyear-eventpage-5x30"
+    },
+    {
+      "eventPageId": "c6269e29-8cd4-43eb-a3df-fe89157eadb7",
+      "slug": "venecianskii-karnaval-v-atmosfere-istoricheskoi-kvartiry-semi-benua-sankt-peterburg",
+      "title": "Рождественский бал в квартире семьи Бенуа — Санкт-Петербург",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-24T19:05:02.336Z",
+      "eventIds": [
+        "evt_6aec6032ebff1161682ecf77"
+      ],
+      "summary": "Вечер в мемориальной квартире Бенуа: рассказ о семейных корнях, музыкальная программа, фуршет и бал в венецианском стиле.",
+      "revisionCount": 3,
+      "activeRewriteVersion": "2026-11-24-newyear-eventpage-5x30"
+    },
+    {
+      "eventPageId": "2155b7ca-558a-461a-bb97-b9ce064e32a4",
+      "slug": "sbornyi-korporativ-25-dekabrya-2026-v-banketnom-zale-astrus",
+      "title": "Сборный корпоратив в банкетном зале «Аструс» — Москва",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-24T19:05:02.336Z",
+      "eventIds": [
+        "evt_tep_1556"
+      ],
+      "summary": "Пятичасовой новогодний вечер с банкетом, ведущим, вокалистом, иллюзионистом, фотозоной и дискотекой.",
+      "revisionCount": 3,
+      "activeRewriteVersion": "2026-11-24-newyear-eventpage-5x30"
+    },
+    {
+      "eventPageId": "7b065de5-d087-470e-a18a-fb7e6b7f5377",
+      "slug": "maskarad-u-snezhinki-sankt-peterburg",
+      "title": "«Маскарад у Снежинки» — Санкт-Петербург",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-24T19:05:02.336Z",
+      "eventIds": [
+        "evt_6aef5c231ac697b1a9a860e6",
+        "evt_6aef5c221ac697b1a9a860a2",
+        "evt_6aef5c221ac697b1a9a8605e",
+        "evt_6aef5c211ac697b1a9a8601a"
+      ],
+      "summary": "Новогодний утренник в Театре Поколений с настоящей ёлкой, маскарадом, сказочными героями и подарками детям.",
+      "revisionCount": 6,
+      "activeRewriteVersion": "2026-11-24-newyear-eventpage-5x30"
+    },
+    {
+      "eventPageId": "0778182d-b1a8-47e2-9aa5-2d02ecbf4ce7",
+      "slug": "novogodnyaya-opera-prazdnichnyi-uzhin-koncert-za-stolikami-sankt-peterburg",
+      "title": "«Новогодняя опера»: ужин-концерт — Санкт-Петербург",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-24T19:05:02.336Z",
+      "eventIds": [
+        "evt_6a9ab1c5248817cc9380e931",
+        "evt_6a9ab5751ccfa4118cf7ab02",
+        "evt_6aa04800ebd0a5a7f86d779a",
+        "evt_6ad0c6d2b1923b9bb451562d"
+      ],
+      "summary": "Вечер в Доме Шрёдера объединит оперные и опереточные арии, камерный концерт и ужин за столиками.",
+      "revisionCount": 4,
+      "activeRewriteVersion": "2026-11-24-newyear-eventpage-5x30"
+    },
+    {
+      "eventPageId": "43ad3464-7d86-4df1-8593-d1f695a5302a",
+      "slug": "chehov-so-smakom-teatr-traktir-s-literaturnym-menyu-v-dome-shredera-sankt-peterburg-4",
+      "title": "«Чехов со смаком»: театр-трактир в Доме Шрёдера",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-24T19:05:02.336Z",
+      "eventIds": [
+        "evt_6afade4f2202c63dcbb559ca",
+        "evt_6ad74f5dcac54ec347d0c92f"
+      ],
+      "summary": "Ужин-спектакль по рассказам Чехова: сцены из произведений, блюда литературных героев и исторический интерьер особняка.",
+      "revisionCount": 4,
+      "activeRewriteVersion": "2026-11-24-newyear-eventpage-5x30"
+    },
+    {
+      "eventPageId": "91449c8d-b00a-456f-a6c5-278b4c33d18f",
+      "slug": "legendy-disko-v-imperatorskom-geograficheskom-obschestve-ot-abba-do-queen-sankt-peterburg",
+      "title": "«Легенды диско: от ABBA до Queen» — Санкт-Петербург",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-24T19:05:02.336Z",
+      "eventIds": [
+        "evt_6af57fea76aa21b705a6f2d2",
+        "evt_6af57fe876aa21b705a6f293"
+      ],
+      "summary": "Новогодний концерт в Русском географическом обществе: хиты ABBA, Boney M., Майкла Джексона, Queen и других артистов в исполнении ансамбля.",
+      "revisionCount": 4,
+      "activeRewriteVersion": "2026-11-24-newyear-eventpage-5x30"
+    },
+    {
+      "eventPageId": "fd366d02-5200-4418-a4ce-33d36723e7fa",
+      "slug": "novogodnee-shou-ot-kabare-skazki-na-noch-moskva",
+      "title": "Новогоднее шоу кабаре «Сказки на ночь» — Москва",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-24T19:05:02.336Z",
+      "eventIds": [
+        "evt_6af6539c7b82e349f70c24dd"
+      ],
+      "summary": "Взрослая новогодняя программа с воздушным номером, юмором, переосмыслением сказочных героинь, премьерами и Дедом Морозом.",
+      "revisionCount": 3,
+      "activeRewriteVersion": "2026-11-24-newyear-eventpage-5x30"
+    },
+    {
+      "eventPageId": "54a37cbf-9e58-4465-bcd2-2542a3f7b1fa",
+      "slug": "ekskursiya-v-osobnyak-shredera-fortepiannyi-koncert-vihri-valsa-s-furshetom-sankt-peterburg",
+      "title": "«Вихри вальса»: экскурсия и концерт в Доме Шрёдера",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-24T19:05:02.336Z",
+      "eventIds": [
+        "evt_6a9bec76d90ffb8eeaf0c23e"
+      ],
+      "summary": "Экскурсия по особняку Карла Шрёдера, фортепианный концерт Виктора Николаева и небольшой фуршет за столиками.",
+      "revisionCount": 3,
+      "activeRewriteVersion": "2026-11-24-newyear-eventpage-5x30"
+    },
+    {
+      "eventPageId": "80a1f005-163d-431b-b89e-727b69a87a79",
+      "slug": "olga-oleinikova-emergency-band-moskva",
+      "title": "Ольга Олейникова и Emergency Band — Москва",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-24T19:05:02.336Z",
+      "eventIds": [
+        "evt_6b006380551874362b8a7259"
+      ],
+      "summary": "Новогодний концерт в стиле рок-н-ролла 1960-х: песни Beatles, Rolling Stones, Боба Дилана и других артистов в живых аранжировках.",
+      "revisionCount": 3,
+      "activeRewriteVersion": "2026-11-24-newyear-eventpage-5x30"
+    },
+    {
+      "eventPageId": "4fe9c87e-e034-4c39-b51a-d58791717c70",
+      "slug": "ushastyi-novyi-god-sankt-peterburg-7",
+      "title": "«Ушастый Новый год» — Санкт-Петербург",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-24T19:05:02.336Z",
+      "eventIds": [
+        "evt_6afb1b77df0229d7316dcb5e"
+      ],
+      "summary": "Интерактивная новогодняя программа для детей 2,5–5 лет: игры с зайчатами, ёлка, Дед Мороз, потешки и подарок каждому ребёнку.",
+      "revisionCount": 3,
+      "activeRewriteVersion": "2026-11-24-newyear-eventpage-5x30"
+    },
+    {
+      "eventPageId": "e534691c-f359-4c8d-8cff-e973f1b9569e",
+      "slug": "gde-moi-2008-community-moskva",
+      "title": "«Мой 2008» в COMMUNITY — Москва",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-24T19:05:02.336Z",
+      "eventIds": [
+        "evt_6ac3e8a5e047a1016fca2ab6"
+      ],
+      "summary": "Новогодняя вечеринка DISCOTHĖQUE с клубными хитами нулевых, диджей-сетами, танцами и выступлением LEKHE.",
+      "revisionCount": 3,
+      "activeRewriteVersion": "2026-11-24-newyear-eventpage-5x30"
+    },
+    {
+      "eventPageId": "ddaa6f35-27b5-485e-808b-c09758554b9b",
+      "slug": "queen-v-imperatorskom-geograficheskom-obschestve-sankt-peterburg",
+      "title": "Queen в Русском географическом обществе — Санкт-Петербург",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-24T19:05:02.336Z",
+      "eventIds": [
+        "evt_6af59e8e002068dd88a6f28e"
+      ],
+      "summary": "Камерный оркестр «Сезоны Оркестра» исполнит хиты Queen в исторических залах Русского географического общества.",
+      "revisionCount": 3,
+      "activeRewriteVersion": "2026-11-24-newyear-eventpage-5x30"
+    },
+    {
+      "eventPageId": "cae214f5-aa64-4cd1-8187-1dff27f1143c",
+      "slug": "12-noch-moskva-2",
+      "title": "«Двенадцатая ночь» — Москва",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-24T19:05:02.336Z",
+      "eventIds": [
+        "evt_6a935d58b6bff28606a23c48",
+        "evt_6a935c026484f5c2317fd832"
+      ],
+      "summary": "Иммерсивная романтическая комедия по Шекспиру: зрители окажутся внутри истории о близнецах, переодевании и любовных недоразумениях.",
+      "revisionCount": 4,
+      "activeRewriteVersion": "2026-11-24-newyear-eventpage-5x30"
+    },
+    {
+      "eventPageId": "a748009d-8ec0-4941-9bde-56ac44ba341d",
+      "slug": "depeche-mode-tribute-show-sankt-peterburg",
+      "title": "Depeche Mode Tribute Show — Санкт-Петербург",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-24T19:05:02.336Z",
+      "eventIds": [
+        "evt_6af72063e8888212d8c9f269"
+      ],
+      "summary": "Петербургский трибьют-концерт с живым исполнением хитов Depeche Mode силами артистов Музыкального театра имени Шаляпина и рок-музыкантов.",
+      "revisionCount": 3,
+      "activeRewriteVersion": "2026-11-24-newyear-eventpage-5x30"
+    },
+    {
+      "eventPageId": "533400bb-f93c-4580-aa0e-e8db11b12f2a",
+      "slug": "poka-chasy-dvenadcat-byut-pesni-iz-lyubimyh-kinofilmov-moskva",
+      "title": "«Пока часы двенадцать бьют…»: песни из кино — Москва",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-24T19:05:02.336Z",
+      "eventIds": [
+        "evt_6aec3eafff7cae1fd45efc15"
+      ],
+      "summary": "Концерт знакомых песен из советских фильмов — от «Чародеев» и «Мэри Поппинс» до «Джентльменов удачи».",
+      "revisionCount": 3,
+      "activeRewriteVersion": "2026-11-24-newyear-eventpage-5x30"
+    },
+    {
+      "eventPageId": "09438c38-2049-42d7-a5dc-b92909fd1a16",
+      "slug": "alexander-dovgopoly-project-eh-zimushka-zima-moskva",
+      "title": "Alexander Dovgopoly Project: «Эх! Зимушка-зима!» — Москва",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-24T19:05:02.336Z",
+      "eventIds": [
+        "evt_6b00664be68a586ec48bb1c4"
+      ],
+      "summary": "Новогодняя программа smooth jazz, фанка и соула от коллектива Александра Довгополова с вокалом Кристины Корнелюк.",
+      "revisionCount": 3,
+      "activeRewriteVersion": "2026-11-24-newyear-eventpage-5x30"
+    },
+    {
+      "eventPageId": "718b00ed-1488-4754-aa78-befaa87180db",
+      "slug": "plyazh-moskva",
+      "title": "Группа «Пляж» — акустический концерт в Москве",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-24T19:05:02.336Z",
+      "eventIds": [
+        "evt_6abe2b3ca01a7c10128d0354"
+      ],
+      "summary": "Новогодний акустический концерт группы «Пляж» с мелодичными песнями, гитарными риффами и тёплой клубной атмосферой.",
+      "revisionCount": 3,
+      "activeRewriteVersion": "2026-11-24-newyear-eventpage-5x30"
+    },
+    {
+      "eventPageId": "50ec592f-de91-4872-bf55-3e57adfaf2cd",
+      "slug": "burlesk-kabare-shou-madam-bum-sankt-peterburg-2",
+      "title": "«Мадам Бум»: бурлеск-кабаре с живым джазом",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-24T19:05:02.336Z",
+      "eventIds": [
+        "evt_6a70a42e5e7b73efea2140c0",
+        "evt_6a70a4325e7b73efea214170",
+        "evt_6a70a4375e7b73efea214220",
+        "evt_6a70a43c5e7b73efea2142d0"
+      ],
+      "summary": "Вечер в петербургском «Юнити Сенная» соединяет театрализованный бурлеск, джазовый вокал и ретро-эстетику кабаре.",
+      "revisionCount": 12,
+      "activeRewriteVersion": "2026-11-24-newyear-eventpage-5x30"
+    },
+    {
+      "eventPageId": "47fa7184-09af-407e-a147-98b15c0eca59",
+      "slug": "burlesk-kabare-shou-madam-bum-dzhazovyi-bunt-moskva",
+      "title": "«Джазовый бунт»: бурлеск-кабаре «Мадам Бум»",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-24T19:05:02.336Z",
+      "eventIds": [
+        "evt_6a60c8c0644f57a97e9e1408",
+        "evt_6a60c8c7644f57a97e9e150b"
+      ],
+      "summary": "Кабаре «Мадам Бум» соединяет живой джаз, вокал и бурлеск в программе «Джазовый бунт» — взрослом сценическом вечере в ретро-эстетике.",
+      "revisionCount": 20,
+      "activeRewriteVersion": "2026-11-24-newyear-eventpage-5x30"
+    }
+  ],
+  "tours": [
+    {
+      "id": "df775918-fb8a-40b8-9570-5d67c65da673",
+      "title": "Мураками — «Белым-бело»",
+      "pageIds": [
+        "f6523fff-b317-4b62-be3f-241cf55b6813",
+        "c91a8e47-d40d-4501-b1d0-9245312e6b26",
+        "ccd6c78e-f61c-4009-927f-e366e11c680f",
+        "ddc11002-ac5e-4134-9ad0-206852bcb32c"
+      ]
+    },
+    {
+      "id": "fb21c308-3b7d-43a6-ad95-b205c6707b3d",
+      "title": "Betsy — новогоднее шоу",
+      "pageIds": [
+        "6146c7fc-73d6-4892-adc6-0b107122e7e5",
+        "81e3da8a-3a1d-4357-a437-bdf58ccf7f5e"
+      ]
+    },
+    {
+      "id": "6ef83891-036f-471b-8ad8-067a275433f8",
+      "title": "Театр на льду Color-Ice — «Щелкунчик»",
+      "pageIds": [
+        "834e8df6-ead7-4134-98bc-ea4b13ae15a0",
+        "882798dc-0d55-4133-9515-d0ba6a65c2c1",
+        "37a41022-a1a0-49c3-978b-dc515fc3b8ef"
+      ]
+    }
+  ],
+  "programPartitions": [
+    {
+      "city": "Санкт-Петербург",
+      "primaryPageId": "71963c39-6367-4331-8eac-7da8cac8b1ac",
+      "winterEventIds": [
+        "evt_6ab6564dc0826605be4e7736",
+        "evt_6ab65653c0826605be4e77f5",
+        "evt_6ab65658c0826605be4e78b4",
+        "evt_6ae9ef0f5b8b99b528b73d45",
+        "evt_6aec484761c1d6c22e234d31",
+        "evt_6aec4ba943608153ccb73d45",
+        "evt_6aec4bac43608153ccb73e04",
+        "evt_6aec4baf43608153ccb73ec3",
+        "evt_6aec4bb143608153ccb73f82",
+        "evt_6afcbdd620dde78e2f25a1c4",
+        "evt_6afcbdda20dde78e2f25a27e",
+        "evt_6afcbdde20dde78e2f25a338"
+      ],
+      "separateProgramPageId": "50ec592f-de91-4872-bf55-3e57adfaf2cd",
+      "genericCabaretEventIds": [
+        "evt_6a70a42e5e7b73efea2140c0",
+        "evt_6a70a4325e7b73efea214170",
+        "evt_6a70a4375e7b73efea214220",
+        "evt_6a70a43c5e7b73efea2142d0"
+      ]
+    }
+  ],
+  "complete": true,
+  "counts": {
+    "selectedInputs": 150,
+    "uniqueSelectedTexts": 148,
+    "additionalProgramSplitRewrite": 2,
+    "publishedRewrites": 150,
+    "mergedGroups": 28,
+    "sourcePagesConsolidated": 60,
+    "tourGroups": 3
+  }
+}

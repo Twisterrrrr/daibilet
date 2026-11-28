@@ -1,0 +1,93 @@
+{
+  "variant": "museum",
+  "status": "READY",
+  "content": {
+    "summary": "Главный музейный комплекс Эрмитажа объединяет Зимний дворец и соседние исторические здания на Дворцовой площади. Здесь можно увидеть парадные залы бывшей императорской резиденции, западноевропейскую живопись, античное искусство и другие коллекции. Перед визитом полезно выбрать маршрут и проверить вход, указанный в билете.",
+    "conversion": {
+      "mode": "admission",
+      "primaryAction": "buy_ticket",
+      "label": "Купить билет на сайте музея",
+      "targetEventId": "",
+      "externalUrl": "https://hermitagemuseum.org/tickets"
+    },
+    "gallery": [],
+    "facts": [
+      { "label": "Основание музея", "value": "1764 год", "sourceUrl": "https://www.hermitagemuseum.org/panorama/virtual_visit/new_hermitage/history/history_2/", "verifiedAt": "2026-10-21" },
+      { "label": "Главный музейный комплекс", "value": "Дворцовая площадь, 2", "sourceUrl": "https://hermitagemuseum.org/explore/complexes/1", "verifiedAt": "2026-10-21" },
+      { "label": "Часы работы", "value": "Вт, пт, сб — 11:00–20:00; ср, чт, вс — 11:00–18:00; понедельник — выходной. Перед визитом проверьте праздничные изменения.", "sourceUrl": "https://www.hermitagemuseum.org/", "verifiedAt": "2026-10-21" },
+      { "label": "Вход", "value": "Следуйте к входу, указанному в билете. Рекомендуется прибыть за 15 минут до сеанса.", "sourceUrl": "https://www.hermitagemuseum.org/news/visitus2020/visitus2020_item/route_mc/", "verifiedAt": "2026-10-21" },
+      { "label": "Билеты онлайн", "value": "Официальный билетный сайт музея; электронный билет показывают на турникете, обмен в кассе не нужен.", "sourceUrl": "https://hermitagemuseum.org/tickets", "verifiedAt": "2026-10-21" }
+    ],
+    "sections": [
+      {
+        "id": "about", "kind": "about", "title": "О музее",
+        "body": "История Эрмитажа началась в 1764 году с собрания живописи Екатерины II. Сегодня Главный музейный комплекс занимает Зимний дворец и соседние здания на Дворцовой площади. Парадные интерьеры соседствуют с коллекциями европейской живописи, античного искусства и предметов разных эпох. Главный штаб — отдельный экспозиционный комплекс на другой стороне площади; перед покупкой выбирайте нужную площадку.",
+        "items": []
+      },
+      {
+        "id": "visit_facts", "kind": "visit_facts", "title": "Перед посещением",
+        "body": "Время работы зависит от дня недели; в праздничные дни возможны изменения. В билете указан вход и время сеанса. Музей рекомендует приходить за 15 минут до начала. Цены и доступные категории билетов проверяйте в официальной продаже.",
+        "items": []
+      },
+      {
+        "id": "ticket_guide", "kind": "ticket_guide", "title": "Билеты и посещение",
+        "body": "Выбирайте билет для нужного экспозиционного комплекса: Главный музейный комплекс и Главный штаб показаны отдельно. Электронные билеты продаются на официальном билетном сайте Эрмитажа; штрихкод можно показать с телефона или распечатать. Входные билеты в кассе продаются на текущий день. Стоимость, льготы и наличие мест зависят от выбранной даты и категории.",
+        "items": [
+          { "title": "Официальная покупка билетов", "description": "Проверьте дату, комплекс, вход и категорию билета перед оплатой.", "imageUrl": "", "linkUrl": "https://hermitagemuseum.org/tickets", "meta": "Сайт музея", "sourceUrl": "https://hermitagemuseum.org/tickets", "details": [] }
+        ]
+      },
+      {
+        "id": "collection", "kind": "collection", "title": "Что посмотреть",
+        "body": "В Главном музейном комплексе можно совместить осмотр парадных залов Зимнего дворца с коллекциями европейской живописи и искусства Древнего мира. Если времени мало, лучше выбрать одну тему и воспользоваться музейным маршрутом.",
+        "items": [
+          { "title": "Парадные залы Зимнего дворца", "description": "Исторические интерьеры бывшей императорской резиденции — отправная точка обзорного маршрута музея.", "imageUrl": "", "linkUrl": "https://www.hermitagemuseum.org/visitus/recommended-trips/trip_1", "meta": "Главный музейный комплекс", "sourceUrl": "https://www.hermitagemuseum.org/visitus/recommended-trips/trip_1", "details": [] },
+          { "title": "Западноевропейская живопись", "description": "В собрании представлены Леонардо да Винчи, Тициан, Рубенс, Рембрандт и другие художники.", "imageUrl": "", "linkUrl": "", "meta": "Коллекция", "sourceUrl": "https://www.hermitagemuseum.org/research/publications/publication_221", "details": [] },
+          { "title": "Искусство Древнего мира", "description": "Античные залы и древнеегипетская экспозиция входят в обзорный маршрут по комплексу.", "imageUrl": "", "linkUrl": "https://www.hermitagemuseum.org/visitus/recommended-trips/trip_1", "meta": "Коллекция", "sourceUrl": "https://www.hermitagemuseum.org/visitus/recommended-trips/trip_1", "details": [] }
+        ]
+      },
+      {
+        "id": "routes", "kind": "routes", "title": "Маршруты по музею",
+        "body": "У музея есть готовые маршруты для первого знакомства и семейного посещения. Они помогают выбрать залы заранее и не пытаться увидеть всё за один визит.",
+        "items": [
+          { "title": "Обзорный маршрут", "description": "Двухчасовой маршрут по главным экспозициям и историческим интерьерам музейного комплекса.", "imageUrl": "", "linkUrl": "https://www.hermitagemuseum.org/visitus/recommended-trips/trip_1", "meta": "Около 2 часов", "sourceUrl": "https://www.hermitagemuseum.org/visitus/recommended-trips/trip_1", "details": [] },
+          { "title": "Семейный маршрут", "description": "Маршрут музея для родителей с детьми: парадные залы, часы «Павлин», античное искусство и Древний Египет.", "imageUrl": "", "linkUrl": "https://www.hermitagemuseum.org/visitus/recommended-trips/trip_3", "meta": "Для семьи", "sourceUrl": "https://www.hermitagemuseum.org/visitus/recommended-trips/trip_3", "details": [] }
+        ]
+      },
+      {
+        "id": "audio_guide", "kind": "audio_guide", "title": "Аудиогид",
+        "body": "У Эрмитажа есть официальное приложение «Аудиогид по Эрмитажу». Актуальные возможности и условия использования проверяйте на сайте музея.",
+        "items": [
+          { "title": "Приложение «Аудиогид по Эрмитажу»", "description": "Официальный цифровой аудиогид музея.", "imageUrl": "", "linkUrl": "https://hermitagemuseum.org/shop/", "meta": "Цифровой формат", "sourceUrl": "https://hermitagemuseum.org/shop/", "details": [] }
+        ]
+      },
+      {
+        "id": "accessibility", "kind": "accessibility", "title": "Доступность",
+        "body": "Музей рекомендует посетителям с ограниченной подвижностью заранее связаться с администраторами выбранного комплекса, чтобы согласовать маршрут и помощь при входе. Для Главного музейного комплекса и Главного штаба опубликованы отдельные планы доступного посещения. Дворец Меншикова и экспозиция «Зимний дворец Петра I» пока не адаптированы для посетителей на креслах-колясках.",
+        "items": [
+          { "title": "План доступного посещения", "description": "Контакты администраторов и планы комплексов размещены на сайте Эрмитажа.", "imageUrl": "", "linkUrl": "https://hermitagemuseum.org/visitus/recommended-trips/for-disabled/", "meta": "Информация музея", "sourceUrl": "https://hermitagemuseum.org/visitus/recommended-trips/for-disabled/", "details": [] }
+        ]
+      },
+      {
+        "id": "location", "kind": "location", "title": "Как добраться",
+        "body": "Главный музейный комплекс находится на Дворцовой площади, 2. Ближайшая станция метро — «Адмиралтейская». У музея несколько входов: нужный указан в вашем билете. Главный штаб находится по адресу Дворцовая площадь, 6/8.",
+        "items": []
+      },
+      {
+        "id": "faq", "kind": "faq", "title": "Частые вопросы",
+        "body": "Перед визитом проверьте дату, вход и условия билета на официальном сайте музея.",
+        "items": [
+          { "title": "Можно ли фотографировать?", "description": "Любительская съёмка для личного использования обычно разрешена без вспышки, штатива и селфи-палки. На отдельных временных выставках и в некоторых музейных пространствах действуют ограничения.", "imageUrl": "", "linkUrl": "https://hermitagemuseum.org/visitus/photo-rules", "meta": "Правила музея", "sourceUrl": "https://hermitagemuseum.org/visitus/photo-rules", "details": [] },
+          { "title": "Нужно ли обменивать электронный билет в кассе?", "description": "Нет. Штрихкод билета прикладывают к считывателю на входе.", "imageUrl": "", "linkUrl": "https://hermitagemuseum.org/tickets", "meta": "Покупка билетов", "sourceUrl": "https://hermitagemuseum.org/tickets", "details": [] },
+          { "title": "Когда музей закрыт?", "description": "Обычный выходной — понедельник; музей также указывает 1 января и 9 мая. Праздничные изменения проверяйте перед поездкой.", "imageUrl": "", "linkUrl": "https://hermitagemuseum.org/explore/complexes/1", "meta": "Режим работы", "sourceUrl": "https://hermitagemuseum.org/explore/complexes/1", "details": [] }
+        ]
+      }
+    ],
+    "sources": [
+      { "title": "Государственный Эрмитаж — Главный музейный комплекс", "url": "https://hermitagemuseum.org/explore/complexes/1", "checkedAt": "2026-10-21" },
+      { "title": "Государственный Эрмитаж — покупка билетов", "url": "https://hermitagemuseum.org/tickets", "checkedAt": "2026-10-21" },
+      { "title": "Государственный Эрмитаж — обзорный маршрут", "url": "https://www.hermitagemuseum.org/visitus/recommended-trips/trip_1", "checkedAt": "2026-10-21" },
+      { "title": "Государственный Эрмитаж — правила фото- и видеосъёмки", "url": "https://hermitagemuseum.org/visitus/photo-rules", "checkedAt": "2026-10-21" },
+      { "title": "Государственный Эрмитаж — доступное посещение", "url": "https://hermitagemuseum.org/visitus/recommended-trips/for-disabled/", "checkedAt": "2026-10-21" }
+    ]
+  }
+}

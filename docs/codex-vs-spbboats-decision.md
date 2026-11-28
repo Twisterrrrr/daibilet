@@ -46,7 +46,7 @@
 ### P0: процесс и QA
 
 - `docs/mentor-review.md` как формат коротких вердиктов перед релизом.
-- `docs/launch-qa-and-deploy.md` как smoke-чеклист.
+- `docs/operations/launch-qa-and-deploy.md` как smoke-чеклист.
 - `scripts/landing-snapshot.mjs` идея: snapshot выдачи лендингов после sync.
 - `scripts/public-performance-snapshot.mjs` идея: cold/warm budgets.
 

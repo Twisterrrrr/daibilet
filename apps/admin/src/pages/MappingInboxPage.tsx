@@ -15,7 +15,7 @@ export function MappingInboxPage() {
             <Inbox className="h-4 w-4" />
           </div>
           <div className="text-2xl font-semibold">{formatNumber(adminData.mappingRows.length)}</div>
-          <div className="text-xs text-muted-foreground">source categories</div>
+          <div className="text-xs text-muted-foreground">категории источника</div>
         </Card>
         <Card className="border-border p-4">
           <div className="text-2xl font-semibold">{formatNumber(adminData.mappingRows.filter((row) => row.mode === 'review').length)}</div>
@@ -34,7 +34,7 @@ export function MappingInboxPage() {
             <td className="px-4 py-3">{row.target}</td>
             <td className="px-4 py-3">{row.subcategory}</td>
             <td className="px-4 py-3">
-              {row.mode === 'auto' ? <StatusBadge status="live" label="auto" /> : <StatusBadge status="incomplete" label="review" />}
+              {row.mode === 'auto' ? <StatusBadge status="live" label="авто" /> : <StatusBadge status="incomplete" label="на проверке" />}
             </td>
           </tr>
         ))}

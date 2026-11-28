@@ -1,0 +1,22 @@
+{
+  "eventId": "evt_6aabcdaddade88dc01841b96",
+  "eventTitle": "Saliva",
+  "eventPageId": "1e132de3-2305-4291-8217-ab5f849f0446",
+  "eventPageSlug": "saliva-ufa",
+  "archiveStatus": "UNUSED_ORIGINAL_SOURCE",
+  "retrievedAt": "2026-11-05",
+  "originalDescription": null,
+  "previousEventOverride": "«Saliva» - рок-концерт на площадке «Огни Уфы» в Уфе.\n\n## Практическая информация\n\n- Место - «Огни Уфы», Уфа\n- Адрес - ул. 50-летия Октября 19\n- Продолжительность - около 120 минут\n- Возрастное ограничение - 16+\n- Билеты - от 3 000 ₽\n\nБилеты продаются онлайн. Оплата на сайте, электронный билет приходит на почту.",
+  "verifiedCurrentData": {
+    "city": "Уфа",
+    "venue": "Огни Уфы",
+    "address": "ул. 50-летия Октября, 19",
+    "date": "2027-04-21",
+    "time": "20:00",
+    "duration": "около 2 часов",
+    "ageLimit": "16+",
+    "priceFromRub": 2500
+  },
+  "mainTextChars": 1106,
+  "previousEffectiveChars": 312
+}

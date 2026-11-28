@@ -1,0 +1,49 @@
+{
+  "eventId": "evt_6a9ace24a11442d3be7ea647",
+  "eventPageId": "9bbdfc0e-a55f-4303-9779-7bd25dab579a",
+  "eventPageSlug": "chaikovskii-pri-svechah-rozhdestvenskii-koncert-muzyki-i-baleta-na-panoramnoi-kryshe-moskva-3",
+  "archiveStatus": "UNUSED_ORIGINAL_SOURCE",
+  "retrievedAt": "2026-11-05",
+  "sourceSnapshot": {
+    "id": "evt_6a9ace24a11442d3be7ea647",
+    "kind": "SINGLE",
+    "slug": "чаиковскии-при-свечах-рождественскии-концерт-музыки-и-балета-на-панорамнои-крыше-6a9ace24a11442d3be7ea647",
+    "seoH1": null,
+    "title": "«Чайковский при свечах»: Рождественский концерт музыки и балета на панорамной крыше!",
+    "sources": [
+      {
+        "code": "TICKETSCLOUD",
+        "name": "Ticketscloud",
+        "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6a9ace24a11442d3be7ea647",
+        "externalId": "6a9ace24a11442d3be7ea647",
+        "metaExternalId": null
+      }
+    ],
+    "venueId": "venue_5cab254e962d37000c1e89da",
+    "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net/production/image/2026-09/6a9acb0f381ee64afb9f046e.jpg",
+    "seoTitle": null,
+    "cityTitle": "Москва",
+    "venueTitle": "Omega Tsvetnoy Rooftop",
+    "description": null,
+    "isIndexable": true,
+    "purchaseFlow": "EXTERNAL",
+    "venueAddress": "Цветной бульвар, дом 15, строение 1",
+    "canonicalPath": null,
+    "primaryCityId": "city_524901",
+    "supplierTitle": null,
+    "managementMode": "SOURCE_MANAGED",
+    "seoDescription": null,
+    "shortDescription": null
+  },
+  "originalDescription": null,
+  "previousEventOverride": "«Чайковский при свечах»: Рождественский концерт музыки и балета на панорамной крыше! - концерт в Москва, на площадке «Omega Tsvetnoy Rooftop». Билеты на выбранную дату; электронный билет приходит на почту после оплаты.\n\n## Когда и где\n\nАдрес: Omega Tsvetnoy Rooftop, Москва.\n\nБилеты от 2000 ₽. Возраст: 6+.",
+  "activeSessions": [
+    {
+      "start": "2027-01-06T14:00:00",
+      "end": "2027-01-06T15:30:00",
+      "price": 2000
+    }
+  ],
+  "mainChars": 593,
+  "previousEffectiveChars": 307
+}

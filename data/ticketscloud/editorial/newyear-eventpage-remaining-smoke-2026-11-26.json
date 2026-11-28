@@ -1,0 +1,586 @@
+{
+  "checkedAt": "2026-11-26T04:46:19.725Z",
+  "total": 64,
+  "ok200": 64,
+  "non200": [],
+  "canonicalMismatch": [],
+  "noindex": [],
+  "rows": [
+    {
+      "slug": "03-01-2027-tula-kostya-kulyasov-i-gruppa-animaciya-animaciya-online-tula",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/03-01-2027-tula-kostya-kulyasov-i-gruppa-animaciya-animaciya-online-tula",
+      "canonical": "https://daibilet.ru/events/03-01-2027-tula-kostya-kulyasov-i-gruppa-animaciya-animaciya-online-tula",
+      "robots": "index, follow",
+      "selfCanonical": true,
+      "hasBody": true
+    },
+    {
+      "slug": "05-01-2027-voronezh-kostya-kulyasov-i-gruppa-animaciya-animaciya-online-voronezh",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/05-01-2027-voronezh-kostya-kulyasov-i-gruppa-animaciya-animaciya-online-voronezh",
+      "canonical": "https://daibilet.ru/events/05-01-2027-voronezh-kostya-kulyasov-i-gruppa-animaciya-animaciya-online-voronezh",
+      "robots": "index, follow",
+      "selfCanonical": true,
+      "hasBody": true
+    },
+    {
+      "slug": "05-01-27-gudtaims-novogodnii-yaroslavl",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/05-01-27-gudtaims-novogodnii-yaroslavl",
+      "canonical": "https://daibilet.ru/events/05-01-27-gudtaims-novogodnii-yaroslavl",
+      "robots": "index, follow",
+      "selfCanonical": true,
+      "hasBody": true
+    },
+    {
+      "slug": "06-01-2027-tambov-kostya-kulyasov-i-gruppa-animaciya-animaciya-online-tambov",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/06-01-2027-tambov-kostya-kulyasov-i-gruppa-animaciya-animaciya-online-tambov",
+      "canonical": "https://daibilet.ru/events/06-01-2027-tambov-kostya-kulyasov-i-gruppa-animaciya-animaciya-online-tambov",
+      "robots": "index, follow",
+      "selfCanonical": true,
+      "hasBody": true
+    },
+    {
+      "slug": "07-01-2027-volgograd-kostya-kulyasov-i-gruppa-animaciya-animaciya-online-volgograd",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/07-01-2027-volgograd-kostya-kulyasov-i-gruppa-animaciya-animaciya-online-volgograd",
+      "canonical": "https://daibilet.ru/events/07-01-2027-volgograd-kostya-kulyasov-i-gruppa-animaciya-animaciya-online-volgograd",
+      "robots": "index, follow",
+      "selfCanonical": true,
+      "hasBody": true
+    },
+    {
+      "slug": "08-01-2027-rostov-na-donu-kostya-kulyasov-i-gruppa-animaciya-animaciya-online-rostov-na-donu",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/08-01-2027-rostov-na-donu-kostya-kulyasov-i-gruppa-animaciya-animaciya-online-rostov-na-donu",
+      "canonical": "https://daibilet.ru/events/08-01-2027-rostov-na-donu-kostya-kulyasov-i-gruppa-animaciya-animaciya-online-rostov-na-donu",
+      "robots": "index, follow",
+      "selfCanonical": true,
+      "hasBody": true
+    },
+    {
+      "slug": "09-01-2027-krasnodar-kostya-kulyasov-i-gruppa-animaciya-animaciya-online-krasnodar",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/09-01-2027-krasnodar-kostya-kulyasov-i-gruppa-animaciya-animaciya-online-krasnodar",
+      "canonical": "https://daibilet.ru/events/09-01-2027-krasnodar-kostya-kulyasov-i-gruppa-animaciya-animaciya-online-krasnodar",
+      "robots": "index, follow",
+      "selfCanonical": true,
+      "hasBody": true
+    },
+    {
+      "slug": "16-12-christmas-party-big-ben-tver",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/16-12-christmas-party-big-ben-tver",
+      "canonical": "https://daibilet.ru/events/16-12-christmas-party-big-ben-tver",
+      "robots": "index, follow",
+      "selfCanonical": true,
+      "hasBody": true
+    },
+    {
+      "slug": "27-dekabrya-new-year-party-cheboksary",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/27-dekabrya-new-year-party-cheboksary",
+      "canonical": "https://daibilet.ru/events/27-dekabrya-new-year-party-cheboksary",
+      "robots": "index, follow",
+      "selfCanonical": true,
+      "hasBody": true
+    },
+    {
+      "slug": "aleks-abra-christmas-in-new-york-novogodnii-dzhaz-s-yumorom-moskva",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/aleks-abra-christmas-in-new-york-novogodnii-dzhaz-s-yumorom-moskva",
+      "canonical": "https://daibilet.ru/events/aleks-abra-christmas-in-new-york-novogodnii-dzhaz-s-yumorom-moskva",
+      "robots": "index, follow",
+      "selfCanonical": true,
+      "hasBody": true
+    },
+    {
+      "slug": "avtorskii-koncert-rvi-meha-orkestra-rozhdestvenskii-koncert-moskva",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/avtorskii-koncert-rvi-meha-orkestra-rozhdestvenskii-koncert-moskva",
+      "canonical": "https://daibilet.ru/events/avtorskii-koncert-rvi-meha-orkestra-rozhdestvenskii-koncert-moskva",
+      "robots": "index, follow",
+      "selfCanonical": true,
+      "hasBody": true
+    },
+    {
+      "slug": "avtorskii-koncert-rvi-meha-orkestra-rozhdestvenskii-koncert-sankt-peterburg",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/avtorskii-koncert-rvi-meha-orkestra-rozhdestvenskii-koncert-sankt-peterburg",
+      "canonical": "https://daibilet.ru/events/avtorskii-koncert-rvi-meha-orkestra-rozhdestvenskii-koncert-sankt-peterburg",
+      "robots": "index, follow",
+      "selfCanonical": true,
+      "hasBody": true
+    },
+    {
+      "slug": "bogemnyi-art-branch-svetskie-tusovki-v-carskoi-rossii-vypusk-novogodnii-sankt-peterburg",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/bogemnyi-art-branch-svetskie-tusovki-v-carskoi-rossii-vypusk-novogodnii-sankt-peterburg",
+      "canonical": "https://daibilet.ru/events/bogemnyi-art-branch-svetskie-tusovki-v-carskoi-rossii-vypusk-novogodnii-sankt-peterburg",
+      "robots": "index, follow",
+      "selfCanonical": true,
+      "hasBody": true
+    },
+    {
+      "slug": "boris-kuzmin-akustika-moskva",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/boris-kuzmin-akustika-moskva",
+      "canonical": "https://daibilet.ru/events/boris-kuzmin-akustika-moskva",
+      "robots": "index, follow",
+      "selfCanonical": true,
+      "hasBody": true
+    },
+    {
+      "slug": "boris-kuzmin-akustika-sankt-peterburg",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/boris-kuzmin-akustika-sankt-peterburg",
+      "canonical": "https://daibilet.ru/events/boris-kuzmin-akustika-sankt-peterburg",
+      "robots": "index, follow",
+      "selfCanonical": true,
+      "hasBody": true
+    },
+    {
+      "slug": "chaikovskii-pri-svechah-rozhdestvenskii-koncert-muzyki-i-baleta-pri-svechah-moskva",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/chaikovskii-pri-svechah-rozhdestvenskii-koncert-muzyki-i-baleta-pri-svechah-moskva",
+      "canonical": "https://daibilet.ru/events/chaikovskii-pri-svechah-rozhdestvenskii-koncert-muzyki-i-baleta-pri-svechah-moskva",
+      "robots": "index, follow",
+      "selfCanonical": true,
+      "hasBody": true
+    },
+    {
+      "slug": "chaikovskii-pri-svechah-rozhdestvenskii-koncert-muzyki-i-baleta-pri-svechah-v-istoricheskom-osobnyake-moskva",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/chaikovskii-pri-svechah-rozhdestvenskii-koncert-muzyki-i-baleta-pri-svechah-v-istoricheskom-osobnyake-moskva",
+      "canonical": "https://daibilet.ru/events/chaikovskii-pri-svechah-rozhdestvenskii-koncert-muzyki-i-baleta-pri-svechah-v-istoricheskom-osobnyake-moskva",
+      "robots": "index, follow",
+      "selfCanonical": true,
+      "hasBody": true
+    },
+    {
+      "slug": "cirk-novogodnii-karnaval-v-g-fokino-bryansk",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/cirk-novogodnii-karnaval-v-g-fokino-bryansk",
+      "canonical": "https://daibilet.ru/events/cirk-novogodnii-karnaval-v-g-fokino-bryansk",
+      "robots": "index, follow",
+      "selfCanonical": true,
+      "hasBody": true
+    },
+    {
+      "slug": "dzhaz-kabare-novogodnyaya-noch-burlesk-shou-v-soprovozhdenii-zhivogo-dzhaza-18-moskva",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/dzhaz-kabare-novogodnyaya-noch-burlesk-shou-v-soprovozhdenii-zhivogo-dzhaza-18-moskva",
+      "canonical": "https://daibilet.ru/events/dzhaz-kabare-novogodnyaya-noch-burlesk-shou-v-soprovozhdenii-zhivogo-dzhaza-18-moskva",
+      "robots": "index, follow",
+      "selfCanonical": true,
+      "hasBody": true
+    },
+    {
+      "slug": "ekskursionnyi-tur-rozhdestvenskaya-moskva-7-yanvarya-2027-iz-kurska-kursk",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/ekskursionnyi-tur-rozhdestvenskaya-moskva-7-yanvarya-2027-iz-kurska-kursk",
+      "canonical": "https://daibilet.ru/events/ekskursionnyi-tur-rozhdestvenskaya-moskva-7-yanvarya-2027-iz-kurska-kursk",
+      "robots": "index, follow",
+      "selfCanonical": true,
+      "hasBody": true
+    },
+    {
+      "slug": "hz-zabeiskaya-elka-moskva",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/hz-zabeiskaya-elka-moskva",
+      "canonical": "https://daibilet.ru/events/hz-zabeiskaya-elka-moskva",
+      "robots": "index, follow",
+      "selfCanonical": true,
+      "hasBody": true
+    },
+    {
+      "slug": "kino-pod-elkoi-koncert-pri-svechah-volzhsk",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/kino-pod-elkoi-koncert-pri-svechah-volzhsk",
+      "canonical": "https://daibilet.ru/events/kino-pod-elkoi-koncert-pri-svechah-volzhsk",
+      "robots": "index, follow",
+      "selfCanonical": true,
+      "hasBody": true
+    },
+    {
+      "slug": "kreativnyi-master-klass-po-sozdaniyu-novogodnego-venka-sankt-peterburg",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/kreativnyi-master-klass-po-sozdaniyu-novogodnego-venka-sankt-peterburg",
+      "canonical": "https://daibilet.ru/events/kreativnyi-master-klass-po-sozdaniyu-novogodnego-venka-sankt-peterburg",
+      "robots": "index, follow",
+      "selfCanonical": true,
+      "hasBody": true
+    },
+    {
+      "slug": "kvartet-alekseya-popova-spb-moskva-christmas-jazz-moskva",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/kvartet-alekseya-popova-spb-moskva-christmas-jazz-moskva",
+      "canonical": "https://daibilet.ru/events/kvartet-alekseya-popova-spb-moskva-christmas-jazz-moskva",
+      "robots": "index, follow",
+      "selfCanonical": true,
+      "hasBody": true
+    },
+    {
+      "slug": "landyshi-novogodnii-koncert-sankt-peterburg",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/landyshi-novogodnii-koncert-sankt-peterburg",
+      "canonical": "https://daibilet.ru/events/landyshi-novogodnii-koncert-sankt-peterburg",
+      "robots": "index, follow",
+      "selfCanonical": true,
+      "hasBody": true
+    },
+    {
+      "slug": "lihoradka-charlstona-novogodnii-uzhin-koncert-za-stolikami-sankt-peterburg",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/lihoradka-charlstona-novogodnii-uzhin-koncert-za-stolikami-sankt-peterburg",
+      "canonical": "https://daibilet.ru/events/lihoradka-charlstona-novogodnii-uzhin-koncert-za-stolikami-sankt-peterburg",
+      "robots": "index, follow",
+      "selfCanonical": true,
+      "hasBody": true
+    },
+    {
+      "slug": "loud-boyz-2027-new-year-x-winline-x-yauza-place-moskva",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/loud-boyz-2027-new-year-x-winline-x-yauza-place-moskva",
+      "canonical": "https://daibilet.ru/events/loud-boyz-2027-new-year-x-winline-x-yauza-place-moskva",
+      "robots": "index, follow",
+      "selfCanonical": true,
+      "hasBody": true
+    },
+    {
+      "slug": "marina-shakleina-i-shabadobo-dzhaz-bend-moskva",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/marina-shakleina-i-shabadobo-dzhaz-bend-moskva",
+      "canonical": "https://daibilet.ru/events/marina-shakleina-i-shabadobo-dzhaz-bend-moskva",
+      "robots": "index, follow",
+      "selfCanonical": true,
+      "hasBody": true
+    },
+    {
+      "slug": "melodii-rozhdestva-zhenskii-hor-sankt-peterburgskoi-mitropolii-sankt-peterburg",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/melodii-rozhdestva-zhenskii-hor-sankt-peterburgskoi-mitropolii-sankt-peterburg",
+      "canonical": "https://daibilet.ru/events/melodii-rozhdestva-zhenskii-hor-sankt-peterburgskoi-mitropolii-sankt-peterburg",
+      "robots": "index, follow",
+      "selfCanonical": true,
+      "hasBody": true
+    },
+    {
+      "slug": "molodost-prostit-gorko-moskva",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/molodost-prostit-gorko-moskva",
+      "canonical": "https://daibilet.ru/events/molodost-prostit-gorko-moskva",
+      "robots": "index, follow",
+      "selfCanonical": true,
+      "hasBody": true
+    },
+    {
+      "slug": "na-rozhdestvo-v-tulu-6-yanvarya-2027-iz-kurska-kursk",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/na-rozhdestvo-v-tulu-6-yanvarya-2027-iz-kurska-kursk",
+      "canonical": "https://daibilet.ru/events/na-rozhdestvo-v-tulu-6-yanvarya-2027-iz-kurska-kursk",
+      "robots": "index, follow",
+      "selfCanonical": true,
+      "hasBody": true
+    },
+    {
+      "slug": "nakonechnyi-4-yanvarya-piter-sankt-peterburg",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/nakonechnyi-4-yanvarya-piter-sankt-peterburg",
+      "canonical": "https://daibilet.ru/events/nakonechnyi-4-yanvarya-piter-sankt-peterburg",
+      "robots": "index, follow",
+      "selfCanonical": true,
+      "hasBody": true
+    },
+    {
+      "slug": "nakonechnyi-5-yanvarya-moskva",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/nakonechnyi-5-yanvarya-moskva",
+      "canonical": "https://daibilet.ru/events/nakonechnyi-5-yanvarya-moskva",
+      "robots": "index, follow",
+      "selfCanonical": true,
+      "hasBody": true
+    },
+    {
+      "slug": "novogodnee-burlishou-moskva",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/novogodnee-burlishou-moskva",
+      "canonical": "https://daibilet.ru/events/novogodnee-burlishou-moskva",
+      "robots": "index, follow",
+      "selfCanonical": true,
+      "hasBody": true
+    },
+    {
+      "slug": "novogodnee-cirkovoe-shou-liliputki-sofii-arzamas",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/novogodnee-cirkovoe-shou-liliputki-sofii-arzamas",
+      "canonical": "https://daibilet.ru/events/novogodnee-cirkovoe-shou-liliputki-sofii-arzamas",
+      "robots": "index, follow",
+      "selfCanonical": true,
+      "hasBody": true
+    },
+    {
+      "slug": "novogodnee-predstavlenie-vse-delo-v-shlyape-po-skazke-n-kurtog-prazdnik-pylelupov-moskva",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/novogodnee-predstavlenie-vse-delo-v-shlyape-po-skazke-n-kurtog-prazdnik-pylelupov-moskva",
+      "canonical": "https://daibilet.ru/events/novogodnee-predstavlenie-vse-delo-v-shlyape-po-skazke-n-kurtog-prazdnik-pylelupov-moskva",
+      "robots": "index, follow",
+      "selfCanonical": true,
+      "hasBody": true
+    },
+    {
+      "slug": "novogodnee-tango-ansambl-remolino-sankt-peterburg",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/novogodnee-tango-ansambl-remolino-sankt-peterburg",
+      "canonical": "https://daibilet.ru/events/novogodnee-tango-ansambl-remolino-sankt-peterburg",
+      "robots": "index, follow",
+      "selfCanonical": true,
+      "hasBody": true
+    },
+    {
+      "slug": "novogodnie-petrovskie-vecherki-moskva",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/novogodnie-petrovskie-vecherki-moskva",
+      "canonical": "https://daibilet.ru/events/novogodnie-petrovskie-vecherki-moskva",
+      "robots": "index, follow",
+      "selfCanonical": true,
+      "hasBody": true
+    },
+    {
+      "slug": "novogodnii-korporativ-dlya-predprinimatelei-inache-sankt-peterburg",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/novogodnii-korporativ-dlya-predprinimatelei-inache-sankt-peterburg",
+      "canonical": "https://daibilet.ru/events/novogodnii-korporativ-dlya-predprinimatelei-inache-sankt-peterburg",
+      "robots": "index, follow",
+      "selfCanonical": true,
+      "hasBody": true
+    },
+    {
+      "slug": "novogodnii-prazdnik-dlya-malyshei-v-gosti-k-dedu-morozu-i-snegurochke-sankt-peterburg",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/novogodnii-prazdnik-dlya-malyshei-v-gosti-k-dedu-morozu-i-snegurochke-sankt-peterburg",
+      "canonical": "https://daibilet.ru/events/novogodnii-prazdnik-dlya-malyshei-v-gosti-k-dedu-morozu-i-snegurochke-sankt-peterburg",
+      "robots": "index, follow",
+      "selfCanonical": true,
+      "hasBody": true
+    },
+    {
+      "slug": "novogodnyaya-elka-dlya-samyh-malenkih-sankt-peterburg",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/novogodnyaya-elka-dlya-samyh-malenkih-sankt-peterburg",
+      "canonical": "https://daibilet.ru/events/novogodnyaya-elka-dlya-samyh-malenkih-sankt-peterburg",
+      "robots": "index, follow",
+      "selfCanonical": true,
+      "hasBody": true
+    },
+    {
+      "slug": "novogodnyaya-elka-dlya-vzroslyh-sankt-peterburg",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/novogodnyaya-elka-dlya-vzroslyh-sankt-peterburg",
+      "canonical": "https://daibilet.ru/events/novogodnyaya-elka-dlya-vzroslyh-sankt-peterburg",
+      "robots": "index, follow",
+      "selfCanonical": true,
+      "hasBody": true
+    },
+    {
+      "slug": "novogodnyaya-grimerka-ekaterinburg",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/novogodnyaya-grimerka-ekaterinburg",
+      "canonical": "https://daibilet.ru/events/novogodnyaya-grimerka-ekaterinburg",
+      "robots": "index, follow",
+      "selfCanonical": true,
+      "hasBody": true
+    },
+    {
+      "slug": "novogodnyaya-noch-2027-dzhoker-sochi",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/novogodnyaya-noch-2027-dzhoker-sochi",
+      "canonical": "https://daibilet.ru/events/novogodnyaya-noch-2027-dzhoker-sochi",
+      "robots": "index, follow",
+      "selfCanonical": true,
+      "hasBody": true
+    },
+    {
+      "slug": "novogodnyaya-rok-akustika-ot-gr-akura-tver",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/novogodnyaya-rok-akustika-ot-gr-akura-tver",
+      "canonical": "https://daibilet.ru/events/novogodnyaya-rok-akustika-ot-gr-akura-tver",
+      "robots": "index, follow",
+      "selfCanonical": true,
+      "hasBody": true
+    },
+    {
+      "slug": "novyi-god-s-arsenalom-moskva",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/novyi-god-s-arsenalom-moskva",
+      "canonical": "https://daibilet.ru/events/novyi-god-s-arsenalom-moskva",
+      "robots": "index, follow",
+      "selfCanonical": true,
+      "hasBody": true
+    },
+    {
+      "slug": "novyi-god-s-kotyatami-barnaul",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/novyi-god-s-kotyatami-barnaul",
+      "canonical": "https://daibilet.ru/events/novyi-god-s-kotyatami-barnaul",
+      "robots": "index, follow",
+      "selfCanonical": true,
+      "hasBody": true
+    },
+    {
+      "slug": "novyi-god-so-starymi-druzyami-2027-sankt-peterburg",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/novyi-god-so-starymi-druzyami-2027-sankt-peterburg",
+      "canonical": "https://daibilet.ru/events/novyi-god-so-starymi-druzyami-2027-sankt-peterburg",
+      "robots": "index, follow",
+      "selfCanonical": true,
+      "hasBody": true
+    },
+    {
+      "slug": "novyi-god-v-dzhem-klub-myuzik-moskva",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/novyi-god-v-dzhem-klub-myuzik-moskva",
+      "canonical": "https://daibilet.ru/events/novyi-god-v-dzhem-klub-myuzik-moskva",
+      "robots": "index, follow",
+      "selfCanonical": true,
+      "hasBody": true
+    },
+    {
+      "slug": "novyi-god-v-krugu-svoih-t-s-lounge-balashiha",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/novyi-god-v-krugu-svoih-t-s-lounge-balashiha",
+      "canonical": "https://daibilet.ru/events/novyi-god-v-krugu-svoih-t-s-lounge-balashiha",
+      "robots": "index, follow",
+      "selfCanonical": true,
+      "hasBody": true
+    },
+    {
+      "slug": "novyi-god-v-krugu-svoih-t-s-lounge-krasnogorsk",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/novyi-god-v-krugu-svoih-t-s-lounge-krasnogorsk",
+      "canonical": "https://daibilet.ru/events/novyi-god-v-krugu-svoih-t-s-lounge-krasnogorsk",
+      "robots": "index, follow",
+      "selfCanonical": true,
+      "hasBody": true
+    },
+    {
+      "slug": "novyi-god-v-maltiiskoi-kapelle-istoricheskii-organ-v-maltiiskoi-kapelle-sankt-peterburg",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/novyi-god-v-maltiiskoi-kapelle-istoricheskii-organ-v-maltiiskoi-kapelle-sankt-peterburg",
+      "canonical": "https://daibilet.ru/events/novyi-god-v-maltiiskoi-kapelle-istoricheskii-organ-v-maltiiskoi-kapelle-sankt-peterburg",
+      "robots": "index, follow",
+      "selfCanonical": true,
+      "hasBody": true
+    },
+    {
+      "slug": "novyi-god-v-maltiiskoi-kapelle-organnyi-koncert-pri-svechah-sankt-peterburg",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/novyi-god-v-maltiiskoi-kapelle-organnyi-koncert-pri-svechah-sankt-peterburg",
+      "canonical": "https://daibilet.ru/events/novyi-god-v-maltiiskoi-kapelle-organnyi-koncert-pri-svechah-sankt-peterburg",
+      "robots": "index, follow",
+      "selfCanonical": true,
+      "hasBody": true
+    },
+    {
+      "slug": "ot-vinta-new-year-27-moskva",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/ot-vinta-new-year-27-moskva",
+      "canonical": "https://daibilet.ru/events/ot-vinta-new-year-27-moskva",
+      "robots": "index, follow",
+      "selfCanonical": true,
+      "hasBody": true
+    },
+    {
+      "slug": "po-sledam-snegurochki-muzykalnaya-skazka-s-lyubimyli-blogerami-bataysk",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/po-sledam-snegurochki-muzykalnaya-skazka-s-lyubimyli-blogerami-bataysk",
+      "canonical": "https://daibilet.ru/events/po-sledam-snegurochki-muzykalnaya-skazka-s-lyubimyli-blogerami-bataysk",
+      "robots": "index, follow",
+      "selfCanonical": true,
+      "hasBody": true
+    },
+    {
+      "slug": "ravanna-novogodnii-koncert-moskva",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/ravanna-novogodnii-koncert-moskva",
+      "canonical": "https://daibilet.ru/events/ravanna-novogodnii-koncert-moskva",
+      "robots": "index, follow",
+      "selfCanonical": true,
+      "hasBody": true
+    },
+    {
+      "slug": "ravanna-novogodnii-koncert-sankt-peterburg",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/ravanna-novogodnii-koncert-sankt-peterburg",
+      "canonical": "https://daibilet.ru/events/ravanna-novogodnii-koncert-sankt-peterburg",
+      "robots": "index, follow",
+      "selfCanonical": true,
+      "hasBody": true
+    },
+    {
+      "slug": "rozalia-novogodnie-koncerty-zhivoi-zvuk-moskva",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/rozalia-novogodnie-koncerty-zhivoi-zvuk-moskva",
+      "canonical": "https://daibilet.ru/events/rozalia-novogodnie-koncerty-zhivoi-zvuk-moskva",
+      "robots": "index, follow",
+      "selfCanonical": true,
+      "hasBody": true
+    },
+    {
+      "slug": "schelkunchik-novogodnyaya-muzykalnaya-skazka-s-pesochnoi-animaciei-moskva-3",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/schelkunchik-novogodnyaya-muzykalnaya-skazka-s-pesochnoi-animaciei-moskva-3",
+      "canonical": "https://daibilet.ru/events/schelkunchik-novogodnyaya-muzykalnaya-skazka-s-pesochnoi-animaciei-moskva-3",
+      "robots": "index, follow",
+      "selfCanonical": true,
+      "hasBody": true
+    },
+    {
+      "slug": "shrek-rave-new-year-25-dekabrya-nirvana-ekaterinburg",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/shrek-rave-new-year-25-dekabrya-nirvana-ekaterinburg",
+      "canonical": "https://daibilet.ru/events/shrek-rave-new-year-25-dekabrya-nirvana-ekaterinburg",
+      "robots": "index, follow",
+      "selfCanonical": true,
+      "hasBody": true
+    },
+    {
+      "slug": "spokanki-christmas-time-moskva",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/spokanki-christmas-time-moskva",
+      "canonical": "https://daibilet.ru/events/spokanki-christmas-time-moskva",
+      "robots": "index, follow",
+      "selfCanonical": true,
+      "hasBody": true
+    },
+    {
+      "slug": "tango-v-parizhe-rozhdestvo-kaliningrad",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/tango-v-parizhe-rozhdestvo-kaliningrad",
+      "canonical": "https://daibilet.ru/events/tango-v-parizhe-rozhdestvo-kaliningrad",
+      "robots": "index, follow",
+      "selfCanonical": true,
+      "hasBody": true
+    },
+    {
+      "slug": "tribyut-shou-kak-v-staroi-skazke-tver",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/tribyut-shou-kak-v-staroi-skazke-tver",
+      "canonical": "https://daibilet.ru/events/tribyut-shou-kak-v-staroi-skazke-tver",
+      "robots": "index, follow",
+      "selfCanonical": true,
+      "hasBody": true
+    },
+    {
+      "slug": "vay-muzykalnoe-loto-novogodnyaya-sbornaya-elka-russkoe-90-e-i-00-e-samara-2",
+      "status": 200,
+      "finalUrl": "https://daibilet.ru/events/vay-muzykalnoe-loto-novogodnyaya-sbornaya-elka-russkoe-90-e-i-00-e-samara-2",
+      "canonical": "https://daibilet.ru/events/vay-muzykalnoe-loto-novogodnyaya-sbornaya-elka-russkoe-90-e-i-00-e-samara-2",
+      "robots": "index, follow",
+      "selfCanonical": true,
+      "hasBody": true
+    }
+  ]
+}

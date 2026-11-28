@@ -136,7 +136,7 @@ export function CitiesCatalogPage() {
                   name={city.name}
                   eventCount={city.events}
                   venueCount={city.venues}
-                  description={resolveCityBrief(city.slug, city.sourceSlug, city.name)}
+                  description={resolveCityBrief(slug, city.sourceSlug, city.name)}
                   href={cityHref(city)}
                   imageUrl={resolveCityCardImage({ slug, sourceSlug: city.sourceSlug, name: city.name })}
                   region={resolveCityRegion(city, destinations)}

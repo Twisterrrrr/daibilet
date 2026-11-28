@@ -1,0 +1,48 @@
+{
+  "createdAt": "2026-11-13",
+  "masterTexts": 90,
+  "eventPageAssociations": 298,
+  "distinctEventPages": 298,
+  "eventIdAssociations": 430,
+  "distinctEventIds": 430,
+  "batches": [
+    {
+      "batch": 1,
+      "masterTexts": 30,
+      "failed": 0
+    },
+    {
+      "batch": 2,
+      "masterTexts": 30,
+      "failed": 0
+    },
+    {
+      "batch": 3,
+      "masterTexts": 30,
+      "failed": 0
+    }
+  ],
+  "repeatPagesSameCity": 224,
+  "repeatPagesAcrossCities": 2,
+  "productionApplied": false,
+  "indexingEnabled": false,
+  "overlapEventPageIds": [],
+  "overlapEventIds": [],
+  "pageSpecificPackage": {
+    "file": "eventpage-next-three-batches-page-specific-content-2026-11-13.json",
+    "markdown": "eventpage-next-three-batches-page-specific-content-2026-11-13.md",
+    "audit": "eventpage-next-three-batches-page-specific-audit-2026-11-13.csv",
+    "pages": 298,
+    "eventIds": 430,
+    "allPagesMeetLength": true,
+    "allPagesMeetParagraphRule": true,
+    "pagesWithPracticalInfo": 298,
+    "pagesWithConflicts": 0,
+    "indexingHoldCounts": {
+      "same_city_repeat_seo_review": 224,
+      "editorial_review": 72,
+      "cross_city_local_context_review": 2
+    },
+    "timingIncluded": false
+  }
+}

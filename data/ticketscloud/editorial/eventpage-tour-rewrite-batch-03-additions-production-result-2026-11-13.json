@@ -1,0 +1,805 @@
+{
+  "startedAt": "2026-11-13T06:24:02.979Z",
+  "groups": [
+    {
+      "title": "Шура — сольный концерт",
+      "tourGroupId": "11b6f74f-8a58-4b50-9a74-745472802464",
+      "pages": 17,
+      "cityRepresentatives": 16,
+      "sameCityUnassigned": 1
+    },
+    {
+      "title": "МЕГАМОЗГ — концерт в рамках тура",
+      "tourGroupId": "b638f16e-ae8a-4d9e-8c6e-169108d3079e",
+      "pages": 16,
+      "cityRepresentatives": 16,
+      "sameCityUnassigned": 0
+    },
+    {
+      "title": "Call Me Karizma — концерт в рамках тура",
+      "tourGroupId": "0571e4ce-c4f2-402b-8844-6436a602b6de",
+      "pages": 10,
+      "cityRepresentatives": 10,
+      "sameCityUnassigned": 0
+    }
+  ],
+  "pages": [
+    {
+      "eventPageId": "76b1bbb7-194e-4e27-b631-0b9e1240bbd0",
+      "eventId": "evt_6ae1b1970b51c66e6b231e92",
+      "eventIds": [
+        "evt_6ae1b1970b51c66e6b231e92"
+      ],
+      "slug": "shura-penza",
+      "url": "https://daibilet.ru/events/shura-penza",
+      "city": "Пенза",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T06:23:37.317Z",
+      "canonicalPath": "/events/shura-penza",
+      "tourGroupId": "11b6f74f-8a58-4b50-9a74-745472802464",
+      "revisionBefore": 4,
+      "revisionAfter": 4,
+      "alreadyApplied": true
+    },
+    {
+      "eventPageId": "5e5abe5b-81a6-47a5-9ec9-a9c800ec8e38",
+      "eventId": "evt_6aa315d5c6a1e6d667517eea",
+      "eventIds": [
+        "evt_6aa315d5c6a1e6d667517eea"
+      ],
+      "slug": "shura-kemerovo",
+      "url": "https://daibilet.ru/events/shura-kemerovo",
+      "city": "Кемерово",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T06:24:06.324Z",
+      "canonicalPath": "/events/shura-kemerovo",
+      "tourGroupId": "11b6f74f-8a58-4b50-9a74-745472802464",
+      "revisionBefore": 1,
+      "revisionAfter": 4,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "1084aab6-a968-4a26-868f-7d372a57c0e1",
+      "eventId": "evt_69a80f23bc4e6b6688330f10",
+      "eventIds": [
+        "evt_69a80f23bc4e6b6688330f10"
+      ],
+      "slug": "shura-kazan",
+      "url": "https://daibilet.ru/events/shura-kazan",
+      "city": "Казань",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T06:24:06.711Z",
+      "canonicalPath": "/events/shura-kazan",
+      "tourGroupId": "11b6f74f-8a58-4b50-9a74-745472802464",
+      "revisionBefore": 1,
+      "revisionAfter": 4,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "d905b162-2582-4f9a-a8de-6bd7b4a16d82",
+      "eventId": "evt_6aaee0bde285cf74d1c74d99",
+      "eventIds": [
+        "evt_6aaee0bde285cf74d1c74d99"
+      ],
+      "slug": "shura-volgograd",
+      "url": "https://daibilet.ru/events/shura-volgograd",
+      "city": "Волгоград",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T06:24:07.106Z",
+      "canonicalPath": "/events/shura-volgograd",
+      "tourGroupId": "11b6f74f-8a58-4b50-9a74-745472802464",
+      "revisionBefore": 1,
+      "revisionAfter": 4,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "667ba26e-8254-4c78-babe-9881ecf695c8",
+      "eventId": "evt_6aa98deb27ef5536ac75d69d",
+      "eventIds": [
+        "evt_6aa98deb27ef5536ac75d69d"
+      ],
+      "slug": "shura-ulan-ude",
+      "url": "https://daibilet.ru/events/shura-ulan-ude",
+      "city": "Улан-Удэ",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T06:24:07.498Z",
+      "canonicalPath": "/events/shura-ulan-ude",
+      "tourGroupId": "11b6f74f-8a58-4b50-9a74-745472802464",
+      "revisionBefore": 1,
+      "revisionAfter": 4,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "ca92ecce-b964-4436-abf6-2c5edee4b072",
+      "eventId": "evt_6aa31c4ee0ee08b94c3db3d5",
+      "eventIds": [
+        "evt_6aa31c4ee0ee08b94c3db3d5"
+      ],
+      "slug": "shura-tomsk",
+      "url": "https://daibilet.ru/events/shura-tomsk",
+      "city": "Томск",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T06:24:07.980Z",
+      "canonicalPath": "/events/shura-tomsk",
+      "tourGroupId": "11b6f74f-8a58-4b50-9a74-745472802464",
+      "revisionBefore": 1,
+      "revisionAfter": 4,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "5455781c-beee-4771-b49d-734f6065c069",
+      "eventId": "evt_6a9043388cfdfb9023e69cac",
+      "eventIds": [
+        "evt_6a9043388cfdfb9023e69cac"
+      ],
+      "slug": "shura-lipeck",
+      "url": "https://daibilet.ru/events/shura-lipeck",
+      "city": "Липецк",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T06:24:08.366Z",
+      "canonicalPath": "/events/shura-lipeck",
+      "tourGroupId": "11b6f74f-8a58-4b50-9a74-745472802464",
+      "revisionBefore": 1,
+      "revisionAfter": 4,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "d66ea080-b39c-40da-8664-d8630ad93eb8",
+      "eventId": "evt_6a7f31d58748aee7347f95d6",
+      "eventIds": [
+        "evt_6a7f31d58748aee7347f95d6"
+      ],
+      "slug": "shura-saratov",
+      "url": "https://daibilet.ru/events/shura-saratov",
+      "city": "Саратов",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T06:24:08.720Z",
+      "canonicalPath": "/events/shura-saratov",
+      "tourGroupId": "11b6f74f-8a58-4b50-9a74-745472802464",
+      "revisionBefore": 1,
+      "revisionAfter": 4,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "06383638-fcd2-425e-a444-7ed1358a6347",
+      "eventId": "evt_6aa9845aba4079b2fa559d23",
+      "eventIds": [
+        "evt_6aa9845aba4079b2fa559d23"
+      ],
+      "slug": "shura-sankt-peterburg",
+      "url": "https://daibilet.ru/events/shura-sankt-peterburg",
+      "city": "Санкт-Петербург",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T06:24:09.114Z",
+      "canonicalPath": "/events/shura-sankt-peterburg",
+      "tourGroupId": "11b6f74f-8a58-4b50-9a74-745472802464",
+      "revisionBefore": 1,
+      "revisionAfter": 4,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "8bb69974-f888-45af-8102-497b1aae415a",
+      "eventId": "evt_6a7f617e85d93155c66b12c4",
+      "eventIds": [
+        "evt_6a7f617e85d93155c66b12c4"
+      ],
+      "slug": "shura-irkutsk",
+      "url": "https://daibilet.ru/events/shura-irkutsk",
+      "city": "Иркутск",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T06:24:09.500Z",
+      "canonicalPath": "/events/shura-irkutsk",
+      "tourGroupId": "11b6f74f-8a58-4b50-9a74-745472802464",
+      "revisionBefore": 1,
+      "revisionAfter": 4,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "fc804ceb-fcd8-4373-9126-33b1b9538bb8",
+      "eventId": "evt_6a7f5e4af3622d1e4079fdf3",
+      "eventIds": [
+        "evt_6a7f5e4af3622d1e4079fdf3"
+      ],
+      "slug": "shura-vladivostok",
+      "url": "https://daibilet.ru/events/shura-vladivostok",
+      "city": "Владивосток",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T06:24:09.856Z",
+      "canonicalPath": "/events/shura-vladivostok",
+      "tourGroupId": "11b6f74f-8a58-4b50-9a74-745472802464",
+      "revisionBefore": 1,
+      "revisionAfter": 4,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "c91c7f95-53e7-4eff-9293-d1cfc487e988",
+      "eventId": "evt_6ab3ce92e34ed8bc76e0b78a",
+      "eventIds": [
+        "evt_6ab3ce92e34ed8bc76e0b78a"
+      ],
+      "slug": "shura-volgograd-2",
+      "url": "https://daibilet.ru/events/shura-volgograd-2",
+      "city": "Волгоград",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T06:24:10.213Z",
+      "canonicalPath": "/events/shura-volgograd-2",
+      "tourGroupId": null,
+      "revisionBefore": 1,
+      "revisionAfter": 3,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "9162f02d-c015-40d8-b7f8-ded8a0fbbe24",
+      "eventId": "evt_69e74b67f1dc9db591136deb",
+      "eventIds": [
+        "evt_69e74b67f1dc9db591136deb"
+      ],
+      "slug": "shura-chelyabinsk",
+      "url": "https://daibilet.ru/events/shura-chelyabinsk",
+      "city": "Челябинск",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T06:24:10.533Z",
+      "canonicalPath": "/events/shura-chelyabinsk",
+      "tourGroupId": "11b6f74f-8a58-4b50-9a74-745472802464",
+      "revisionBefore": 1,
+      "revisionAfter": 4,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "4132485f-4a67-42d5-bc77-cbbb08316fe3",
+      "eventId": "evt_69e67b2dc8fb254d708ba235",
+      "eventIds": [
+        "evt_69e67b2dc8fb254d708ba235"
+      ],
+      "slug": "shura-ufa",
+      "url": "https://daibilet.ru/events/shura-ufa",
+      "city": "Уфа",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-12T21:03:35.204Z",
+      "canonicalPath": "/events/shura-ufa",
+      "tourGroupId": "11b6f74f-8a58-4b50-9a74-745472802464",
+      "revisionBefore": 3,
+      "revisionAfter": 5,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "a10bbbdd-8b48-4b89-9526-085e366b3619",
+      "eventId": "evt_69b040d961884aa8c8772f4b",
+      "eventIds": [
+        "evt_69b040d961884aa8c8772f4b"
+      ],
+      "slug": "shura-samara",
+      "url": "https://daibilet.ru/events/shura-samara",
+      "city": "Самара",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T06:24:11.424Z",
+      "canonicalPath": "/events/shura-samara",
+      "tourGroupId": "11b6f74f-8a58-4b50-9a74-745472802464",
+      "revisionBefore": 1,
+      "revisionAfter": 4,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "b7b8513d-d6e7-47b9-9413-f8c91a0dfdbf",
+      "eventId": "evt_69a54a462f10714ffa03da5a",
+      "eventIds": [
+        "evt_69a54a462f10714ffa03da5a"
+      ],
+      "slug": "shura-nizhniy-novgorod",
+      "url": "https://daibilet.ru/events/shura-nizhniy-novgorod",
+      "city": "Нижний Новгород",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T06:24:11.812Z",
+      "canonicalPath": "/events/shura-nizhniy-novgorod",
+      "tourGroupId": "11b6f74f-8a58-4b50-9a74-745472802464",
+      "revisionBefore": 1,
+      "revisionAfter": 4,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "58c5b1f0-f928-447a-8058-10aebe5a6050",
+      "eventId": "evt_69b0435fccddb4e5f2a03b1a",
+      "eventIds": [
+        "evt_69b0435fccddb4e5f2a03b1a"
+      ],
+      "slug": "shura-voronezh",
+      "url": "https://daibilet.ru/events/shura-voronezh",
+      "city": "Воронеж",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T06:24:12.179Z",
+      "canonicalPath": "/events/shura-voronezh",
+      "tourGroupId": "11b6f74f-8a58-4b50-9a74-745472802464",
+      "revisionBefore": 1,
+      "revisionAfter": 4,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "383ccbf2-16de-4ad3-ab71-bae47485cabf",
+      "eventId": "evt_6aee380ce2443c855170bdab",
+      "eventIds": [
+        "evt_6aee380ce2443c855170bdab"
+      ],
+      "slug": "megamozg-voronezh",
+      "url": "https://daibilet.ru/events/megamozg-voronezh",
+      "city": "Воронеж",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T06:24:12.653Z",
+      "canonicalPath": "/events/megamozg-voronezh",
+      "tourGroupId": "b638f16e-ae8a-4d9e-8c6e-169108d3079e",
+      "revisionBefore": 1,
+      "revisionAfter": 4,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "ac2e4a25-7882-4efb-9d0b-ce78f9022c62",
+      "eventId": "evt_6aee27373e51cf84832de54b",
+      "eventIds": [
+        "evt_6aee27373e51cf84832de54b"
+      ],
+      "slug": "megamozg-rostov-na-donu",
+      "url": "https://daibilet.ru/events/megamozg-rostov-na-donu",
+      "city": "Ростов-на-Дону",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T06:24:13.073Z",
+      "canonicalPath": "/events/megamozg-rostov-na-donu",
+      "tourGroupId": "b638f16e-ae8a-4d9e-8c6e-169108d3079e",
+      "revisionBefore": 1,
+      "revisionAfter": 4,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "c30c0fe7-0634-4014-bbce-ac2afcb398fa",
+      "eventId": "evt_6aede501c6f431f331bcd41c",
+      "eventIds": [
+        "evt_6aede501c6f431f331bcd41c"
+      ],
+      "slug": "megamozg-krasnodar",
+      "url": "https://daibilet.ru/events/megamozg-krasnodar",
+      "city": "Краснодар",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T06:24:13.501Z",
+      "canonicalPath": "/events/megamozg-krasnodar",
+      "tourGroupId": "b638f16e-ae8a-4d9e-8c6e-169108d3079e",
+      "revisionBefore": 1,
+      "revisionAfter": 4,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "30436488-45c2-4ed5-8bbe-ee6640acf925",
+      "eventId": "evt_6adf800e55a18bbac897f5c5",
+      "eventIds": [
+        "evt_6adf800e55a18bbac897f5c5"
+      ],
+      "slug": "megamozg-chelyabinsk",
+      "url": "https://daibilet.ru/events/megamozg-chelyabinsk",
+      "city": "Челябинск",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T06:24:13.930Z",
+      "canonicalPath": "/events/megamozg-chelyabinsk",
+      "tourGroupId": "b638f16e-ae8a-4d9e-8c6e-169108d3079e",
+      "revisionBefore": 1,
+      "revisionAfter": 4,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "65e9ea33-63d4-43d6-84e6-6fbed942d310",
+      "eventId": "evt_6ada07444d9876ffa71f9aca",
+      "eventIds": [
+        "evt_6ada07444d9876ffa71f9aca"
+      ],
+      "slug": "megamozg-ufa",
+      "url": "https://daibilet.ru/events/megamozg-ufa",
+      "city": "Уфа",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T06:24:14.338Z",
+      "canonicalPath": "/events/megamozg-ufa",
+      "tourGroupId": "b638f16e-ae8a-4d9e-8c6e-169108d3079e",
+      "revisionBefore": 1,
+      "revisionAfter": 4,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "9c3bf4b1-337f-40c1-94fe-36f24cdcf935",
+      "eventId": "evt_6ad9fbb1a5e54f1a3a8f80b5",
+      "eventIds": [
+        "evt_6ad9fbb1a5e54f1a3a8f80b5"
+      ],
+      "slug": "megamozg-tyumen",
+      "url": "https://daibilet.ru/events/megamozg-tyumen",
+      "city": "Тюмень",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T06:24:14.699Z",
+      "canonicalPath": "/events/megamozg-tyumen",
+      "tourGroupId": "b638f16e-ae8a-4d9e-8c6e-169108d3079e",
+      "revisionBefore": 1,
+      "revisionAfter": 4,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "1b98d70c-35bb-4179-9291-cce317d68960",
+      "eventId": "evt_6ad8ea79d504d9b6f330f92a",
+      "eventIds": [
+        "evt_6ad8ea79d504d9b6f330f92a"
+      ],
+      "slug": "megamozg-ekaterinburg",
+      "url": "https://daibilet.ru/events/megamozg-ekaterinburg",
+      "city": "Екатеринбург",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-11T12:14:18.581Z",
+      "canonicalPath": "/events/megamozg-ekaterinburg",
+      "tourGroupId": "b638f16e-ae8a-4d9e-8c6e-169108d3079e",
+      "revisionBefore": 4,
+      "revisionAfter": 6,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "a337d28e-5211-470d-9474-fea811f00b3e",
+      "eventId": "evt_6ad8df569c1641cb1e9e92b0",
+      "eventIds": [
+        "evt_6ad8df569c1641cb1e9e92b0"
+      ],
+      "slug": "megamozg-perm",
+      "url": "https://daibilet.ru/events/megamozg-perm",
+      "city": "Пермь",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T06:24:15.406Z",
+      "canonicalPath": "/events/megamozg-perm",
+      "tourGroupId": "b638f16e-ae8a-4d9e-8c6e-169108d3079e",
+      "revisionBefore": 1,
+      "revisionAfter": 4,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "4619f411-541e-442e-a60e-72c20ba24543",
+      "eventId": "evt_6ad8cfdf2699c05cb9dbd2f3",
+      "eventIds": [
+        "evt_6ad8cfdf2699c05cb9dbd2f3"
+      ],
+      "slug": "megamozg-izhevsk",
+      "url": "https://daibilet.ru/events/megamozg-izhevsk",
+      "city": "Ижевск",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T06:24:15.833Z",
+      "canonicalPath": "/events/megamozg-izhevsk",
+      "tourGroupId": "b638f16e-ae8a-4d9e-8c6e-169108d3079e",
+      "revisionBefore": 1,
+      "revisionAfter": 4,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "c5c3d11d-6202-45c4-bd20-c33b24f220eb",
+      "eventId": "evt_6ab16e8ecb104f3265d47df9",
+      "eventIds": [
+        "evt_6ab16e8ecb104f3265d47df9"
+      ],
+      "slug": "megamozg-kazan",
+      "url": "https://daibilet.ru/events/megamozg-kazan",
+      "city": "Казань",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T06:24:16.192Z",
+      "canonicalPath": "/events/megamozg-kazan",
+      "tourGroupId": "b638f16e-ae8a-4d9e-8c6e-169108d3079e",
+      "revisionBefore": 1,
+      "revisionAfter": 4,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "1a5c4950-b30e-4a58-9c84-89c1b298307f",
+      "eventId": "evt_6ab16a495107893b0d64a793",
+      "eventIds": [
+        "evt_6ab16a495107893b0d64a793"
+      ],
+      "slug": "megamozg-nizhniy-novgorod",
+      "url": "https://daibilet.ru/events/megamozg-nizhniy-novgorod",
+      "city": "Нижний Новгород",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T06:24:16.519Z",
+      "canonicalPath": "/events/megamozg-nizhniy-novgorod",
+      "tourGroupId": "b638f16e-ae8a-4d9e-8c6e-169108d3079e",
+      "revisionBefore": 1,
+      "revisionAfter": 4,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "d0b1e715-c3c2-4799-aa22-696961f6da0c",
+      "eventId": "evt_6ab16569887ba6b9dd25666e",
+      "eventIds": [
+        "evt_6ab16569887ba6b9dd25666e"
+      ],
+      "slug": "megamozg-vladimir",
+      "url": "https://daibilet.ru/events/megamozg-vladimir",
+      "city": "Владимир",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T06:24:16.851Z",
+      "canonicalPath": "/events/megamozg-vladimir",
+      "tourGroupId": "b638f16e-ae8a-4d9e-8c6e-169108d3079e",
+      "revisionBefore": 1,
+      "revisionAfter": 4,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "6c836560-1f39-4550-929f-114d4f2c144c",
+      "eventId": "evt_6ada16e305c4496a1704384b",
+      "eventIds": [
+        "evt_6ada16e305c4496a1704384b"
+      ],
+      "slug": "megamozg-penza",
+      "url": "https://daibilet.ru/events/megamozg-penza",
+      "city": "Пенза",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T06:24:17.172Z",
+      "canonicalPath": "/events/megamozg-penza",
+      "tourGroupId": "b638f16e-ae8a-4d9e-8c6e-169108d3079e",
+      "revisionBefore": 1,
+      "revisionAfter": 4,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "35b786ff-0db7-4a0c-850d-21c1882b23de",
+      "eventId": "evt_6ada13c3ab7401d1e584a6af",
+      "eventIds": [
+        "evt_6ada13c3ab7401d1e584a6af"
+      ],
+      "slug": "megamozg-samara",
+      "url": "https://daibilet.ru/events/megamozg-samara",
+      "city": "Самара",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T06:24:17.563Z",
+      "canonicalPath": "/events/megamozg-samara",
+      "tourGroupId": "b638f16e-ae8a-4d9e-8c6e-169108d3079e",
+      "revisionBefore": 1,
+      "revisionAfter": 4,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "f3ccbbb7-10c4-4107-9aee-732c43effa7d",
+      "eventId": "evt_6ab17431161fd9902f6a81de",
+      "eventIds": [
+        "evt_6ab17431161fd9902f6a81de"
+      ],
+      "slug": "megamozg-tula",
+      "url": "https://daibilet.ru/events/megamozg-tula",
+      "city": "Тула",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T06:24:17.935Z",
+      "canonicalPath": "/events/megamozg-tula",
+      "tourGroupId": "b638f16e-ae8a-4d9e-8c6e-169108d3079e",
+      "revisionBefore": 1,
+      "revisionAfter": 4,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "26b64085-aacf-48d6-b99a-8b7db7902199",
+      "eventId": "evt_6ab15fe8795a3029260bfb86",
+      "eventIds": [
+        "evt_6ab15fe8795a3029260bfb86"
+      ],
+      "slug": "megamozg-yaroslavl",
+      "url": "https://daibilet.ru/events/megamozg-yaroslavl",
+      "city": "Ярославль",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T06:24:18.313Z",
+      "canonicalPath": "/events/megamozg-yaroslavl",
+      "tourGroupId": "b638f16e-ae8a-4d9e-8c6e-169108d3079e",
+      "revisionBefore": 1,
+      "revisionAfter": 4,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "25ea05a1-9336-4ad4-9651-5a1b75092dad",
+      "eventId": "evt_6ac8ec6c5aa1b4370eadf622",
+      "eventIds": [
+        "evt_6ac8ec6c5aa1b4370eadf622"
+      ],
+      "slug": "call-me-karizma-17-aprelya-novosibirsk",
+      "url": "https://daibilet.ru/events/call-me-karizma-17-aprelya-novosibirsk",
+      "city": "Новосибирск",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T06:24:18.663Z",
+      "canonicalPath": "/events/call-me-karizma-17-aprelya-novosibirsk",
+      "tourGroupId": "0571e4ce-c4f2-402b-8844-6436a602b6de",
+      "revisionBefore": 1,
+      "revisionAfter": 4,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "05a6610f-96dd-417a-bd20-49bcd9a71a6e",
+      "eventId": "evt_6a832e7b85e603f946e8529b",
+      "eventIds": [
+        "evt_6a832e7b85e603f946e8529b"
+      ],
+      "slug": "call-me-karizma-10-aprelya-krasnodar",
+      "url": "https://daibilet.ru/events/call-me-karizma-10-aprelya-krasnodar",
+      "city": "Краснодар",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T06:24:19.026Z",
+      "canonicalPath": "/events/call-me-karizma-10-aprelya-krasnodar",
+      "tourGroupId": "0571e4ce-c4f2-402b-8844-6436a602b6de",
+      "revisionBefore": 1,
+      "revisionAfter": 4,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "cfe0ae1d-47a5-41b6-88b8-c9dc27de17eb",
+      "eventId": "evt_6a83325e05a0c2c7e8ebe86a",
+      "eventIds": [
+        "evt_6a83325e05a0c2c7e8ebe86a"
+      ],
+      "slug": "call-me-karizma-25-aprelya-samara",
+      "url": "https://daibilet.ru/events/call-me-karizma-25-aprelya-samara",
+      "city": "Самара",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T06:24:19.412Z",
+      "canonicalPath": "/events/call-me-karizma-25-aprelya-samara",
+      "tourGroupId": "0571e4ce-c4f2-402b-8844-6436a602b6de",
+      "revisionBefore": 1,
+      "revisionAfter": 4,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "80578e30-7878-417c-b3bd-40e7327deb0f",
+      "eventId": "evt_6a832a5f8d1562e48b949ca9",
+      "eventIds": [
+        "evt_6a832a5f8d1562e48b949ca9"
+      ],
+      "slug": "call-me-karizma-9-aprelya-rostov-na-donu",
+      "url": "https://daibilet.ru/events/call-me-karizma-9-aprelya-rostov-na-donu",
+      "city": "Ростов-на-Дону",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T06:24:19.793Z",
+      "canonicalPath": "/events/call-me-karizma-9-aprelya-rostov-na-donu",
+      "tourGroupId": "0571e4ce-c4f2-402b-8844-6436a602b6de",
+      "revisionBefore": 1,
+      "revisionAfter": 4,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "1c31270c-9c15-4141-b841-229d00a43aaa",
+      "eventId": "evt_6a832ef1ee9565ee56584882",
+      "eventIds": [
+        "evt_6a832ef1ee9565ee56584882"
+      ],
+      "slug": "call-me-karizma-16-aprelya-ekaterinburg",
+      "url": "https://daibilet.ru/events/call-me-karizma-16-aprelya-ekaterinburg",
+      "city": "Екатеринбург",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T06:24:20.190Z",
+      "canonicalPath": "/events/call-me-karizma-16-aprelya-ekaterinburg",
+      "tourGroupId": "0571e4ce-c4f2-402b-8844-6436a602b6de",
+      "revisionBefore": 1,
+      "revisionAfter": 4,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "d263bc5c-1cc1-4213-a710-f07154b1d227",
+      "eventId": "evt_6a833165bcc0da660b9ec09a",
+      "eventIds": [
+        "evt_6a833165bcc0da660b9ec09a"
+      ],
+      "slug": "call-me-karizma-23-aprelya-sankt-peterburg",
+      "url": "https://daibilet.ru/events/call-me-karizma-23-aprelya-sankt-peterburg",
+      "city": "Санкт-Петербург",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T06:24:20.604Z",
+      "canonicalPath": "/events/call-me-karizma-23-aprelya-sankt-peterburg",
+      "tourGroupId": "0571e4ce-c4f2-402b-8844-6436a602b6de",
+      "revisionBefore": 1,
+      "revisionAfter": 4,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "288eb250-bd66-45d9-8286-e8e5d5f6f4eb",
+      "eventId": "evt_6a8325dc270cbffc3ebf4f60",
+      "eventIds": [
+        "evt_6a8325dc270cbffc3ebf4f60"
+      ],
+      "slug": "call-me-karizma-2-aprelya-nizhnii-novgorod-nizhniy-novgorod",
+      "url": "https://daibilet.ru/events/call-me-karizma-2-aprelya-nizhnii-novgorod-nizhniy-novgorod",
+      "city": "Нижний Новгород",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T06:24:20.997Z",
+      "canonicalPath": "/events/call-me-karizma-2-aprelya-nizhnii-novgorod-nizhniy-novgorod",
+      "tourGroupId": "0571e4ce-c4f2-402b-8844-6436a602b6de",
+      "revisionBefore": 1,
+      "revisionAfter": 4,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "677e3f58-a78c-4762-bfaf-dda95771bf85",
+      "eventId": "evt_6a8330ce5d4e8a4127ca3eac",
+      "eventIds": [
+        "evt_6a8330ce5d4e8a4127ca3eac"
+      ],
+      "slug": "call-me-karizma-18-aprelya-krasnoyarsk",
+      "url": "https://daibilet.ru/events/call-me-karizma-18-aprelya-krasnoyarsk",
+      "city": "Красноярск",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T06:24:21.479Z",
+      "canonicalPath": "/events/call-me-karizma-18-aprelya-krasnoyarsk",
+      "tourGroupId": "0571e4ce-c4f2-402b-8844-6436a602b6de",
+      "revisionBefore": 1,
+      "revisionAfter": 4,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "b64b8b6e-37dd-4b3a-9ff0-d3c33695b91b",
+      "eventId": "evt_6a8331ef05a0c2c7e8ebe768",
+      "eventIds": [
+        "evt_6a8331ef05a0c2c7e8ebe768"
+      ],
+      "slug": "call-me-karizma-24-aprelya-moskva",
+      "url": "https://daibilet.ru/events/call-me-karizma-24-aprelya-moskva",
+      "city": "Москва",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T06:24:21.944Z",
+      "canonicalPath": "/events/call-me-karizma-24-aprelya-moskva",
+      "tourGroupId": "0571e4ce-c4f2-402b-8844-6436a602b6de",
+      "revisionBefore": 1,
+      "revisionAfter": 4,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "2bf2acf9-1d06-46c2-9159-6fcf85ab25b5",
+      "eventId": "evt_6a832d5a270cbffc3ebf5418",
+      "eventIds": [
+        "evt_6a832d5a270cbffc3ebf5418"
+      ],
+      "slug": "call-me-karizma-3-aprelya-kazan",
+      "url": "https://daibilet.ru/events/call-me-karizma-3-aprelya-kazan",
+      "city": "Казань",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T06:24:22.363Z",
+      "canonicalPath": "/events/call-me-karizma-3-aprelya-kazan",
+      "tourGroupId": "0571e4ce-c4f2-402b-8844-6436a602b6de",
+      "revisionBefore": 1,
+      "revisionAfter": 4,
+      "alreadyApplied": false
+    }
+  ],
+  "sameCityUnassigned": 1,
+  "completedAt": "2026-11-13T06:24:22.578Z",
+  "completed": true
+}

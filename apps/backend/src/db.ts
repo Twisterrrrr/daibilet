@@ -1,13 +1,14 @@
-import { createRequire } from 'node:module';
-import path from 'node:path';
+import pg from 'pg';
 import type { DbClient, QueryResult } from './types/db.js';
 
 interface PgPool {
   query<Row = Record<string, unknown>>(text: string, params?: readonly unknown[]): Promise<QueryResult<Row>>;
+  connect(): Promise<PgClient>;
 }
 
-interface PgModule {
-  Pool: new (config: { connectionString: string; max: number }) => PgPool;
+interface PgClient {
+  query<Row = Record<string, unknown>>(text: string, params?: readonly unknown[]): Promise<QueryResult<Row>>;
+  release(): void;
 }
 
 export interface DbStatsRow {
@@ -30,9 +31,8 @@ export interface RecentEventRow {
 
 let pool: PgPool | undefined;
 
-export function createDb(rootDir: string): DbClient {
-  const requireFromDbPackage = createRequire(path.join(rootDir, 'packages', 'db', 'package.json'));
-  const { Pool } = requireFromDbPackage('pg') as PgModule;
+export function createDb(_rootDir?: string): DbClient {
+  const { Pool } = pg;
   const connectionString = process.env.DATABASE_URL || 'postgresql://daibilet:daibilet@127.0.0.1:5437/daibilet';
 
   pool ??= new Pool({ connectionString, max: 3 });
@@ -40,6 +40,23 @@ export function createDb(rootDir: string): DbClient {
   return {
     query<Row = Record<string, unknown>>(text: string, params?: readonly unknown[]) {
       return getPool().query<Row>(text, params);
+    },
+
+    async transaction<T>(callback: (client: {
+      query<Row = Record<string, unknown>>(text: string, params?: readonly unknown[]): Promise<QueryResult<Row>>;
+    }) => Promise<T>) {
+      const client = await getPool().connect();
+      try {
+        await client.query('BEGIN');
+        const result = await callback({ query: (text, params) => client.query(text, params) });
+        await client.query('COMMIT');
+        return result;
+      } catch (error) {
+        await client.query('ROLLBACK');
+        throw error;
+      } finally {
+        client.release();
+      }
     },
 
     async stats() {

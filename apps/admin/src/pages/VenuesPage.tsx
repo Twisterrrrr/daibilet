@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { adminFetch } from '@/lib/admin-api';
 import { Building2, Globe2, Image, Loader2, MapPin, Save, Search, Ticket } from 'lucide-react';
 
 import { DataTableShell, PageHeader, StatusBadge } from '@/components/admin/primitives';
@@ -10,12 +11,12 @@ import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { adminData, formatDateTime, formatMoney, formatNumber } from '@/data';
 import type { AdminVenueDetail, AdminVenueRow } from '@/types';
 
-const API_BASE_URL =
-  ((import.meta as ImportMeta & { env?: { VITE_DAIBILET_API_URL?: string } }).env?.VITE_DAIBILET_API_URL as string | undefined) ||
-  'http://127.0.0.1:4000';
 
 type VenuesListResponse = {
   generatedAt: string;
+  page?: number;
+  pages?: number;
+  limit?: number;
   total: number;
   rows: AdminVenueRow[];
   metrics: {
@@ -26,8 +27,11 @@ type VenuesListResponse = {
   };
 };
 
+const PAGE_SIZE = 80;
+
 type VenueDraft = {
   title: string;
+  editorialTitle: string;
   shortDescription: string;
   description: string;
   heroImageUrl: string;
@@ -48,9 +52,13 @@ const kindOptions = [
   { value: 'CLUB_BAR_RESTAURANT', label: 'Клуб / ресторан' },
   { value: 'PIER', label: 'Причал' },
   { value: 'MEETING_POINT', label: 'Точка встречи' },
+  { value: 'PARK', label: 'Парк' },
+  { value: 'MONUMENT', label: 'Памятник' },
   { value: 'OUTDOOR_LOCATION', label: 'Открытая локация' },
   { value: 'SPORT_ACTIVITY_SPACE', label: 'Спорт / активность' },
   { value: 'ATTRACTION', label: 'Аттракцион' },
+  { value: 'TEMPLE', label: 'Храм' },
+  { value: 'BUS', label: 'Автобус / посадка' },
   { value: 'ONLINE', label: 'Онлайн' },
   { value: 'OTHER', label: 'Другое' },
 ];
@@ -88,10 +96,10 @@ function normalizeStatus(status?: string | null) {
 
 function statusBadge(status?: string | null) {
   const normalized = normalizeStatus(status);
-  if (normalized === 'PUBLISHED' || status === 'published') return <StatusBadge status="live" label="published" />;
-  if (normalized === 'CANDIDATE' || status === 'candidate') return <StatusBadge status="incomplete" label="candidate" />;
-  if (normalized === 'HIDDEN' || status === 'hidden') return <StatusBadge status="error" label="hidden" />;
-  return <StatusBadge status="draft" label="location" />;
+  if (normalized === 'PUBLISHED' || status === 'published') return <StatusBadge status="live" label="опубликовано" />;
+  if (normalized === 'CANDIDATE' || status === 'candidate') return <StatusBadge status="incomplete" label="кандидат" />;
+  if (normalized === 'HIDDEN' || status === 'hidden') return <StatusBadge status="error" label="скрыто" />;
+  return <StatusBadge status="draft" label="локация" />;
 }
 
 function kindLabel(kind?: string | null) {
@@ -102,6 +110,7 @@ function kindLabel(kind?: string | null) {
 function emptyDraft(venue?: AdminVenueDetail | null): VenueDraft {
   return {
     title: venue?.title || '',
+    editorialTitle: venue?.editorialTitle || '',
     shortDescription: venue?.shortDescription || '',
     description: venue?.description || '',
     heroImageUrl: venue?.heroImageUrl || '',
@@ -119,8 +128,9 @@ function detailToRow(detail: AdminVenueDetail, previous?: AdminVenueRow): AdminV
   return {
     ...(previous || {}),
     id: detail.id,
-    name: detail.title,
+    name: detail.editorialTitle || detail.title,
     title: detail.title,
+    editorialTitle: detail.editorialTitle,
     slug: detail.slug,
     city: detail.city || previous?.city || 'Не указан',
     address: detail.address,
@@ -145,6 +155,7 @@ function detailToRow(detail: AdminVenueDetail, previous?: AdminVenueRow): AdminV
 export function VenuesPage() {
   const [query, setQuery] = React.useState('');
   const [familyFilter, setFamilyFilter] = React.useState<'all' | 'institution' | 'location'>('all');
+  const [page, setPage] = React.useState(1);
   const [payload, setPayload] = React.useState<VenuesListResponse>(() => buildLocalResponse());
   const [isLoading, setIsLoading] = React.useState(false);
   const [loadError, setLoadError] = React.useState<string | null>(null);
@@ -156,13 +167,17 @@ export function VenuesPage() {
   const [saveError, setSaveError] = React.useState<string | null>(null);
 
   React.useEffect(() => {
+    setPage(1);
+  }, [query, familyFilter]);
+
+  React.useEffect(() => {
     const controller = new AbortController();
-    const params = new URLSearchParams({ limit: '160' });
+    const params = new URLSearchParams({ limit: String(PAGE_SIZE), page: String(page) });
     if (query.trim()) params.set('q', query.trim());
     if (familyFilter !== 'all') params.set('family', familyFilter);
     setIsLoading(true);
 
-    fetch(`${API_BASE_URL}/api/admin/venues?${params.toString()}`, {
+    adminFetch(`/api/admin/venues?${params.toString()}`, {
       cache: 'no-store',
       signal: controller.signal,
     })
@@ -184,7 +199,10 @@ export function VenuesPage() {
       });
 
     return () => controller.abort();
-  }, [query, familyFilter]);
+  }, [query, familyFilter, page]);
+
+  const currentPage = payload.page || page;
+  const pages = payload.pages || Math.max(1, Math.ceil((payload.total || 0) / PAGE_SIZE));
 
   React.useEffect(() => {
     setDraft(emptyDraft(venueDetail));
@@ -197,7 +215,7 @@ export function VenuesPage() {
     setIsDetailLoading(true);
 
     try {
-      const response = await fetch(`${API_BASE_URL}/api/admin/venues/${encodeURIComponent(venue.id)}`, { cache: 'no-store' });
+      const response = await adminFetch(`/api/admin/venues/${encodeURIComponent(venue.id)}`, { cache: 'no-store' });
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
       const detail = (await response.json()) as AdminVenueDetail | null;
       if (!detail) throw new Error('Площадка не найдена');
@@ -216,7 +234,7 @@ export function VenuesPage() {
     setSaveError(null);
 
     try {
-      const response = await fetch(`${API_BASE_URL}/api/admin/venues/${encodeURIComponent(venueDetail.id)}`, {
+      const response = await adminFetch(`/api/admin/venues/${encodeURIComponent(venueDetail.id)}`, {
         method: 'PATCH',
         headers: { 'content-type': 'application/json' },
         body: JSON.stringify(draft),
@@ -273,7 +291,7 @@ export function VenuesPage() {
         </div>
         <div className="flex items-center gap-2 text-xs text-muted-foreground">
           {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
-          {loadError ? <span>fallback: {loadError}</span> : <span>{formatNumber(payload.total)} найдено</span>}
+          {loadError ? <span>резерв API: {loadError}</span> : <span>{formatNumber(payload.total)} найдено</span>}
         </div>
       </div>
 
@@ -309,6 +327,18 @@ export function VenuesPage() {
           </tr>
         ))}
       </DataTableShell>
+
+      <div className="mt-4 flex items-center justify-end gap-2">
+        <Button variant="outline" size="sm" disabled={currentPage <= 1 || isLoading} onClick={() => setPage(currentPage - 1)}>
+          Назад
+        </Button>
+        <span className="text-xs text-muted-foreground">
+          {currentPage} / {pages}
+        </span>
+        <Button variant="outline" size="sm" disabled={currentPage >= pages || isLoading} onClick={() => setPage(currentPage + 1)}>
+          Вперёд
+        </Button>
+      </div>
 
       <div className="hidden">
         {payload.rows.map((venue) => (
@@ -393,7 +423,7 @@ function VenueSheet(props: {
               {statusBadge(detail?.pageStatus || venue.pageStatus)}
               <Badge variant="outline">{kindLabel(detail?.kind || venue.kind || venue.proposedKind)}</Badge>
             </div>
-            <h2 className="mt-3 text-xl font-semibold leading-snug">{detail?.title || venue.name}</h2>
+            <h2 className="mt-3 text-xl font-semibold leading-snug">{detail?.editorialTitle || detail?.title || venue.name}</h2>
             <div className="mt-1 flex flex-wrap gap-3 text-xs text-muted-foreground">
               <span className="font-mono">{venue.id}</span>
               {detail?.slug ? <span>{detail.slug}</span> : null}
@@ -416,6 +446,10 @@ function VenueSheet(props: {
                     <div className="mt-4 grid gap-3 md:grid-cols-2">
                       <Field label="Название">
                         <Input value={draft.title} onChange={(event) => onDraftChange((current) => ({ ...current, title: event.target.value }))} />
+                      </Field>
+                      <Field label="Редакторское название">
+                        <Input value={draft.editorialTitle} onChange={(event) => onDraftChange((current) => ({ ...current, editorialTitle: event.target.value }))} placeholder="Пустое поле использует название из синка" />
+                        <p className="mt-1 text-xs text-muted-foreground">Показывается посетителям вместо исходного названия. Синк это поле не перезаписывает.</p>
                       </Field>
                       <Field label="Тип площадки">
                         <select value={draft.kind} onChange={(event) => onDraftChange((current) => ({ ...current, kind: event.target.value }))} className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm">
@@ -454,14 +488,14 @@ function VenueSheet(props: {
                       <EditableField label="Короткое описание" value={draft.shortDescription} onChange={(shortDescription) => onDraftChange((current) => ({ ...current, shortDescription }))} multiline />
                       <EditableField label="Описание" value={draft.description} onChange={(description) => onDraftChange((current) => ({ ...current, description }))} multiline />
                       <div className="grid gap-3 md:grid-cols-2">
-                        <EditableField label="seoH1" value={draft.seoH1} onChange={(seoH1) => onDraftChange((current) => ({ ...current, seoH1 }))} />
-                        <EditableField label="canonicalPath" value={draft.canonicalPath} onChange={(canonicalPath) => onDraftChange((current) => ({ ...current, canonicalPath }))} />
+                        <EditableField label="SEO H1" value={draft.seoH1} onChange={(seoH1) => onDraftChange((current) => ({ ...current, seoH1 }))} />
+                        <EditableField label="Канонический путь" value={draft.canonicalPath} onChange={(canonicalPath) => onDraftChange((current) => ({ ...current, canonicalPath }))} />
                       </div>
-                      <EditableField label="seoTitle" value={draft.seoTitle} onChange={(seoTitle) => onDraftChange((current) => ({ ...current, seoTitle }))} />
-                      <EditableField label="seoDescription" value={draft.seoDescription} onChange={(seoDescription) => onDraftChange((current) => ({ ...current, seoDescription }))} multiline />
+                      <EditableField label="SEO title" value={draft.seoTitle} onChange={(seoTitle) => onDraftChange((current) => ({ ...current, seoTitle }))} />
+                      <EditableField label="SEO description" value={draft.seoDescription} onChange={(seoDescription) => onDraftChange((current) => ({ ...current, seoDescription }))} multiline />
                       <label className="inline-flex items-center gap-2 text-sm">
                         <input type="checkbox" checked={draft.isIndexable} onChange={(event) => onDraftChange((current) => ({ ...current, isIndexable: event.target.checked }))} />
-                        indexable
+                        индексировать
                       </label>
                     </div>
                   </section>
@@ -491,7 +525,7 @@ function VenueSheet(props: {
                   <section className="rounded-lg border border-border p-4">
                     <div className="flex items-center gap-2">
                       <Image className="h-4 w-4 text-muted-foreground" />
-                      <h3 className="text-sm font-semibold">Hero</h3>
+                      <h3 className="text-sm font-semibold">Обложка</h3>
                     </div>
                     <div className="mt-4 aspect-[4/3] overflow-hidden rounded-lg border border-border bg-secondary">
                       {imageUrl ? (
@@ -500,26 +534,26 @@ function VenueSheet(props: {
                         <div className="flex h-full items-center justify-center text-sm text-muted-foreground">изображение не задано</div>
                       )}
                     </div>
-                    <EditableField label="heroImageUrl" value={draft.heroImageUrl} onChange={(heroImageUrl) => onDraftChange((current) => ({ ...current, heroImageUrl }))} />
+                    <EditableField label="URL обложки" value={draft.heroImageUrl} onChange={(heroImageUrl) => onDraftChange((current) => ({ ...current, heroImageUrl }))} />
                   </section>
 
                   <section className="rounded-lg border border-border p-4">
-                    <h3 className="text-sm font-semibold">Public-ready чек</h3>
+                    <h3 className="text-sm font-semibold">Готовность к публикации</h3>
                     <div className="mt-3 flex flex-wrap gap-2">
                       <Badge variant="outline" className={draft.title ? 'border-success/30 bg-success/10 text-success' : ''}>
-                        title
+                        название
                       </Badge>
                       <Badge variant="outline" className={draft.shortDescription ? 'border-success/30 bg-success/10 text-success' : ''}>
-                        short
+                        короткое описание
                       </Badge>
                       <Badge variant="outline" className={draft.seoTitle ? 'border-success/30 bg-success/10 text-success' : ''}>
-                        seoTitle
+                        SEO title
                       </Badge>
                       <Badge variant="outline" className={draft.canonicalPath ? 'border-success/30 bg-success/10 text-success' : ''}>
-                        canonical
+                        каноникал
                       </Badge>
                       <Badge variant="outline" className={draft.heroImageUrl ? 'border-success/30 bg-success/10 text-success' : ''}>
-                        hero
+                        обложка
                       </Badge>
                     </div>
                   </section>

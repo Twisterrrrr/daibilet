@@ -1,0 +1,2316 @@
+{
+  "date": "2026-11-12/13",
+  "batches": {
+    "33": {
+      "items": 30,
+      "result": [
+        {
+          "eventId": "evt_6a5b5f3a22df122781b0e622",
+          "eventPageId": "658e0c7d-cbd9-4e89-9bcf-858a80b80660",
+          "slug": "neoklassicheskii-koncert-kompozitora-denisa-stelmaha-v-irkutske-irkutsk",
+          "url": "/events/neoklassicheskii-koncert-kompozitora-denisa-stelmaha-v-irkutske-irkutsk",
+          "title": "Неоклассический концерт композитора Дениса Стельмаха в Иркутске.",
+          "status": "READY",
+          "isIndexable": true,
+          "publishedAt": "2026-11-12T20:39:31.319Z",
+          "revision": "1->3"
+        },
+        {
+          "eventId": "evt_6a35492b38e8bdc916dd698b",
+          "eventPageId": "dfce45ad-5a1c-47d9-a179-210b70eed9be",
+          "slug": "20-11-2026-bratsk-kostya-kulyasov-i-gruppa-animaciya-animaciya-online-bratsk",
+          "url": "/events/20-11-2026-bratsk-kostya-kulyasov-i-gruppa-animaciya-animaciya-online-bratsk",
+          "title": "20.11.2026 / Братск /Костя Кулясов и группа АнимациЯ /animaciya.online",
+          "status": "READY",
+          "isIndexable": true,
+          "publishedAt": "2026-11-12T20:39:31.780Z",
+          "revision": "1->3"
+        },
+        {
+          "eventId": "evt_69d24132d1068f8c88a31ea7",
+          "eventPageId": "285d2698-62e2-4919-bd6e-bb332d2ea13f",
+          "slug": "bolshoi-solnyi-koncert-russkii-razmer-33-tyumen",
+          "url": "/events/bolshoi-solnyi-koncert-russkii-razmer-33-tyumen",
+          "title": "Большой сольный концерт Русский Размер - 33!",
+          "status": "READY",
+          "isIndexable": true,
+          "publishedAt": "2026-11-12T20:39:32.280Z",
+          "revision": "1->3"
+        },
+        {
+          "eventId": "evt_6abba5432f613cb2e5fac11b",
+          "eventPageId": "24a663f5-6c57-4529-8265-bae684eab6fe",
+          "slug": "argishti-koncert-golos-neba-i-zemli-tyumen",
+          "url": "/events/argishti-koncert-golos-neba-i-zemli-tyumen",
+          "title": "Аргишти Концерт \"Голос Неба и Земли\"",
+          "status": "READY",
+          "isIndexable": true,
+          "publishedAt": "2026-11-12T20:39:32.775Z",
+          "revision": "1->3"
+        },
+        {
+          "eventId": "evt_6a8d9a2efd0cb2c5bdf471d6",
+          "eventPageId": "d17ff131-ddc5-473c-9856-0c7454a23fa7",
+          "slug": "billy-s-band-ekaterinburg",
+          "url": "/events/billy-s-band-ekaterinburg",
+          "title": "Billy’s Band",
+          "status": "READY",
+          "isIndexable": true,
+          "publishedAt": "2026-11-12T20:39:33.236Z",
+          "revision": "1->3"
+        },
+        {
+          "eventId": "evt_6a8c23fc3eef01592600c567",
+          "eventPageId": "94d3d989-b114-447d-b922-1c80d6ec34e7",
+          "slug": "ivan-zolo-penza-20-noyabrya-rok-kafe-131-2-penza",
+          "url": "/events/ivan-zolo-penza-20-noyabrya-rok-kafe-131-2-penza",
+          "title": "IVAN ZOLO | ПЕНЗА | 20 НОЯБРЯ | РОК-КАФЕ 13½",
+          "status": "READY",
+          "isIndexable": true,
+          "publishedAt": "2026-11-12T20:39:33.803Z",
+          "revision": "1->3"
+        },
+        {
+          "eventId": "evt_6acfa4f855de9e5ece972783",
+          "eventPageId": "1be63f00-1b74-47df-89a6-aaaefbe4b8df",
+          "slug": "november-metal-fest-moskva",
+          "url": "/events/november-metal-fest-moskva",
+          "title": "NOVEMBER METAL FEST",
+          "status": "READY",
+          "isIndexable": true,
+          "publishedAt": "2026-11-12T20:39:34.233Z",
+          "revision": "1->3"
+        },
+        {
+          "eventId": "evt_6a48f77538bdf7b85c2fa7bf",
+          "eventPageId": "48c818c1-d023-4167-bfd1-8bc3e489fe44",
+          "slug": "simfoniya-roka-akt-pervyi-cheboksary",
+          "url": "/events/simfoniya-roka-akt-pervyi-cheboksary",
+          "title": "Симфония рока: Акт первый",
+          "status": "READY",
+          "isIndexable": true,
+          "publishedAt": "2026-11-12T20:39:34.742Z",
+          "revision": "1->3"
+        },
+        {
+          "eventId": "evt_6abf5bbd4b44952667022700",
+          "eventPageId": "787c34c2-5e9d-427a-8864-f44d24b50a0a",
+          "slug": "koncert-antona-zacepina-sankt-peterburg",
+          "url": "/events/koncert-antona-zacepina-sankt-peterburg",
+          "title": "Концерт Антона Зацепина",
+          "status": "READY",
+          "isIndexable": true,
+          "publishedAt": "2026-11-12T20:39:35.182Z",
+          "revision": "1->3"
+        },
+        {
+          "eventId": "evt_6ab3b454a57c3e210575e8d5",
+          "eventPageId": "baa923ce-7a3b-4ce3-a7a5-becda8d1b064",
+          "slug": "koncert-olega-nikitina-dlya-nas-s-toboyu-moskva",
+          "url": "/events/koncert-olega-nikitina-dlya-nas-s-toboyu-moskva",
+          "title": "Концерт Олега Никитина - \"Для нас с тобою\"",
+          "status": "READY",
+          "isIndexable": true,
+          "publishedAt": "2026-11-12T20:39:35.603Z",
+          "revision": "1->3"
+        },
+        {
+          "eventId": "evt_6ab536719aaeb8b240db7270",
+          "eventPageId": "6187f718-cf13-49c7-903b-8c529a9c30ee",
+          "slug": "oleg-medvedev-i-roman-filippov-koncert-v-kc-dom-moskva",
+          "url": "/events/oleg-medvedev-i-roman-filippov-koncert-v-kc-dom-moskva",
+          "title": "Олег Медведев и Роман Филиппов - концерт в КЦ ДОМ",
+          "status": "READY",
+          "isIndexable": true,
+          "publishedAt": "2026-11-12T20:39:36.051Z",
+          "revision": "1->3"
+        },
+        {
+          "eventId": "evt_6a8f47e3e2a0d1e8e741cc2d",
+          "eventPageId": "098983af-62af-4a52-9752-f52541fffce7",
+          "slug": "aikko-koncert-v-penze-penza",
+          "url": "/events/aikko-koncert-v-penze-penza",
+          "title": "AIKKO [КОНЦЕРТ В ПЕНЗЕ]",
+          "status": "READY",
+          "isIndexable": true,
+          "publishedAt": "2026-11-12T20:39:36.472Z",
+          "revision": "1->3"
+        },
+        {
+          "eventId": "evt_6964c159e639aebdf4720d07",
+          "eventPageId": "de3777a1-8a0e-4f74-ae90-dfd54dd82b00",
+          "slug": "gruppa-mirazh-bolshoi-solnyi-koncert-sankt-peterburg",
+          "url": "/events/gruppa-mirazh-bolshoi-solnyi-koncert-sankt-peterburg",
+          "title": "Группа Мираж. Большой сольный концерт",
+          "status": "READY",
+          "isIndexable": true,
+          "publishedAt": "2026-11-12T20:39:36.909Z",
+          "revision": "1->3"
+        },
+        {
+          "eventId": "evt_6ad7c429b34fc421a1a6dc4d",
+          "eventPageId": "73dbd515-b1d8-463e-8c1c-11e84afffa30",
+          "slug": "20-noyabrya-gruppa-zahar-hity-gruppy-korol-i-shut-i-russkogo-pank-roka-moskva",
+          "url": "/events/20-noyabrya-gruppa-zahar-hity-gruppy-korol-i-shut-i-russkogo-pank-roka-moskva",
+          "title": "20 Ноября. Группа \"ЗАХАР\". Хиты группы \"Король и Шут\" и русского панк рока.",
+          "status": "READY",
+          "isIndexable": true,
+          "publishedAt": "2026-11-12T20:39:37.592Z",
+          "revision": "1->3"
+        },
+        {
+          "eventId": "evt_6a7b2c1b052ba5d10bcef00d",
+          "eventPageId": "ccdbcafe-96cb-4cf8-9fee-79bd33e02e0e",
+          "slug": "chingis-han-legendarnaya-gruppa-80h-moskva",
+          "url": "/events/chingis-han-legendarnaya-gruppa-80h-moskva",
+          "title": "Чингис Хан - легендарная группа 80х!",
+          "status": "READY",
+          "isIndexable": true,
+          "publishedAt": "2026-11-12T20:39:38.161Z",
+          "revision": "1->3"
+        },
+        {
+          "eventId": "evt_6ac902126e74e195425d8d07",
+          "eventPageId": "d3a7b8cc-666b-4b85-ac25-43bf1730f891",
+          "slug": "dzhaz-rasskaz-kommunalnaya-kvartira-sankt-peterburg",
+          "url": "/events/dzhaz-rasskaz-kommunalnaya-kvartira-sankt-peterburg",
+          "title": "\"Джаз-рассказ. Зощенко. Коммунальная квартира.\"",
+          "status": "READY",
+          "isIndexable": true,
+          "publishedAt": "2026-11-12T20:39:38.583Z",
+          "revision": "1->3"
+        },
+        {
+          "eventId": "evt_6ae0bb923a910a1ec52b4ce5",
+          "eventPageId": "9f0d124e-02dd-460f-9549-237fe6efd586",
+          "slug": "koncert-uchenikov-aset-moskva",
+          "url": "/events/koncert-uchenikov-aset-moskva",
+          "title": "КОНЦЕРТ УЧЕНИКОВ ASET",
+          "status": "READY",
+          "isIndexable": true,
+          "publishedAt": "2026-11-12T20:39:38.949Z",
+          "revision": "1->3"
+        },
+        {
+          "eventId": "evt_6acf9d518a697b06e80c02a1",
+          "eventPageId": "6b54c755-887c-4240-b3ca-b4d99c1b5017",
+          "slug": "organ-muzyka-kino-aleksandr-hmarnyi-smolensk",
+          "url": "/events/organ-muzyka-kino-aleksandr-hmarnyi-smolensk",
+          "title": "\"ОРГАН. МУЗЫКА КИНО\". Александр Хмарный",
+          "status": "READY",
+          "isIndexable": true,
+          "publishedAt": "2026-11-12T20:39:39.357Z",
+          "revision": "1->3"
+        },
+        {
+          "eventId": "evt_6a0a26f221a01d97b31dde32",
+          "eventPageId": "5eaee4c1-5103-477b-a6f7-89adb4699adb",
+          "slug": "sveta-bolshoi-solnyi-koncert-krasnodar",
+          "url": "/events/sveta-bolshoi-solnyi-koncert-krasnodar",
+          "title": "Света. Большой сольный концерт",
+          "status": "READY",
+          "isIndexable": true,
+          "publishedAt": "2026-11-12T20:39:39.808Z",
+          "revision": "1->3"
+        },
+        {
+          "eventId": "evt_6ad9ed76a2273572e81fc9fd",
+          "eventPageId": "46505d54-d974-42cb-b192-dfe892754a81",
+          "slug": "reiv-dlya-vygorevshih-lo-fi-jazz-acoustic-edition-moskva",
+          "url": "/events/reiv-dlya-vygorevshih-lo-fi-jazz-acoustic-edition-moskva",
+          "title": "Рейв для выгоревших: Lo-Fi Jazz Acoustic Edition",
+          "status": "READY",
+          "isIndexable": true,
+          "publishedAt": "2026-11-12T20:39:40.329Z",
+          "revision": "1->3"
+        },
+        {
+          "eventId": "evt_6ace2f3c256c476149092f41",
+          "eventPageId": "5559ee8a-3d82-406d-99b6-dcb5356201ab",
+          "slug": "friday-night-betty-boop-lovers-elena-moiseenko-moskva",
+          "url": "/events/friday-night-betty-boop-lovers-elena-moiseenko-moskva",
+          "title": "FRIDAY NIGHT: BETTY BOOP LOVERS & ЕЛЕНА МОИСЕЕНКО",
+          "status": "READY",
+          "isIndexable": true,
+          "publishedAt": "2026-11-12T20:39:40.804Z",
+          "revision": "1->3"
+        },
+        {
+          "eventId": "evt_6ac89bd95a0ab1050c104ea5",
+          "eventPageId": "ec3f5b6b-4331-4718-8f8f-6180ff85851c",
+          "slug": "nochnoi-dzhem-s-mihailom-mishurisom-moskva-4",
+          "url": "/events/nochnoi-dzhem-s-mihailom-mishurisom-moskva-4",
+          "title": "Ночной Джем с Михаилом Мишурисом",
+          "status": "READY",
+          "isIndexable": true,
+          "publishedAt": "2026-11-12T20:39:41.315Z",
+          "revision": "1->3"
+        },
+        {
+          "eventId": "evt_6a4d70d11c24ad99ff20c6b5",
+          "eventPageId": "2b5a9cc8-50e6-4792-88c7-ac51044f24de",
+          "slug": "vivaldi-pri-svechah-sankt-peterburg",
+          "url": "/events/vivaldi-pri-svechah-sankt-peterburg",
+          "title": "Вивальди при свечах",
+          "status": "READY",
+          "isIndexable": true,
+          "publishedAt": "2026-11-12T20:39:41.924Z",
+          "revision": "1->3"
+        },
+        {
+          "eventId": "evt_6a58b64e6042ce6aae06b897",
+          "eventPageId": "056639b6-c3d3-425b-bc4e-7d4ee95fcb90",
+          "slug": "melodii-svechei-arfa-i-skripka-sankt-peterburg",
+          "url": "/events/melodii-svechei-arfa-i-skripka-sankt-peterburg",
+          "title": "Мелодии свечей. Арфа и скрипка",
+          "status": "READY",
+          "isIndexable": true,
+          "publishedAt": "2026-11-12T20:39:42.873Z",
+          "revision": "1->3"
+        },
+        {
+          "eventId": "evt_6ab5b3771689cbe6f9504b2d",
+          "eventPageId": "b4214bac-0ed4-4e6b-a6d2-e5e608b7c5be",
+          "slug": "100-jazz-band-stefaniya-damocidi-rossiya-greciya-moskva",
+          "url": "/events/100-jazz-band-stefaniya-damocidi-rossiya-greciya-moskva",
+          "title": "100% JAZZ BAND & СТЕФАНИЯ ДАМОЦИДИ (РОССИЯ/ГРЕЦИЯ)",
+          "status": "READY",
+          "isIndexable": true,
+          "publishedAt": "2026-11-12T20:39:43.641Z",
+          "revision": "1->3"
+        },
+        {
+          "eventId": "evt_6ad4df46be48c3d73d517275",
+          "eventPageId": "6e84c774-06e5-4fd9-8503-f0e361bf5785",
+          "slug": "miyadzaki-zhivye-saundtreki-pod-zvezdnym-kupolom-nizhniy-novgorod",
+          "url": "/events/miyadzaki-zhivye-saundtreki-pod-zvezdnym-kupolom-nizhniy-novgorod",
+          "title": "Миядзаки. Живые саундтреки под звёздным куполом",
+          "status": "READY",
+          "isIndexable": true,
+          "publishedAt": "2026-11-12T20:39:44.162Z",
+          "revision": "1->3"
+        },
+        {
+          "eventId": "evt_6aba7c740f4bff70eecfc034",
+          "eventPageId": "e066ce62-e14b-40ed-a076-fd007f6cd7c6",
+          "slug": "koncert-amerikanskii-dzhaz-moskva",
+          "url": "/events/koncert-amerikanskii-dzhaz-moskva",
+          "title": "Концерт «Американский джаз»",
+          "status": "READY",
+          "isIndexable": true,
+          "publishedAt": "2026-11-12T20:39:44.541Z",
+          "revision": "1->3"
+        },
+        {
+          "eventId": "evt_6aabed1937cfc49b052e4ec2",
+          "eventPageId": "a669d70c-6734-41af-80ba-8ba59065c576",
+          "slug": "legendy-disko-v-osobnyake-polovcova-ot-abba-do-queen-sankt-peterburg",
+          "url": "/events/legendy-disko-v-osobnyake-polovcova-ot-abba-do-queen-sankt-peterburg",
+          "title": "Легенды диско в Особняке Половцова. От ABBA до Queen",
+          "status": "READY",
+          "isIndexable": true,
+          "publishedAt": "2026-11-12T20:39:45.260Z",
+          "revision": "1->3"
+        },
+        {
+          "eventId": "evt_6a85bee78a30a92439b11567",
+          "eventPageId": "1fc75d75-92ff-4e80-bacd-123e0abc7ee1",
+          "slug": "20-11-evgeniya-rybakova-i-gruppa-obnimi-kita-rok-s-barabanami-i-skripkoi-ryazan",
+          "url": "/events/20-11-evgeniya-rybakova-i-gruppa-obnimi-kita-rok-s-barabanami-i-skripkoi-ryazan",
+          "title": "20.11 | Евгения Рыбакова и группа Обними Кита | Рок с барабанами и скрипкой | Рязань",
+          "status": "READY",
+          "isIndexable": true,
+          "publishedAt": "2026-11-12T20:39:45.984Z",
+          "revision": "1->3"
+        },
+        {
+          "eventId": "evt_6aba2978f1a4b004e357e43c",
+          "eventPageId": "2bbaf66a-ba4c-4c22-8aad-32a9d985aafe",
+          "slug": "vselennaya-golosov-muzykalnoe-shou-yulaik-sankt-peterburg",
+          "url": "/events/vselennaya-golosov-muzykalnoe-shou-yulaik-sankt-peterburg",
+          "title": "Вселенная голосов: музыкальное шоу ЮLAЙК",
+          "status": "READY",
+          "isIndexable": true,
+          "publishedAt": "2026-11-12T20:39:46.379Z",
+          "revision": "1->3"
+        }
+      ],
+      "smoke": {
+        "cache": {
+          "ok": true,
+          "warm": "none",
+          "reason": "EventPage editorial batch 33 publication"
+        },
+        "revalidated": 30,
+        "indexNowQueued": 30,
+        "results": [
+          {
+            "slug": "neoklassicheskii-koncert-kompozitora-denisa-stelmaha-v-irkutske-irkutsk",
+            "ok": true,
+            "indexNowQueued": true
+          },
+          {
+            "slug": "20-11-2026-bratsk-kostya-kulyasov-i-gruppa-animaciya-animaciya-online-bratsk",
+            "ok": true,
+            "indexNowQueued": true
+          },
+          {
+            "slug": "bolshoi-solnyi-koncert-russkii-razmer-33-tyumen",
+            "ok": true,
+            "indexNowQueued": true
+          },
+          {
+            "slug": "argishti-koncert-golos-neba-i-zemli-tyumen",
+            "ok": true,
+            "indexNowQueued": true
+          },
+          {
+            "slug": "billy-s-band-ekaterinburg",
+            "ok": true,
+            "indexNowQueued": true
+          },
+          {
+            "slug": "ivan-zolo-penza-20-noyabrya-rok-kafe-131-2-penza",
+            "ok": true,
+            "indexNowQueued": true
+          },
+          {
+            "slug": "november-metal-fest-moskva",
+            "ok": true,
+            "indexNowQueued": true
+          },
+          {
+            "slug": "simfoniya-roka-akt-pervyi-cheboksary",
+            "ok": true,
+            "indexNowQueued": true
+          },
+          {
+            "slug": "koncert-antona-zacepina-sankt-peterburg",
+            "ok": true,
+            "indexNowQueued": true
+          },
+          {
+            "slug": "koncert-olega-nikitina-dlya-nas-s-toboyu-moskva",
+            "ok": true,
+            "indexNowQueued": true
+          },
+          {
+            "slug": "oleg-medvedev-i-roman-filippov-koncert-v-kc-dom-moskva",
+            "ok": true,
+            "indexNowQueued": true
+          },
+          {
+            "slug": "aikko-koncert-v-penze-penza",
+            "ok": true,
+            "indexNowQueued": true
+          },
+          {
+            "slug": "gruppa-mirazh-bolshoi-solnyi-koncert-sankt-peterburg",
+            "ok": true,
+            "indexNowQueued": true
+          },
+          {
+            "slug": "20-noyabrya-gruppa-zahar-hity-gruppy-korol-i-shut-i-russkogo-pank-roka-moskva",
+            "ok": true,
+            "indexNowQueued": true
+          },
+          {
+            "slug": "chingis-han-legendarnaya-gruppa-80h-moskva",
+            "ok": true,
+            "indexNowQueued": true
+          },
+          {
+            "slug": "dzhaz-rasskaz-kommunalnaya-kvartira-sankt-peterburg",
+            "ok": true,
+            "indexNowQueued": true
+          },
+          {
+            "slug": "koncert-uchenikov-aset-moskva",
+            "ok": true,
+            "indexNowQueued": true
+          },
+          {
+            "slug": "organ-muzyka-kino-aleksandr-hmarnyi-smolensk",
+            "ok": true,
+            "indexNowQueued": true
+          },
+          {
+            "slug": "sveta-bolshoi-solnyi-koncert-krasnodar",
+            "ok": true,
+            "indexNowQueued": true
+          },
+          {
+            "slug": "reiv-dlya-vygorevshih-lo-fi-jazz-acoustic-edition-moskva",
+            "ok": true,
+            "indexNowQueued": true
+          },
+          {
+            "slug": "friday-night-betty-boop-lovers-elena-moiseenko-moskva",
+            "ok": true,
+            "indexNowQueued": true
+          },
+          {
+            "slug": "nochnoi-dzhem-s-mihailom-mishurisom-moskva-4",
+            "ok": true,
+            "indexNowQueued": true
+          },
+          {
+            "slug": "vivaldi-pri-svechah-sankt-peterburg",
+            "ok": true,
+            "indexNowQueued": true
+          },
+          {
+            "slug": "melodii-svechei-arfa-i-skripka-sankt-peterburg",
+            "ok": true,
+            "indexNowQueued": true
+          },
+          {
+            "slug": "100-jazz-band-stefaniya-damocidi-rossiya-greciya-moskva",
+            "ok": true,
+            "indexNowQueued": true
+          },
+          {
+            "slug": "miyadzaki-zhivye-saundtreki-pod-zvezdnym-kupolom-nizhniy-novgorod",
+            "ok": true,
+            "indexNowQueued": true
+          },
+          {
+            "slug": "koncert-amerikanskii-dzhaz-moskva",
+            "ok": true,
+            "indexNowQueued": true
+          },
+          {
+            "slug": "legendy-disko-v-osobnyake-polovcova-ot-abba-do-queen-sankt-peterburg",
+            "ok": true,
+            "indexNowQueued": true
+          },
+          {
+            "slug": "20-11-evgeniya-rybakova-i-gruppa-obnimi-kita-rok-s-barabanami-i-skripkoi-ryazan",
+            "ok": true,
+            "indexNowQueued": true
+          },
+          {
+            "slug": "vselennaya-golosov-muzykalnoe-shou-yulaik-sankt-peterburg",
+            "ok": true,
+            "indexNowQueued": true
+          }
+        ],
+        "smoke": [
+          {
+            "slug": "neoklassicheskii-koncert-kompozitora-denisa-stelmaha-v-irkutske-irkutsk",
+            "status": 200,
+            "canonical": "https://daibilet.ru/events/neoklassicheskii-koncert-kompozitora-denisa-stelmaha-v-irkutske-irkutsk",
+            "robots": "index, follow",
+            "hasPracticalInfo": true,
+            "hasAbout": true,
+            "hasUl": true
+          },
+          {
+            "slug": "20-11-2026-bratsk-kostya-kulyasov-i-gruppa-animaciya-animaciya-online-bratsk",
+            "status": 200,
+            "canonical": "https://daibilet.ru/events/20-11-2026-bratsk-kostya-kulyasov-i-gruppa-animaciya-animaciya-online-bratsk",
+            "robots": "index, follow",
+            "hasPracticalInfo": true,
+            "hasAbout": true,
+            "hasUl": true
+          },
+          {
+            "slug": "bolshoi-solnyi-koncert-russkii-razmer-33-tyumen",
+            "status": 200,
+            "canonical": "https://daibilet.ru/events/bolshoi-solnyi-koncert-russkii-razmer-33-tyumen",
+            "robots": "index, follow",
+            "hasPracticalInfo": true,
+            "hasAbout": true,
+            "hasUl": true
+          },
+          {
+            "slug": "argishti-koncert-golos-neba-i-zemli-tyumen",
+            "status": 200,
+            "canonical": "https://daibilet.ru/events/argishti-koncert-golos-neba-i-zemli-tyumen",
+            "robots": "index, follow",
+            "hasPracticalInfo": true,
+            "hasAbout": true,
+            "hasUl": true
+          },
+          {
+            "slug": "billy-s-band-ekaterinburg",
+            "status": 200,
+            "canonical": "https://daibilet.ru/events/billy-s-band-ekaterinburg",
+            "robots": "index, follow",
+            "hasPracticalInfo": true,
+            "hasAbout": true,
+            "hasUl": true
+          },
+          {
+            "slug": "ivan-zolo-penza-20-noyabrya-rok-kafe-131-2-penza",
+            "status": 200,
+            "canonical": "https://daibilet.ru/events/ivan-zolo-penza-20-noyabrya-rok-kafe-131-2-penza",
+            "robots": "index, follow",
+            "hasPracticalInfo": true,
+            "hasAbout": true,
+            "hasUl": true
+          },
+          {
+            "slug": "november-metal-fest-moskva",
+            "status": 200,
+            "canonical": "https://daibilet.ru/events/november-metal-fest-moskva",
+            "robots": "index, follow",
+            "hasPracticalInfo": true,
+            "hasAbout": true,
+            "hasUl": true
+          },
+          {
+            "slug": "simfoniya-roka-akt-pervyi-cheboksary",
+            "status": 200,
+            "canonical": "https://daibilet.ru/events/simfoniya-roka-akt-pervyi-cheboksary",
+            "robots": "index, follow",
+            "hasPracticalInfo": true,
+            "hasAbout": true,
+            "hasUl": true
+          },
+          {
+            "slug": "koncert-antona-zacepina-sankt-peterburg",
+            "status": 200,
+            "canonical": "https://daibilet.ru/events/koncert-antona-zacepina-sankt-peterburg",
+            "robots": "index, follow",
+            "hasPracticalInfo": true,
+            "hasAbout": true,
+            "hasUl": true
+          },
+          {
+            "slug": "koncert-olega-nikitina-dlya-nas-s-toboyu-moskva",
+            "status": 200,
+            "canonical": "https://daibilet.ru/events/koncert-olega-nikitina-dlya-nas-s-toboyu-moskva",
+            "robots": "index, follow",
+            "hasPracticalInfo": true,
+            "hasAbout": true,
+            "hasUl": true
+          },
+          {
+            "slug": "oleg-medvedev-i-roman-filippov-koncert-v-kc-dom-moskva",
+            "status": 200,
+            "canonical": "https://daibilet.ru/events/oleg-medvedev-i-roman-filippov-koncert-v-kc-dom-moskva",
+            "robots": "index, follow",
+            "hasPracticalInfo": true,
+            "hasAbout": true,
+            "hasUl": true
+          },
+          {
+            "slug": "aikko-koncert-v-penze-penza",
+            "status": 200,
+            "canonical": "https://daibilet.ru/events/aikko-koncert-v-penze-penza",
+            "robots": "index, follow",
+            "hasPracticalInfo": true,
+            "hasAbout": true,
+            "hasUl": true
+          },
+          {
+            "slug": "gruppa-mirazh-bolshoi-solnyi-koncert-sankt-peterburg",
+            "status": 200,
+            "canonical": "https://daibilet.ru/events/gruppa-mirazh-bolshoi-solnyi-koncert-sankt-peterburg",
+            "robots": "index, follow",
+            "hasPracticalInfo": true,
+            "hasAbout": true,
+            "hasUl": true
+          },
+          {
+            "slug": "20-noyabrya-gruppa-zahar-hity-gruppy-korol-i-shut-i-russkogo-pank-roka-moskva",
+            "status": 200,
+            "canonical": "https://daibilet.ru/events/20-noyabrya-gruppa-zahar-hity-gruppy-korol-i-shut-i-russkogo-pank-roka-moskva",
+            "robots": "index, follow",
+            "hasPracticalInfo": true,
+            "hasAbout": true,
+            "hasUl": true
+          },
+          {
+            "slug": "chingis-han-legendarnaya-gruppa-80h-moskva",
+            "status": 200,
+            "canonical": "https://daibilet.ru/events/chingis-han-legendarnaya-gruppa-80h-moskva",
+            "robots": "index, follow",
+            "hasPracticalInfo": true,
+            "hasAbout": true,
+            "hasUl": true
+          },
+          {
+            "slug": "dzhaz-rasskaz-kommunalnaya-kvartira-sankt-peterburg",
+            "status": 200,
+            "canonical": "https://daibilet.ru/events/dzhaz-rasskaz-kommunalnaya-kvartira-sankt-peterburg",
+            "robots": "index, follow",
+            "hasPracticalInfo": true,
+            "hasAbout": true,
+            "hasUl": true
+          },
+          {
+            "slug": "koncert-uchenikov-aset-moskva",
+            "status": 200,
+            "canonical": "https://daibilet.ru/events/koncert-uchenikov-aset-moskva",
+            "robots": "index, follow",
+            "hasPracticalInfo": true,
+            "hasAbout": true,
+            "hasUl": true
+          },
+          {
+            "slug": "organ-muzyka-kino-aleksandr-hmarnyi-smolensk",
+            "status": 200,
+            "canonical": "https://daibilet.ru/events/organ-muzyka-kino-aleksandr-hmarnyi-smolensk",
+            "robots": "index, follow",
+            "hasPracticalInfo": true,
+            "hasAbout": true,
+            "hasUl": true
+          },
+          {
+            "slug": "sveta-bolshoi-solnyi-koncert-krasnodar",
+            "status": 200,
+            "canonical": "https://daibilet.ru/events/sveta-bolshoi-solnyi-koncert-krasnodar",
+            "robots": "index, follow",
+            "hasPracticalInfo": true,
+            "hasAbout": true,
+            "hasUl": true
+          },
+          {
+            "slug": "reiv-dlya-vygorevshih-lo-fi-jazz-acoustic-edition-moskva",
+            "status": 200,
+            "canonical": "https://daibilet.ru/events/reiv-dlya-vygorevshih-lo-fi-jazz-acoustic-edition-moskva",
+            "robots": "index, follow",
+            "hasPracticalInfo": true,
+            "hasAbout": true,
+            "hasUl": true
+          },
+          {
+            "slug": "friday-night-betty-boop-lovers-elena-moiseenko-moskva",
+            "status": 200,
+            "canonical": "https://daibilet.ru/events/friday-night-betty-boop-lovers-elena-moiseenko-moskva",
+            "robots": "index, follow",
+            "hasPracticalInfo": true,
+            "hasAbout": true,
+            "hasUl": true
+          },
+          {
+            "slug": "nochnoi-dzhem-s-mihailom-mishurisom-moskva-4",
+            "status": 200,
+            "canonical": "https://daibilet.ru/events/nochnoi-dzhem-s-mihailom-mishurisom-moskva-4",
+            "robots": "index, follow",
+            "hasPracticalInfo": true,
+            "hasAbout": true,
+            "hasUl": true
+          },
+          {
+            "slug": "vivaldi-pri-svechah-sankt-peterburg",
+            "status": 200,
+            "canonical": "https://daibilet.ru/events/vivaldi-pri-svechah-sankt-peterburg",
+            "robots": "index, follow",
+            "hasPracticalInfo": true,
+            "hasAbout": true,
+            "hasUl": true
+          },
+          {
+            "slug": "melodii-svechei-arfa-i-skripka-sankt-peterburg",
+            "status": 200,
+            "canonical": "https://daibilet.ru/events/melodii-svechei-arfa-i-skripka-sankt-peterburg",
+            "robots": "index, follow",
+            "hasPracticalInfo": true,
+            "hasAbout": true,
+            "hasUl": true
+          },
+          {
+            "slug": "100-jazz-band-stefaniya-damocidi-rossiya-greciya-moskva",
+            "status": 200,
+            "canonical": "https://daibilet.ru/events/100-jazz-band-stefaniya-damocidi-rossiya-greciya-moskva",
+            "robots": "index, follow",
+            "hasPracticalInfo": true,
+            "hasAbout": true,
+            "hasUl": true
+          },
+          {
+            "slug": "miyadzaki-zhivye-saundtreki-pod-zvezdnym-kupolom-nizhniy-novgorod",
+            "status": 200,
+            "canonical": "https://daibilet.ru/events/miyadzaki-zhivye-saundtreki-pod-zvezdnym-kupolom-nizhniy-novgorod",
+            "robots": "index, follow",
+            "hasPracticalInfo": true,
+            "hasAbout": true,
+            "hasUl": true
+          },
+          {
+            "slug": "koncert-amerikanskii-dzhaz-moskva",
+            "status": 200,
+            "canonical": "https://daibilet.ru/events/koncert-amerikanskii-dzhaz-moskva",
+            "robots": "index, follow",
+            "hasPracticalInfo": true,
+            "hasAbout": true,
+            "hasUl": true
+          },
+          {
+            "slug": "legendy-disko-v-osobnyake-polovcova-ot-abba-do-queen-sankt-peterburg",
+            "status": 200,
+            "canonical": "https://daibilet.ru/events/legendy-disko-v-osobnyake-polovcova-ot-abba-do-queen-sankt-peterburg",
+            "robots": "index, follow",
+            "hasPracticalInfo": true,
+            "hasAbout": true,
+            "hasUl": true
+          },
+          {
+            "slug": "20-11-evgeniya-rybakova-i-gruppa-obnimi-kita-rok-s-barabanami-i-skripkoi-ryazan",
+            "status": 200,
+            "canonical": "https://daibilet.ru/events/20-11-evgeniya-rybakova-i-gruppa-obnimi-kita-rok-s-barabanami-i-skripkoi-ryazan",
+            "robots": "index, follow",
+            "hasPracticalInfo": true,
+            "hasAbout": true,
+            "hasUl": true
+          },
+          {
+            "slug": "vselennaya-golosov-muzykalnoe-shou-yulaik-sankt-peterburg",
+            "status": 200,
+            "canonical": "https://daibilet.ru/events/vselennaya-golosov-muzykalnoe-shou-yulaik-sankt-peterburg",
+            "robots": "index, follow",
+            "hasPracticalInfo": true,
+            "hasAbout": true,
+            "hasUl": true
+          }
+        ]
+      }
+    },
+    "34": {
+      "items": 30,
+      "result": [
+        {
+          "eventId": "evt_6abe3bb6687e7189fbea2681",
+          "eventPageId": "71f2a6ca-93f2-4734-99d2-621bc8fcb75a",
+          "slug": "cirk-buduschego-za-granyu-vozmozhnogo-megion",
+          "url": "/events/cirk-buduschego-za-granyu-vozmozhnogo-megion",
+          "title": "Цирк БУДУЩЕГО \"За гранью возможного\"",
+          "status": "READY",
+          "isIndexable": true,
+          "publishedAt": "2026-11-12T20:54:15.584Z",
+          "revision": "1->3"
+        },
+        {
+          "eventId": "evt_6ae480f313bd1cf7f817140e",
+          "eventPageId": "4ea14013-4b7b-4380-a53a-809d47b7b31b",
+          "slug": "interaktivnyi-spektakl-kolobok-ot-1-do-4-let-sankt-peterburg-2",
+          "url": "/events/interaktivnyi-spektakl-kolobok-ot-1-do-4-let-sankt-peterburg-2",
+          "title": "Интерактивный спектакль \"Колобок\" от 1 до 4 лет",
+          "status": "READY",
+          "isIndexable": true,
+          "publishedAt": "2026-11-12T20:54:15.834Z",
+          "revision": "1->3"
+        },
+        {
+          "eventId": "evt_6ada6ae8305c94f5abfdf68a",
+          "eventPageId": "affe879e-60e6-4f19-b5c7-2845784ea4c9",
+          "slug": "shou-legendy-russkogo-roka-oktyabrskiy-respublika-bashkortostan",
+          "url": "/events/shou-legendy-russkogo-roka-oktyabrskiy-respublika-bashkortostan",
+          "title": "Шоу \"ЛЕГЕНДЫ РУССКОГО РОКА\"",
+          "status": "READY",
+          "isIndexable": true,
+          "publishedAt": "2026-11-12T20:54:16.333Z",
+          "revision": "1->3"
+        },
+        {
+          "eventId": "evt_6ad092fe545764b2af011a47",
+          "eventPageId": "afcc6407-6576-43d1-8ac8-9f1033d1716a",
+          "slug": "spektakl-chto-tvoryat-muzhchiny-s-sergeem-astahovym-v-liskah-liski",
+          "url": "/events/spektakl-chto-tvoryat-muzhchiny-s-sergeem-astahovym-v-liskah-liski",
+          "title": "Спектакль \"Что Творят Мужчины\" с Сергеем Астаховым в Лисках",
+          "status": "READY",
+          "isIndexable": true,
+          "publishedAt": "2026-11-12T20:54:16.825Z",
+          "revision": "1->3"
+        },
+        {
+          "eventId": "evt_6a9e83d9bf254d6af788ecf7",
+          "eventPageId": "647aee3a-07f2-457a-911e-d8869bde486d",
+          "slug": "spektakl-master-i-margarita-g-maikop-maykop",
+          "url": "/events/spektakl-master-i-margarita-g-maikop-maykop",
+          "title": "Спектакль Мастер и Маргарита г Майкоп",
+          "status": "READY",
+          "isIndexable": true,
+          "publishedAt": "2026-11-12T20:54:17.084Z",
+          "revision": "1->3"
+        },
+        {
+          "eventId": "evt_6ad665cefd4f74ee19528c6f",
+          "eventPageId": "371eaf45-0f88-4a9f-87d2-665ecc76d8c5",
+          "slug": "oge-po-litre-spektakl-dlya-9-10-11-klassov-po-pese-yulii-voronovoi-sankt-peterburg",
+          "url": "/events/oge-po-litre-spektakl-dlya-9-10-11-klassov-po-pese-yulii-voronovoi-sankt-peterburg",
+          "title": "\"ОГЭ ПО ЛИТРЕ\", спектакль для старших классов от независимого театрального проекта \"чтеатр\"",
+          "status": "READY",
+          "isIndexable": true,
+          "publishedAt": "2026-11-12T20:54:17.363Z",
+          "revision": "1->3"
+        },
+        {
+          "eventId": "evt_6a81e42523d46ece3991999f",
+          "eventPageId": "c4d86679-bb1b-42f2-bb49-34d4279dd97c",
+          "slug": "voshititelnye-istorii-parikmahera-nakonechnikova-spektakl-komediya-sankt-peterburg",
+          "url": "/events/voshititelnye-istorii-parikmahera-nakonechnikova-spektakl-komediya-sankt-peterburg",
+          "title": "«Восхитительные истории парикмахера Наконечникова» спектакль, комедия",
+          "status": "READY",
+          "isIndexable": true,
+          "publishedAt": "2026-11-12T20:54:17.632Z",
+          "revision": "1->3"
+        },
+        {
+          "eventId": "evt_6adb15e2aae814aa3feec217",
+          "eventPageId": "c61a4f6c-d87f-4104-8db3-dd06c697c4db",
+          "slug": "shou-fokusov-i-yumora-moskva-2",
+          "url": "/events/shou-fokusov-i-yumora-moskva-2",
+          "title": "Шоу фокусов и юмора",
+          "status": "READY",
+          "isIndexable": true,
+          "publishedAt": "2026-11-12T20:54:17.884Z",
+          "revision": "1->3"
+        },
+        {
+          "eventId": "evt_6ab96928572915057208cefe",
+          "eventPageId": "c654befc-0c89-45d6-ba48-8e61dcd39378",
+          "slug": "burlesk-detektiv-ubiistvenno-krasiva-moskva",
+          "url": "/events/burlesk-detektiv-ubiistvenno-krasiva-moskva",
+          "title": "Бурлеск-детектив \"Убийственно красива\"",
+          "status": "READY",
+          "isIndexable": true,
+          "publishedAt": "2026-11-12T20:54:18.206Z",
+          "revision": "1->3"
+        },
+        {
+          "eventId": "evt_6ad1a31fc76d83a966b0385b",
+          "eventPageId": "f36a54b0-5574-4c53-af79-b825d487e002",
+          "slug": "spektakl-levoryuciya-tolyatti",
+          "url": "/events/spektakl-levoryuciya-tolyatti",
+          "title": "Спектакль \"Леворюция\"",
+          "status": "READY",
+          "isIndexable": true,
+          "publishedAt": "2026-11-12T20:54:18.515Z",
+          "revision": "1->3"
+        },
+        {
+          "eventId": "evt_6ae3719e1ee81e4acbdfbab4",
+          "eventPageId": "34b72484-819b-4803-b217-758a87a89d5e",
+          "slug": "minecraft-show-mainkraft-shou-moskva",
+          "url": "/events/minecraft-show-mainkraft-shou-moskva",
+          "title": "MINECRAFT SHOW - МАЙНКРАФТ ШОУ",
+          "status": "READY",
+          "isIndexable": true,
+          "publishedAt": "2026-11-12T20:54:18.796Z",
+          "revision": "1->3"
+        },
+        {
+          "eventId": "evt_6ada1a33ab6296106c050c7d",
+          "eventPageId": "224aa887-0753-4055-ae10-7a8695a2cee9",
+          "slug": "golaya-ufa",
+          "url": "/events/golaya-ufa",
+          "title": "\"Голая\"",
+          "status": "READY",
+          "isIndexable": true,
+          "publishedAt": "2026-11-12T20:54:19.037Z",
+          "revision": "1->3"
+        },
+        {
+          "eventId": "evt_6aaa4fe9eaf8e47c65c8662f",
+          "eventPageId": "630d5c5a-19ab-4778-a865-28c51b5f89f3",
+          "slug": "balet-spyaschaya-krasavica-sankt-peterburg",
+          "url": "/events/balet-spyaschaya-krasavica-sankt-peterburg",
+          "title": "Балет «Спящая красавица»",
+          "status": "READY",
+          "isIndexable": true,
+          "publishedAt": "2026-11-12T20:54:19.311Z",
+          "revision": "1->3"
+        },
+        {
+          "eventId": "evt_6ac4b946e3e6e24dc6d369ee",
+          "eventPageId": "66d9b6db-fa49-4387-83fc-32398a483397",
+          "slug": "cirk-na-ldu-tver",
+          "url": "/events/cirk-na-ldu-tver",
+          "title": "Цирк на льду",
+          "status": "READY",
+          "isIndexable": true,
+          "publishedAt": "2026-11-12T20:54:19.620Z",
+          "revision": "1->3"
+        },
+        {
+          "eventId": "evt_6ae328f5284463eaa2d84c64",
+          "eventPageId": "90cb9f61-9c85-4861-8e16-e6725f9223e3",
+          "slug": "immersivnoe-shou-spektakl-kartina-na-million-moskva",
+          "url": "/events/immersivnoe-shou-spektakl-kartina-na-million-moskva",
+          "title": "Иммерсивное шоу-спектакль «КАРТИНА НА МИЛЛИОН»",
+          "status": "READY",
+          "isIndexable": true,
+          "publishedAt": "2026-11-12T20:54:19.889Z",
+          "revision": "1->3"
+        },
+        {
+          "eventId": "evt_6a980232f1ed4e1a970c38a4",
+          "eventPageId": "8761f6f2-c495-4d1a-a2f0-bf46adec3ae4",
+          "slug": "tablao-de-las-llamas-unikalnyi-spektakl-flamenko-chistaya-strast-i-improvizaciya-moskva",
+          "url": "/events/tablao-de-las-llamas-unikalnyi-spektakl-flamenko-chistaya-strast-i-improvizaciya-moskva",
+          "title": "TABLAO. De Las Llamas: уникальный спектакль фламенко – чистая страсть и импровизация",
+          "status": "READY",
+          "isIndexable": true,
+          "publishedAt": "2026-11-12T20:54:20.165Z",
+          "revision": "1->3"
+        },
+        {
+          "eventId": "evt_6ad01c1a65580925b38fac16",
+          "eventPageId": "57bff3e8-5138-4216-905f-6e19988e5df4",
+          "slug": "metel-muzykalno-dramaticheskaya-fantaziya-po-povesti-a-s-pushkina-sankt-peterburg",
+          "url": "/events/metel-muzykalno-dramaticheskaya-fantaziya-po-povesti-a-s-pushkina-sankt-peterburg",
+          "title": "Метель. Спектакль по повести А. С. Пушкина",
+          "status": "READY",
+          "isIndexable": true,
+          "publishedAt": "2026-11-12T20:54:20.404Z",
+          "revision": "1->3"
+        },
+        {
+          "eventId": "evt_6aae8d87cd604f1f02cd5ba2",
+          "eventPageId": "e132a92a-83b8-417c-880c-19a36451e603",
+          "slug": "gala-shou-a-lya-russ-v-plameni-1000-svechei-tobolsk",
+          "url": "/events/gala-shou-a-lya-russ-v-plameni-1000-svechei-tobolsk",
+          "title": "Гала-шоу «А-Ля Русс» в пламени 1000 свечей",
+          "status": "READY",
+          "isIndexable": true,
+          "publishedAt": "2026-11-12T20:54:20.663Z",
+          "revision": "1->3"
+        },
+        {
+          "eventId": "evt_6ae0bcb83fa7836a7734bd38",
+          "eventPageId": "11b4d6a5-8422-44f2-80d8-38afa0e26b79",
+          "slug": "vecher-valsa-gala-koncert-solistov-baleta-sankt-peterburg",
+          "url": "/events/vecher-valsa-gala-koncert-solistov-baleta-sankt-peterburg",
+          "title": "\"Вечер вальса\" гала‑концерт солистов балета",
+          "status": "READY",
+          "isIndexable": true,
+          "publishedAt": "2026-11-12T20:54:20.957Z",
+          "revision": "1->3"
+        },
+        {
+          "eventId": "evt_6ae8c6fa8f5a9feed820ac76",
+          "eventPageId": "b7056c4e-a383-4e4f-8604-d300ee1461e5",
+          "slug": "byt-chelovekom-sankt-peterburg-2",
+          "url": "/events/byt-chelovekom-sankt-peterburg-2",
+          "title": "Быть Человеком",
+          "status": "READY",
+          "isIndexable": true,
+          "publishedAt": "2026-11-12T20:54:21.269Z",
+          "revision": "1->3"
+        },
+        {
+          "eventId": "evt_6ad1a365c76d83a966b0388f",
+          "eventPageId": "963c638b-94dc-4aea-9c7b-15d40f99a597",
+          "slug": "semeinyi-spektakl-skazka-o-poteryannom-vremeni-tolyatti",
+          "url": "/events/semeinyi-spektakl-skazka-o-poteryannom-vremeni-tolyatti",
+          "title": "Семейный спектакль «Сказка о потерянном времени»",
+          "status": "READY",
+          "isIndexable": true,
+          "publishedAt": "2026-11-12T20:54:21.519Z",
+          "revision": "1->3"
+        },
+        {
+          "eventId": "evt_6ab2596f5df7c377d183d0b0",
+          "eventPageId": "29c70f59-6f0a-4b33-992c-cd69d19a6c8a",
+          "slug": "u-nas-v-pyutyurbyurge-literaturno-muzykalnyi-spektakl-s-komicheskim-ishodom-po-yumoristicheskim-ras-sankt-peterburg",
+          "url": "/events/u-nas-v-pyutyurbyurge-literaturno-muzykalnyi-spektakl-s-komicheskim-ishodom-po-yumoristicheskim-ras-sankt-peterburg",
+          "title": "\"У нас в Пютюрбюрге\". Литературно-музыкальный спектакль с комическим исходом по юмористическим рассказам А. П. Чехова",
+          "status": "READY",
+          "isIndexable": true,
+          "publishedAt": "2026-11-12T20:54:21.770Z",
+          "revision": "1->3"
+        },
+        {
+          "eventId": "evt_6a81e71dc82a495fbaf183f4",
+          "eventPageId": "54784c4f-fc4a-4995-9243-4bae69acfeef",
+          "slug": "smotri-naverh-spektakl-po-motivam-rasskazov-reya-bredberi-sankt-peterburg",
+          "url": "/events/smotri-naverh-spektakl-po-motivam-rasskazov-reya-bredberi-sankt-peterburg",
+          "title": "«Смотри наверх!» спектакль по мотивам рассказов Рэя Брэдбери",
+          "status": "READY",
+          "isIndexable": true,
+          "publishedAt": "2026-11-12T20:54:22.106Z",
+          "revision": "1->3"
+        },
+        {
+          "eventId": "evt_6ac41631946eca2227e0c0e4",
+          "eventPageId": "6c3ee94e-b7ca-4296-a4ec-6d7fe357fead",
+          "slug": "interaktivnyi-spektakl-teremok-ot-1-do-4-let-sankt-peterburg",
+          "url": "/events/interaktivnyi-spektakl-teremok-ot-1-do-4-let-sankt-peterburg",
+          "title": "Интерактивный спектакль \"Теремок\" от 1 до 4 лет",
+          "status": "READY",
+          "isIndexable": true,
+          "publishedAt": "2026-11-12T20:54:22.434Z",
+          "revision": "1->3"
+        },
+        {
+          "eventId": "evt_6a9f72b2ed68f08ba4ec7e66",
+          "eventPageId": "81982e23-542d-4ea3-a49b-0b5c16681a2d",
+          "slug": "v-obyatiyah-dozhdya-tancevalnoe-shou-s-dozhdem-prokopevsk",
+          "url": "/events/v-obyatiyah-dozhdya-tancevalnoe-shou-s-dozhdem-prokopevsk",
+          "title": "В ОБЪЯТИЯХ ДОЖДЯ - танцевальное шоу с дождем",
+          "status": "READY",
+          "isIndexable": true,
+          "publishedAt": "2026-11-12T20:54:22.755Z",
+          "revision": "1->3"
+        },
+        {
+          "eventId": "evt_6adbc38e87c30d12a61c9359",
+          "eventPageId": "9759fa35-96a1-4123-993a-3a87784236e1",
+          "slug": "gorko-komediinyi-spektakl-dueta-nebolet-chelyabinsk",
+          "url": "/events/gorko-komediinyi-spektakl-dueta-nebolet-chelyabinsk",
+          "title": "Горько! Комедийный спектакль дуэта \"НЕБОЛЕТ\"",
+          "status": "READY",
+          "isIndexable": true,
+          "publishedAt": "2026-11-12T20:54:23.071Z",
+          "revision": "1->3"
+        },
+        {
+          "eventId": "evt_6ae9c83b0af34f653ffdfcf5",
+          "eventPageId": "10245629-af80-4ca6-aba9-dc034dcb9ae9",
+          "slug": "solnyi-stendap-koncert-rasslabsya-tak-u-vseh-chita",
+          "url": "/events/solnyi-stendap-koncert-rasslabsya-tak-u-vseh-chita",
+          "title": "Сольный стендап концерт \"Расслабься так у всех \"",
+          "status": "READY",
+          "isIndexable": true,
+          "publishedAt": "2026-11-12T20:54:23.376Z",
+          "revision": "1->3"
+        },
+        {
+          "eventId": "evt_6aa3c70694dba4b99f7b0bca",
+          "eventPageId": "fe153e1f-e0f7-4dca-8c56-cffabde24840",
+          "slug": "komediya-kogda-angely-shutyat-gatchina",
+          "url": "/events/komediya-kogda-angely-shutyat-gatchina",
+          "title": "Комедия,, Когда Ангелы шутят,,",
+          "status": "READY",
+          "isIndexable": true,
+          "publishedAt": "2026-11-12T20:54:23.751Z",
+          "revision": "1->3"
+        },
+        {
+          "eventId": "evt_6ac6016ea6a04d1eb2c6e077",
+          "eventPageId": "30074b01-a189-4722-8ccb-f64ed269e05a",
+          "slug": "koncert-spektakl-pisma-neznakomke-moskva",
+          "url": "/events/koncert-spektakl-pisma-neznakomke-moskva",
+          "title": "Концерт-спектакль «Письма незнакомке»",
+          "status": "READY",
+          "isIndexable": true,
+          "publishedAt": "2026-11-12T20:54:24.016Z",
+          "revision": "1->3"
+        },
+        {
+          "eventId": "evt_6a07139893b4c769a21e390d",
+          "eventPageId": "00e44f38-2137-4b51-8a2a-60fb50dd0ddb",
+          "slug": "gore-ot-uma-moskva",
+          "url": "/events/gore-ot-uma-moskva",
+          "title": "Горе от ума",
+          "status": "READY",
+          "isIndexable": true,
+          "publishedAt": "2026-11-12T20:54:24.282Z",
+          "revision": "1->3"
+        }
+      ],
+      "smoke": {
+        "cache": {
+          "ok": true,
+          "warm": "none",
+          "reason": "EventPage editorial batch 34 publication"
+        },
+        "revalidated": 30,
+        "indexNowQueued": 30,
+        "results": [
+          {
+            "slug": "cirk-buduschego-za-granyu-vozmozhnogo-megion",
+            "ok": true,
+            "indexNowQueued": true
+          },
+          {
+            "slug": "interaktivnyi-spektakl-kolobok-ot-1-do-4-let-sankt-peterburg-2",
+            "ok": true,
+            "indexNowQueued": true
+          },
+          {
+            "slug": "shou-legendy-russkogo-roka-oktyabrskiy-respublika-bashkortostan",
+            "ok": true,
+            "indexNowQueued": true
+          },
+          {
+            "slug": "spektakl-chto-tvoryat-muzhchiny-s-sergeem-astahovym-v-liskah-liski",
+            "ok": true,
+            "indexNowQueued": true
+          },
+          {
+            "slug": "spektakl-master-i-margarita-g-maikop-maykop",
+            "ok": true,
+            "indexNowQueued": true
+          },
+          {
+            "slug": "oge-po-litre-spektakl-dlya-9-10-11-klassov-po-pese-yulii-voronovoi-sankt-peterburg",
+            "ok": true,
+            "indexNowQueued": true
+          },
+          {
+            "slug": "voshititelnye-istorii-parikmahera-nakonechnikova-spektakl-komediya-sankt-peterburg",
+            "ok": true,
+            "indexNowQueued": true
+          },
+          {
+            "slug": "shou-fokusov-i-yumora-moskva-2",
+            "ok": true,
+            "indexNowQueued": true
+          },
+          {
+            "slug": "burlesk-detektiv-ubiistvenno-krasiva-moskva",
+            "ok": true,
+            "indexNowQueued": true
+          },
+          {
+            "slug": "spektakl-levoryuciya-tolyatti",
+            "ok": true,
+            "indexNowQueued": true
+          },
+          {
+            "slug": "minecraft-show-mainkraft-shou-moskva",
+            "ok": true,
+            "indexNowQueued": true
+          },
+          {
+            "slug": "golaya-ufa",
+            "ok": true,
+            "indexNowQueued": true
+          },
+          {
+            "slug": "balet-spyaschaya-krasavica-sankt-peterburg",
+            "ok": true,
+            "indexNowQueued": true
+          },
+          {
+            "slug": "cirk-na-ldu-tver",
+            "ok": true,
+            "indexNowQueued": true
+          },
+          {
+            "slug": "immersivnoe-shou-spektakl-kartina-na-million-moskva",
+            "ok": true,
+            "indexNowQueued": true
+          },
+          {
+            "slug": "tablao-de-las-llamas-unikalnyi-spektakl-flamenko-chistaya-strast-i-improvizaciya-moskva",
+            "ok": true,
+            "indexNowQueued": true
+          },
+          {
+            "slug": "metel-muzykalno-dramaticheskaya-fantaziya-po-povesti-a-s-pushkina-sankt-peterburg",
+            "ok": true,
+            "indexNowQueued": true
+          },
+          {
+            "slug": "gala-shou-a-lya-russ-v-plameni-1000-svechei-tobolsk",
+            "ok": true,
+            "indexNowQueued": true
+          },
+          {
+            "slug": "vecher-valsa-gala-koncert-solistov-baleta-sankt-peterburg",
+            "ok": true,
+            "indexNowQueued": true
+          },
+          {
+            "slug": "byt-chelovekom-sankt-peterburg-2",
+            "ok": true,
+            "indexNowQueued": true
+          },
+          {
+            "slug": "semeinyi-spektakl-skazka-o-poteryannom-vremeni-tolyatti",
+            "ok": true,
+            "indexNowQueued": true
+          },
+          {
+            "slug": "u-nas-v-pyutyurbyurge-literaturno-muzykalnyi-spektakl-s-komicheskim-ishodom-po-yumoristicheskim-ras-sankt-peterburg",
+            "ok": true,
+            "indexNowQueued": true
+          },
+          {
+            "slug": "smotri-naverh-spektakl-po-motivam-rasskazov-reya-bredberi-sankt-peterburg",
+            "ok": true,
+            "indexNowQueued": true
+          },
+          {
+            "slug": "interaktivnyi-spektakl-teremok-ot-1-do-4-let-sankt-peterburg",
+            "ok": true,
+            "indexNowQueued": true
+          },
+          {
+            "slug": "v-obyatiyah-dozhdya-tancevalnoe-shou-s-dozhdem-prokopevsk",
+            "ok": true,
+            "indexNowQueued": true
+          },
+          {
+            "slug": "gorko-komediinyi-spektakl-dueta-nebolet-chelyabinsk",
+            "ok": true,
+            "indexNowQueued": true
+          },
+          {
+            "slug": "solnyi-stendap-koncert-rasslabsya-tak-u-vseh-chita",
+            "ok": true,
+            "indexNowQueued": true
+          },
+          {
+            "slug": "komediya-kogda-angely-shutyat-gatchina",
+            "ok": true,
+            "indexNowQueued": true
+          },
+          {
+            "slug": "koncert-spektakl-pisma-neznakomke-moskva",
+            "ok": true,
+            "indexNowQueued": true
+          },
+          {
+            "slug": "gore-ot-uma-moskva",
+            "ok": true,
+            "indexNowQueued": true
+          }
+        ],
+        "smoke": [
+          {
+            "slug": "cirk-buduschego-za-granyu-vozmozhnogo-megion",
+            "status": 200,
+            "canonical": "https://daibilet.ru/events/cirk-buduschego-za-granyu-vozmozhnogo-megion",
+            "robots": "index, follow",
+            "hasPracticalInfo": true,
+            "hasAbout": true,
+            "hasUl": true
+          },
+          {
+            "slug": "interaktivnyi-spektakl-kolobok-ot-1-do-4-let-sankt-peterburg-2",
+            "status": 200,
+            "canonical": "https://daibilet.ru/events/interaktivnyi-spektakl-kolobok-ot-1-do-4-let-sankt-peterburg-2",
+            "robots": "index, follow",
+            "hasPracticalInfo": true,
+            "hasAbout": true,
+            "hasUl": true
+          },
+          {
+            "slug": "shou-legendy-russkogo-roka-oktyabrskiy-respublika-bashkortostan",
+            "status": 200,
+            "canonical": "https://daibilet.ru/events/shou-legendy-russkogo-roka-oktyabrskiy-respublika-bashkortostan",
+            "robots": "index, follow",
+            "hasPracticalInfo": true,
+            "hasAbout": true,
+            "hasUl": true
+          },
+          {
+            "slug": "spektakl-chto-tvoryat-muzhchiny-s-sergeem-astahovym-v-liskah-liski",
+            "status": 200,
+            "canonical": "https://daibilet.ru/events/spektakl-chto-tvoryat-muzhchiny-s-sergeem-astahovym-v-liskah-liski",
+            "robots": "index, follow",
+            "hasPracticalInfo": true,
+            "hasAbout": true,
+            "hasUl": true
+          },
+          {
+            "slug": "spektakl-master-i-margarita-g-maikop-maykop",
+            "status": 200,
+            "canonical": "https://daibilet.ru/events/spektakl-master-i-margarita-g-maikop-maykop",
+            "robots": "index, follow",
+            "hasPracticalInfo": true,
+            "hasAbout": true,
+            "hasUl": true
+          },
+          {
+            "slug": "oge-po-litre-spektakl-dlya-9-10-11-klassov-po-pese-yulii-voronovoi-sankt-peterburg",
+            "status": 200,
+            "canonical": "https://daibilet.ru/events/oge-po-litre-spektakl-dlya-9-10-11-klassov-po-pese-yulii-voronovoi-sankt-peterburg",
+            "robots": "index, follow",
+            "hasPracticalInfo": true,
+            "hasAbout": true,
+            "hasUl": true
+          },
+          {
+            "slug": "voshititelnye-istorii-parikmahera-nakonechnikova-spektakl-komediya-sankt-peterburg",
+            "status": 200,
+            "canonical": "https://daibilet.ru/events/voshititelnye-istorii-parikmahera-nakonechnikova-spektakl-komediya-sankt-peterburg",
+            "robots": "index, follow",
+            "hasPracticalInfo": true,
+            "hasAbout": true,
+            "hasUl": true
+          },
+          {
+            "slug": "shou-fokusov-i-yumora-moskva-2",
+            "status": 200,
+            "canonical": "https://daibilet.ru/events/shou-fokusov-i-yumora-moskva-2",
+            "robots": "index, follow",
+            "hasPracticalInfo": true,
+            "hasAbout": true,
+            "hasUl": true
+          },
+          {
+            "slug": "burlesk-detektiv-ubiistvenno-krasiva-moskva",
+            "status": 200,
+            "canonical": "https://daibilet.ru/events/burlesk-detektiv-ubiistvenno-krasiva-moskva",
+            "robots": "index, follow",
+            "hasPracticalInfo": true,
+            "hasAbout": true,
+            "hasUl": true
+          },
+          {
+            "slug": "spektakl-levoryuciya-tolyatti",
+            "status": 200,
+            "canonical": "https://daibilet.ru/events/spektakl-levoryuciya-tolyatti",
+            "robots": "index, follow",
+            "hasPracticalInfo": true,
+            "hasAbout": true,
+            "hasUl": true
+          },
+          {
+            "slug": "minecraft-show-mainkraft-shou-moskva",
+            "status": 200,
+            "canonical": "https://daibilet.ru/events/minecraft-show-mainkraft-shou-moskva",
+            "robots": "index, follow",
+            "hasPracticalInfo": true,
+            "hasAbout": true,
+            "hasUl": true
+          },
+          {
+            "slug": "golaya-ufa",
+            "status": 200,
+            "canonical": "https://daibilet.ru/events/golaya-ufa",
+            "robots": "index, follow",
+            "hasPracticalInfo": true,
+            "hasAbout": true,
+            "hasUl": true
+          },
+          {
+            "slug": "balet-spyaschaya-krasavica-sankt-peterburg",
+            "status": 200,
+            "canonical": "https://daibilet.ru/events/balet-spyaschaya-krasavica-sankt-peterburg",
+            "robots": "index, follow",
+            "hasPracticalInfo": true,
+            "hasAbout": true,
+            "hasUl": true
+          },
+          {
+            "slug": "cirk-na-ldu-tver",
+            "status": 200,
+            "canonical": "https://daibilet.ru/events/cirk-na-ldu-tver",
+            "robots": "index, follow",
+            "hasPracticalInfo": true,
+            "hasAbout": true,
+            "hasUl": true
+          },
+          {
+            "slug": "immersivnoe-shou-spektakl-kartina-na-million-moskva",
+            "status": 200,
+            "canonical": "https://daibilet.ru/events/immersivnoe-shou-spektakl-kartina-na-million-moskva",
+            "robots": "index, follow",
+            "hasPracticalInfo": true,
+            "hasAbout": true,
+            "hasUl": true
+          },
+          {
+            "slug": "tablao-de-las-llamas-unikalnyi-spektakl-flamenko-chistaya-strast-i-improvizaciya-moskva",
+            "status": 200,
+            "canonical": "https://daibilet.ru/events/tablao-de-las-llamas-unikalnyi-spektakl-flamenko-chistaya-strast-i-improvizaciya-moskva",
+            "robots": "index, follow",
+            "hasPracticalInfo": true,
+            "hasAbout": true,
+            "hasUl": true
+          },
+          {
+            "slug": "metel-muzykalno-dramaticheskaya-fantaziya-po-povesti-a-s-pushkina-sankt-peterburg",
+            "status": 200,
+            "canonical": "https://daibilet.ru/events/metel-muzykalno-dramaticheskaya-fantaziya-po-povesti-a-s-pushkina-sankt-peterburg",
+            "robots": "index, follow",
+            "hasPracticalInfo": true,
+            "hasAbout": true,
+            "hasUl": true
+          },
+          {
+            "slug": "gala-shou-a-lya-russ-v-plameni-1000-svechei-tobolsk",
+            "status": 200,
+            "canonical": "https://daibilet.ru/events/gala-shou-a-lya-russ-v-plameni-1000-svechei-tobolsk",
+            "robots": "index, follow",
+            "hasPracticalInfo": true,
+            "hasAbout": true,
+            "hasUl": true
+          },
+          {
+            "slug": "vecher-valsa-gala-koncert-solistov-baleta-sankt-peterburg",
+            "status": 200,
+            "canonical": "https://daibilet.ru/events/vecher-valsa-gala-koncert-solistov-baleta-sankt-peterburg",
+            "robots": "index, follow",
+            "hasPracticalInfo": true,
+            "hasAbout": true,
+            "hasUl": true
+          },
+          {
+            "slug": "byt-chelovekom-sankt-peterburg-2",
+            "status": 200,
+            "canonical": "https://daibilet.ru/events/byt-chelovekom-sankt-peterburg-2",
+            "robots": "index, follow",
+            "hasPracticalInfo": true,
+            "hasAbout": true,
+            "hasUl": true
+          },
+          {
+            "slug": "semeinyi-spektakl-skazka-o-poteryannom-vremeni-tolyatti",
+            "status": 200,
+            "canonical": "https://daibilet.ru/events/semeinyi-spektakl-skazka-o-poteryannom-vremeni-tolyatti",
+            "robots": "index, follow",
+            "hasPracticalInfo": true,
+            "hasAbout": true,
+            "hasUl": true
+          },
+          {
+            "slug": "u-nas-v-pyutyurbyurge-literaturno-muzykalnyi-spektakl-s-komicheskim-ishodom-po-yumoristicheskim-ras-sankt-peterburg",
+            "status": 200,
+            "canonical": "https://daibilet.ru/events/u-nas-v-pyutyurbyurge-literaturno-muzykalnyi-spektakl-s-komicheskim-ishodom-po-yumoristicheskim-ras-sankt-peterburg",
+            "robots": "index, follow",
+            "hasPracticalInfo": true,
+            "hasAbout": true,
+            "hasUl": true
+          },
+          {
+            "slug": "smotri-naverh-spektakl-po-motivam-rasskazov-reya-bredberi-sankt-peterburg",
+            "status": 200,
+            "canonical": "https://daibilet.ru/events/smotri-naverh-spektakl-po-motivam-rasskazov-reya-bredberi-sankt-peterburg",
+            "robots": "index, follow",
+            "hasPracticalInfo": true,
+            "hasAbout": true,
+            "hasUl": true
+          },
+          {
+            "slug": "interaktivnyi-spektakl-teremok-ot-1-do-4-let-sankt-peterburg",
+            "status": 200,
+            "canonical": "https://daibilet.ru/events/interaktivnyi-spektakl-teremok-ot-1-do-4-let-sankt-peterburg",
+            "robots": "index, follow",
+            "hasPracticalInfo": true,
+            "hasAbout": true,
+            "hasUl": true
+          },
+          {
+            "slug": "v-obyatiyah-dozhdya-tancevalnoe-shou-s-dozhdem-prokopevsk",
+            "status": 200,
+            "canonical": "https://daibilet.ru/events/v-obyatiyah-dozhdya-tancevalnoe-shou-s-dozhdem-prokopevsk",
+            "robots": "index, follow",
+            "hasPracticalInfo": true,
+            "hasAbout": true,
+            "hasUl": true
+          },
+          {
+            "slug": "gorko-komediinyi-spektakl-dueta-nebolet-chelyabinsk",
+            "status": 200,
+            "canonical": "https://daibilet.ru/events/gorko-komediinyi-spektakl-dueta-nebolet-chelyabinsk",
+            "robots": "index, follow",
+            "hasPracticalInfo": true,
+            "hasAbout": true,
+            "hasUl": true
+          },
+          {
+            "slug": "solnyi-stendap-koncert-rasslabsya-tak-u-vseh-chita",
+            "status": 200,
+            "canonical": "https://daibilet.ru/events/solnyi-stendap-koncert-rasslabsya-tak-u-vseh-chita",
+            "robots": "index, follow",
+            "hasPracticalInfo": true,
+            "hasAbout": true,
+            "hasUl": true
+          },
+          {
+            "slug": "komediya-kogda-angely-shutyat-gatchina",
+            "status": 200,
+            "canonical": "https://daibilet.ru/events/komediya-kogda-angely-shutyat-gatchina",
+            "robots": "index, follow",
+            "hasPracticalInfo": true,
+            "hasAbout": true,
+            "hasUl": true
+          },
+          {
+            "slug": "koncert-spektakl-pisma-neznakomke-moskva",
+            "status": 200,
+            "canonical": "https://daibilet.ru/events/koncert-spektakl-pisma-neznakomke-moskva",
+            "robots": "index, follow",
+            "hasPracticalInfo": true,
+            "hasAbout": true,
+            "hasUl": true
+          },
+          {
+            "slug": "gore-ot-uma-moskva",
+            "status": 200,
+            "canonical": "https://daibilet.ru/events/gore-ot-uma-moskva",
+            "robots": "index, follow",
+            "hasPracticalInfo": true,
+            "hasAbout": true,
+            "hasUl": true
+          }
+        ]
+      }
+    },
+    "35": {
+      "items": 30,
+      "result": [
+        {
+          "eventId": "evt_6abfdf4844c0d778508ab59d",
+          "eventPageId": "26400982-1d36-4c87-b9b0-76f7d951933c",
+          "slug": "zooteatr-reptilii-v-g-sankt-peterburg-trk-grand-kanon-sankt-peterburg-11",
+          "url": "/events/zooteatr-reptilii-v-g-sankt-peterburg-trk-grand-kanon-sankt-peterburg-11",
+          "title": "Зоотеатр Рептилий в г.Санкт-Петербург ТРК \"Гранд Каньон\"",
+          "status": "READY",
+          "isIndexable": true,
+          "publishedAt": "2026-11-12T21:03:33.872Z",
+          "revision": "1->3"
+        },
+        {
+          "eventId": "evt_6abd3551bb0e6eb0fcaf6566",
+          "eventPageId": "b101b491-51af-4794-97d9-478c8f726767",
+          "slug": "arktida-v-barnaule-20-11-epoha-barnaul",
+          "url": "/events/arktida-v-barnaule-20-11-epoha-barnaul",
+          "title": "АрктидА в Барнауле | 20.11 | Эпоха",
+          "status": "READY",
+          "isIndexable": true,
+          "publishedAt": "2026-11-12T21:03:34.314Z",
+          "revision": "1->3"
+        },
+        {
+          "eventId": "evt_6acf1f4c461b7ec4e84809a8",
+          "eventPageId": "abe896ec-3e51-49f8-84b7-5dc8cef0a720",
+          "slug": "grinevich-band-krasnoyarsk",
+          "url": "/events/grinevich-band-krasnoyarsk",
+          "title": "Grinevich Band",
+          "status": "READY",
+          "isIndexable": true,
+          "publishedAt": "2026-11-12T21:03:34.621Z",
+          "revision": "1->3"
+        },
+        {
+          "eventId": "evt_6a99c356c8272782df28b202",
+          "eventPageId": "e36cf51c-af1b-4cfe-b24e-146e5fc1c19c",
+          "slug": "gde-moi-2008-ruki-vverh-novosibirsk",
+          "url": "/events/gde-moi-2008-ruki-vverh-novosibirsk",
+          "title": "МОЙ 2008 @РУКИ ВВЕРХ",
+          "status": "READY",
+          "isIndexable": true,
+          "publishedAt": "2026-11-12T21:03:34.909Z",
+          "revision": "1->3"
+        },
+        {
+          "eventId": "evt_69e67b2dc8fb254d708ba235",
+          "eventPageId": "4132485f-4a67-42d5-bc77-cbbb08316fe3",
+          "slug": "shura-ufa",
+          "url": "/events/shura-ufa",
+          "title": "Шура",
+          "status": "READY",
+          "isIndexable": true,
+          "publishedAt": "2026-11-12T21:03:35.204Z",
+          "revision": "1->3"
+        },
+        {
+          "eventId": "evt_6ab3d5e729220f8b76951c4e",
+          "eventPageId": "dc79b8fe-20c3-4d19-b3d0-72ec13d9ce6a",
+          "slug": "kompozitor-aleksandr-demidov-ot-mirovyh-hitov-do-sobstvennyh-sochinenii-saratov",
+          "url": "/events/kompozitor-aleksandr-demidov-ot-mirovyh-hitov-do-sobstvennyh-sochinenii-saratov",
+          "title": "Александр Демидов. От мировых хитов до собственных сочинений",
+          "status": "READY",
+          "isIndexable": true,
+          "publishedAt": "2026-11-12T21:03:35.540Z",
+          "revision": "1->3"
+        },
+        {
+          "eventId": "evt_6ad72bdf3cae083479cda054",
+          "eventPageId": "c82b14c5-4c58-4c8c-8520-2ab41af5e6a4",
+          "slug": "vay-muzykalnoe-loto-russkie-hity-karaoke-samara",
+          "url": "/events/vay-muzykalnoe-loto-russkie-hity-karaoke-samara",
+          "title": "Ваy Музыкальное лото. Русские хиты караоке",
+          "status": "READY",
+          "isIndexable": true,
+          "publishedAt": "2026-11-12T21:03:35.828Z",
+          "revision": "1->3"
+        },
+        {
+          "eventId": "evt_6abb72955205569562304800",
+          "eventPageId": "a2583299-5a1c-436c-926f-6b741dbe3b71",
+          "slug": "aleksandr-bessonov-pochemu-devushki-vybirayut-plohih-parnei-saratov",
+          "url": "/events/aleksandr-bessonov-pochemu-devushki-vybirayut-plohih-parnei-saratov",
+          "title": "Александр Бессонов. Почему девушки выбирают плохих парней?!",
+          "status": "READY",
+          "isIndexable": true,
+          "publishedAt": "2026-11-12T21:03:36.119Z",
+          "revision": "1->3"
+        },
+        {
+          "eventId": "evt_6ad72b976d4207b2aca3b264",
+          "eventPageId": "07bc9dae-e47d-43db-9b4a-6f2da34a93f5",
+          "slug": "vau-muzykalnoe-loto-hity-2010-h-i-2020-h-miks-samara",
+          "url": "/events/vau-muzykalnoe-loto-hity-2010-h-i-2020-h-miks-samara",
+          "title": "Вау Музыкальное лото. Хиты 2010-х и 2020-х. Микс",
+          "status": "READY",
+          "isIndexable": true,
+          "publishedAt": "2026-11-12T21:03:36.505Z",
+          "revision": "1->3"
+        },
+        {
+          "eventId": "evt_6a9025c12d15420969ee29a4",
+          "eventPageId": "b17ab5f1-6245-45d8-9389-9b00b6219146",
+          "slug": "nurminskii-solnyi-koncert-izhevsk-20-noyabrya-pepelac-izhevsk",
+          "url": "/events/nurminskii-solnyi-koncert-izhevsk-20-noyabrya-pepelac-izhevsk",
+          "title": "Нурминский: сольный концерт | Ижевск | 20 ноября | «Пепелац»",
+          "status": "READY",
+          "isIndexable": true,
+          "publishedAt": "2026-11-12T21:03:36.810Z",
+          "revision": "1->3"
+        },
+        {
+          "eventId": "evt_6ad375247811d402476aece7",
+          "eventPageId": "e4b39ef9-3aec-4e39-9810-4952423ea99a",
+          "slug": "peterburgskie-nedotrogi-sankt-peterburg",
+          "url": "/events/peterburgskie-nedotrogi-sankt-peterburg",
+          "title": "Петербургские недотроги",
+          "status": "READY",
+          "isIndexable": true,
+          "publishedAt": "2026-11-12T21:03:37.117Z",
+          "revision": "1->3"
+        },
+        {
+          "eventId": "evt_6abe7d6549980d932b3870a2",
+          "eventPageId": "c4261020-3892-47e6-ad3f-f5bd0393912d",
+          "slug": "homie-h-20-noyabrya-h-klub-atmosfera-g-kursk",
+          "url": "/events/homie-h-20-noyabrya-h-klub-atmosfera-g-kursk",
+          "title": "HOMIE х 20 ноября х Клуб \"АтмосферА\" г.Курск",
+          "status": "READY",
+          "isIndexable": true,
+          "publishedAt": "2026-11-12T21:03:37.432Z",
+          "revision": "1->3"
+        },
+        {
+          "eventId": "evt_6adb1713aae814aa3feec288",
+          "eventPageId": "c700e4e4-f721-4125-9662-95f19063a0a9",
+          "slug": "zhenskii-stand-up-na-sretenke-moskva-3",
+          "url": "/events/zhenskii-stand-up-na-sretenke-moskva-3",
+          "title": "Женский Stand-up на Сретенке",
+          "status": "READY",
+          "isIndexable": true,
+          "publishedAt": "2026-11-12T21:03:37.718Z",
+          "revision": "1->3"
+        },
+        {
+          "eventId": "evt_6ad070f0ea26f43b317b2203",
+          "eventPageId": "67e4b313-9ef6-4f8b-877c-15694f7ccb92",
+          "slug": "tango-na-krayu-sankt-peterburg",
+          "url": "/events/tango-na-krayu-sankt-peterburg",
+          "title": "«Танго на краю»",
+          "status": "READY",
+          "isIndexable": true,
+          "publishedAt": "2026-11-12T21:03:38.003Z",
+          "revision": "1->3"
+        },
+        {
+          "eventId": "evt_6a2165a3fda45c3dbab8de0b",
+          "eventPageId": "8844e3ea-cb0f-4015-b53e-6d9b2f9fe3cf",
+          "slug": "hren-prezentaciya-alboma-yaroslavl",
+          "url": "/events/hren-prezentaciya-alboma-yaroslavl",
+          "title": "ХРЕН - Презентация альбома.",
+          "status": "READY",
+          "isIndexable": true,
+          "publishedAt": "2026-11-12T21:03:38.309Z",
+          "revision": "1->3"
+        },
+        {
+          "eventId": "evt_6ad102e08a3d48f8ef6bbfed",
+          "eventPageId": "73d35d05-4f80-4750-8e95-a4e1574ed301",
+          "slug": "novogodnii-roman-kaliningrad",
+          "url": "/events/novogodnii-roman-kaliningrad",
+          "title": "Новогодний роман",
+          "status": "READY",
+          "isIndexable": true,
+          "publishedAt": "2026-11-12T21:03:38.675Z",
+          "revision": "1->3"
+        },
+        {
+          "eventId": "evt_6ad6079b8642084db3c45525",
+          "eventPageId": "71a34211-665c-4cb1-b028-c9e7f59ab142",
+          "slug": "molitva-v-opere-organ-i-vokal-v-lyublino-moskva",
+          "url": "/events/molitva-v-opere-organ-i-vokal-v-lyublino-moskva",
+          "title": "Молитва в опере. Орган и вокал в Люблино",
+          "status": "READY",
+          "isIndexable": true,
+          "publishedAt": "2026-11-12T21:03:39.005Z",
+          "revision": "1->3"
+        },
+        {
+          "eventId": "evt_6a80bb37d5e0b6805ae2548a",
+          "eventPageId": "1249a947-9abe-47ae-92a4-014cb339a4bb",
+          "slug": "kamazz-elec",
+          "url": "/events/kamazz-elec",
+          "title": "Kamazz (Елец)",
+          "status": "READY",
+          "isIndexable": true,
+          "publishedAt": "2026-11-12T21:03:39.307Z",
+          "revision": "1->3"
+        },
+        {
+          "eventId": "evt_6a834fe02aecff7375880cb2",
+          "eventPageId": "15aaf33e-ec9b-4b88-ade5-740ff0445f17",
+          "slug": "georgii-tadorovskii-raitet-20-h-30-h-moskva",
+          "url": "/events/georgii-tadorovskii-raitet-20-h-30-h-moskva",
+          "title": "\"Георгий Тадоровский. Раритет 20-х, 30-х.\"",
+          "status": "READY",
+          "isIndexable": true,
+          "publishedAt": "2026-11-12T21:03:39.596Z",
+          "revision": "1->3"
+        },
+        {
+          "eventId": "evt_6ad72a1f4bd4c3b966805e7f",
+          "eventPageId": "76a6fb72-ec87-4be2-9b65-5fa0d4845303",
+          "slug": "rzhunimagu-moskva",
+          "url": "/events/rzhunimagu-moskva",
+          "title": "РЖУНИМАГУ",
+          "status": "READY",
+          "isIndexable": true,
+          "publishedAt": "2026-11-12T21:03:39.909Z",
+          "revision": "1->3"
+        },
+        {
+          "eventId": "evt_6ae95b36f72e3bc4bd335b1e",
+          "eventPageId": "1d12015d-6f89-4324-95ee-7fbd909d8dcf",
+          "slug": "nauchnoe-priklyuchenie-prosto-fizika-dlya-detei-5-6-let-tomsk",
+          "url": "/events/nauchnoe-priklyuchenie-prosto-fizika-dlya-detei-5-6-let-tomsk",
+          "title": "Научное приключение \"Просто физика\" для детей 5-6 лет",
+          "status": "READY",
+          "isIndexable": true,
+          "publishedAt": "2026-11-12T21:03:40.216Z",
+          "revision": "1->3"
+        },
+        {
+          "eventId": "evt_6ac41ae41ae1e010e17ebc62",
+          "eventPageId": "091da527-8f44-49a6-81ca-3b58a7c77e51",
+          "slug": "interaktivnyi-spektakl-muha-cokotuha-ot-2-do-6-let-sankt-peterburg",
+          "url": "/events/interaktivnyi-spektakl-muha-cokotuha-ot-2-do-6-let-sankt-peterburg",
+          "title": "Интерактивный спектакль \"Муха Цокотуха \" от 2 до 6 лет",
+          "status": "READY",
+          "isIndexable": true,
+          "publishedAt": "2026-11-12T21:03:40.513Z",
+          "revision": "1->3"
+        },
+        {
+          "eventId": "evt_6ae8931e51757db721c9ea93",
+          "eventPageId": "893ff937-ee4f-4f60-b8a6-a7f14bf930e3",
+          "slug": "koncert-dlya-samyh-malenkih-kompozitory-detyam-sankt-peterburg",
+          "url": "/events/koncert-dlya-samyh-malenkih-kompozitory-detyam-sankt-peterburg",
+          "title": "Концерт для самых маленьких. «Композиторы — детям»",
+          "status": "READY",
+          "isIndexable": true,
+          "publishedAt": "2026-11-12T21:03:41.109Z",
+          "revision": "1->3"
+        },
+        {
+          "eventId": "evt_6ad0eb9bfbe00f8ed98415b8",
+          "eventPageId": "eb9b0325-b0ab-4973-9df9-e8105a02ff51",
+          "slug": "snegurochka-moskva",
+          "url": "/events/snegurochka-moskva",
+          "title": "СНЕГУРОЧКА",
+          "status": "READY",
+          "isIndexable": true,
+          "publishedAt": "2026-11-12T21:03:41.716Z",
+          "revision": "1->3"
+        },
+        {
+          "eventId": "evt_6ae22e2b5c566fa80d616c61",
+          "eventPageId": "41928531-1274-4cb8-8bd9-595eb3ba095e",
+          "slug": "vladimirskii-dvorec-s-posescheniem-zakrytyh-zalov-sankt-peterburg",
+          "url": "/events/vladimirskii-dvorec-s-posescheniem-zakrytyh-zalov-sankt-peterburg",
+          "title": "ВЛАДИМИРСКИЙ ДВОРЕЦ С ПОСЕЩЕНИЕМ ЗАКРЫТЫХ ЗАЛОВ",
+          "status": "READY",
+          "isIndexable": true,
+          "publishedAt": "2026-11-12T21:03:42.613Z",
+          "revision": "1->3"
+        },
+        {
+          "eventId": "evt_6ae0a56fe7b4157b12d925e5",
+          "eventPageId": "975df5ac-1668-4d4a-8cfa-80e2ac25b492",
+          "slug": "master-klass-po-maslyanoi-zhivopisi-moskva",
+          "url": "/events/master-klass-po-maslyanoi-zhivopisi-moskva",
+          "title": "Мастер-класс по масляной живописи",
+          "status": "READY",
+          "isIndexable": true,
+          "publishedAt": "2026-11-12T21:03:43.352Z",
+          "revision": "1->3"
+        },
+        {
+          "eventId": "evt_6adf83dbed5d32331a9a1f7c",
+          "eventPageId": "55b50c48-7d6b-424a-82ea-9fe46deb029d",
+          "slug": "zmei-interaktivnoe-znakomstvo-s-ekzoticheskimi-zhivotnymi-sankt-peterburg",
+          "url": "/events/zmei-interaktivnoe-znakomstvo-s-ekzoticheskimi-zhivotnymi-sankt-peterburg",
+          "title": "\"Змеи\" Интерактивное знакомство с Экзотическими животными",
+          "status": "READY",
+          "isIndexable": true,
+          "publishedAt": "2026-11-12T21:03:43.739Z",
+          "revision": "1->3"
+        },
+        {
+          "eventId": "evt_6ae04da86e85b1b0dcb87315",
+          "eventPageId": "cf75b687-b12e-41c1-a341-dd1c4ceb29f6",
+          "slug": "istoricheskii-organ-v-maltiiskoi-kapelle-v-dvizhenii-i-sozercanii-sankt-peterburg",
+          "url": "/events/istoricheskii-organ-v-maltiiskoi-kapelle-v-dvizhenii-i-sozercanii-sankt-peterburg",
+          "title": "Исторический орган в Мальтийской капелле. В движении и созерцании",
+          "status": "READY",
+          "isIndexable": true,
+          "publishedAt": "2026-11-12T21:03:44.082Z",
+          "revision": "1->3"
+        },
+        {
+          "eventId": "evt_6ad518950a1afb85fbb7abff",
+          "eventPageId": "dfd63a9e-429d-4fcf-9363-7ea5526dece2",
+          "slug": "novyi-kampus-mgtu-i-okrestnosti-moskva",
+          "url": "/events/novyi-kampus-mgtu-i-okrestnosti-moskva",
+          "title": "Новый кампус МГТУ и окрестности.",
+          "status": "READY",
+          "isIndexable": true,
+          "publishedAt": "2026-11-12T21:03:44.521Z",
+          "revision": "1->3"
+        },
+        {
+          "eventId": "evt_6a354033e1c45b241e22fb67",
+          "eventPageId": "f9c7a36d-1241-4e63-b676-db3f1fee5b7d",
+          "slug": "21-11-2026-irkutsk-kostya-kulyasov-i-gruppa-animaciya-animaciya-online-irkutsk",
+          "url": "/events/21-11-2026-irkutsk-kostya-kulyasov-i-gruppa-animaciya-animaciya-online-irkutsk",
+          "title": "21.11.2026 / Иркутск /Костя Кулясов и группа АнимациЯ /animaciya.online",
+          "status": "READY",
+          "isIndexable": true,
+          "publishedAt": "2026-11-12T21:03:44.953Z",
+          "revision": "1->3"
+        }
+      ],
+      "smoke": {
+        "cache": {
+          "ok": true,
+          "warm": "none",
+          "reason": "EventPage editorial batch 35 publication"
+        },
+        "revalidated": 30,
+        "indexNowQueued": 30,
+        "results": [
+          {
+            "slug": "zooteatr-reptilii-v-g-sankt-peterburg-trk-grand-kanon-sankt-peterburg-11",
+            "ok": true,
+            "indexNowQueued": true
+          },
+          {
+            "slug": "arktida-v-barnaule-20-11-epoha-barnaul",
+            "ok": true,
+            "indexNowQueued": true
+          },
+          {
+            "slug": "grinevich-band-krasnoyarsk",
+            "ok": true,
+            "indexNowQueued": true
+          },
+          {
+            "slug": "gde-moi-2008-ruki-vverh-novosibirsk",
+            "ok": true,
+            "indexNowQueued": true
+          },
+          {
+            "slug": "shura-ufa",
+            "ok": true,
+            "indexNowQueued": true
+          },
+          {
+            "slug": "kompozitor-aleksandr-demidov-ot-mirovyh-hitov-do-sobstvennyh-sochinenii-saratov",
+            "ok": true,
+            "indexNowQueued": true
+          },
+          {
+            "slug": "vay-muzykalnoe-loto-russkie-hity-karaoke-samara",
+            "ok": true,
+            "indexNowQueued": true
+          },
+          {
+            "slug": "aleksandr-bessonov-pochemu-devushki-vybirayut-plohih-parnei-saratov",
+            "ok": true,
+            "indexNowQueued": true
+          },
+          {
+            "slug": "vau-muzykalnoe-loto-hity-2010-h-i-2020-h-miks-samara",
+            "ok": true,
+            "indexNowQueued": true
+          },
+          {
+            "slug": "nurminskii-solnyi-koncert-izhevsk-20-noyabrya-pepelac-izhevsk",
+            "ok": true,
+            "indexNowQueued": true
+          },
+          {
+            "slug": "peterburgskie-nedotrogi-sankt-peterburg",
+            "ok": true,
+            "indexNowQueued": true
+          },
+          {
+            "slug": "homie-h-20-noyabrya-h-klub-atmosfera-g-kursk",
+            "ok": true,
+            "indexNowQueued": true
+          },
+          {
+            "slug": "zhenskii-stand-up-na-sretenke-moskva-3",
+            "ok": true,
+            "indexNowQueued": true
+          },
+          {
+            "slug": "tango-na-krayu-sankt-peterburg",
+            "ok": true,
+            "indexNowQueued": true
+          },
+          {
+            "slug": "hren-prezentaciya-alboma-yaroslavl",
+            "ok": true,
+            "indexNowQueued": true
+          },
+          {
+            "slug": "novogodnii-roman-kaliningrad",
+            "ok": true,
+            "indexNowQueued": true
+          },
+          {
+            "slug": "molitva-v-opere-organ-i-vokal-v-lyublino-moskva",
+            "ok": true,
+            "indexNowQueued": true
+          },
+          {
+            "slug": "kamazz-elec",
+            "ok": true,
+            "indexNowQueued": true
+          },
+          {
+            "slug": "georgii-tadorovskii-raitet-20-h-30-h-moskva",
+            "ok": true,
+            "indexNowQueued": true
+          },
+          {
+            "slug": "rzhunimagu-moskva",
+            "ok": true,
+            "indexNowQueued": true
+          },
+          {
+            "slug": "nauchnoe-priklyuchenie-prosto-fizika-dlya-detei-5-6-let-tomsk",
+            "ok": true,
+            "indexNowQueued": true
+          },
+          {
+            "slug": "interaktivnyi-spektakl-muha-cokotuha-ot-2-do-6-let-sankt-peterburg",
+            "ok": true,
+            "indexNowQueued": true
+          },
+          {
+            "slug": "koncert-dlya-samyh-malenkih-kompozitory-detyam-sankt-peterburg",
+            "ok": true,
+            "indexNowQueued": true
+          },
+          {
+            "slug": "snegurochka-moskva",
+            "ok": true,
+            "indexNowQueued": true
+          },
+          {
+            "slug": "vladimirskii-dvorec-s-posescheniem-zakrytyh-zalov-sankt-peterburg",
+            "ok": true,
+            "indexNowQueued": true
+          },
+          {
+            "slug": "master-klass-po-maslyanoi-zhivopisi-moskva",
+            "ok": true,
+            "indexNowQueued": true
+          },
+          {
+            "slug": "zmei-interaktivnoe-znakomstvo-s-ekzoticheskimi-zhivotnymi-sankt-peterburg",
+            "ok": true,
+            "indexNowQueued": true
+          },
+          {
+            "slug": "istoricheskii-organ-v-maltiiskoi-kapelle-v-dvizhenii-i-sozercanii-sankt-peterburg",
+            "ok": true,
+            "indexNowQueued": true
+          },
+          {
+            "slug": "novyi-kampus-mgtu-i-okrestnosti-moskva",
+            "ok": true,
+            "indexNowQueued": true
+          },
+          {
+            "slug": "21-11-2026-irkutsk-kostya-kulyasov-i-gruppa-animaciya-animaciya-online-irkutsk",
+            "ok": true,
+            "indexNowQueued": true
+          }
+        ],
+        "smoke": [
+          {
+            "slug": "zooteatr-reptilii-v-g-sankt-peterburg-trk-grand-kanon-sankt-peterburg-11",
+            "status": 200,
+            "canonical": "https://daibilet.ru/events/zooteatr-reptilii-v-g-sankt-peterburg-trk-grand-kanon-sankt-peterburg-11",
+            "robots": "index, follow",
+            "hasPracticalInfo": true,
+            "hasAbout": true,
+            "hasUl": true
+          },
+          {
+            "slug": "arktida-v-barnaule-20-11-epoha-barnaul",
+            "status": 200,
+            "canonical": "https://daibilet.ru/events/arktida-v-barnaule-20-11-epoha-barnaul",
+            "robots": "index, follow",
+            "hasPracticalInfo": true,
+            "hasAbout": true,
+            "hasUl": true
+          },
+          {
+            "slug": "grinevich-band-krasnoyarsk",
+            "status": 200,
+            "canonical": "https://daibilet.ru/events/grinevich-band-krasnoyarsk",
+            "robots": "index, follow",
+            "hasPracticalInfo": true,
+            "hasAbout": true,
+            "hasUl": true
+          },
+          {
+            "slug": "gde-moi-2008-ruki-vverh-novosibirsk",
+            "status": 200,
+            "canonical": "https://daibilet.ru/events/gde-moi-2008-ruki-vverh-novosibirsk",
+            "robots": "index, follow",
+            "hasPracticalInfo": true,
+            "hasAbout": true,
+            "hasUl": true
+          },
+          {
+            "slug": "shura-ufa",
+            "status": 200,
+            "canonical": "https://daibilet.ru/events/shura-ufa",
+            "robots": "index, follow",
+            "hasPracticalInfo": true,
+            "hasAbout": true,
+            "hasUl": true
+          },
+          {
+            "slug": "kompozitor-aleksandr-demidov-ot-mirovyh-hitov-do-sobstvennyh-sochinenii-saratov",
+            "status": 200,
+            "canonical": "https://daibilet.ru/events/kompozitor-aleksandr-demidov-ot-mirovyh-hitov-do-sobstvennyh-sochinenii-saratov",
+            "robots": "index, follow",
+            "hasPracticalInfo": true,
+            "hasAbout": true,
+            "hasUl": true
+          },
+          {
+            "slug": "vay-muzykalnoe-loto-russkie-hity-karaoke-samara",
+            "status": 200,
+            "canonical": "https://daibilet.ru/events/vay-muzykalnoe-loto-russkie-hity-karaoke-samara",
+            "robots": "index, follow",
+            "hasPracticalInfo": true,
+            "hasAbout": true,
+            "hasUl": true
+          },
+          {
+            "slug": "aleksandr-bessonov-pochemu-devushki-vybirayut-plohih-parnei-saratov",
+            "status": 200,
+            "canonical": "https://daibilet.ru/events/aleksandr-bessonov-pochemu-devushki-vybirayut-plohih-parnei-saratov",
+            "robots": "index, follow",
+            "hasPracticalInfo": true,
+            "hasAbout": true,
+            "hasUl": true
+          },
+          {
+            "slug": "vau-muzykalnoe-loto-hity-2010-h-i-2020-h-miks-samara",
+            "status": 200,
+            "canonical": "https://daibilet.ru/events/vau-muzykalnoe-loto-hity-2010-h-i-2020-h-miks-samara",
+            "robots": "index, follow",
+            "hasPracticalInfo": true,
+            "hasAbout": true,
+            "hasUl": true
+          },
+          {
+            "slug": "nurminskii-solnyi-koncert-izhevsk-20-noyabrya-pepelac-izhevsk",
+            "status": 200,
+            "canonical": "https://daibilet.ru/events/nurminskii-solnyi-koncert-izhevsk-20-noyabrya-pepelac-izhevsk",
+            "robots": "index, follow",
+            "hasPracticalInfo": true,
+            "hasAbout": true,
+            "hasUl": true
+          },
+          {
+            "slug": "peterburgskie-nedotrogi-sankt-peterburg",
+            "status": 200,
+            "canonical": "https://daibilet.ru/events/peterburgskie-nedotrogi-sankt-peterburg",
+            "robots": "index, follow",
+            "hasPracticalInfo": true,
+            "hasAbout": true,
+            "hasUl": true
+          },
+          {
+            "slug": "homie-h-20-noyabrya-h-klub-atmosfera-g-kursk",
+            "status": 200,
+            "canonical": "https://daibilet.ru/events/homie-h-20-noyabrya-h-klub-atmosfera-g-kursk",
+            "robots": "index, follow",
+            "hasPracticalInfo": true,
+            "hasAbout": true,
+            "hasUl": true
+          },
+          {
+            "slug": "zhenskii-stand-up-na-sretenke-moskva-3",
+            "status": 200,
+            "canonical": "https://daibilet.ru/events/zhenskii-stand-up-na-sretenke-moskva-3",
+            "robots": "index, follow",
+            "hasPracticalInfo": true,
+            "hasAbout": true,
+            "hasUl": true
+          },
+          {
+            "slug": "tango-na-krayu-sankt-peterburg",
+            "status": 200,
+            "canonical": "https://daibilet.ru/events/tango-na-krayu-sankt-peterburg",
+            "robots": "index, follow",
+            "hasPracticalInfo": true,
+            "hasAbout": true,
+            "hasUl": true
+          },
+          {
+            "slug": "hren-prezentaciya-alboma-yaroslavl",
+            "status": 200,
+            "canonical": "https://daibilet.ru/events/hren-prezentaciya-alboma-yaroslavl",
+            "robots": "index, follow",
+            "hasPracticalInfo": true,
+            "hasAbout": true,
+            "hasUl": true
+          },
+          {
+            "slug": "novogodnii-roman-kaliningrad",
+            "status": 200,
+            "canonical": "https://daibilet.ru/events/novogodnii-roman-kaliningrad",
+            "robots": "index, follow",
+            "hasPracticalInfo": true,
+            "hasAbout": true,
+            "hasUl": true
+          },
+          {
+            "slug": "molitva-v-opere-organ-i-vokal-v-lyublino-moskva",
+            "status": 200,
+            "canonical": "https://daibilet.ru/events/molitva-v-opere-organ-i-vokal-v-lyublino-moskva",
+            "robots": "index, follow",
+            "hasPracticalInfo": true,
+            "hasAbout": true,
+            "hasUl": true
+          },
+          {
+            "slug": "kamazz-elec",
+            "status": 200,
+            "canonical": "https://daibilet.ru/events/kamazz-elec",
+            "robots": "index, follow",
+            "hasPracticalInfo": true,
+            "hasAbout": true,
+            "hasUl": true
+          },
+          {
+            "slug": "georgii-tadorovskii-raitet-20-h-30-h-moskva",
+            "status": 200,
+            "canonical": "https://daibilet.ru/events/georgii-tadorovskii-raitet-20-h-30-h-moskva",
+            "robots": "index, follow",
+            "hasPracticalInfo": true,
+            "hasAbout": true,
+            "hasUl": true
+          },
+          {
+            "slug": "rzhunimagu-moskva",
+            "status": 200,
+            "canonical": "https://daibilet.ru/events/rzhunimagu-moskva",
+            "robots": "index, follow",
+            "hasPracticalInfo": true,
+            "hasAbout": true,
+            "hasUl": true
+          },
+          {
+            "slug": "nauchnoe-priklyuchenie-prosto-fizika-dlya-detei-5-6-let-tomsk",
+            "status": 200,
+            "canonical": "https://daibilet.ru/events/nauchnoe-priklyuchenie-prosto-fizika-dlya-detei-5-6-let-tomsk",
+            "robots": "index, follow",
+            "hasPracticalInfo": true,
+            "hasAbout": true,
+            "hasUl": true
+          },
+          {
+            "slug": "interaktivnyi-spektakl-muha-cokotuha-ot-2-do-6-let-sankt-peterburg",
+            "status": 200,
+            "canonical": "https://daibilet.ru/events/interaktivnyi-spektakl-muha-cokotuha-ot-2-do-6-let-sankt-peterburg",
+            "robots": "index, follow",
+            "hasPracticalInfo": true,
+            "hasAbout": true,
+            "hasUl": true
+          },
+          {
+            "slug": "koncert-dlya-samyh-malenkih-kompozitory-detyam-sankt-peterburg",
+            "status": 200,
+            "canonical": "https://daibilet.ru/events/koncert-dlya-samyh-malenkih-kompozitory-detyam-sankt-peterburg",
+            "robots": "index, follow",
+            "hasPracticalInfo": true,
+            "hasAbout": true,
+            "hasUl": true
+          },
+          {
+            "slug": "snegurochka-moskva",
+            "status": 200,
+            "canonical": "https://daibilet.ru/events/snegurochka-moskva",
+            "robots": "index, follow",
+            "hasPracticalInfo": true,
+            "hasAbout": true,
+            "hasUl": true
+          },
+          {
+            "slug": "vladimirskii-dvorec-s-posescheniem-zakrytyh-zalov-sankt-peterburg",
+            "status": 200,
+            "canonical": "https://daibilet.ru/events/vladimirskii-dvorec-s-posescheniem-zakrytyh-zalov-sankt-peterburg",
+            "robots": "index, follow",
+            "hasPracticalInfo": true,
+            "hasAbout": true,
+            "hasUl": true
+          },
+          {
+            "slug": "master-klass-po-maslyanoi-zhivopisi-moskva",
+            "status": 200,
+            "canonical": "https://daibilet.ru/events/master-klass-po-maslyanoi-zhivopisi-moskva",
+            "robots": "index, follow",
+            "hasPracticalInfo": true,
+            "hasAbout": true,
+            "hasUl": true
+          },
+          {
+            "slug": "zmei-interaktivnoe-znakomstvo-s-ekzoticheskimi-zhivotnymi-sankt-peterburg",
+            "status": 200,
+            "canonical": "https://daibilet.ru/events/zmei-interaktivnoe-znakomstvo-s-ekzoticheskimi-zhivotnymi-sankt-peterburg",
+            "robots": "index, follow",
+            "hasPracticalInfo": true,
+            "hasAbout": true,
+            "hasUl": true
+          },
+          {
+            "slug": "istoricheskii-organ-v-maltiiskoi-kapelle-v-dvizhenii-i-sozercanii-sankt-peterburg",
+            "status": 200,
+            "canonical": "https://daibilet.ru/events/istoricheskii-organ-v-maltiiskoi-kapelle-v-dvizhenii-i-sozercanii-sankt-peterburg",
+            "robots": "index, follow",
+            "hasPracticalInfo": true,
+            "hasAbout": true,
+            "hasUl": true
+          },
+          {
+            "slug": "novyi-kampus-mgtu-i-okrestnosti-moskva",
+            "status": 200,
+            "canonical": "https://daibilet.ru/events/novyi-kampus-mgtu-i-okrestnosti-moskva",
+            "robots": "index, follow",
+            "hasPracticalInfo": true,
+            "hasAbout": true,
+            "hasUl": true
+          },
+          {
+            "slug": "21-11-2026-irkutsk-kostya-kulyasov-i-gruppa-animaciya-animaciya-online-irkutsk",
+            "status": 200,
+            "canonical": "https://daibilet.ru/events/21-11-2026-irkutsk-kostya-kulyasov-i-gruppa-animaciya-animaciya-online-irkutsk",
+            "robots": "index, follow",
+            "hasPracticalInfo": true,
+            "hasAbout": true,
+            "hasUl": true
+          }
+        ]
+      }
+    }
+  },
+  "totals": {
+    "published": 90,
+    "uniqueEventIds": 90,
+    "uniqueEventPages": 90,
+    "productionIndexableEventPages": 357,
+    "productionEventPages": 6218
+  }
+}

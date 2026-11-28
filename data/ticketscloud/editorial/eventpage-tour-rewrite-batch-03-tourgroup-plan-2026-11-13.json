@@ -1,0 +1,288 @@
+{
+  "batch": 3,
+  "createdAt": "2026-11-13T05:53:53.417Z",
+  "groups": [
+    {
+      "groupNo": 1,
+      "sourceRank": 3,
+      "key": "цирк шоу браво г",
+      "title": "Цирковое представление «Шоу Браво»",
+      "existingTourGroupId": null,
+      "candidatePageIds": [
+        "6ae2a40e-e0a8-4205-a3f9-4ee6b39b40f4",
+        "ed61179f-05ed-4150-8002-91254937ca1b",
+        "e9269026-b520-44ce-889e-19adc9d817b3",
+        "b2f781d4-d5f6-4c3e-ab84-cd4316bacf56",
+        "4002e040-ff8c-4248-93d0-fffd77726604"
+      ],
+      "extraSameCityPageIds": []
+    },
+    {
+      "groupNo": 2,
+      "sourceRank": 12,
+      "key": "достойный стендап",
+      "title": "«Достойный стендап»",
+      "existingTourGroupId": null,
+      "candidatePageIds": [
+        "03818c2a-ced1-4873-afea-d683fb5eae95",
+        "b5a98917-4e32-4e1f-9b50-978afc16d79c"
+      ],
+      "extraSameCityPageIds": [
+        "17215bed-e434-4bd6-b7e0-2008a06d5af3"
+      ]
+    },
+    {
+      "groupNo": 3,
+      "sourceRank": 23,
+      "key": "цирк бруно в г",
+      "title": "Цирковое шоу «Бруно»",
+      "existingTourGroupId": null,
+      "candidatePageIds": [
+        "be4df034-fb72-4267-981c-1a30e3d657d4",
+        "ccbfe318-3491-4ad3-a602-5ae1fc7b7b87",
+        "6d2bbcae-551f-4ec0-949d-544ad683e946"
+      ],
+      "extraSameCityPageIds": []
+    },
+    {
+      "groupNo": 4,
+      "sourceRank": 31,
+      "key": "константин бутаков",
+      "title": "Сольный стендап Константина Бутакова",
+      "existingTourGroupId": null,
+      "candidatePageIds": [
+        "7c7ef641-85ca-433c-a9b1-bad70de68c38",
+        "0eb4a499-0dce-4569-9748-aca36a11beb8"
+      ],
+      "extraSameCityPageIds": []
+    },
+    {
+      "groupNo": 5,
+      "sourceRank": 36,
+      "key": "анимация",
+      "title": "Группа «АнимациЯ» — концерт к 26-летию",
+      "existingTourGroupId": null,
+      "candidatePageIds": [
+        "b3b42a30-6777-4e85-93fb-702e28bd893e",
+        "9f4a3b3b-b9f9-4499-96c2-a63a7ee9b205"
+      ],
+      "extraSameCityPageIds": []
+    },
+    {
+      "groupNo": 6,
+      "sourceRank": 37,
+      "key": "medio modo fest",
+      "title": "Medio Modo Fest: фестиваль научно-популярных лекций",
+      "existingTourGroupId": null,
+      "candidatePageIds": [
+        "d31661d5-8449-46fe-b09f-c7aeb2559eb4",
+        "2c2a1e2f-c92f-4934-8cd7-00c5febca3b0"
+      ],
+      "extraSameCityPageIds": []
+    },
+    {
+      "groupNo": 7,
+      "sourceRank": 38,
+      "key": "маша и медведи",
+      "title": "«Маша и Медведи» — концерт",
+      "existingTourGroupId": null,
+      "candidatePageIds": [
+        "ebf2f74e-7402-424e-88e9-a5eda3abbc33",
+        "4ae65e1b-1da5-4618-ae51-8c12fdf64eb2"
+      ],
+      "extraSameCityPageIds": []
+    },
+    {
+      "groupNo": 8,
+      "sourceRank": 39,
+      "key": "артемизия и satarova сольный концерт",
+      "title": "Артемизия и SATAROVA — концерт двух музыкальных проектов",
+      "existingTourGroupId": null,
+      "candidatePageIds": [
+        "fec2106f-da87-465a-b817-e07faf224bb6",
+        "87d3abfc-b61c-4085-8c36-3a86f669bd21"
+      ],
+      "extraSameCityPageIds": []
+    },
+    {
+      "groupNo": 9,
+      "sourceRank": 40,
+      "key": "бессонов лирика",
+      "title": "«Бессонов. Лирика» — чтение рассказов о любви",
+      "existingTourGroupId": null,
+      "candidatePageIds": [
+        "521ce655-5147-4f16-b0bf-01800f5a641b",
+        "48b99fcf-a0b7-4ef4-8501-a41d31b12ea0"
+      ],
+      "extraSameCityPageIds": []
+    },
+    {
+      "groupNo": 10,
+      "sourceRank": 41,
+      "key": "константин лем white fox music",
+      "title": "Константин Лем и White Fox Music — акустический концерт",
+      "existingTourGroupId": null,
+      "candidatePageIds": [
+        "5c39fe8d-a4b1-419c-97c2-8d4abc5ae733",
+        "89464ae8-7024-4e79-bbb2-3a42087ca69e"
+      ],
+      "extraSameCityPageIds": []
+    },
+    {
+      "groupNo": 11,
+      "sourceRank": 42,
+      "key": "стендап концерт виктории складчиковой повтор материала года",
+      "title": "Виктория Складчикова — стендап, повтор материала 2026 года",
+      "existingTourGroupId": null,
+      "candidatePageIds": [
+        "e9e456cd-a5e9-4728-98a2-a643ee1eb0de",
+        "a258cb76-80a4-446a-ba86-da28b6868dc0"
+      ],
+      "extraSameCityPageIds": []
+    },
+    {
+      "groupNo": 12,
+      "sourceRank": 43,
+      "key": "торба на круче",
+      "title": "«Торба-на-Круче» — концерт",
+      "existingTourGroupId": null,
+      "candidatePageIds": [
+        "b988135c-a6c8-400a-a69c-57e00f82bc90",
+        "ae9f795d-c6ea-4d20-ac86-302b3b7f160f"
+      ],
+      "extraSameCityPageIds": []
+    },
+    {
+      "groupNo": 13,
+      "sourceRank": 44,
+      "key": "юлия коган",
+      "title": "Юлия Коган — концерт с юмористическими песнями и балладами",
+      "existingTourGroupId": null,
+      "candidatePageIds": [
+        "253aa8a9-76d2-450b-a805-29fa7830fea3",
+        "98d5ea04-bfac-405f-badb-7bf94046e02f"
+      ],
+      "extraSameCityPageIds": []
+    },
+    {
+      "groupNo": 14,
+      "sourceRank": 45,
+      "key": "norma tale сольный концерт",
+      "title": "Norma Tale — сольный концерт",
+      "existingTourGroupId": null,
+      "candidatePageIds": [
+        "48506e71-2dd1-4f74-8c89-2e263f6370e7",
+        "86523635-3eaf-4fa3-808e-93195f7bad94"
+      ],
+      "extraSameCityPageIds": []
+    },
+    {
+      "groupNo": 15,
+      "sourceRank": 46,
+      "key": "алексей решетун новый год по судебно медицински",
+      "title": "Алексей Решетун - Новый год по судебно-медицински",
+      "existingTourGroupId": "c429fda0-35a3-4673-8a02-b3929fbbcf85",
+      "candidatePageIds": [
+        "52bbc926-af2c-4607-9383-2f8115b0b383",
+        "cd321ce8-6706-491a-bc76-df931489a9ea"
+      ],
+      "extraSameCityPageIds": []
+    },
+    {
+      "groupNo": 16,
+      "sourceRank": 47,
+      "key": "palc сольный концерт",
+      "title": "PALC — сольный концерт",
+      "existingTourGroupId": null,
+      "candidatePageIds": [
+        "e1487b06-5891-4fb6-8edf-3c9b13f731e0",
+        "17726ece-a5fb-42d7-b73d-cea17df22c8f"
+      ],
+      "extraSameCityPageIds": []
+    },
+    {
+      "groupNo": 17,
+      "sourceRank": 48,
+      "key": "хиты х караоке с оркестром",
+      "title": "«Хиты 2000-х»: караоке с оркестром",
+      "existingTourGroupId": null,
+      "candidatePageIds": [
+        "4a556c9a-9aaa-4b25-91c7-1b5ce60a0cc7",
+        "40dd2d16-166b-4b65-86c4-5a4b68b14ed2"
+      ],
+      "extraSameCityPageIds": []
+    },
+    {
+      "groupNo": 18,
+      "sourceRank": 49,
+      "key": "алексей третьяков это точно икона научно исторический взгляд на самые необычные образы в иконописи",
+      "title": "Алексей Третьяков — «Это точно икона?»",
+      "existingTourGroupId": null,
+      "candidatePageIds": [
+        "3345594a-d6d4-4687-97f2-a3a7fe81eb61",
+        "21a9b8fa-d0ac-42ea-b012-2c14c73daab6"
+      ],
+      "extraSameCityPageIds": []
+    },
+    {
+      "groupNo": 19,
+      "sourceRank": 50,
+      "key": "мэрилин монро как паутина на ветру",
+      "title": "Спектакль «Мэрилин Монро. Как паутина на ветру…»",
+      "existingTourGroupId": null,
+      "candidatePageIds": [
+        "9d10cb36-940f-42ae-8503-2c3e594fb27e",
+        "027c156e-dc4d-401c-b5f2-e9bd8818b0e0"
+      ],
+      "extraSameCityPageIds": []
+    },
+    {
+      "groupNo": 20,
+      "sourceRank": 51,
+      "key": "voroth ворот",
+      "title": "Voroth (Ворот) — концерт в рамках METAL ASSAULT FEST",
+      "existingTourGroupId": null,
+      "candidatePageIds": [
+        "9c945e58-7368-4941-a373-62b17312f0f7",
+        "83cb872c-4333-4735-b1a6-47a4722b3f25"
+      ],
+      "extraSameCityPageIds": []
+    },
+    {
+      "groupNo": 21,
+      "sourceRank": 52,
+      "key": "жека басотский",
+      "title": "Жека Басотский — концерт",
+      "existingTourGroupId": null,
+      "candidatePageIds": [
+        "963df98d-1f6d-403a-8e5d-39fe0766511e",
+        "29d35f16-9d00-4fae-ad54-ab3935e1060e"
+      ],
+      "extraSameCityPageIds": []
+    },
+    {
+      "groupNo": 22,
+      "sourceRank": 53,
+      "key": "музыкальное лото бинго fm",
+      "title": "Музыкальное лото «Бинго FM»",
+      "existingTourGroupId": null,
+      "candidatePageIds": [
+        "c35e694b-8535-4da7-823d-e22eaac0f1d9",
+        "8efdeace-e414-401c-b0d2-d17d82680fba"
+      ],
+      "extraSameCityPageIds": []
+    },
+    {
+      "groupNo": 23,
+      "sourceRank": 54,
+      "key": "сольный концерт мирославы и златы быковых в е",
+      "title": "Мирослава и Злата Быковы — концерт «Тот самый тур»",
+      "existingTourGroupId": null,
+      "candidatePageIds": [
+        "93f6eba8-b2b6-4ce3-a1c8-0299f645fe79",
+        "14896912-adc4-4f67-8de7-4bbccb604cda"
+      ],
+      "extraSameCityPageIds": []
+    }
+  ]
+}

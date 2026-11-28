@@ -1,0 +1,471 @@
+{
+  "date": "2026-11-10",
+  "batches": {
+    "B01": {
+      "pages": 30,
+      "readyIndexable": 30,
+      "sitemap": 30
+    },
+    "B02": {
+      "pages": 30,
+      "readyIndexable": 30,
+      "sitemap": 30
+    },
+    "B03": {
+      "published": 30,
+      "readyIndexable": 30,
+      "sitemap": 29,
+      "applyResult": [
+        {
+          "eventId": "evt_6ab12ead40211bfa698fb047",
+          "eventPageId": "b8cb77c6-0671-4718-a157-b2eb55601384",
+          "slug": "ladies-of-burlesque-novogodnee-gala-shou-v-muzykalnom-klube-magnus-locus-moskva",
+          "title": "Ladies of Burlesque - новогоднее гала-шоу в музыкальном клубе Magnus Locus",
+          "status": "READY",
+          "isIndexable": true,
+          "publishedAt": "2026-11-10T11:53:20.326Z",
+          "revisionBefore": 1,
+          "eventIds": [
+            "evt_6ab12ead40211bfa698fb047"
+          ]
+        },
+        {
+          "eventId": "evt_6a99c23d4439113c339a2144",
+          "eventPageId": "d65c791a-2e85-4efb-8b8e-4030fe706aeb",
+          "slug": "ekskursiya-v-osobnyak-shredera-koncert-novogodnyaya-melodiya-sankt-peterburg",
+          "title": "Экскурсия в особняк Шрёдера + концерт \"Новогодняя мелодия\"",
+          "status": "READY",
+          "isIndexable": true,
+          "publishedAt": "2026-11-10T11:53:20.640Z",
+          "revisionBefore": 1,
+          "eventIds": [
+            "evt_6a99c23d4439113c339a2144"
+          ]
+        },
+        {
+          "eventId": "evt_6ace441b94e5d842dd83258f",
+          "eventPageId": "c150367c-5ff3-4cdc-9733-69d8b1a4838e",
+          "slug": "celentano-show-italyanskii-novyi-god-moskva",
+          "title": "CELENTANO SHOW: ИТАЛЬЯНСКИЙ НОВЫЙ ГОД",
+          "status": "READY",
+          "isIndexable": true,
+          "publishedAt": "2026-11-10T11:53:21.025Z",
+          "revisionBefore": 1,
+          "eventIds": [
+            "evt_6ace441b94e5d842dd83258f"
+          ]
+        },
+        {
+          "eventId": "evt_6a917901b8a6abb00e53560c",
+          "eventPageId": "c4f864da-e9b3-4df9-a051-485d33c71d4e",
+          "slug": "balet-schelkunchik-sankt-peterburg-3",
+          "title": "Балет \"Щелкунчик\"",
+          "status": "READY",
+          "isIndexable": true,
+          "publishedAt": "2026-11-10T11:53:21.396Z",
+          "revisionBefore": 1,
+          "eventIds": [
+            "evt_6a917901b8a6abb00e53560c"
+          ]
+        },
+        {
+          "eventId": "evt_6abc1be98fd931cd1ab5981e",
+          "eventPageId": "5d8d3b79-a5f1-4241-b06f-9f44194c4424",
+          "slug": "organ-v-planetarii-rozhdestvo-sankt-peterburg",
+          "title": "Орган в планетарии. Рождество",
+          "status": "READY",
+          "isIndexable": true,
+          "publishedAt": "2026-11-10T11:53:21.732Z",
+          "revisionBefore": 1,
+          "eventIds": [
+            "evt_6abc1be98fd931cd1ab5981e"
+          ]
+        },
+        {
+          "eventId": "evt_6ace4633701e99b77512fcda",
+          "eventPageId": "4b9c2a29-c483-46cc-8710-b05384bf7efd",
+          "slug": "novyi-god-so-svetlanoi-zhavoronkovoi-acoustic-soul-moskva",
+          "title": "НОВЫЙ ГОД СО СВЕТЛАНОЙ ЖАВОРОНКОВОЙ & ACOUSTIC SOUL",
+          "status": "READY",
+          "isIndexable": true,
+          "publishedAt": "2026-11-10T11:53:22.066Z",
+          "revisionBefore": 1,
+          "eventIds": [
+            "evt_6ace4633701e99b77512fcda"
+          ]
+        },
+        {
+          "eventId": "evt_6ace47837478368535458a19",
+          "eventPageId": "f84981f5-0a10-4982-b4e7-7a17ef64b311",
+          "slug": "nani-eva-skazochnyi-novyi-god-moskva",
+          "title": "НАНИ ЕВА: «СКАЗОЧНЫЙ НОВЫЙ ГОД»",
+          "status": "READY",
+          "isIndexable": true,
+          "publishedAt": "2026-11-10T11:53:22.343Z",
+          "revisionBefore": 1,
+          "eventIds": [
+            "evt_6ace47837478368535458a19"
+          ]
+        },
+        {
+          "eventId": "evt_6ac3630f41275f6f8027784b",
+          "eventPageId": "ac4b121a-e55f-4017-b2ee-f461a0c2d0bd",
+          "slug": "samye-znamenitye-dzhazovye-kompozicii-vseh-vremen-moskva-10",
+          "title": "Самые знаменитые джазовые композиции в Новый Год!",
+          "status": "READY",
+          "isIndexable": true,
+          "publishedAt": "2026-11-10T11:53:22.563Z",
+          "revisionBefore": 1,
+          "eventIds": [
+            "evt_6ac3630f41275f6f8027784b"
+          ]
+        },
+        {
+          "eventId": "evt_6ace44c760331e4c297fc165",
+          "eventPageId": "df0a57c1-0c20-4f2b-9330-475c6b474195",
+          "slug": "aleks-abra-sinatra-christmas-novogodnee-dzhazovoe-shou-moskva",
+          "title": "АЛЕКС АБРА: «SINATRA CHRISTMAS. НОВОГОДНЕЕ ДЖАЗОВОЕ ШОУ»",
+          "status": "READY",
+          "isIndexable": true,
+          "publishedAt": "2026-11-10T11:53:22.776Z",
+          "revisionBefore": 1,
+          "eventIds": [
+            "evt_6ace44c760331e4c297fc165"
+          ]
+        },
+        {
+          "eventId": "evt_6abcf114cdcbcf662313bab1",
+          "eventPageId": "2df760db-137c-45e1-b8d8-3be9c7e096b8",
+          "slug": "novogodnyaya-noch-novyi-god-2027-volgograd",
+          "title": "Новогодняя ночь | Новый год 2027",
+          "status": "READY",
+          "isIndexable": true,
+          "publishedAt": "2026-11-10T11:53:23.012Z",
+          "revisionBefore": 1,
+          "eventIds": [
+            "evt_6abcf114cdcbcf662313bab1"
+          ]
+        },
+        {
+          "eventId": "evt_6ac76ed0c480670db6243c3c",
+          "eventPageId": "f7bff281-d08a-4a4b-b7da-a563a289eb9b",
+          "slug": "novogodnyaya-noch-novyi-god-2027-volgograd-2",
+          "title": "Новогодняя ночь|Новый год 2027",
+          "status": "READY",
+          "isIndexable": true,
+          "publishedAt": "2026-11-10T11:53:23.259Z",
+          "revisionBefore": 1,
+          "eventIds": [
+            "evt_6ac76ed0c480670db6243c3c"
+          ]
+        },
+        {
+          "eventId": "evt_6ab0aaacb9c8aa04ad59fc8e",
+          "eventPageId": "fd8d795f-50b0-48d5-9721-8eadceac095f",
+          "slug": "novogodnyaya-noch-v-restorane-timerhan-kazan",
+          "title": "Новогодняя ночь в ресторане «Тимерхан»",
+          "status": "READY",
+          "isIndexable": true,
+          "publishedAt": "2026-11-10T11:53:23.508Z",
+          "revisionBefore": 1,
+          "eventIds": [
+            "evt_6ab0aaacb9c8aa04ad59fc8e"
+          ]
+        },
+        {
+          "eventId": "evt_6ad7284a3cae083479cd9f08",
+          "eventPageId": "2202b172-83c1-4d2b-87dc-d8524ff0fe4c",
+          "slug": "novogodnyaya-noch-v-restorane-saiyar-kazan",
+          "title": "Новогодняя ночь в ресторане Сайяр",
+          "status": "READY",
+          "isIndexable": true,
+          "publishedAt": "2026-11-10T11:53:23.809Z",
+          "revisionBefore": 1,
+          "eventIds": [
+            "evt_6ad7284a3cae083479cd9f08"
+          ]
+        },
+        {
+          "eventId": "evt_6adccee1a8cdae9ba5a64e13",
+          "eventPageId": "ff2472d5-aa17-4a38-a03b-5b7159ba467c",
+          "slug": "novogodnyaya-noch-2027-v-nebo-ruftop-g-korolev",
+          "title": "НОВОГОДНЯЯ НОЧЬ 2027 в \"NЕБО\" Руфтоп, г. Королёв",
+          "status": "READY",
+          "isIndexable": true,
+          "publishedAt": "2026-11-10T11:53:24.136Z",
+          "revisionBefore": 1,
+          "eventIds": [
+            "evt_6adccee1a8cdae9ba5a64e13"
+          ]
+        },
+        {
+          "eventId": "evt_6ab527cc83153f69a9fe0cd2",
+          "eventPageId": "ff4633bd-1f6b-4645-9e0a-af43f8ec9a3a",
+          "slug": "gde-moi-2008-treff8-ny-moskva",
+          "title": "МОЙ 2008: НОВОГОДНЯЯ НОЧЬ @TREFF8",
+          "status": "READY",
+          "isIndexable": true,
+          "publishedAt": "2026-11-10T11:53:24.367Z",
+          "revisionBefore": 1,
+          "eventIds": [
+            "evt_6ab527cc83153f69a9fe0cd2"
+          ]
+        },
+        {
+          "eventId": "evt_6ad927b5b72572149d1b6d0e",
+          "eventPageId": "58a67333-7266-44e1-9b75-7fae3aa393db",
+          "slug": "novogodnyaya-noch-2027-v-soho-rooms-avraam-russo-i-soso-pavliashvili-moskva",
+          "title": "Новогодняя ночь 2027 в Soho Rooms: Авраам РУССО и Сосо ПАВЛИАШВИЛИ!",
+          "status": "READY",
+          "isIndexable": true,
+          "publishedAt": "2026-11-10T11:53:24.603Z",
+          "revisionBefore": 1,
+          "eventIds": [
+            "evt_6ad927b5b72572149d1b6d0e"
+          ]
+        },
+        {
+          "eventId": "evt_6ac7b0d5ef2d55f6918ab309",
+          "eventPageId": "8f117697-ce7d-47b7-b642-39da36ff7c0e",
+          "slug": "novogodnyaya-noch-2027-v-arbat-hall-puteshestvie-v-mir-fantazii-moskva",
+          "title": "Новогодняя ночь 2027 в ARBAT HALL - Путешествие в мир фантазий",
+          "status": "READY",
+          "isIndexable": true,
+          "publishedAt": "2026-11-10T11:53:24.928Z",
+          "revisionBefore": 1,
+          "eventIds": [
+            "evt_6ac7b0d5ef2d55f6918ab309"
+          ]
+        },
+        {
+          "eventId": "evt_6a86ee1c50470c72fc8570b4",
+          "eventPageId": "6f9c6808-86fb-467f-8956-45ad90040e15",
+          "slug": "novogodnyaya-noch-v-restorane-istoriya-sankt-peterburg",
+          "title": "Новогодняя ночь в ресторане \"История\"",
+          "status": "READY",
+          "isIndexable": true,
+          "publishedAt": "2026-11-10T11:53:25.196Z",
+          "revisionBefore": 1,
+          "eventIds": [
+            "evt_6a86ee1c50470c72fc8570b4"
+          ]
+        },
+        {
+          "eventId": "evt_6a86e994e57975302b351c61",
+          "eventPageId": "b6e08f2f-ad38-4e99-a13a-8390e7f0e68a",
+          "slug": "novogodnyaya-noch-v-restorane-sobytii-aleksandrovskii-park-sankt-peterburg",
+          "title": "Новогодняя ночь в ресторане событий \"Александровский Парк\"",
+          "status": "READY",
+          "isIndexable": true,
+          "publishedAt": "2026-11-10T11:53:25.433Z",
+          "revisionBefore": 1,
+          "eventIds": [
+            "evt_6a86e994e57975302b351c61"
+          ]
+        },
+        {
+          "eventId": "evt_6aac54fc55314e031b192395",
+          "eventPageId": "0da19d53-4397-4795-905e-4b03c8b25ee4",
+          "slug": "novyi-god-2026-2027-sankt-peterburg",
+          "title": "Новый год 2026/2027",
+          "status": "READY",
+          "isIndexable": true,
+          "publishedAt": "2026-11-10T11:53:25.731Z",
+          "revisionBefore": 1,
+          "eventIds": [
+            "evt_6aac54fc55314e031b192395"
+          ]
+        },
+        {
+          "eventId": "evt_6ad1d3fbe9ada527f794fe01",
+          "eventPageId": "b1f714b9-cf60-4f09-aecf-534c2e648f9a",
+          "slug": "novyi-god-v-gamme-na-sadovom-moskva",
+          "title": "Новый год в «Гамме на Садовом»",
+          "status": "READY",
+          "isIndexable": true,
+          "publishedAt": "2026-11-10T11:53:25.939Z",
+          "revisionBefore": 1,
+          "eventIds": [
+            "evt_6ad1d3fbe9ada527f794fe01"
+          ]
+        },
+        {
+          "eventId": "evt_6ad4d34db1c46d8759bc4b6f",
+          "eventPageId": "42c20ee1-8c93-428b-adce-a2c923304e9c",
+          "slug": "novogodnie-hity-dlya-tenora-i-royalya-pri-svechah-moskva",
+          "title": "Новогодние хиты для тенора и рояля при свечах",
+          "status": "READY",
+          "isIndexable": true,
+          "publishedAt": "2026-11-10T11:53:26.166Z",
+          "revisionBefore": 1,
+          "eventIds": [
+            "evt_6ad4d34db1c46d8759bc4b6f"
+          ]
+        },
+        {
+          "eventId": "evt_6a7439a232c0c00095808d62",
+          "eventPageId": "41ad9397-d9ad-47e1-91f1-ba2d776d86cf",
+          "slug": "novogodnii-subbotnii-dzhaz-i-horoshee-nastroenie-moskva",
+          "title": "Новогодний субботний джаз и хорошее настроение",
+          "status": "READY",
+          "isIndexable": true,
+          "publishedAt": "2026-11-10T11:53:26.510Z",
+          "revisionBefore": 1,
+          "eventIds": [
+            "evt_6a7439a232c0c00095808d62"
+          ]
+        },
+        {
+          "eventId": "evt_6ac6bb08b2aca4fab5c5b971",
+          "eventPageId": "deb774fc-ba91-46f8-bbee-0d302dda2ccd",
+          "slug": "novogodnii-ogonek-so-zvezdami-80-90h-gruppa-karolina-tver",
+          "title": "Новогодний Огонёк со Звёздами 80-90х, группа \"КАРОЛИНА\"",
+          "status": "READY",
+          "isIndexable": true,
+          "publishedAt": "2026-11-10T11:53:26.906Z",
+          "revisionBefore": 1,
+          "eventIds": [
+            "evt_6ac6bb08b2aca4fab5c5b971"
+          ]
+        },
+        {
+          "eventId": "evt_69bb12020a78bb64bfcde2aa",
+          "eventPageId": "0efc6881-5bff-4dd5-a32d-97e36e045ed0",
+          "slug": "novogodnyaya-white-diskoteka-90h-moskva",
+          "title": "Новогодняя WHITE Дискотека 90х",
+          "status": "READY",
+          "isIndexable": true,
+          "publishedAt": "2026-11-10T11:53:27.115Z",
+          "revisionBefore": 1,
+          "eventIds": [
+            "evt_69bb12020a78bb64bfcde2aa"
+          ]
+        },
+        {
+          "eventId": "evt_6adfa21c948b8bb0619343f3",
+          "eventPageId": "000a3953-4d69-4085-8b6d-ae4354a114d6",
+          "slug": "novogodnii-smo-rodnik-moskva",
+          "title": "Новогодний СМО_РОДНИК",
+          "status": "READY",
+          "isIndexable": true,
+          "publishedAt": "2026-11-10T11:53:27.370Z",
+          "revisionBefore": 1,
+          "eventIds": [
+            "evt_6adfa21c948b8bb0619343f3"
+          ]
+        },
+        {
+          "eventId": "evt_6a65f2a0ccf2c6d0cd493b05",
+          "eventPageId": "ce9a6854-947d-481f-bc82-3788557a627a",
+          "slug": "novogodnii-ogonek-so-zvezdami-80-90h-prazdnichnyi-koncert-ryazan",
+          "title": "Новогодний Огонёк со Звёздами 80-90х! Праздничный концерт!",
+          "status": "READY",
+          "isIndexable": true,
+          "publishedAt": "2026-11-10T11:53:27.590Z",
+          "revisionBefore": 1,
+          "eventIds": [
+            "evt_6a65f2a0ccf2c6d0cd493b05"
+          ]
+        },
+        {
+          "eventId": "evt_6a9c4c413207bfb65eb48cf9",
+          "eventPageId": "11aad633-cb3a-4e44-9029-b56ea6b79e03",
+          "slug": "ekskursiya-v-osobnyak-shredera-koncert-novogodnii-divertisment-za-stolikami-s-furshetom-sankt-peterburg",
+          "title": "Экскурсия в особняк Шрёдера + концерт \"Новогодний дивертисмент\" за столиками с фуршетом",
+          "status": "READY",
+          "isIndexable": true,
+          "publishedAt": "2026-11-10T11:53:27.791Z",
+          "revisionBefore": 1,
+          "eventIds": [
+            "evt_6a9c4c413207bfb65eb48cf9"
+          ]
+        },
+        {
+          "eventId": "evt_tep_778",
+          "eventPageId": "ed53eea0-40da-4fd6-a983-71b1dad689e2",
+          "slug": "novogodnyaya-ekskursiya-2027-na-avtobuse-ot-krasnoi-ploschadi",
+          "title": "Новогодняя экскурсия 2027 на автобусе от Красной Площади",
+          "status": "READY",
+          "isIndexable": true,
+          "publishedAt": "2026-11-10T11:53:27.966Z",
+          "revisionBefore": 1,
+          "eventIds": [
+            "evt_tep_778"
+          ]
+        },
+        {
+          "eventId": "evt_tep_1018",
+          "eventPageId": "c85048f7-6d59-4ba1-982e-fbdf4e987c4c",
+          "slug": "novogodnii-poyuschii-avtobus",
+          "title": "Новогодний поющий автобус",
+          "status": "READY",
+          "isIndexable": true,
+          "publishedAt": "2026-11-10T11:53:28.176Z",
+          "revisionBefore": 1,
+          "eventIds": [
+            "evt_tep_1018"
+          ]
+        }
+      ]
+    }
+  },
+  "totals": {
+    "pages": 90,
+    "readyIndexable": 90,
+    "sitemap": 89
+  },
+  "revalidation": {
+    "eventPages": 30,
+    "legacyAliases": 30,
+    "indexNowQueued": 30,
+    "allOk": true
+  },
+  "smoke": {
+    "checked": 30,
+    "sitemapStatus": 200,
+    "api200": 30,
+    "html200": 30,
+    "canonicalOk": 30,
+    "noindex": 0,
+    "heading": 30,
+    "practical": 30,
+    "externalHtml": {
+      "checked": 30,
+      "passed": 30,
+      "allStatus200": true,
+      "allCanonicalCorrect": true,
+      "noindex": 0,
+      "headingsPresent": 30,
+      "practicalInfoPresent": 30
+    }
+  },
+  "sitemapException": {
+    "eventId": "evt_6a7439a232c0c00095808d62",
+    "eventPageId": "41ad9397-d9ad-47e1-91f1-ba2d776d86cf",
+    "slug": "novogodnii-subbotnii-dzhaz-i-horoshee-nastroenie-moskva",
+    "url": "https://daibilet.ru/events/novogodnii-subbotnii-dzhaz-i-horoshee-nastroenie-moskva",
+    "pagePublishedAndIndexable": true,
+    "pageHttp": 200,
+    "canonicalOk": true,
+    "robotsNoindex": false,
+    "inSitemap": false,
+    "changedRelation": false,
+    "reason": "Public catalog/sitemap did not emit this EventPage slug; catalog eligibility/mapping needs separate investigation."
+  },
+  "publicEdge": {
+    "status": 200,
+    "cacheStatus": "HIT",
+    "targetUrlsPresent": 63,
+    "cacheTtlSeconds": 1800,
+    "originBypass": {
+      "status": 200,
+      "cacheStatus": "BYPASS",
+      "targetUrlsPresent": 89,
+      "missing": "novogodnii-subbotnii-dzhaz-i-horoshee-nastroenie-moskva"
+    },
+    "externalHtml": {
+      "checked": 30,
+      "passed": 30
+    }
+  }
+}

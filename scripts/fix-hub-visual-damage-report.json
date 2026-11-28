@@ -1,0 +1,1956 @@
+[
+  {
+    "city": "rostov-na-donu",
+    "bases": 86,
+    "unflipped": [
+      "msii-na-dmitrovskoy",
+      "muzey-skzhd",
+      "pamyatnik-pushkinu",
+      "pamyatnik-santehniku",
+      "park-revolyutsii",
+      "skulptura-kupec-korobeynik",
+      "starocherkasskaya-dvorec-efremovyh",
+      "teatr-dramy-im-gorkogo"
+    ],
+    "upsideSuspects": [
+      "msii-na-dmitrovskoy",
+      "muzey-skzhd",
+      "pamyatnik-pushkinu",
+      "pamyatnik-santehniku",
+      "park-revolyutsii",
+      "skulptura-kupec-korobeynik",
+      "starocherkasskaya-dvorec-efremovyh",
+      "teatr-dramy-im-gorkogo"
+    ],
+    "collage": [
+      {
+        "stem": "aksay-kupecheskaya-ulica",
+        "seamV": 28.8,
+        "seamH": 50.4
+      },
+      {
+        "stem": "aksay-naberezhnaya",
+        "seamV": 0.2,
+        "seamH": 36.7
+      },
+      {
+        "stem": "aksay-podzemnyy-kompleks",
+        "seamV": 25,
+        "seamH": 53.5
+      },
+      {
+        "stem": "aksay-zdanie-zastavy",
+        "seamV": 53.2,
+        "seamH": 43.9
+      },
+      {
+        "stem": "aksayskaya-tamozhennaya-zastava",
+        "seamV": 23.1,
+        "seamH": 43.5
+      },
+      {
+        "stem": "bol-shaya-sadovaya-ulitsa",
+        "seamV": 61,
+        "seamH": 35
+      },
+      {
+        "stem": "dohodnyy-dom-kisina",
+        "seamV": 19.7,
+        "seamH": 50.7
+      },
+      {
+        "stem": "dom-chernovoy",
+        "seamV": 17.4,
+        "seamH": 34.3
+      },
+      {
+        "stem": "dom-kotlyarova",
+        "seamV": 63.8,
+        "seamH": 36.4
+      },
+      {
+        "stem": "dom-vrangelya",
+        "seamV": 60.7,
+        "seamH": 34.7
+      },
+      {
+        "stem": "donskaya-kazachya-gvardiya",
+        "seamV": 31.4,
+        "seamH": 34.7
+      },
+      {
+        "stem": "kafedralnyy-sobor-rozhdestva-bogorodicy",
+        "seamV": 19.4,
+        "seamH": 30.6
+      },
+      {
+        "stem": "makaronka-s61",
+        "seamV": 31,
+        "seamH": 36
+      },
+      {
+        "stem": "manych-gudilo",
+        "seamV": 23,
+        "seamH": 42.5
+      },
+      {
+        "stem": "manych-kurgany",
+        "seamV": 32.8,
+        "seamH": 52.8
+      },
+      {
+        "stem": "manych-ornito-tochki",
+        "seamV": 24.1,
+        "seamH": 64.6
+      },
+      {
+        "stem": "manych-stepnye-marshruty",
+        "seamV": 11.8,
+        "seamH": 31.9
+      },
+      {
+        "stem": "msii-na-dmitrovskoy",
+        "seamV": 49.9,
+        "seamH": 23.2
+      },
+      {
+        "stem": "muzey-istorii-organov-pravoporyadka",
+        "seamV": 35.5,
+        "seamH": 41.8
+      },
+      {
+        "stem": "muzey-izobrazitelnyh-iskusstv",
+        "seamV": 21.8,
+        "seamH": 48.9
+      },
+      {
+        "stem": "muzey-kosmonavtiki",
+        "seamV": 25.7,
+        "seamH": 28.1
+      },
+      {
+        "stem": "muzey-russko-armyanskoy-druzhby",
+        "seamV": 35.9,
+        "seamH": 28.5
+      },
+      {
+        "stem": "oblastnoy-muzey-kraevedeniya",
+        "seamV": 39.9,
+        "seamH": 39.6
+      },
+      {
+        "stem": "onegin-dacha",
+        "seamV": 42.8,
+        "seamH": 49.2
+      },
+      {
+        "stem": "osobnyak-paramonova",
+        "seamV": 27.8,
+        "seamH": 37
+      },
+      {
+        "stem": "osobnyak-suprunova",
+        "seamV": 19.2,
+        "seamH": 32.9
+      },
+      {
+        "stem": "ozero-manych-gudilo",
+        "seamV": 22.4,
+        "seamH": 44.4
+      },
+      {
+        "stem": "pamyatnik-dimitriyu-rostovskomu",
+        "seamV": 39.4,
+        "seamH": 23.1
+      },
+      {
+        "stem": "pamyatnik-elizavete-petrovne",
+        "seamV": 54.7,
+        "seamH": 45.4
+      },
+      {
+        "stem": "pamyatnik-leninu",
+        "seamV": 23.3,
+        "seamH": 89.3
+      },
+      {
+        "stem": "pamyatnik-pervokonnikam",
+        "seamV": 22.5,
+        "seamH": 58.6
+      },
+      {
+        "stem": "pamyatnik-pushkinu",
+        "seamV": 64.5,
+        "seamH": 33.5
+      },
+      {
+        "stem": "pamyatnik-santehniku",
+        "seamV": 33.4,
+        "seamH": 38.7
+      },
+      {
+        "stem": "pamyatnik-sholohovu",
+        "seamV": 27.6,
+        "seamH": 84.2
+      },
+      {
+        "stem": "pamyatnik-stepanu-razinu",
+        "seamV": 27.8,
+        "seamH": 68.4
+      },
+      {
+        "stem": "pamyatnik-vodoprovodu",
+        "seamV": 39.5,
+        "seamH": 40.2
+      },
+      {
+        "stem": "paramonovskie-sklady",
+        "seamV": 28.9,
+        "seamH": 23.6
+      },
+      {
+        "stem": "park-gorkogo",
+        "seamV": 37.2,
+        "seamH": 34.8
+      },
+      {
+        "stem": "park-levoberezhnyy",
+        "seamV": 23.3,
+        "seamH": 70.1
+      },
+      {
+        "stem": "park-revolyutsii",
+        "seamV": 52.7,
+        "seamH": 54.5
+      },
+      {
+        "stem": "passazh-gench-oglueva",
+        "seamV": 33.7,
+        "seamH": 56.9
+      },
+      {
+        "stem": "puhlyakovskiy-bereg-dona",
+        "seamV": 15.8,
+        "seamH": 43.9
+      },
+      {
+        "stem": "puhlyakovskiy-degustaciya",
+        "seamV": 22.7,
+        "seamH": 48.1
+      },
+      {
+        "stem": "puhlyakovskiy-festivalnaya-ploshchad",
+        "seamV": 41.7,
+        "seamH": 50.7
+      },
+      {
+        "stem": "puhlyakovskiy-vinogradniki",
+        "seamV": 18.6,
+        "seamH": 67.4
+      },
+      {
+        "stem": "puhlyakovskiy",
+        "seamV": 26.8,
+        "seamH": 29.6
+      },
+      {
+        "stem": "pushkinskaya-ulitsa",
+        "seamV": 26.7,
+        "seamH": 65.3
+      },
+      {
+        "stem": "raki-i-gady",
+        "seamV": 17,
+        "seamH": 52.2
+      },
+      {
+        "stem": "rostovskiy-rak",
+        "seamV": 29.1,
+        "seamH": 26.4
+      },
+      {
+        "stem": "ryumochnaya-hrustal",
+        "seamV": 38.5,
+        "seamH": 25.7
+      },
+      {
+        "stem": "skulptura-cvetochnica",
+        "seamV": 38.8,
+        "seamH": 46.1
+      },
+      {
+        "stem": "skulptura-kupec-korobeynik",
+        "seamV": 28.7,
+        "seamH": 42.6
+      },
+      {
+        "stem": "skulptura-nahalenok-i-ded-shchukar",
+        "seamV": 38.1,
+        "seamH": 42.3
+      },
+      {
+        "stem": "skulptura-rostovchanka",
+        "seamV": 38.1,
+        "seamH": 49.2
+      },
+      {
+        "stem": "smotrovaya-na-sedova",
+        "seamV": 18.3,
+        "seamH": 93.6
+      },
+      {
+        "stem": "sobornyy-pereulok",
+        "seamV": 31.4,
+        "seamH": 34.7
+      },
+      {
+        "stem": "starocherkasskaya-dom-krepost-zhuchenkova",
+        "seamV": 42.8,
+        "seamH": 21.4
+      },
+      {
+        "stem": "starocherkasskaya-kazachiy-plyazh",
+        "seamV": 22.4,
+        "seamH": 34.6
+      },
+      {
+        "stem": "starocherkasskaya-maydan",
+        "seamV": 30.4,
+        "seamH": 17.7
+      },
+      {
+        "stem": "starocherkasskaya-monastyrskoe-urochishche",
+        "seamV": 13.9,
+        "seamH": 30.4
+      },
+      {
+        "stem": "starocherkasskaya-petropavlovskaya-cerkov",
+        "seamV": 35.6,
+        "seamH": 48.2
+      },
+      {
+        "stem": "starocherkasskaya-voskresenskiy-sobor",
+        "seamV": 20.7,
+        "seamH": 29.7
+      },
+      {
+        "stem": "starocherkasskaya",
+        "seamV": 14,
+        "seamH": 68.5
+      },
+      {
+        "stem": "staroobryadcheskiy-pokrovskiy-sobor",
+        "seamV": 31.7,
+        "seamH": 50.9
+      },
+      {
+        "stem": "surb-hach",
+        "seamV": 25.9,
+        "seamH": 40
+      },
+      {
+        "stem": "tachanka-rostovchanka",
+        "seamV": 22.6,
+        "seamH": 31.2
+      },
+      {
+        "stem": "tanais-glavnyy-raskop",
+        "seamV": 42.6,
+        "seamH": 32.8
+      },
+      {
+        "stem": "tanais-istoriko-bytovaya-ekspoziciya",
+        "seamV": 41.1,
+        "seamH": 27.9
+      },
+      {
+        "stem": "tanais-muzey-amfor",
+        "seamV": 30.3,
+        "seamH": 36.5
+      },
+      {
+        "stem": "tanais-smotrovaya",
+        "seamV": 16.4,
+        "seamH": 61
+      },
+      {
+        "stem": "tanais-usadba-meota",
+        "seamV": 36.4,
+        "seamH": 16.1
+      },
+      {
+        "stem": "tanais",
+        "seamV": 17.2,
+        "seamH": 36.7
+      },
+      {
+        "stem": "torgovyy-dom-yablokovyh",
+        "seamV": 39.3,
+        "seamH": 37.1
+      },
+      {
+        "stem": "tsentral-nyy-rynok-staryy-bazar",
+        "seamV": 37.8,
+        "seamH": 61.4
+      },
+      {
+        "stem": "zdanie-gorodskoy-dumy",
+        "seamV": 35.1,
+        "seamH": 31.7
+      },
+      {
+        "stem": "zdanie-gosudarstvennogo-banka",
+        "seamV": 23.6,
+        "seamH": 78.3
+      }
+    ],
+    "clones": []
+  },
+  {
+    "city": "omsk",
+    "bases": 86,
+    "unflipped": [
+      "chernoluchye-tropa-zdorovya",
+      "ermitazh-sibir",
+      "muzey-teatralnogo-iskusstva",
+      "pamyatnik-van-gogu",
+      "starina-ohotniche-zimovye",
+      "starina-sibirskaya",
+      "ulitsa-chokana-valihanova"
+    ],
+    "upsideSuspects": [
+      "chernoluchye-tropa-zdorovya",
+      "ermitazh-sibir",
+      "muzey-teatralnogo-iskusstva",
+      "pamyatnik-van-gogu",
+      "starina-ohotniche-zimovye",
+      "starina-sibirskaya",
+      "ulitsa-chokana-valihanova"
+    ],
+    "collage": [
+      {
+        "stem": "chasovnya-serafima-i-alekseya",
+        "seamV": 52.1,
+        "seamH": 44.1
+      },
+      {
+        "stem": "chernoluchye-chernyy-yar",
+        "seamV": 39.7,
+        "seamH": 48.3
+      },
+      {
+        "stem": "chernoluchye-gribnye-polyany",
+        "seamV": 0.2,
+        "seamH": 28.7
+      },
+      {
+        "stem": "chernoluchye-ozero-linevo",
+        "seamV": 26.5,
+        "seamH": 47.5
+      },
+      {
+        "stem": "chernoluchye-plyazh-luka",
+        "seamV": 44.5,
+        "seamH": 23.1
+      },
+      {
+        "stem": "chernoluchye-svyatoy-istochnik",
+        "seamV": 57.8,
+        "seamH": 22
+      },
+      {
+        "stem": "chernoluchye",
+        "seamV": 57.9,
+        "seamH": 22.1
+      },
+      {
+        "stem": "distsiplinarnye-kazarma",
+        "seamV": 37.7,
+        "seamH": 16.6
+      },
+      {
+        "stem": "gastrodvor-lyubinskiy",
+        "seamV": 18.1,
+        "seamH": 31.3
+      },
+      {
+        "stem": "hram-ioanna-krestitelya",
+        "seamV": 52.2,
+        "seamH": 52.6
+      },
+      {
+        "stem": "identity-gastro",
+        "seamV": 33,
+        "seamH": 31.1
+      },
+      {
+        "stem": "identity-symbol",
+        "seamV": 37.2,
+        "seamH": 40.4
+      },
+      {
+        "stem": "irtyshskaya-naberezhnaya",
+        "seamV": 34.3,
+        "seamH": 47.7
+      },
+      {
+        "stem": "kadetskiy-korpus",
+        "seamV": 33.9,
+        "seamH": 31
+      },
+      {
+        "stem": "kamergerskiy-pereulok",
+        "seamV": 8.6,
+        "seamH": 36.5
+      },
+      {
+        "stem": "katolicheskiy-hram-sretenie",
+        "seamV": 39.8,
+        "seamH": 17.4
+      },
+      {
+        "stem": "literaturnyy-muzey-dostoevskogo",
+        "seamV": 28.4,
+        "seamH": 20.9
+      },
+      {
+        "stem": "moskovskie-torgovye-ryady",
+        "seamV": 27.6,
+        "seamH": 65.3
+      },
+      {
+        "stem": "moya-istoriya",
+        "seamV": 47.3,
+        "seamH": 58.8
+      },
+      {
+        "stem": "muzey-izobrazitelnyh-iskusstv-vrubelya",
+        "seamV": 28.3,
+        "seamH": 46.5
+      },
+      {
+        "stem": "muzey-kondratiya-belova",
+        "seamV": 20.5,
+        "seamH": 28.5
+      },
+      {
+        "stem": "muzey-prosvescheniya",
+        "seamV": 29,
+        "seamH": 36.2
+      },
+      {
+        "stem": "muzey-teatralnogo-iskusstva",
+        "seamV": 31.4,
+        "seamH": 21.4
+      },
+      {
+        "stem": "muzey-voinskoy-slavy",
+        "seamV": 27.8,
+        "seamH": 33.1
+      },
+      {
+        "stem": "muzykalnyy-teatr",
+        "seamV": 19.8,
+        "seamH": 59.7
+      },
+      {
+        "stem": "nikolskiy-kazachiy-sobor",
+        "seamV": 44.3,
+        "seamH": 22.9
+      },
+      {
+        "stem": "odno-vino",
+        "seamV": 36.5,
+        "seamH": 21.8
+      },
+      {
+        "stem": "omskaya-krepost",
+        "seamV": 31.1,
+        "seamH": 52.6
+      },
+      {
+        "stem": "osobnyak-batyushkina",
+        "seamV": 36.9,
+        "seamH": 48.7
+      },
+      {
+        "stem": "pamyatnik-bortsam-revolyutsii",
+        "seamV": 38.1,
+        "seamH": 14.1
+      },
+      {
+        "stem": "pamyatnik-don-kihot",
+        "seamV": 43,
+        "seamH": 56.2
+      },
+      {
+        "stem": "pamyatnik-dostoevskomu-nesuschiy-krest",
+        "seamV": 45.1,
+        "seamH": 17.7
+      },
+      {
+        "stem": "pamyatnik-gorodovomu",
+        "seamV": 44.1,
+        "seamH": 37.4
+      },
+      {
+        "stem": "pamyatnik-kniga-lyubvi",
+        "seamV": 21.6,
+        "seamH": 94.2
+      },
+      {
+        "stem": "pamyatnik-lyubochka",
+        "seamV": 74.5,
+        "seamH": 27.3
+      },
+      {
+        "stem": "pamyatnik-maratonets",
+        "seamV": 27.8,
+        "seamH": 41
+      },
+      {
+        "stem": "pamyatnik-olenyu",
+        "seamV": 47.6,
+        "seamH": 29.3
+      },
+      {
+        "stem": "pamyatnik-petru-i-fevronii",
+        "seamV": 62,
+        "seamH": 54.2
+      },
+      {
+        "stem": "pamyatnik-valihanovu",
+        "seamV": 38,
+        "seamH": 39.5
+      },
+      {
+        "stem": "pamyatnik-van-gogu",
+        "seamV": 32.9,
+        "seamH": 49.4
+      },
+      {
+        "stem": "park-30-letiya-vlksm",
+        "seamV": 27.7,
+        "seamH": 70.4
+      },
+      {
+        "stem": "park-koroleva",
+        "seamV": 41,
+        "seamH": 28.7
+      },
+      {
+        "stem": "ptichya-gavan",
+        "seamV": 66,
+        "seamH": 35.4
+      },
+      {
+        "stem": "rechnoy-vokzal",
+        "seamV": 30.7,
+        "seamH": 52.1
+      },
+      {
+        "stem": "restoran-senkevich",
+        "seamV": 75.6,
+        "seamH": 63.7
+      },
+      {
+        "stem": "skuratov",
+        "seamV": 16.6,
+        "seamH": 58.7
+      },
+      {
+        "stem": "solenyy-zefir",
+        "seamV": 32.4,
+        "seamH": 28.9
+      },
+      {
+        "stem": "sovetskiy-park",
+        "seamV": 41.1,
+        "seamH": 46.4
+      },
+      {
+        "stem": "starina-dom-gladkova",
+        "seamV": 45.7,
+        "seamH": 53.1
+      },
+      {
+        "stem": "starina-kuznitsa",
+        "seamV": 38.2,
+        "seamH": 38.7
+      },
+      {
+        "stem": "starina-pyatistenok",
+        "seamV": 17.1,
+        "seamH": 30.9
+      },
+      {
+        "stem": "starina-sibirskaya",
+        "seamV": 29,
+        "seamH": 37.4
+      },
+      {
+        "stem": "starina-tatarskaya-usadba",
+        "seamV": 51,
+        "seamH": 40.1
+      },
+      {
+        "stem": "sudebnyy-dom",
+        "seamV": 20.3,
+        "seamH": 51.6
+      },
+      {
+        "stem": "teatr-dramy",
+        "seamV": 16.5,
+        "seamH": 41.3
+      },
+      {
+        "stem": "teatr-kukol-arlekin",
+        "seamV": 34,
+        "seamH": 38.9
+      },
+      {
+        "stem": "terrasa-muzykalnogo-teatra",
+        "seamV": 13.2,
+        "seamH": 74
+      },
+      {
+        "stem": "upravlenie-zheleznoy-dorogi",
+        "seamV": 29.2,
+        "seamH": 32.2
+      },
+      {
+        "stem": "uspenskiy-kafedral-nyy-sobor",
+        "seamV": 12.6,
+        "seamH": 60.3
+      },
+      {
+        "stem": "viking-rok-klub",
+        "seamV": 34.2,
+        "seamH": 60
+      },
+      {
+        "stem": "vystavochnaya-ploschad-flora",
+        "seamV": 15.4,
+        "seamH": 28.3
+      },
+      {
+        "stem": "zakladnoy-kamen-hrama-sergiya-radonezhskogo",
+        "seamV": 22.2,
+        "seamH": 53.1
+      }
+    ],
+    "clones": []
+  },
+  {
+    "city": "tyumen",
+    "bases": 103,
+    "unflipped": [
+      "pamyatnik-leninu",
+      "ploschad-bortsov-revolyutsii",
+      "restoran-karavella"
+    ],
+    "upsideSuspects": [
+      "pamyatnik-leninu",
+      "ploschad-bortsov-revolyutsii",
+      "restoran-karavella"
+    ],
+    "collage": [
+      {
+        "stem": "akvapark-letoleto",
+        "seamV": 29.2,
+        "seamH": 24.2
+      },
+      {
+        "stem": "amfiteatr-nizhney-naberezhnoy",
+        "seamV": 28.7,
+        "seamH": 23.7
+      },
+      {
+        "stem": "andreevskoe-ozero",
+        "seamV": 30.4,
+        "seamH": 40.8
+      },
+      {
+        "stem": "avan-termy",
+        "seamV": 54.3,
+        "seamH": 40.5
+      },
+      {
+        "stem": "bar-kanava",
+        "seamV": 30.9,
+        "seamH": 78.7
+      },
+      {
+        "stem": "chetyrehurovnevaya-naberezhnaya",
+        "seamV": 32.6,
+        "seamH": 43.5
+      },
+      {
+        "stem": "dom-burkova",
+        "seamV": 32.3,
+        "seamH": 43.3
+      },
+      {
+        "stem": "dom-popovoy",
+        "seamV": 40.4,
+        "seamH": 63.8
+      },
+      {
+        "stem": "dom-shaychika",
+        "seamV": 33,
+        "seamH": 46.9
+      },
+      {
+        "stem": "dvoryanskoe-sobranie",
+        "seamV": 33.8,
+        "seamH": 43.6
+      },
+      {
+        "stem": "fudkort-parohodnoy-kontory",
+        "seamV": 27.3,
+        "seamH": 46.2
+      },
+      {
+        "stem": "gilevskaya-roshcha",
+        "seamV": 29.3,
+        "seamH": 29.5
+      },
+      {
+        "stem": "gostinyy-dvor",
+        "seamV": 57,
+        "seamH": 76.1
+      },
+      {
+        "stem": "identity-architecture",
+        "seamV": 42.2,
+        "seamH": 73.2
+      },
+      {
+        "stem": "identity-art",
+        "seamV": 15.1,
+        "seamH": 35.4
+      },
+      {
+        "stem": "identity-gastro",
+        "seamV": 28.1,
+        "seamH": 36.2
+      },
+      {
+        "stem": "identity-symbol",
+        "seamV": 31,
+        "seamH": 48
+      },
+      {
+        "stem": "ilinskiy-monastyr",
+        "seamV": 11.9,
+        "seamH": 58.4
+      },
+      {
+        "stem": "kafe-maksim",
+        "seamV": 59.9,
+        "seamH": 62.1
+      },
+      {
+        "stem": "kommercheskoe-uchilishche",
+        "seamV": 11.4,
+        "seamH": 28.9
+      },
+      {
+        "stem": "komsomolskaya-ploschad",
+        "seamV": 32.8,
+        "seamH": 35.5
+      },
+      {
+        "stem": "most-vlyublennyh",
+        "seamV": 29.8,
+        "seamH": 71.7
+      },
+      {
+        "stem": "muzey-kuznechnogo-remesla",
+        "seamV": 22,
+        "seamH": 28.6
+      },
+      {
+        "stem": "muzey-mebeli-kozlovoy",
+        "seamV": 29.3,
+        "seamH": 24.7
+      },
+      {
+        "stem": "muzey-retro-tehniki-mihaylova",
+        "seamV": 32.4,
+        "seamH": 43.3
+      },
+      {
+        "stem": "muzey-slovtsova",
+        "seamV": 29.6,
+        "seamH": 22.8
+      },
+      {
+        "stem": "pamyatnik-dvorniku",
+        "seamV": 22.1,
+        "seamH": 33.1
+      },
+      {
+        "stem": "pamyatnik-ermaku",
+        "seamV": 29.6,
+        "seamH": 20.3
+      },
+      {
+        "stem": "pamyatnik-ershovu",
+        "seamV": 22.8,
+        "seamH": 50.3
+      },
+      {
+        "stem": "pamyatnik-klyuch-tyumeni",
+        "seamV": 42.8,
+        "seamH": 27.8
+      },
+      {
+        "stem": "pamyatnik-leninu",
+        "seamV": 23.7,
+        "seamH": 31.8
+      },
+      {
+        "stem": "pamyatnik-pochtalonke",
+        "seamV": 13.3,
+        "seamH": 60.1
+      },
+      {
+        "stem": "pamyatnik-rasputinu",
+        "seamV": 19.4,
+        "seamH": 29.4
+      },
+      {
+        "stem": "pamyatnik-shkolnikam",
+        "seamV": 38.6,
+        "seamH": 43.9
+      },
+      {
+        "stem": "pamyatnik-tekutyevu",
+        "seamV": 38.6,
+        "seamH": 36.7
+      },
+      {
+        "stem": "pervaya-vodokolonna",
+        "seamV": 38.5,
+        "seamH": 40.7
+      },
+      {
+        "stem": "peshehodnaya-ulitsa-dzerzhinskogo",
+        "seamV": 33.3,
+        "seamH": 39.5
+      },
+      {
+        "stem": "ploschad-proshchaniya",
+        "seamV": 43.1,
+        "seamH": 38.1
+      },
+      {
+        "stem": "prikaznaya-izba",
+        "seamV": 28.6,
+        "seamH": 53.8
+      },
+      {
+        "stem": "restoran-chum",
+        "seamV": 40.5,
+        "seamH": 48.2
+      },
+      {
+        "stem": "restoran-poseydon",
+        "seamV": 18.2,
+        "seamH": 36.7
+      },
+      {
+        "stem": "rossiya-moya-istoriya",
+        "seamV": 32.4,
+        "seamH": 64.6
+      },
+      {
+        "stem": "sinagoga-madregot",
+        "seamV": 13.3,
+        "seamH": 50.6
+      },
+      {
+        "stem": "skulptura-melodiya",
+        "seamV": 23.5,
+        "seamH": 31.4
+      },
+      {
+        "stem": "skver-sibirskih-koshek",
+        "seamV": 43.3,
+        "seamH": 28.2
+      },
+      {
+        "stem": "sobornaya-mechet",
+        "seamV": 44.9,
+        "seamH": 28.2
+      },
+      {
+        "stem": "sovetskiy-termy",
+        "seamV": 30.3,
+        "seamH": 35
+      },
+      {
+        "stem": "spasskaya-tserkov",
+        "seamV": 28.7,
+        "seamH": 23.8
+      },
+      {
+        "stem": "tayga-termy",
+        "seamV": 47.5,
+        "seamH": 24.2
+      },
+      {
+        "stem": "teatr-kukol",
+        "seamV": 13,
+        "seamH": 51
+      },
+      {
+        "stem": "termal-nye-istochniki",
+        "seamV": 25.7,
+        "seamH": 83.3
+      },
+      {
+        "stem": "tobolsk-ermakovo-pole",
+        "seamV": 18.8,
+        "seamH": 31.1
+      },
+      {
+        "stem": "tobolsk-gubernskiy-muzey",
+        "seamV": 22,
+        "seamH": 28.5
+      },
+      {
+        "stem": "tobolsk-ilinskiy",
+        "seamV": 36.6,
+        "seamH": 48.9
+      },
+      {
+        "stem": "tobolsk-kreml",
+        "seamV": 30.2,
+        "seamH": 37.2
+      },
+      {
+        "stem": "tobolsk-kremlin",
+        "seamV": 31.3,
+        "seamH": 49.2
+      },
+      {
+        "stem": "tobolsk-muzey-semi-nikolaya-ii",
+        "seamV": 39.9,
+        "seamH": 33
+      },
+      {
+        "stem": "tobolsk-pryamskiy-vzvoz",
+        "seamV": 19.8,
+        "seamH": 62.1
+      },
+      {
+        "stem": "tobolsk-rentereya",
+        "seamV": 31.9,
+        "seamH": 33.4
+      },
+      {
+        "stem": "tobolsk-sofiysko-uspenskiy-sobor",
+        "seamV": 29.8,
+        "seamH": 16.2
+      },
+      {
+        "stem": "tobolsk-troitskaya-tserkov",
+        "seamV": 15.3,
+        "seamH": 31.1
+      },
+      {
+        "stem": "tobolsk-tyuremnyy-zamok",
+        "seamV": 23.8,
+        "seamH": 48.1
+      },
+      {
+        "stem": "tobolsk-zahariya-i-elisaveta",
+        "seamV": 40.2,
+        "seamH": 41
+      },
+      {
+        "stem": "tobolsk",
+        "seamV": 31.2,
+        "seamH": 51.1
+      },
+      {
+        "stem": "troitskiy-monastyr",
+        "seamV": 28.4,
+        "seamH": 47.8
+      },
+      {
+        "stem": "tsvetnoy-bulvar",
+        "seamV": 20,
+        "seamH": 31.3
+      },
+      {
+        "stem": "usadba-kolokolnikovyh",
+        "seamV": 30.7,
+        "seamH": 52.5
+      },
+      {
+        "stem": "usadba-masharova",
+        "seamV": 18.6,
+        "seamH": 30.8
+      },
+      {
+        "stem": "verhniy-bor-basseyn",
+        "seamV": 55.9,
+        "seamH": 21.6
+      },
+      {
+        "stem": "verhniy-bor-ekotropa",
+        "seamV": 61.1,
+        "seamH": 47.6
+      },
+      {
+        "stem": "verhniy-bor-eldorado",
+        "seamV": 18.7,
+        "seamH": 62.9
+      },
+      {
+        "stem": "verhniy-bor-krivoe-ozero",
+        "seamV": 45.4,
+        "seamH": 29
+      },
+      {
+        "stem": "verhniy-bor-spa",
+        "seamV": 55.5,
+        "seamH": 35.4
+      },
+      {
+        "stem": "verhniy-bor-usadba",
+        "seamV": 28.2,
+        "seamH": 54.9
+      },
+      {
+        "stem": "verhniy-bor",
+        "seamV": 28.6,
+        "seamH": 60.6
+      },
+      {
+        "stem": "yalutorovsk-dekabristy",
+        "seamV": 51.6,
+        "seamH": 30.2
+      },
+      {
+        "stem": "yalutorovsk-krepost",
+        "seamV": 20.4,
+        "seamH": 39.8
+      },
+      {
+        "stem": "yalutorovsk-ostrog",
+        "seamV": 21.1,
+        "seamH": 49.7
+      },
+      {
+        "stem": "yalutorovsk-skovoroda",
+        "seamV": 18.3,
+        "seamH": 42.9
+      },
+      {
+        "stem": "zatyumenskiy-ekopark",
+        "seamV": 63.8,
+        "seamH": 66.9
+      },
+      {
+        "stem": "znamenskiy-kafedral-nyy-sobor",
+        "seamV": 30.5,
+        "seamH": 33.9
+      }
+    ],
+    "clones": []
+  },
+  {
+    "city": "penza",
+    "bases": 74,
+    "unflipped": [
+      "dama-s-sobachkoy",
+      "restoran-lokalnoy-kuhni",
+      "skver-slavy",
+      "spasskiy-kafedralnyy-sobor"
+    ],
+    "upsideSuspects": [
+      "dama-s-sobachkoy",
+      "restoran-lokalnoy-kuhni",
+      "skver-slavy",
+      "spasskiy-kafedralnyy-sobor"
+    ],
+    "collage": [
+      {
+        "stem": "ahunskiy-sosnovyy-bor",
+        "seamV": 40.2,
+        "seamH": 42.9
+      },
+      {
+        "stem": "ahuny-sanatornyy-kvartal",
+        "seamV": 40,
+        "seamH": 46.1
+      },
+      {
+        "stem": "ahuny-tropy-zdorovya",
+        "seamV": 0.2,
+        "seamH": 39.5
+      },
+      {
+        "stem": "botanicheskiy-sad-pgu",
+        "seamV": 10.1,
+        "seamH": 45.9
+      },
+      {
+        "stem": "byust-denisa-davydova",
+        "seamV": 0.2,
+        "seamH": 45.1
+      },
+      {
+        "stem": "byust-radishcheva",
+        "seamV": 52,
+        "seamH": 75.3
+      },
+      {
+        "stem": "centralnyy-rynok",
+        "seamV": 52.3,
+        "seamH": 22
+      },
+      {
+        "stem": "dama-s-sobachkoy",
+        "seamV": 38.3,
+        "seamH": 57.8
+      },
+      {
+        "stem": "dom-gubernatora",
+        "seamV": 55.1,
+        "seamH": 31.8
+      },
+      {
+        "stem": "dom-kuptsa-karpova",
+        "seamV": 39.7,
+        "seamH": 28.3
+      },
+      {
+        "stem": "dom-kuptsa-myasnikova",
+        "seamV": 37.9,
+        "seamH": 25
+      },
+      {
+        "stem": "dom-meyerholda",
+        "seamV": 42,
+        "seamH": 38.4
+      },
+      {
+        "stem": "dom-muzey-burdenko",
+        "seamV": 33.5,
+        "seamH": 39.7
+      },
+      {
+        "stem": "dramaticheskiy-teatr-lunacharskogo",
+        "seamV": 42.5,
+        "seamH": 38.7
+      },
+      {
+        "stem": "filarmoniya",
+        "seamV": 21,
+        "seamH": 43.1
+      },
+      {
+        "stem": "kartinnaya-galereya-im-savickogo",
+        "seamV": 19.5,
+        "seamH": 29.1
+      },
+      {
+        "stem": "kofeyni-fontannoy-ploshchadi",
+        "seamV": 48.8,
+        "seamH": 31
+      },
+      {
+        "stem": "kraevedcheskiy-muzey",
+        "seamV": 36.9,
+        "seamH": 29.5
+      },
+      {
+        "stem": "literaturnyy-muzey",
+        "seamV": 43.6,
+        "seamH": 41.8
+      },
+      {
+        "stem": "moskovskaya-gastro-kvartal",
+        "seamV": 27,
+        "seamH": 29.4
+      },
+      {
+        "stem": "muzey-klyuchevskogo",
+        "seamV": 40.2,
+        "seamH": 54.2
+      },
+      {
+        "stem": "muzey-odnoy-kartiny-im-g-v-myasnikova",
+        "seamV": 19.7,
+        "seamH": 44.4
+      },
+      {
+        "stem": "muzey-zapovednik-tarhany",
+        "seamV": 43.8,
+        "seamH": 51.7
+      },
+      {
+        "stem": "naberezhnaya-sury",
+        "seamV": 31.4,
+        "seamH": 54.9
+      },
+      {
+        "stem": "narodnyy-dom",
+        "seamV": 42.3,
+        "seamH": 44.9
+      },
+      {
+        "stem": "narovchat-dom-muzey-kuprina",
+        "seamV": 30.7,
+        "seamH": 36.2
+      },
+      {
+        "stem": "narovchat-kuprin",
+        "seamV": 45,
+        "seamH": 37.6
+      },
+      {
+        "stem": "narovchat-troice-skanov-monastyr",
+        "seamV": 32.5,
+        "seamH": 20.5
+      },
+      {
+        "stem": "narovchat-uezdnyy-centr",
+        "seamV": 25.8,
+        "seamH": 51.2
+      },
+      {
+        "stem": "olimpiyskaya-alleya",
+        "seamV": 61.8,
+        "seamH": 36.7
+      },
+      {
+        "stem": "pamyatnik-belinskomu",
+        "seamV": 38.9,
+        "seamH": 49
+      },
+      {
+        "stem": "pamyatnik-bratyam-nikitinym",
+        "seamV": 40.8,
+        "seamH": 41.7
+      },
+      {
+        "stem": "pamyatnik-chekanshchiku",
+        "seamV": 24.2,
+        "seamH": 34.2
+      },
+      {
+        "stem": "pamyatnik-materi",
+        "seamV": 35.5,
+        "seamH": 42
+      },
+      {
+        "stem": "pamyatnik-meyerholdu",
+        "seamV": 71.1,
+        "seamH": 15.6
+      },
+      {
+        "stem": "pamyatnik-pervoposelentsu",
+        "seamV": 23.5,
+        "seamH": 35.8
+      },
+      {
+        "stem": "pamyatnik-seme",
+        "seamV": 41.4,
+        "seamH": 32.1
+      },
+      {
+        "stem": "pamyatnik-stroitelyam-kreposti",
+        "seamV": 51.3,
+        "seamH": 50
+      },
+      {
+        "stem": "pamyatnik-yuveliru",
+        "seamV": 39.7,
+        "seamH": 46.8
+      },
+      {
+        "stem": "park-imeni-v-g-belinskogo",
+        "seamV": 65,
+        "seamH": 22.9
+      },
+      {
+        "stem": "penzenskaya-peshehodnaya-ulitsa-moskovskaya",
+        "seamV": 31.6,
+        "seamH": 35.5
+      },
+      {
+        "stem": "radishchevo-muzey-zapovednik",
+        "seamV": 28.1,
+        "seamH": 38
+      },
+      {
+        "stem": "radishchevo-panorama",
+        "seamV": 0.2,
+        "seamH": 52.4
+      },
+      {
+        "stem": "radishchevo-park-usadby",
+        "seamV": 45.6,
+        "seamH": 22.3
+      },
+      {
+        "stem": "radishchevo-preobrazhenskaya-cerkov",
+        "seamV": 45.1,
+        "seamH": 36.6
+      },
+      {
+        "stem": "rotonda-v-parke-belinskogo",
+        "seamV": 52.2,
+        "seamH": 27.6
+      },
+      {
+        "stem": "skver-slavy",
+        "seamV": 29.8,
+        "seamH": 25.6
+      },
+      {
+        "stem": "smotrovaya-staraya-penza",
+        "seamV": 9.6,
+        "seamH": 68.9
+      },
+      {
+        "stem": "svetozvukovoy-fontan",
+        "seamV": 25.7,
+        "seamH": 50.6
+      },
+      {
+        "stem": "tarhany-cerkov-marii-egipetskoy",
+        "seamV": 36.8,
+        "seamH": 22.7
+      },
+      {
+        "stem": "tarhany-day-trip",
+        "seamV": 40.2,
+        "seamH": 39.4
+      },
+      {
+        "stem": "tarhany-lyudskaya-izba",
+        "seamV": 28.4,
+        "seamH": 39.7
+      },
+      {
+        "stem": "tarhany-park",
+        "seamV": 39.8,
+        "seamH": 17.3
+      },
+      {
+        "stem": "tarhany-sklep-arsenevyh",
+        "seamV": 33,
+        "seamH": 62.8
+      },
+      {
+        "stem": "torgovye-ryady",
+        "seamV": 32.8,
+        "seamH": 48.8
+      },
+      {
+        "stem": "troickiy-monastyr",
+        "seamV": 18.3,
+        "seamH": 31.9
+      },
+      {
+        "stem": "tropa-zdorovya",
+        "seamV": 56.3,
+        "seamH": 37.7
+      },
+      {
+        "stem": "uspenskiy-kafedralnyy-sobor",
+        "seamV": 31.2,
+        "seamH": 28.7
+      },
+      {
+        "stem": "zdanie-dvoryanskogo-sobraniya",
+        "seamV": 47,
+        "seamH": 35.4
+      }
+    ],
+    "clones": []
+  },
+  {
+    "city": "chelyabinsk",
+    "bases": 111,
+    "unflipped": [
+      "arkaim-poselok-mednogo-veka",
+      "brudershaft",
+      "experimentus",
+      "kofeynya-udobno",
+      "pamyatnik-nishchemu",
+      "po-chesnoku",
+      "taganay-belyy-klyuch",
+      "taganay-usadba",
+      "turgoyak-plyazh",
+      "zyuratkul-reka-bolshaya-satka"
+    ],
+    "upsideSuspects": [
+      "arkaim-poselok-mednogo-veka",
+      "brudershaft",
+      "experimentus",
+      "kofeynya-udobno",
+      "pamyatnik-nishchemu",
+      "po-chesnoku",
+      "taganay-belyy-klyuch",
+      "taganay-usadba",
+      "turgoyak-plyazh",
+      "zyuratkul-reka-bolshaya-satka"
+    ],
+    "collage": [
+      {
+        "stem": "aloe-pole",
+        "seamV": 32.9,
+        "seamH": 28.2
+      },
+      {
+        "stem": "arkaim-gora-shamanka-lysaya",
+        "seamV": 33.8,
+        "seamH": 49.8
+      },
+      {
+        "stem": "arkaim-kurgan-temir",
+        "seamV": 12.4,
+        "seamH": 40.6
+      },
+      {
+        "stem": "arkaim-muzey-prirody-i-cheloveka",
+        "seamV": 57.2,
+        "seamH": 43.4
+      },
+      {
+        "stem": "arkaim-muzey-vosssozdanogo-poseleniya",
+        "seamV": 26.2,
+        "seamH": 51.9
+      },
+      {
+        "stem": "arkaim",
+        "seamV": 14.8,
+        "seamH": 28.8
+      },
+      {
+        "stem": "belyy-rynok",
+        "seamV": 51.7,
+        "seamH": 50.4
+      },
+      {
+        "stem": "chelyabinsk-siti",
+        "seamV": 18,
+        "seamH": 52.5
+      },
+      {
+        "stem": "chtz",
+        "seamV": 35,
+        "seamH": 62
+      },
+      {
+        "stem": "dom-dantsigera",
+        "seamV": 17,
+        "seamH": 36.3
+      },
+      {
+        "stem": "dom-holodova",
+        "seamV": 19.5,
+        "seamH": 35.7
+      },
+      {
+        "stem": "dom-oblispolkoma",
+        "seamV": 20.4,
+        "seamH": 54.2
+      },
+      {
+        "stem": "dom-pechati",
+        "seamV": 22.9,
+        "seamH": 46.8
+      },
+      {
+        "stem": "elevator",
+        "seamV": 24.6,
+        "seamH": 40.8
+      },
+      {
+        "stem": "experimentus",
+        "seamV": 34,
+        "seamH": 36
+      },
+      {
+        "stem": "gosbank",
+        "seamV": 41.5,
+        "seamH": 33.9
+      },
+      {
+        "stem": "hodok-s-sobakoy",
+        "seamV": 34.4,
+        "seamH": 43.8
+      },
+      {
+        "stem": "hram-aleksandra-nevskogo",
+        "seamV": 37.7,
+        "seamH": 78.5
+      },
+      {
+        "stem": "identity-architecture",
+        "seamV": 26.1,
+        "seamH": 33.2
+      },
+      {
+        "stem": "identity-art",
+        "seamV": 38.8,
+        "seamH": 74.2
+      },
+      {
+        "stem": "identity-gastro",
+        "seamV": 17.2,
+        "seamH": 35.7
+      },
+      {
+        "stem": "identity-symbol",
+        "seamV": 45.1,
+        "seamH": 36.1
+      },
+      {
+        "stem": "izumrudnyy-karer",
+        "seamV": 49.5,
+        "seamH": 17.9
+      },
+      {
+        "stem": "kamernyy-teatr",
+        "seamV": 39.2,
+        "seamH": 35.1
+      },
+      {
+        "stem": "kaslinskaya-64",
+        "seamV": 16.3,
+        "seamH": 75.4
+      },
+      {
+        "stem": "kirovka-chelyabinskiy-arbat",
+        "seamV": 26.4,
+        "seamH": 46.2
+      },
+      {
+        "stem": "kofeynya-udobno",
+        "seamV": 28.3,
+        "seamH": 26.2
+      },
+      {
+        "stem": "muzey-istorii-chtz",
+        "seamV": 38.2,
+        "seamH": 19.2
+      },
+      {
+        "stem": "muzey-retro-avtomobiley",
+        "seamV": 30.7,
+        "seamH": 47
+      },
+      {
+        "stem": "muzey-yuzhno-uralskoy-zheleznoy-dorogi",
+        "seamV": 37.6,
+        "seamH": 37.6
+      },
+      {
+        "stem": "naberezhnaya-reki-miass",
+        "seamV": 52.8,
+        "seamH": 57.7
+      },
+      {
+        "stem": "odigitrievskiy-monastyr",
+        "seamV": 18.1,
+        "seamH": 43.6
+      },
+      {
+        "stem": "organnyy-zal-rodina",
+        "seamV": 53.5,
+        "seamH": 47.9
+      },
+      {
+        "stem": "osobnyak-arhipova",
+        "seamV": 17,
+        "seamH": 42.4
+      },
+      {
+        "stem": "pamyatnik-glinke",
+        "seamV": 47.6,
+        "seamH": 84.9
+      },
+      {
+        "stem": "pamyatnik-izvozchiku",
+        "seamV": 44.6,
+        "seamH": 63.2
+      },
+      {
+        "stem": "pamyatnik-kurchatovu",
+        "seamV": 19.5,
+        "seamH": 45
+      },
+      {
+        "stem": "pamyatnik-leninu",
+        "seamV": 12,
+        "seamH": 32.7
+      },
+      {
+        "stem": "pamyatnik-levshe",
+        "seamV": 29.6,
+        "seamH": 48.3
+      },
+      {
+        "stem": "pamyatnik-nishchemu",
+        "seamV": 25.8,
+        "seamH": 38.4
+      },
+      {
+        "stem": "pamyatnik-orlenku",
+        "seamV": 14.9,
+        "seamH": 42.9
+      },
+      {
+        "stem": "pamyatnik-osnovatelyam",
+        "seamV": 15.2,
+        "seamH": 47.4
+      },
+      {
+        "stem": "pamyatnik-prokofievu",
+        "seamV": 36.3,
+        "seamH": 39.4
+      },
+      {
+        "stem": "pamyatnik-tankistam-dobrovoltsam",
+        "seamV": 54.1,
+        "seamH": 60
+      },
+      {
+        "stem": "park-kul-tury-i-otdyha-im-yu-a-gagarina",
+        "seamV": 57.2,
+        "seamH": 59.2
+      },
+      {
+        "stem": "park-pushkina",
+        "seamV": 38.2,
+        "seamH": 15.9
+      },
+      {
+        "stem": "passage-yaushevyh",
+        "seamV": 22,
+        "seamH": 33.6
+      },
+      {
+        "stem": "ploschad-iskusstv",
+        "seamV": 30.1,
+        "seamH": 48.4
+      },
+      {
+        "stem": "po-chesnoku",
+        "seamV": 19.4,
+        "seamH": 32.1
+      },
+      {
+        "stem": "pochtovyy-muzey",
+        "seamV": 23.5,
+        "seamH": 42.1
+      },
+      {
+        "stem": "restoran-kupecheskiy",
+        "seamV": 47.8,
+        "seamH": 33.8
+      },
+      {
+        "stem": "roza-vetrov",
+        "seamV": 20.4,
+        "seamH": 29.8
+      },
+      {
+        "stem": "sad-pobedy",
+        "seamV": 47.6,
+        "seamH": 76
+      },
+      {
+        "stem": "simeonovskiy-sobor",
+        "seamV": 22.7,
+        "seamH": 34.6
+      },
+      {
+        "stem": "sinagoga-chabad",
+        "seamV": 20.4,
+        "seamH": 84.9
+      },
+      {
+        "stem": "skaz-ob-urale",
+        "seamV": 21.7,
+        "seamH": 72.3
+      },
+      {
+        "stem": "staryy-kraevedcheskiy",
+        "seamV": 28,
+        "seamH": 34
+      },
+      {
+        "stem": "taganay-belyy-klyuch",
+        "seamV": 19.8,
+        "seamH": 36.4
+      },
+      {
+        "stem": "taganay-lestnitsa",
+        "seamV": 29.5,
+        "seamH": 21.8
+      },
+      {
+        "stem": "taganay-meteostantsiya",
+        "seamV": 28.2,
+        "seamH": 62.3
+      },
+      {
+        "stem": "taganay-perya",
+        "seamV": 36.3,
+        "seamH": 32.1
+      },
+      {
+        "stem": "taganay-teschin-yazyk",
+        "seamV": 50.2,
+        "seamH": 16.9
+      },
+      {
+        "stem": "taganay-usadba",
+        "seamV": 48,
+        "seamH": 41.1
+      },
+      {
+        "stem": "teatr-kukol-volkhovskiy",
+        "seamV": 21.9,
+        "seamH": 61.9
+      },
+      {
+        "stem": "teatr-opery-glinki",
+        "seamV": 21.6,
+        "seamH": 35
+      },
+      {
+        "stem": "troitskaya-tserkov",
+        "seamV": 27.5,
+        "seamH": 47.8
+      },
+      {
+        "stem": "turgoyak-buhta-trimaranov",
+        "seamV": 36.6,
+        "seamH": 34.8
+      },
+      {
+        "stem": "turgoyak-ekotropa",
+        "seamV": 56.9,
+        "seamH": 35.5
+      },
+      {
+        "stem": "turgoyak-megalit-1",
+        "seamV": 42.3,
+        "seamH": 53.3
+      },
+      {
+        "stem": "turgoyak-mengiry",
+        "seamV": 55.7,
+        "seamH": 45.2
+      },
+      {
+        "stem": "turgoyak-plyazh",
+        "seamV": 37.5,
+        "seamH": 38.7
+      },
+      {
+        "stem": "turgoyak-simvol-very",
+        "seamV": 17.6,
+        "seamH": 31.9
+      },
+      {
+        "stem": "turgoyak-skit",
+        "seamV": 25.9,
+        "seamH": 32.2
+      },
+      {
+        "stem": "tyuz",
+        "seamV": 15.9,
+        "seamH": 54.5
+      },
+      {
+        "stem": "uvildy-ekotropa-uvildinskie-zori",
+        "seamV": 53.4,
+        "seamH": 32.5
+      },
+      {
+        "stem": "uvildy-ostrov-golodai",
+        "seamV": 53.7,
+        "seamH": 52.2
+      },
+      {
+        "stem": "uvildy-ostrov-vyazovyy",
+        "seamV": 92.4,
+        "seamH": 58.9
+      },
+      {
+        "stem": "uvildy-radonovyy-byuvet",
+        "seamV": 44.8,
+        "seamH": 14
+      },
+      {
+        "stem": "uvildy-tsentralnyy-plyazh",
+        "seamV": 60.4,
+        "seamH": 53.2
+      },
+      {
+        "stem": "uvildy",
+        "seamV": 81.9,
+        "seamH": 57.9
+      },
+      {
+        "stem": "venskiy-vals",
+        "seamV": 19.4,
+        "seamH": 39.7
+      },
+      {
+        "stem": "vokzal-glavnyy",
+        "seamV": 33.5,
+        "seamH": 30.5
+      },
+      {
+        "stem": "zyuratkul-ekotropa-na-hrebet",
+        "seamV": 18.1,
+        "seamH": 39.1
+      },
+      {
+        "stem": "zyuratkul-gora-lukash",
+        "seamV": 25.1,
+        "seamH": 46.6
+      },
+      {
+        "stem": "zyuratkul-kipyashchiy-klyuch",
+        "seamV": 20.4,
+        "seamH": 66.6
+      },
+      {
+        "stem": "zyuratkul-reka-bolshaya-satka",
+        "seamV": 44.2,
+        "seamH": 45.3
+      },
+      {
+        "stem": "zyuratkul-skaly-medvedi",
+        "seamV": 115,
+        "seamH": 14.5
+      },
+      {
+        "stem": "zyuratkul-vysokogornoe-ozero",
+        "seamV": 18.8,
+        "seamH": 29
+      },
+      {
+        "stem": "zyuratkul",
+        "seamV": 22.7,
+        "seamH": 93.6
+      }
+    ],
+    "clones": []
+  }
+]

@@ -234,6 +234,12 @@ function venueRecommendation(venue) {
   if (venue.typeGuess === "sport_outdoor") {
     return { kind: "sport_activity_space", pageStatus: "candidate", reason: "спорт/активность" };
   }
+  if (venue.typeGuess === "park") {
+    return { kind: "park", pageStatus: "candidate", reason: "парк / сквер" };
+  }
+  if (venue.typeGuess === "monument") {
+    return { kind: "monument", pageStatus: "candidate", reason: "памятник (Важные места)" };
+  }
   if (venue.events >= 100) {
     return { kind: "other", pageStatus: "candidate", reason: "много событий, нужна ручная проверка" };
   }

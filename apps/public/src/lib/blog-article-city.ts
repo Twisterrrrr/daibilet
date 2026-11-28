@@ -6,7 +6,21 @@ const CITY_SLUG_BY_TITLE: Record<string, string> = {
   'Санкт-Петербург': 'saint-petersburg',
 };
 
+/** Pseudo-cities in blog meta - not real /cities/{slug} hubs. */
+const PSEUDO_CITY_SLUGS = new Set(['regions', 'multi']);
+const PSEUDO_CITY_LABELS = new Set(['Регионы', 'Несколько городов', 'Без города']);
+
+function isPseudoBlogCity(city?: string | null, citySlug?: string | null): boolean {
+  const slug = String(citySlug || '')
+    .trim()
+    .toLowerCase();
+  if (slug && PSEUDO_CITY_SLUGS.has(slug)) return true;
+  const label = String(city || '').trim();
+  return Boolean(label && PSEUDO_CITY_LABELS.has(label));
+}
+
 export function resolveBlogCityHref(city?: string | null, citySlug?: string | null): string | null {
+  if (isPseudoBlogCity(city, citySlug)) return null;
   if (citySlug) return cityHref({ name: city || citySlug, slug: citySlug });
   if (city && CITY_SLUG_BY_TITLE[city]) {
     return cityHref({ name: city, slug: CITY_SLUG_BY_TITLE[city] });
@@ -16,6 +30,7 @@ export function resolveBlogCityHref(city?: string | null, citySlug?: string | nu
 
 /** Афиша города — сразу к расписанию на CityPage. */
 export function resolveBlogCityEventsHref(city?: string | null, citySlug?: string | null): string | null {
+  if (isPseudoBlogCity(city, citySlug)) return null;
   if (citySlug) return cityEventsHref({ name: city || citySlug, slug: citySlug });
   if (city && CITY_SLUG_BY_TITLE[city]) {
     return cityEventsHref({ name: city, slug: CITY_SLUG_BY_TITLE[city] });

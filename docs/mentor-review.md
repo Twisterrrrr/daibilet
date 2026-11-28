@@ -1,4 +1,4 @@
-﻿# Daibilet MVP Mentor Review
+# Daibilet MVP Mentor Review
 
 Этот документ фиксирует независимую проверку MVP перед первыми продажами.
 Роль ментора: архитектор-тимлид. Он не пишет код вместо основного исполнителя, а ищет риски запуска, слабые места UX, ошибки в данных и места, где код может выглядеть рабочим, но ломать продажный сценарий.
@@ -275,7 +275,7 @@ Readiness событий переведен на backend-коды: `NO_FUTURE_SE
 
 #### QA/deploy checklist, 2026-06-20
 
-Статус: подготовлен общий лист допуска к первым продажам: `docs/launch-qa-and-deploy.md`.
+Статус: подготовлен общий лист допуска к первым продажам: `docs/operations/launch-qa-and-deploy.md`.
 
 Менторская оценка: документ правильно удерживает фокус на launch-critical вещах: источники, покупка через виджеты, public smoke, admin smoke, API smoke, минимальная защита админки, домены, env и Git/CI/CD. Новые продуктовые фичи до прохождения этого списка не добавлять, кроме исправления блокеров.
 #### Deploy hardening, 2026-06-20
@@ -286,9 +286,9 @@ Readiness событий переведен на backend-коды: `NO_FUTURE_SE
 
 Проверка: `node --check apps/backend/src/server.js`, `npm run public:build`, `npm run admin:build`. Дополнительно поднят backend на порту `4011` с `DAIBILET_REQUIRE_ADMIN_AUTH=1`, `ADMIN_EMAIL=admin@daibilet.ru`, `ADMIN_PASSWORD=admin123`: `/api/admin/sources` без auth вернул `401`, с auth вернул `200`, `/api/public/stats` вернул `200`.
 
-Документы: добавлены `docs/deploy-timeweb.md`, `deploy/systemd/daibilet-api.service`, `deploy/nginx/daibilet.conf.example`, обновлен `.env.example`.
+Документы: добавлены `docs/operations/deploy-timeweb.md`, `deploy/systemd/daibilet-api.service`, `deploy/nginx/daibilet.conf.example`, обновлен `.env.example`.
 
-Остаточный риск: Teplohod production sync нужно проверять уже с сервера `213.171.7.16`, потому что именно этот IP whitelist.
+Остаточный риск (исторический): Teplohod sync раньше белили IP `213.171.7.16` (труп). С 2026-07-30 catalog sync на MSK - allowlist должен содержать **`201.24.125.184`**, не `.16`. Owner: сверить в кабинете Teplohod.
 
 #### Backend TypeScript foundation, 2026-06-24
 

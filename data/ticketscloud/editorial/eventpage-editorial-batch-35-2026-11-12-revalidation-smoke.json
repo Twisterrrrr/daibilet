@@ -1,0 +1,433 @@
+{
+  "cache": {
+    "ok": true,
+    "warm": "none",
+    "reason": "EventPage editorial batch 35 publication"
+  },
+  "revalidated": 30,
+  "indexNowQueued": 30,
+  "results": [
+    {
+      "slug": "zooteatr-reptilii-v-g-sankt-peterburg-trk-grand-kanon-sankt-peterburg-11",
+      "ok": true,
+      "indexNowQueued": true
+    },
+    {
+      "slug": "arktida-v-barnaule-20-11-epoha-barnaul",
+      "ok": true,
+      "indexNowQueued": true
+    },
+    {
+      "slug": "grinevich-band-krasnoyarsk",
+      "ok": true,
+      "indexNowQueued": true
+    },
+    {
+      "slug": "gde-moi-2008-ruki-vverh-novosibirsk",
+      "ok": true,
+      "indexNowQueued": true
+    },
+    {
+      "slug": "shura-ufa",
+      "ok": true,
+      "indexNowQueued": true
+    },
+    {
+      "slug": "kompozitor-aleksandr-demidov-ot-mirovyh-hitov-do-sobstvennyh-sochinenii-saratov",
+      "ok": true,
+      "indexNowQueued": true
+    },
+    {
+      "slug": "vay-muzykalnoe-loto-russkie-hity-karaoke-samara",
+      "ok": true,
+      "indexNowQueued": true
+    },
+    {
+      "slug": "aleksandr-bessonov-pochemu-devushki-vybirayut-plohih-parnei-saratov",
+      "ok": true,
+      "indexNowQueued": true
+    },
+    {
+      "slug": "vau-muzykalnoe-loto-hity-2010-h-i-2020-h-miks-samara",
+      "ok": true,
+      "indexNowQueued": true
+    },
+    {
+      "slug": "nurminskii-solnyi-koncert-izhevsk-20-noyabrya-pepelac-izhevsk",
+      "ok": true,
+      "indexNowQueued": true
+    },
+    {
+      "slug": "peterburgskie-nedotrogi-sankt-peterburg",
+      "ok": true,
+      "indexNowQueued": true
+    },
+    {
+      "slug": "homie-h-20-noyabrya-h-klub-atmosfera-g-kursk",
+      "ok": true,
+      "indexNowQueued": true
+    },
+    {
+      "slug": "zhenskii-stand-up-na-sretenke-moskva-3",
+      "ok": true,
+      "indexNowQueued": true
+    },
+    {
+      "slug": "tango-na-krayu-sankt-peterburg",
+      "ok": true,
+      "indexNowQueued": true
+    },
+    {
+      "slug": "hren-prezentaciya-alboma-yaroslavl",
+      "ok": true,
+      "indexNowQueued": true
+    },
+    {
+      "slug": "novogodnii-roman-kaliningrad",
+      "ok": true,
+      "indexNowQueued": true
+    },
+    {
+      "slug": "molitva-v-opere-organ-i-vokal-v-lyublino-moskva",
+      "ok": true,
+      "indexNowQueued": true
+    },
+    {
+      "slug": "kamazz-elec",
+      "ok": true,
+      "indexNowQueued": true
+    },
+    {
+      "slug": "georgii-tadorovskii-raitet-20-h-30-h-moskva",
+      "ok": true,
+      "indexNowQueued": true
+    },
+    {
+      "slug": "rzhunimagu-moskva",
+      "ok": true,
+      "indexNowQueued": true
+    },
+    {
+      "slug": "nauchnoe-priklyuchenie-prosto-fizika-dlya-detei-5-6-let-tomsk",
+      "ok": true,
+      "indexNowQueued": true
+    },
+    {
+      "slug": "interaktivnyi-spektakl-muha-cokotuha-ot-2-do-6-let-sankt-peterburg",
+      "ok": true,
+      "indexNowQueued": true
+    },
+    {
+      "slug": "koncert-dlya-samyh-malenkih-kompozitory-detyam-sankt-peterburg",
+      "ok": true,
+      "indexNowQueued": true
+    },
+    {
+      "slug": "snegurochka-moskva",
+      "ok": true,
+      "indexNowQueued": true
+    },
+    {
+      "slug": "vladimirskii-dvorec-s-posescheniem-zakrytyh-zalov-sankt-peterburg",
+      "ok": true,
+      "indexNowQueued": true
+    },
+    {
+      "slug": "master-klass-po-maslyanoi-zhivopisi-moskva",
+      "ok": true,
+      "indexNowQueued": true
+    },
+    {
+      "slug": "zmei-interaktivnoe-znakomstvo-s-ekzoticheskimi-zhivotnymi-sankt-peterburg",
+      "ok": true,
+      "indexNowQueued": true
+    },
+    {
+      "slug": "istoricheskii-organ-v-maltiiskoi-kapelle-v-dvizhenii-i-sozercanii-sankt-peterburg",
+      "ok": true,
+      "indexNowQueued": true
+    },
+    {
+      "slug": "novyi-kampus-mgtu-i-okrestnosti-moskva",
+      "ok": true,
+      "indexNowQueued": true
+    },
+    {
+      "slug": "21-11-2026-irkutsk-kostya-kulyasov-i-gruppa-animaciya-animaciya-online-irkutsk",
+      "ok": true,
+      "indexNowQueued": true
+    }
+  ],
+  "smoke": [
+    {
+      "slug": "zooteatr-reptilii-v-g-sankt-peterburg-trk-grand-kanon-sankt-peterburg-11",
+      "status": 200,
+      "canonical": "https://daibilet.ru/events/zooteatr-reptilii-v-g-sankt-peterburg-trk-grand-kanon-sankt-peterburg-11",
+      "robots": "index, follow",
+      "hasPracticalInfo": true,
+      "hasAbout": true,
+      "hasUl": true
+    },
+    {
+      "slug": "arktida-v-barnaule-20-11-epoha-barnaul",
+      "status": 200,
+      "canonical": "https://daibilet.ru/events/arktida-v-barnaule-20-11-epoha-barnaul",
+      "robots": "index, follow",
+      "hasPracticalInfo": true,
+      "hasAbout": true,
+      "hasUl": true
+    },
+    {
+      "slug": "grinevich-band-krasnoyarsk",
+      "status": 200,
+      "canonical": "https://daibilet.ru/events/grinevich-band-krasnoyarsk",
+      "robots": "index, follow",
+      "hasPracticalInfo": true,
+      "hasAbout": true,
+      "hasUl": true
+    },
+    {
+      "slug": "gde-moi-2008-ruki-vverh-novosibirsk",
+      "status": 200,
+      "canonical": "https://daibilet.ru/events/gde-moi-2008-ruki-vverh-novosibirsk",
+      "robots": "index, follow",
+      "hasPracticalInfo": true,
+      "hasAbout": true,
+      "hasUl": true
+    },
+    {
+      "slug": "shura-ufa",
+      "status": 200,
+      "canonical": "https://daibilet.ru/events/shura-ufa",
+      "robots": "index, follow",
+      "hasPracticalInfo": true,
+      "hasAbout": true,
+      "hasUl": true
+    },
+    {
+      "slug": "kompozitor-aleksandr-demidov-ot-mirovyh-hitov-do-sobstvennyh-sochinenii-saratov",
+      "status": 200,
+      "canonical": "https://daibilet.ru/events/kompozitor-aleksandr-demidov-ot-mirovyh-hitov-do-sobstvennyh-sochinenii-saratov",
+      "robots": "index, follow",
+      "hasPracticalInfo": true,
+      "hasAbout": true,
+      "hasUl": true
+    },
+    {
+      "slug": "vay-muzykalnoe-loto-russkie-hity-karaoke-samara",
+      "status": 200,
+      "canonical": "https://daibilet.ru/events/vay-muzykalnoe-loto-russkie-hity-karaoke-samara",
+      "robots": "index, follow",
+      "hasPracticalInfo": true,
+      "hasAbout": true,
+      "hasUl": true
+    },
+    {
+      "slug": "aleksandr-bessonov-pochemu-devushki-vybirayut-plohih-parnei-saratov",
+      "status": 200,
+      "canonical": "https://daibilet.ru/events/aleksandr-bessonov-pochemu-devushki-vybirayut-plohih-parnei-saratov",
+      "robots": "index, follow",
+      "hasPracticalInfo": true,
+      "hasAbout": true,
+      "hasUl": true
+    },
+    {
+      "slug": "vau-muzykalnoe-loto-hity-2010-h-i-2020-h-miks-samara",
+      "status": 200,
+      "canonical": "https://daibilet.ru/events/vau-muzykalnoe-loto-hity-2010-h-i-2020-h-miks-samara",
+      "robots": "index, follow",
+      "hasPracticalInfo": true,
+      "hasAbout": true,
+      "hasUl": true
+    },
+    {
+      "slug": "nurminskii-solnyi-koncert-izhevsk-20-noyabrya-pepelac-izhevsk",
+      "status": 200,
+      "canonical": "https://daibilet.ru/events/nurminskii-solnyi-koncert-izhevsk-20-noyabrya-pepelac-izhevsk",
+      "robots": "index, follow",
+      "hasPracticalInfo": true,
+      "hasAbout": true,
+      "hasUl": true
+    },
+    {
+      "slug": "peterburgskie-nedotrogi-sankt-peterburg",
+      "status": 200,
+      "canonical": "https://daibilet.ru/events/peterburgskie-nedotrogi-sankt-peterburg",
+      "robots": "index, follow",
+      "hasPracticalInfo": true,
+      "hasAbout": true,
+      "hasUl": true
+    },
+    {
+      "slug": "homie-h-20-noyabrya-h-klub-atmosfera-g-kursk",
+      "status": 200,
+      "canonical": "https://daibilet.ru/events/homie-h-20-noyabrya-h-klub-atmosfera-g-kursk",
+      "robots": "index, follow",
+      "hasPracticalInfo": true,
+      "hasAbout": true,
+      "hasUl": true
+    },
+    {
+      "slug": "zhenskii-stand-up-na-sretenke-moskva-3",
+      "status": 200,
+      "canonical": "https://daibilet.ru/events/zhenskii-stand-up-na-sretenke-moskva-3",
+      "robots": "index, follow",
+      "hasPracticalInfo": true,
+      "hasAbout": true,
+      "hasUl": true
+    },
+    {
+      "slug": "tango-na-krayu-sankt-peterburg",
+      "status": 200,
+      "canonical": "https://daibilet.ru/events/tango-na-krayu-sankt-peterburg",
+      "robots": "index, follow",
+      "hasPracticalInfo": true,
+      "hasAbout": true,
+      "hasUl": true
+    },
+    {
+      "slug": "hren-prezentaciya-alboma-yaroslavl",
+      "status": 200,
+      "canonical": "https://daibilet.ru/events/hren-prezentaciya-alboma-yaroslavl",
+      "robots": "index, follow",
+      "hasPracticalInfo": true,
+      "hasAbout": true,
+      "hasUl": true
+    },
+    {
+      "slug": "novogodnii-roman-kaliningrad",
+      "status": 200,
+      "canonical": "https://daibilet.ru/events/novogodnii-roman-kaliningrad",
+      "robots": "index, follow",
+      "hasPracticalInfo": true,
+      "hasAbout": true,
+      "hasUl": true
+    },
+    {
+      "slug": "molitva-v-opere-organ-i-vokal-v-lyublino-moskva",
+      "status": 200,
+      "canonical": "https://daibilet.ru/events/molitva-v-opere-organ-i-vokal-v-lyublino-moskva",
+      "robots": "index, follow",
+      "hasPracticalInfo": true,
+      "hasAbout": true,
+      "hasUl": true
+    },
+    {
+      "slug": "kamazz-elec",
+      "status": 200,
+      "canonical": "https://daibilet.ru/events/kamazz-elec",
+      "robots": "index, follow",
+      "hasPracticalInfo": true,
+      "hasAbout": true,
+      "hasUl": true
+    },
+    {
+      "slug": "georgii-tadorovskii-raitet-20-h-30-h-moskva",
+      "status": 200,
+      "canonical": "https://daibilet.ru/events/georgii-tadorovskii-raitet-20-h-30-h-moskva",
+      "robots": "index, follow",
+      "hasPracticalInfo": true,
+      "hasAbout": true,
+      "hasUl": true
+    },
+    {
+      "slug": "rzhunimagu-moskva",
+      "status": 200,
+      "canonical": "https://daibilet.ru/events/rzhunimagu-moskva",
+      "robots": "index, follow",
+      "hasPracticalInfo": true,
+      "hasAbout": true,
+      "hasUl": true
+    },
+    {
+      "slug": "nauchnoe-priklyuchenie-prosto-fizika-dlya-detei-5-6-let-tomsk",
+      "status": 200,
+      "canonical": "https://daibilet.ru/events/nauchnoe-priklyuchenie-prosto-fizika-dlya-detei-5-6-let-tomsk",
+      "robots": "index, follow",
+      "hasPracticalInfo": true,
+      "hasAbout": true,
+      "hasUl": true
+    },
+    {
+      "slug": "interaktivnyi-spektakl-muha-cokotuha-ot-2-do-6-let-sankt-peterburg",
+      "status": 200,
+      "canonical": "https://daibilet.ru/events/interaktivnyi-spektakl-muha-cokotuha-ot-2-do-6-let-sankt-peterburg",
+      "robots": "index, follow",
+      "hasPracticalInfo": true,
+      "hasAbout": true,
+      "hasUl": true
+    },
+    {
+      "slug": "koncert-dlya-samyh-malenkih-kompozitory-detyam-sankt-peterburg",
+      "status": 200,
+      "canonical": "https://daibilet.ru/events/koncert-dlya-samyh-malenkih-kompozitory-detyam-sankt-peterburg",
+      "robots": "index, follow",
+      "hasPracticalInfo": true,
+      "hasAbout": true,
+      "hasUl": true
+    },
+    {
+      "slug": "snegurochka-moskva",
+      "status": 200,
+      "canonical": "https://daibilet.ru/events/snegurochka-moskva",
+      "robots": "index, follow",
+      "hasPracticalInfo": true,
+      "hasAbout": true,
+      "hasUl": true
+    },
+    {
+      "slug": "vladimirskii-dvorec-s-posescheniem-zakrytyh-zalov-sankt-peterburg",
+      "status": 200,
+      "canonical": "https://daibilet.ru/events/vladimirskii-dvorec-s-posescheniem-zakrytyh-zalov-sankt-peterburg",
+      "robots": "index, follow",
+      "hasPracticalInfo": true,
+      "hasAbout": true,
+      "hasUl": true
+    },
+    {
+      "slug": "master-klass-po-maslyanoi-zhivopisi-moskva",
+      "status": 200,
+      "canonical": "https://daibilet.ru/events/master-klass-po-maslyanoi-zhivopisi-moskva",
+      "robots": "index, follow",
+      "hasPracticalInfo": true,
+      "hasAbout": true,
+      "hasUl": true
+    },
+    {
+      "slug": "zmei-interaktivnoe-znakomstvo-s-ekzoticheskimi-zhivotnymi-sankt-peterburg",
+      "status": 200,
+      "canonical": "https://daibilet.ru/events/zmei-interaktivnoe-znakomstvo-s-ekzoticheskimi-zhivotnymi-sankt-peterburg",
+      "robots": "index, follow",
+      "hasPracticalInfo": true,
+      "hasAbout": true,
+      "hasUl": true
+    },
+    {
+      "slug": "istoricheskii-organ-v-maltiiskoi-kapelle-v-dvizhenii-i-sozercanii-sankt-peterburg",
+      "status": 200,
+      "canonical": "https://daibilet.ru/events/istoricheskii-organ-v-maltiiskoi-kapelle-v-dvizhenii-i-sozercanii-sankt-peterburg",
+      "robots": "index, follow",
+      "hasPracticalInfo": true,
+      "hasAbout": true,
+      "hasUl": true
+    },
+    {
+      "slug": "novyi-kampus-mgtu-i-okrestnosti-moskva",
+      "status": 200,
+      "canonical": "https://daibilet.ru/events/novyi-kampus-mgtu-i-okrestnosti-moskva",
+      "robots": "index, follow",
+      "hasPracticalInfo": true,
+      "hasAbout": true,
+      "hasUl": true
+    },
+    {
+      "slug": "21-11-2026-irkutsk-kostya-kulyasov-i-gruppa-animaciya-animaciya-online-irkutsk",
+      "status": 200,
+      "canonical": "https://daibilet.ru/events/21-11-2026-irkutsk-kostya-kulyasov-i-gruppa-animaciya-animaciya-online-irkutsk",
+      "robots": "index, follow",
+      "hasPracticalInfo": true,
+      "hasAbout": true,
+      "hasUl": true
+    }
+  ]
+}

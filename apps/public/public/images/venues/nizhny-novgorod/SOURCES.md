@@ -1,0 +1,9 @@
+# Nizhny Novgorod place image sources
+
+- `skulptura-veselaya-koza-r20261102*.jpg`: photo of the actual Jolly Goat sculpture by Bogdanov-62, [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Streets_in_Nizhny_Novgorod_14.jpg), CC BY-SA 4.0. The original is kept as `skulptura-veselaya-koza-source.jpg`.
+- `pamyatnik-gorodovomu-r20261102*.jpg`: full view of the City Policeman sculpture by vivali, [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:%D0%93%D0%BE%D1%80%D0%BE%D0%B4%D0%BE%D0%B2%D0%BE%D0%B9_-_panoramio.jpg), CC BY 3.0. Original: `pamyatnik-gorodovomu-source.jpg`.
+- `pamyatnik-n-a-dobrolyubovu-r20261102*.jpg`: wide photograph of the monument in its square by Наталья Филатова, [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:%D0%91%D0%BE%D0%BB%D1%8C%D1%88%D0%B0%D1%8F_%D0%9F%D0%BE%D0%BA%D1%80%D0%BE%D0%B2%D1%81%D0%BA%D0%B0%D1%8F_%D1%83%D0%BB._%D0%9F%D0%B0%D0%BC%D1%8F%D1%82%D0%BD%D0%B8%D0%BA_%D0%9D.%D0%90._%D0%94%D0%BE%D0%B1%D1%80%D0%BE%D0%BB%D1%8E%D0%B1%D0%BE%D0%B2%D1%83_-_panoramio.jpg), CC BY 3.0. Original: `pamyatnik-n-a-dobrolyubovu-source.jpg`.
+- `pamyatnik-georgiyu-vsevolodovichu-i-simonu-suzdalskomu-r20261102*.jpg`: the complete founders' monument by Alexxx1979, [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Nizhny_Novgorod._Kremlin._Archangel_Michael_Cathedral._Monument_to_Yuri_Vsevolodovich_and_Simon_of_Suzdal_P5180767_2800.jpg), CC BY-SA 4.0. Original: `pamyatnik-georgiyu-vsevolodovichu-i-simonu-suzdalskomu-source.jpg`.
+- `russkiy-muzey-fotografii-r20261102*.jpg`: corrected to the museum camera exhibition image that was already present in this asset set (`photo-museum*.jpg`); removed the unrelated two-image collage.
+
+The attribution and license pages identify the photographed subjects and the reuse terms. The source photographs above are adapted only by resizing and cropping to the card aspect ratio.

@@ -1,0 +1,49 @@
+{
+  "eventId": "evt_6ace72d8e3304bdcce50be32",
+  "eventPageId": "cba0fb4e-fe37-4fda-a70c-f02c35cd5867",
+  "eventPageSlug": "anna-asti-solnyi-koncert-shou-carica-v-g-chelyabinsk",
+  "archiveStatus": "UNUSED_ORIGINAL_SOURCE",
+  "retrievedAt": "2026-11-05",
+  "sourceSnapshot": {
+    "id": "evt_6ace72d8e3304bdcce50be32",
+    "kind": "SINGLE",
+    "slug": "anna-asti-сольныи-концерт-шоу-царица-в-г-челябинск-6ace72d8e3304bdcce50be32",
+    "seoH1": null,
+    "title": "ANNA ASTI. Сольный концерт \"ШОУ \"Царица\" в г. Челябинск",
+    "sources": [
+      {
+        "code": "TICKETSCLOUD",
+        "name": "Ticketscloud",
+        "sourceUrl": "https://ticketscloud.org/v1/widgets/common?token=eyJhbGciOiJIUzI1NiIsImlzcyI6InRpY2tldHNjbG91ZC5ydSIsInR5cCI6IkpXVCJ9.eyJwIjoiNjhiNjA1ODk2NWExMTlkOWRkYTU5NzI5In0.NfLxwobFNxE5HDzcS1Xh9Faf4NmmoOJ0teg7HJnQEZc&event=6ace72d8e3304bdcce50be32",
+        "externalId": "6ace72d8e3304bdcce50be32",
+        "metaExternalId": null
+      }
+    ],
+    "venueId": "venue_5e45d2a383e85af009615682",
+    "imageUrl": "https://ticketscloud-prod.storage.yandexcloud.net/production/image/2026-10/6ace72d836b5ea2196a05de8.jpg",
+    "seoTitle": null,
+    "cityTitle": "Челябинск",
+    "venueTitle": "Ледовая арена Трактор",
+    "description": null,
+    "isIndexable": true,
+    "purchaseFlow": "EXTERNAL",
+    "venueAddress": "ул. 250-Летия Челябинска, 38",
+    "canonicalPath": null,
+    "primaryCityId": "city_1508291",
+    "supplierTitle": null,
+    "managementMode": "SOURCE_MANAGED",
+    "seoDescription": null,
+    "shortDescription": null
+  },
+  "originalDescription": null,
+  "previousEventOverride": null,
+  "activeSessions": [
+    {
+      "start": "2027-03-16T15:00:00",
+      "end": "2027-03-16T17:30:00",
+      "price": 2200
+    }
+  ],
+  "mainChars": 591,
+  "previousEffectiveChars": 1
+}

@@ -1,0 +1,1502 @@
+[
+  {
+    "batch": 1,
+    "sequence": 1,
+    "slug": "murakami-belym-belo-sankt-peterburg",
+    "sourceChars": 1157,
+    "sourceMainChars": 1157,
+    "rewriteChars": 1230,
+    "paragraphs": 4,
+    "status": "PASS"
+  },
+  {
+    "batch": 1,
+    "sequence": 2,
+    "slug": "samaya-zimnyaya-skazka-novogodnyaya-elka-i-spektakl-dlya-detei-v-samare-samara-2",
+    "sourceChars": 1039,
+    "sourceMainChars": 1034,
+    "rewriteChars": 1236,
+    "paragraphs": 4,
+    "status": "PASS"
+  },
+  {
+    "batch": 1,
+    "sequence": 3,
+    "slug": "tradicii-prazdnovaniya-rozhdestva-i-novogo-goda-s-uzhinom-i-degustaciei-igristogo-moskva",
+    "sourceChars": 1198,
+    "sourceMainChars": 1196,
+    "rewriteChars": 1390,
+    "paragraphs": 4,
+    "status": "PASS"
+  },
+  {
+    "batch": 1,
+    "sequence": 4,
+    "slug": "novogodnyaya-elka-snezhnoe-priklyuchenie-ovechek-nizhniy-novgorod",
+    "sourceChars": 824,
+    "sourceMainChars": 824,
+    "rewriteChars": 1084,
+    "paragraphs": 4,
+    "status": "PASS"
+  },
+  {
+    "batch": 1,
+    "sequence": 5,
+    "slug": "novogodnyaya-elka-na-teplohode-s-interaktivnym-spektaklem-taina-ledyanogo-posoha-moskva-2",
+    "sourceChars": 1637,
+    "sourceMainChars": 1634,
+    "rewriteChars": 1896,
+    "paragraphs": 5,
+    "status": "PASS"
+  },
+  {
+    "batch": 1,
+    "sequence": 6,
+    "slug": "interaktivnaya-elka-v-parke-chudes-galileo-sankt-peterburg",
+    "sourceChars": 1041,
+    "sourceMainChars": 1005,
+    "rewriteChars": 1068,
+    "paragraphs": 4,
+    "status": "PASS"
+  },
+  {
+    "batch": 1,
+    "sequence": 7,
+    "slug": "interaktivnaya-elka-v-parke-chudes-galileo-samara",
+    "sourceChars": 1004,
+    "sourceMainChars": 968,
+    "rewriteChars": 1048,
+    "paragraphs": 4,
+    "status": "PASS"
+  },
+  {
+    "batch": 1,
+    "sequence": 8,
+    "slug": "novogodnii-detskii-bal-snezhnaya-koroleva-sankt-peterburg-4",
+    "sourceChars": 456,
+    "sourceMainChars": 456,
+    "rewriteChars": 769,
+    "paragraphs": 3,
+    "status": "PASS"
+  },
+  {
+    "batch": 1,
+    "sequence": 9,
+    "slug": "sofi-gerte-dialog-u-novogodnei-elki-moskva",
+    "sourceChars": 1472,
+    "sourceMainChars": 1470,
+    "rewriteChars": 1520,
+    "paragraphs": 4,
+    "status": "PASS"
+  },
+  {
+    "batch": 1,
+    "sequence": 10,
+    "slug": "rozhdestvenskii-dzhaz-iz-nyu-iorka-v-moskvu-s-olgoi-stupinoi-b-band-moskva",
+    "sourceChars": 1331,
+    "sourceMainChars": 1331,
+    "rewriteChars": 1472,
+    "paragraphs": 4,
+    "status": "PASS"
+  },
+  {
+    "batch": 1,
+    "sequence": 11,
+    "slug": "art-branch-rozhdestvo-i-novyi-god-tradicii-glavnyh-prazdnikov-v-carskoi-seme-i-iskusstve-sankt-peterburg",
+    "sourceChars": 1143,
+    "sourceMainChars": 1143,
+    "rewriteChars": 1253,
+    "paragraphs": 4,
+    "status": "PASS"
+  },
+  {
+    "batch": 1,
+    "sequence": 12,
+    "slug": "art-branch-kto-privez-elku-v-peterburg-zimnie-tradicii-stolicy-sankt-peterburg",
+    "sourceChars": 865,
+    "sourceMainChars": 865,
+    "rewriteChars": 1052,
+    "paragraphs": 4,
+    "status": "PASS"
+  },
+  {
+    "batch": 1,
+    "sequence": 13,
+    "slug": "novogodnii-koncert-diskoteka-mix-80-90-h-na-teplohode-imperatrica-moskva-2",
+    "sourceChars": 1167,
+    "sourceMainChars": 1161,
+    "rewriteChars": 1517,
+    "paragraphs": 4,
+    "status": "PASS"
+  },
+  {
+    "batch": 1,
+    "sequence": 14,
+    "slug": "novogodnee-shou-anna-i-elza-chast-3-sankt-peterburg",
+    "sourceChars": 1322,
+    "sourceMainChars": 1322,
+    "rewriteChars": 1663,
+    "paragraphs": 4,
+    "status": "PASS"
+  },
+  {
+    "batch": 1,
+    "sequence": 15,
+    "slug": "postmodern-jazz-party-happy-new-year-moskva",
+    "sourceChars": 1620,
+    "sourceMainChars": 1618,
+    "rewriteChars": 1666,
+    "paragraphs": 4,
+    "status": "PASS"
+  },
+  {
+    "batch": 1,
+    "sequence": 16,
+    "slug": "novogodnii-roman-kaliningrad-4",
+    "sourceChars": 310,
+    "sourceMainChars": 310,
+    "rewriteChars": 708,
+    "paragraphs": 3,
+    "status": "PASS"
+  },
+  {
+    "batch": 1,
+    "sequence": 17,
+    "slug": "novogodnii-jam-session-kemerovo",
+    "sourceChars": 361,
+    "sourceMainChars": 361,
+    "rewriteChars": 848,
+    "paragraphs": 3,
+    "status": "PASS"
+  },
+  {
+    "batch": 1,
+    "sequence": 18,
+    "slug": "novogodnie-priklyucheniya-mashi-i-medvedya-barnaul",
+    "sourceChars": 892,
+    "sourceMainChars": 892,
+    "rewriteChars": 1081,
+    "paragraphs": 4,
+    "status": "PASS"
+  },
+  {
+    "batch": 1,
+    "sequence": 19,
+    "slug": "ha-my-rozhdestvenskoe-novosibirsk",
+    "sourceChars": 844,
+    "sourceMainChars": 844,
+    "rewriteChars": 948,
+    "paragraphs": 3,
+    "status": "PASS"
+  },
+  {
+    "batch": 1,
+    "sequence": 20,
+    "slug": "betsy-novogodnee-shou-yaroslavl",
+    "sourceChars": 757,
+    "sourceMainChars": 757,
+    "rewriteChars": 800,
+    "paragraphs": 3,
+    "status": "PASS"
+  },
+  {
+    "batch": 1,
+    "sequence": 21,
+    "slug": "hot-club-de-russia-christmas-jazz-party-moskva",
+    "sourceChars": 1355,
+    "sourceMainChars": 1351,
+    "rewriteChars": 1545,
+    "paragraphs": 4,
+    "status": "PASS"
+  },
+  {
+    "batch": 1,
+    "sequence": 22,
+    "slug": "novogodnyaya-noch-31-dekabrya-v-peterburge-ded-moroz-podarki-i-furshet-sankt-peterburg",
+    "sourceChars": 1849,
+    "sourceMainChars": 1849,
+    "rewriteChars": 2192,
+    "paragraphs": 6,
+    "status": "PASS"
+  },
+  {
+    "batch": 1,
+    "sequence": 23,
+    "slug": "novogodnii-traktor-barnaul",
+    "sourceChars": 598,
+    "sourceMainChars": 598,
+    "rewriteChars": 1006,
+    "paragraphs": 4,
+    "status": "PASS"
+  },
+  {
+    "batch": 1,
+    "sequence": 24,
+    "slug": "dzhaz-klub-nz-novogodnii-dzhaz-kaliningrad-2",
+    "sourceChars": 633,
+    "sourceMainChars": 632,
+    "rewriteChars": 798,
+    "paragraphs": 3,
+    "status": "PASS"
+  },
+  {
+    "batch": 1,
+    "sequence": 25,
+    "slug": "novogodnyaya-elka-bembi-volshebnaya-elochka-nizhniy-novgorod",
+    "sourceChars": 624,
+    "sourceMainChars": 624,
+    "rewriteChars": 886,
+    "paragraphs": 3,
+    "status": "PASS"
+  },
+  {
+    "batch": 1,
+    "sequence": 26,
+    "slug": "schelkunchik-muzyka-novogodnei-nochi-organnyi-duet-art-bene-dmitrii-maksimenko-i-anna-vetlugina-moskva",
+    "sourceChars": 1656,
+    "sourceMainChars": 1656,
+    "rewriteChars": 1875,
+    "paragraphs": 5,
+    "status": "PASS"
+  },
+  {
+    "batch": 1,
+    "sequence": 27,
+    "slug": "sneg-nad-peterburgom-novogodnii-organ-pri-svechah-sankt-peterburg",
+    "sourceChars": 1776,
+    "sourceMainChars": 1770,
+    "rewriteChars": 1954,
+    "paragraphs": 5,
+    "status": "PASS"
+  },
+  {
+    "batch": 1,
+    "sequence": 28,
+    "slug": "novogodnyaya-elka-holodnoe-serdce-nizhniy-novgorod",
+    "sourceChars": 803,
+    "sourceMainChars": 803,
+    "rewriteChars": 1028,
+    "paragraphs": 4,
+    "status": "PASS"
+  },
+  {
+    "batch": 1,
+    "sequence": 29,
+    "slug": "novogodnie-hity-pesni-abba-sinatry-i-sovetskogo-kino-pri-svechah-moskva",
+    "sourceChars": 1523,
+    "sourceMainChars": 1523,
+    "rewriteChars": 1996,
+    "paragraphs": 4,
+    "status": "PASS"
+  },
+  {
+    "batch": 1,
+    "sequence": 30,
+    "slug": "ezhik-fima-novogodnie-chudesa-sankt-peterburg-4",
+    "sourceChars": 1352,
+    "sourceMainChars": 1350,
+    "rewriteChars": 1790,
+    "paragraphs": 5,
+    "status": "PASS"
+  },
+  {
+    "batch": 2,
+    "sequence": 1,
+    "slug": "novogodnyaya-elka-supergeroiskaya-elka-nizhniy-novgorod",
+    "sourceChars": 631,
+    "sourceMainChars": 631,
+    "rewriteChars": 1066,
+    "paragraphs": 4,
+    "status": "PASS"
+  },
+  {
+    "batch": 2,
+    "sequence": 2,
+    "slug": "kinomuzyka-lyubimye-narodnye-hity-i-novogodnie-pesni-pri-svechah-moskva",
+    "sourceChars": 1489,
+    "sourceMainChars": 1489,
+    "rewriteChars": 1717,
+    "paragraphs": 4,
+    "status": "PASS"
+  },
+  {
+    "batch": 2,
+    "sequence": 3,
+    "slug": "bdo-petra-vostokova-dzhaz-syuita-schelkunchik-moskva",
+    "sourceChars": 1881,
+    "sourceMainChars": 1869,
+    "rewriteChars": 1981,
+    "paragraphs": 4,
+    "status": "PASS"
+  },
+  {
+    "batch": 2,
+    "sequence": 4,
+    "slug": "rospis-elochnyh-igrushek-s-vidom-na-isaakii-ot-artvaibs-sankt-peterburg",
+    "sourceChars": 672,
+    "sourceMainChars": 672,
+    "rewriteChars": 743,
+    "paragraphs": 3,
+    "status": "PASS"
+  },
+  {
+    "batch": 2,
+    "sequence": 5,
+    "slug": "malenkaya-elochka-sankt-peterburg",
+    "sourceChars": 420,
+    "sourceMainChars": 420,
+    "rewriteChars": 737,
+    "paragraphs": 3,
+    "status": "PASS"
+  },
+  {
+    "batch": 2,
+    "sequence": 6,
+    "slug": "novogodnii-ogonek-s-a7-i-russkim-radio-moskva",
+    "sourceChars": 831,
+    "sourceMainChars": 825,
+    "rewriteChars": 1041,
+    "paragraphs": 3,
+    "status": "PASS"
+  },
+  {
+    "batch": 2,
+    "sequence": 7,
+    "slug": "novogodnie-kompozicii-venki-elochki-s-vidom-na-isaakii-ot-artvaibs-sankt-peterburg",
+    "sourceChars": 775,
+    "sourceMainChars": 775,
+    "rewriteChars": 863,
+    "paragraphs": 3,
+    "status": "PASS"
+  },
+  {
+    "batch": 2,
+    "sequence": 8,
+    "slug": "ledovoe-shou-schelkunchik-v-sterlitamake-sterlitamak-2",
+    "sourceChars": 672,
+    "sourceMainChars": 672,
+    "rewriteChars": 810,
+    "paragraphs": 3,
+    "status": "PASS"
+  },
+  {
+    "batch": 2,
+    "sequence": 9,
+    "slug": "ledovoe-shou-schelkunchik-v-tambove-tambov",
+    "sourceChars": 610,
+    "sourceMainChars": 591,
+    "rewriteChars": 768,
+    "paragraphs": 3,
+    "status": "PASS"
+  },
+  {
+    "batch": 2,
+    "sequence": 10,
+    "slug": "ledovoe-shou-schelkunchik-v-lipecke-lipeck-2",
+    "sourceChars": 681,
+    "sourceMainChars": 638,
+    "rewriteChars": 761,
+    "paragraphs": 3,
+    "status": "PASS"
+  },
+  {
+    "batch": 2,
+    "sequence": 11,
+    "slug": "koncert-rozhdestvenskie-vstrechi-s-ansamblem-pesni-i-plyaski-donskih-kazakov-rostov-na-donu-2",
+    "sourceChars": 1980,
+    "sourceMainChars": 1952,
+    "rewriteChars": 2179,
+    "paragraphs": 5,
+    "status": "PASS"
+  },
+  {
+    "batch": 2,
+    "sequence": 12,
+    "slug": "novogodnie-kompozicii-venki-i-elochki-ot-artvaibs-sankt-peterburg",
+    "sourceChars": 775,
+    "sourceMainChars": 775,
+    "rewriteChars": 1345,
+    "paragraphs": 4,
+    "status": "PASS"
+  },
+  {
+    "batch": 2,
+    "sequence": 13,
+    "slug": "novogodnee-predstavlenie-vse-delo-v-shlyape-po-skazke-prazdnik-pylelupov-moskva-4",
+    "sourceChars": 310,
+    "sourceMainChars": 310,
+    "rewriteChars": 1649,
+    "paragraphs": 4,
+    "status": "PASS"
+  },
+  {
+    "batch": 2,
+    "sequence": 14,
+    "slug": "ledovoe-shou-schelkunchik-v-novosibirske-novosibirsk-2",
+    "sourceChars": 791,
+    "sourceMainChars": 768,
+    "rewriteChars": 1300,
+    "paragraphs": 4,
+    "status": "PASS"
+  },
+  {
+    "batch": 2,
+    "sequence": 15,
+    "slug": "rospis-elochnyh-igrushek-ot-artvaibs-sankt-peterburg",
+    "sourceChars": 614,
+    "sourceMainChars": 614,
+    "rewriteChars": 1248,
+    "paragraphs": 4,
+    "status": "PASS"
+  },
+  {
+    "batch": 2,
+    "sequence": 16,
+    "slug": "rock-christmas-metallica-i-scorpions-pri-svechah-akustika-moskva",
+    "sourceChars": 603,
+    "sourceMainChars": 599,
+    "rewriteChars": 1350,
+    "paragraphs": 4,
+    "status": "PASS"
+  },
+  {
+    "batch": 2,
+    "sequence": 17,
+    "slug": "gr-ivan-kaif-novosibirsk",
+    "sourceChars": 1334,
+    "sourceMainChars": 1323,
+    "rewriteChars": 1675,
+    "paragraphs": 5,
+    "status": "PASS"
+  },
+  {
+    "batch": 2,
+    "sequence": 18,
+    "slug": "saundtreki-rozhdestva-sankt-peterburg",
+    "sourceChars": 937,
+    "sourceMainChars": 935,
+    "rewriteChars": 1279,
+    "paragraphs": 4,
+    "status": "PASS"
+  },
+  {
+    "batch": 2,
+    "sequence": 19,
+    "slug": "schelkunchik-noch-dzhaza-moskva",
+    "sourceChars": 888,
+    "sourceMainChars": 888,
+    "rewriteChars": 1302,
+    "paragraphs": 4,
+    "status": "PASS"
+  },
+  {
+    "batch": 2,
+    "sequence": 20,
+    "slug": "balet-schelkunchik-sankt-peterburg-20",
+    "sourceChars": 844,
+    "sourceMainChars": 844,
+    "rewriteChars": 1270,
+    "paragraphs": 4,
+    "status": "PASS"
+  },
+  {
+    "batch": 2,
+    "sequence": 21,
+    "slug": "schelkunchik-novogodnyaya-muzykalnaya-skazka-s-pesochnoi-animaciei-moskva-2",
+    "sourceChars": 888,
+    "sourceMainChars": 888,
+    "rewriteChars": 1245,
+    "paragraphs": 4,
+    "status": "PASS"
+  },
+  {
+    "batch": 2,
+    "sequence": 22,
+    "slug": "kosmicheskii-dzhaz-novogodnie-hity-sankt-peterburg",
+    "sourceChars": 852,
+    "sourceMainChars": 850,
+    "rewriteChars": 1258,
+    "paragraphs": 4,
+    "status": "PASS"
+  },
+  {
+    "batch": 2,
+    "sequence": 23,
+    "slug": "betsy-novogodnee-shou-moskva",
+    "sourceChars": 921,
+    "sourceMainChars": 919,
+    "rewriteChars": 1205,
+    "paragraphs": 4,
+    "status": "PASS"
+  },
+  {
+    "batch": 2,
+    "sequence": 24,
+    "slug": "novogodnyaya-noch-v-zavarke-koncert-yasmi-moskva",
+    "sourceChars": 1287,
+    "sourceMainChars": 1287,
+    "rewriteChars": 1300,
+    "paragraphs": 3,
+    "status": "PASS"
+  },
+  {
+    "batch": 2,
+    "sequence": 25,
+    "slug": "kak-ded-moroz-na-svet-poyavilsya-penza-3",
+    "sourceChars": 513,
+    "sourceMainChars": 513,
+    "rewriteChars": 1213,
+    "paragraphs": 4,
+    "status": "PASS"
+  },
+  {
+    "batch": 2,
+    "sequence": 26,
+    "slug": "tutty-frutty-party-koncert-pesen-elvisa-ot-gr-the-great-pretenders-tver",
+    "sourceChars": 474,
+    "sourceMainChars": 472,
+    "rewriteChars": 1100,
+    "paragraphs": 4,
+    "status": "PASS"
+  },
+  {
+    "batch": 2,
+    "sequence": 27,
+    "slug": "rozhdestvenskii-organ-pri-svechah-sankt-peterburg-2",
+    "sourceChars": 789,
+    "sourceMainChars": 789,
+    "rewriteChars": 1175,
+    "paragraphs": 4,
+    "status": "PASS"
+  },
+  {
+    "batch": 2,
+    "sequence": 28,
+    "slug": "muzh-v-novogodnyuyu-ipoteku-kaliningrad",
+    "sourceChars": 371,
+    "sourceMainChars": 371,
+    "rewriteChars": 846,
+    "paragraphs": 3,
+    "status": "PASS"
+  },
+  {
+    "batch": 2,
+    "sequence": 29,
+    "slug": "novogodnyaya-vecherinka-s-pridurkom-kaliningrad",
+    "sourceChars": 542,
+    "sourceMainChars": 542,
+    "rewriteChars": 1022,
+    "paragraphs": 4,
+    "status": "PASS"
+  },
+  {
+    "batch": 2,
+    "sequence": 30,
+    "slug": "ledovoe-shou-taina-semi-deda-moroza-podarok-lipeck",
+    "sourceChars": 1369,
+    "sourceMainChars": 1366,
+    "rewriteChars": 1596,
+    "paragraphs": 5,
+    "status": "PASS"
+  },
+  {
+    "batch": 3,
+    "sequence": 1,
+    "slug": "art-festival-pereryv-krasnoyarsk",
+    "sourceChars": 1225,
+    "sourceMainChars": 1225,
+    "rewriteChars": 1346,
+    "paragraphs": 4,
+    "status": "PASS"
+  },
+  {
+    "batch": 3,
+    "sequence": 2,
+    "slug": "kristall-deda-moroza-operaciya-spasenie-naberezhnye-chelny",
+    "sourceChars": 1602,
+    "sourceMainChars": 1602,
+    "rewriteChars": 1767,
+    "paragraphs": 6,
+    "status": "PASS"
+  },
+  {
+    "batch": 3,
+    "sequence": 3,
+    "slug": "po-schuchemu-veleniyu-teatralno-cirkovaya-skazka-molokovo",
+    "sourceChars": 1076,
+    "sourceMainChars": 1076,
+    "rewriteChars": 1319,
+    "paragraphs": 5,
+    "status": "PASS"
+  },
+  {
+    "batch": 3,
+    "sequence": 4,
+    "slug": "snegovik-pochtovik-muzykalnaya-skazka-sofrino",
+    "sourceChars": 1319,
+    "sourceMainChars": 1319,
+    "rewriteChars": 1455,
+    "paragraphs": 5,
+    "status": "PASS"
+  },
+  {
+    "batch": 3,
+    "sequence": 5,
+    "slug": "03-01-2027-azon-v-podolske-ozdorovitelnyi-koncert-podolsk",
+    "sourceChars": 1624,
+    "sourceMainChars": 1618,
+    "rewriteChars": 1885,
+    "paragraphs": 6,
+    "status": "PASS"
+  },
+  {
+    "batch": 3,
+    "sequence": 6,
+    "slug": "murakami-belym-belo-vladimir",
+    "sourceChars": 1327,
+    "sourceMainChars": 1327,
+    "rewriteChars": 1538,
+    "paragraphs": 6,
+    "status": "PASS"
+  },
+  {
+    "batch": 3,
+    "sequence": 7,
+    "slug": "12-mesyacev-zelenograd",
+    "sourceChars": 1139,
+    "sourceMainChars": 1136,
+    "rewriteChars": 1148,
+    "paragraphs": 4,
+    "status": "PASS"
+  },
+  {
+    "batch": 3,
+    "sequence": 8,
+    "slug": "murakami-belym-belo-kazan",
+    "sourceChars": 1177,
+    "sourceMainChars": 1177,
+    "rewriteChars": 1458,
+    "paragraphs": 5,
+    "status": "PASS"
+  },
+  {
+    "batch": 3,
+    "sequence": 9,
+    "slug": "prednovogodnee-karaokekamikadze-rostislav-kolpakov-vs-evgenii-egorov-moskva",
+    "sourceChars": 1294,
+    "sourceMainChars": 1284,
+    "rewriteChars": 1602,
+    "paragraphs": 5,
+    "status": "PASS"
+  },
+  {
+    "batch": 3,
+    "sequence": 10,
+    "slug": "via-sinyaya-ptica-3-yanvarya-yaroslavl-dk-neftyanik-yaroslavl",
+    "sourceChars": 1315,
+    "sourceMainChars": 1312,
+    "rewriteChars": 1449,
+    "paragraphs": 5,
+    "status": "PASS"
+  },
+  {
+    "batch": 3,
+    "sequence": 11,
+    "slug": "murakami-belym-belo-naberezhnye-chelny",
+    "sourceChars": 1194,
+    "sourceMainChars": 1194,
+    "rewriteChars": 1302,
+    "paragraphs": 4,
+    "status": "PASS"
+  },
+  {
+    "batch": 3,
+    "sequence": 12,
+    "slug": "tribyut-hautiluc-pompiliuc-ot-gr-novyi-predmet-tver",
+    "sourceChars": 1101,
+    "sourceMainChars": 1101,
+    "rewriteChars": 1125,
+    "paragraphs": 4,
+    "status": "PASS"
+  },
+  {
+    "batch": 3,
+    "sequence": 13,
+    "slug": "muzyka-pri-svechah-melodii-rozhdestva-sankt-peterburg-3",
+    "sourceChars": 994,
+    "sourceMainChars": 991,
+    "rewriteChars": 1178,
+    "paragraphs": 4,
+    "status": "PASS"
+  },
+  {
+    "batch": 3,
+    "sequence": 14,
+    "slug": "kto-rezhisser-novogo-goda-moskva",
+    "sourceChars": 1166,
+    "sourceMainChars": 1166,
+    "rewriteChars": 1411,
+    "paragraphs": 5,
+    "status": "PASS"
+  },
+  {
+    "batch": 3,
+    "sequence": 15,
+    "slug": "chaikovskii-pri-svechah-rozhdestvenskii-koncert-muzyki-i-baleta-na-panoramnoi-kryshe-moskva-5",
+    "sourceChars": 1167,
+    "sourceMainChars": 1161,
+    "rewriteChars": 1232,
+    "paragraphs": 4,
+    "status": "PASS"
+  },
+  {
+    "batch": 3,
+    "sequence": 16,
+    "slug": "roxette-tribute-love-show-sankt-peterburg",
+    "sourceChars": 1856,
+    "sourceMainChars": 1852,
+    "rewriteChars": 2045,
+    "paragraphs": 6,
+    "status": "PASS"
+  },
+  {
+    "batch": 3,
+    "sequence": 17,
+    "slug": "new-year-s-downtownbeat-band-kaby-ne-bylo-zimy-moskva",
+    "sourceChars": 1176,
+    "sourceMainChars": 1172,
+    "rewriteChars": 1443,
+    "paragraphs": 5,
+    "status": "PASS"
+  },
+  {
+    "batch": 3,
+    "sequence": 18,
+    "slug": "ekskursiya-v-osobnyak-shredera-koncert-rozhdestvo-s-dunaevskim-za-stolikami-s-furshetom-sankt-peterburg",
+    "sourceChars": 1135,
+    "sourceMainChars": 1133,
+    "rewriteChars": 1624,
+    "paragraphs": 5,
+    "status": "PASS"
+  },
+  {
+    "batch": 3,
+    "sequence": 19,
+    "slug": "ot-mirovyh-hitov-do-lyubimyh-kinolent-novogodnii-vecher-pri-svechah-cimmer-morrikone-tariverdiev-moskva",
+    "sourceChars": 1743,
+    "sourceMainChars": 1708,
+    "rewriteChars": 1887,
+    "paragraphs": 6,
+    "status": "PASS"
+  },
+  {
+    "batch": 3,
+    "sequence": 20,
+    "slug": "rozhdestvo-s-dunaevskim-irina-aleshina-prazdnichnyi-koncert-za-stolikami-sankt-peterburg",
+    "sourceChars": 1100,
+    "sourceMainChars": 1100,
+    "rewriteChars": 1280,
+    "paragraphs": 5,
+    "status": "PASS"
+  },
+  {
+    "batch": 3,
+    "sequence": 21,
+    "slug": "v-svechah-shedevry-klassiki-v-usadbe-derzhavina-sankt-peterburg",
+    "sourceChars": 1290,
+    "sourceMainChars": 1273,
+    "rewriteChars": 1442,
+    "paragraphs": 5,
+    "status": "PASS"
+  },
+  {
+    "batch": 3,
+    "sequence": 22,
+    "slug": "tvorcheskii-master-klass-po-izgotovleniyu-podstavki-iz-gipsa-i-aromaticheskoi-svechi-perm-4",
+    "sourceChars": 567,
+    "sourceMainChars": 567,
+    "rewriteChars": 1070,
+    "paragraphs": 4,
+    "status": "PASS"
+  },
+  {
+    "batch": 3,
+    "sequence": 23,
+    "slug": "koncert-extra-time-jazz-band-vidnoe",
+    "sourceChars": 411,
+    "sourceMainChars": 411,
+    "rewriteChars": 1019,
+    "paragraphs": 4,
+    "status": "PASS"
+  },
+  {
+    "batch": 3,
+    "sequence": 24,
+    "slug": "rok-akustika-po-vashim-zayavkam-smolensk",
+    "sourceChars": 592,
+    "sourceMainChars": 590,
+    "rewriteChars": 828,
+    "paragraphs": 3,
+    "status": "PASS"
+  },
+  {
+    "batch": 3,
+    "sequence": 25,
+    "slug": "kontent-zavod-omsk",
+    "sourceChars": 751,
+    "sourceMainChars": 736,
+    "rewriteChars": 1062,
+    "paragraphs": 4,
+    "status": "PASS"
+  },
+  {
+    "batch": 3,
+    "sequence": 26,
+    "slug": "koncert-rozhdestvenskie-vstrechi-s-ansamblem-pesni-i-plyaski-donskih-kazakov-rostov-na-donu",
+    "sourceChars": 1897,
+    "sourceMainChars": 1894,
+    "rewriteChars": 2068,
+    "paragraphs": 5,
+    "status": "PASS"
+  },
+  {
+    "batch": 3,
+    "sequence": 27,
+    "slug": "hozyaika-mednoi-gory-krasnodar",
+    "sourceChars": 927,
+    "sourceMainChars": 924,
+    "rewriteChars": 1011,
+    "paragraphs": 4,
+    "status": "PASS"
+  },
+  {
+    "batch": 3,
+    "sequence": 28,
+    "slug": "dmitrii-dubrov-plotnik82-belgorod-3-01-2027-belgorod",
+    "sourceChars": 696,
+    "sourceMainChars": 692,
+    "rewriteChars": 1086,
+    "paragraphs": 4,
+    "status": "PASS"
+  },
+  {
+    "batch": 3,
+    "sequence": 29,
+    "slug": "moi-2008-rassvet-voronezh",
+    "sourceChars": 851,
+    "sourceMainChars": 848,
+    "rewriteChars": 1081,
+    "paragraphs": 4,
+    "status": "PASS"
+  },
+  {
+    "batch": 3,
+    "sequence": 30,
+    "slug": "prazdnik-kotoryi-vsegda-s-toboi-18-ufa-3",
+    "sourceChars": 493,
+    "sourceMainChars": 493,
+    "rewriteChars": 842,
+    "paragraphs": 3,
+    "status": "PASS"
+  },
+  {
+    "batch": 4,
+    "sequence": 1,
+    "slug": "kinouzhin-po-motivam-filma-odin-doma-syktyvkar",
+    "sourceChars": 524,
+    "sourceMainChars": 522,
+    "rewriteChars": 889,
+    "paragraphs": 4,
+    "status": "PASS"
+  },
+  {
+    "batch": 4,
+    "sequence": 2,
+    "slug": "moi-2008-abrikos-arena-stavropol",
+    "sourceChars": 820,
+    "sourceMainChars": 819,
+    "rewriteChars": 1010,
+    "paragraphs": 4,
+    "status": "PASS"
+  },
+  {
+    "batch": 4,
+    "sequence": 3,
+    "slug": "moi-2008-elcin-centr-ekaterinburg-2",
+    "sourceChars": 888,
+    "sourceMainChars": 885,
+    "rewriteChars": 1066,
+    "paragraphs": 4,
+    "status": "PASS"
+  },
+  {
+    "batch": 4,
+    "sequence": 4,
+    "slug": "rozhdestvenskii-gala-koncert-solistov-baleta-s-obzornoi-ekskursiei-po-dvorcu-nachalo-ekskursii-17-sankt-peterburg",
+    "sourceChars": 1054,
+    "sourceMainChars": 1054,
+    "rewriteChars": 1095,
+    "paragraphs": 4,
+    "status": "PASS"
+  },
+  {
+    "batch": 4,
+    "sequence": 5,
+    "slug": "taina-ledyanoi-zvezdy-penza-2",
+    "sourceChars": 512,
+    "sourceMainChars": 512,
+    "rewriteChars": 868,
+    "paragraphs": 3,
+    "status": "PASS"
+  },
+  {
+    "batch": 4,
+    "sequence": 6,
+    "slug": "kosmofabrika-deda-moroza-volgograd",
+    "sourceChars": 545,
+    "sourceMainChars": 543,
+    "rewriteChars": 812,
+    "paragraphs": 3,
+    "status": "PASS"
+  },
+  {
+    "batch": 4,
+    "sequence": 7,
+    "slug": "samvel-ginovyan-solnyi-stendap-koncert-krasnoyarsk-2",
+    "sourceChars": 543,
+    "sourceMainChars": 543,
+    "rewriteChars": 723,
+    "paragraphs": 3,
+    "status": "PASS"
+  },
+  {
+    "batch": 4,
+    "sequence": 8,
+    "slug": "kinouzhin-po-motivam-filma-grinch-syktyvkar",
+    "sourceChars": 423,
+    "sourceMainChars": 421,
+    "rewriteChars": 807,
+    "paragraphs": 4,
+    "status": "PASS"
+  },
+  {
+    "batch": 4,
+    "sequence": 9,
+    "slug": "rukavichka-deda-moroza-barnaul",
+    "sourceChars": 749,
+    "sourceMainChars": 748,
+    "rewriteChars": 882,
+    "paragraphs": 3,
+    "status": "PASS"
+  },
+  {
+    "batch": 4,
+    "sequence": 10,
+    "slug": "novosele-penza",
+    "sourceChars": 660,
+    "sourceMainChars": 660,
+    "rewriteChars": 796,
+    "paragraphs": 3,
+    "status": "PASS"
+  },
+  {
+    "batch": 4,
+    "sequence": 11,
+    "slug": "belym-belo-volgograd-2",
+    "sourceChars": 476,
+    "sourceMainChars": 476,
+    "rewriteChars": 822,
+    "paragraphs": 3,
+    "status": "PASS"
+  },
+  {
+    "batch": 4,
+    "sequence": 12,
+    "slug": "hitoboi-tver",
+    "sourceChars": 337,
+    "sourceMainChars": 337,
+    "rewriteChars": 683,
+    "paragraphs": 3,
+    "status": "PASS"
+  },
+  {
+    "batch": 4,
+    "sequence": 13,
+    "slug": "lyubimye-hity-90-h-00-h-i-10-h-v-stile-ska-ot-barni-barflai-tver",
+    "sourceChars": 339,
+    "sourceMainChars": 339,
+    "rewriteChars": 731,
+    "paragraphs": 3,
+    "status": "PASS"
+  },
+  {
+    "batch": 4,
+    "sequence": 14,
+    "slug": "roma-zhelud-nizhniy-novgorod",
+    "sourceChars": 285,
+    "sourceMainChars": 285,
+    "rewriteChars": 740,
+    "paragraphs": 3,
+    "status": "PASS"
+  },
+  {
+    "batch": 4,
+    "sequence": 15,
+    "slug": "dzhaz-v-gorode-k-kaliningrad-5",
+    "sourceChars": 676,
+    "sourceMainChars": 676,
+    "rewriteChars": 809,
+    "paragraphs": 3,
+    "status": "PASS"
+  },
+  {
+    "batch": 4,
+    "sequence": 16,
+    "slug": "novogodnii-ogonek-na-volnah-na-ledokolnom-teplohode-imperatrica-moskva",
+    "sourceChars": 1864,
+    "sourceMainChars": 1839,
+    "rewriteChars": 1910,
+    "paragraphs": 5,
+    "status": "PASS"
+  },
+  {
+    "batch": 4,
+    "sequence": 17,
+    "slug": "tribyut-mumii-troll-tver",
+    "sourceChars": 474,
+    "sourceMainChars": 474,
+    "rewriteChars": 716,
+    "paragraphs": 3,
+    "status": "PASS"
+  },
+  {
+    "batch": 4,
+    "sequence": 18,
+    "slug": "novogodnii-maskarad-voiceup-moskva",
+    "sourceChars": 297,
+    "sourceMainChars": 297,
+    "rewriteChars": 693,
+    "paragraphs": 3,
+    "status": "PASS"
+  },
+  {
+    "batch": 4,
+    "sequence": 19,
+    "slug": "chaikovskii-pri-svechah-rozhdestvenskaya-klassika-moskva",
+    "sourceChars": 620,
+    "sourceMainChars": 617,
+    "rewriteChars": 916,
+    "paragraphs": 4,
+    "status": "PASS"
+  },
+  {
+    "batch": 4,
+    "sequence": 20,
+    "slug": "rozhdestvenskoe-chudo-folk-koncert-pri-svechah-moskva",
+    "sourceChars": 2079,
+    "sourceMainChars": 2079,
+    "rewriteChars": 2090,
+    "paragraphs": 4,
+    "status": "PASS"
+  },
+  {
+    "batch": 4,
+    "sequence": 21,
+    "slug": "organ-v-planetarii-rozhdestvo-sankt-peterburg-3",
+    "sourceChars": 349,
+    "sourceMainChars": 349,
+    "rewriteChars": 929,
+    "paragraphs": 3,
+    "status": "PASS"
+  },
+  {
+    "batch": 4,
+    "sequence": 22,
+    "slug": "solo-retro-christmas-moskva",
+    "sourceChars": 784,
+    "sourceMainChars": 781,
+    "rewriteChars": 994,
+    "paragraphs": 3,
+    "status": "PASS"
+  },
+  {
+    "batch": 4,
+    "sequence": 23,
+    "slug": "gastronomicheskii-vecher-rozhdestvenskii-uzhin-sankt-peterburg",
+    "sourceChars": 342,
+    "sourceMainChars": 342,
+    "rewriteChars": 808,
+    "paragraphs": 3,
+    "status": "PASS"
+  },
+  {
+    "batch": 4,
+    "sequence": 24,
+    "slug": "rozhdestvenskii-koncert-kompozitora-yulii-kockoi-moskva",
+    "sourceChars": 785,
+    "sourceMainChars": 783,
+    "rewriteChars": 1243,
+    "paragraphs": 4,
+    "status": "PASS"
+  },
+  {
+    "batch": 4,
+    "sequence": 25,
+    "slug": "mimohodec-postnovogodnii-kvartirnik-po-rasskazam-slavy-se-sankt-peterburg",
+    "sourceChars": 869,
+    "sourceMainChars": 867,
+    "rewriteChars": 1005,
+    "paragraphs": 3,
+    "status": "PASS"
+  },
+  {
+    "batch": 4,
+    "sequence": 26,
+    "slug": "anatolii-vishnyakov-lider-gruppy-galakticheskaya-federaciya-rozhdestvenskii-koncert-sankt-peterburg",
+    "sourceChars": 328,
+    "sourceMainChars": 328,
+    "rewriteChars": 723,
+    "paragraphs": 3,
+    "status": "PASS"
+  },
+  {
+    "batch": 4,
+    "sequence": 27,
+    "slug": "burlesk-kabare-shou-madam-bum-dzhazovyi-bunt-moskva",
+    "sourceChars": 979,
+    "sourceMainChars": 979,
+    "rewriteChars": 1278,
+    "paragraphs": 4,
+    "status": "PASS"
+  },
+  {
+    "batch": 4,
+    "sequence": 28,
+    "slug": "trio-marii-aksenovoi-snezhnyi-dzhaz-moskva",
+    "sourceChars": 1609,
+    "sourceMainChars": 1599,
+    "rewriteChars": 1777,
+    "paragraphs": 5,
+    "status": "PASS"
+  },
+  {
+    "batch": 4,
+    "sequence": 29,
+    "slug": "balet-schelkunchik-s-obzornoi-ekskursiei-po-dvorcu-nachalo-ekskursii-18-45-nachalo-baleta-20-00-sankt-peterburg-7",
+    "sourceChars": 1247,
+    "sourceMainChars": 1247,
+    "rewriteChars": 1618,
+    "paragraphs": 4,
+    "status": "PASS"
+  },
+  {
+    "batch": 4,
+    "sequence": 30,
+    "slug": "rozhdestvenskii-dzhaz-novogodnii-koncert-s-dzhazovoi-zvezdoi-gabriel-biggest-moskva",
+    "sourceChars": 584,
+    "sourceMainChars": 582,
+    "rewriteChars": 819,
+    "paragraphs": 3,
+    "status": "PASS"
+  },
+  {
+    "batch": 5,
+    "sequence": 1,
+    "slug": "glavnaya-apres-ski-vecherinka-moskvy-moskva",
+    "sourceChars": 1184,
+    "sourceMainChars": 1183,
+    "rewriteChars": 1395,
+    "paragraphs": 5,
+    "status": "PASS"
+  },
+  {
+    "batch": 5,
+    "sequence": 2,
+    "slug": "burlesk-kabare-shou-madam-bum-sankt-peterburg",
+    "sourceChars": 972,
+    "sourceMainChars": 972,
+    "rewriteChars": 1228,
+    "paragraphs": 4,
+    "status": "PASS"
+  },
+  {
+    "batch": 5,
+    "sequence": 3,
+    "slug": "sbornyi-korporativ-18-dekabrya-2026-v-gostinice-kosmos",
+    "sourceChars": 1066,
+    "sourceMainChars": 1054,
+    "rewriteChars": 1079,
+    "paragraphs": 4,
+    "status": "PASS"
+  },
+  {
+    "batch": 5,
+    "sequence": 4,
+    "slug": "lomovoi-radio-natasha-itogi-2026-solo-sankt-peterburg",
+    "sourceChars": 1851,
+    "sourceMainChars": 1837,
+    "rewriteChars": 2082,
+    "paragraphs": 6,
+    "status": "PASS"
+  },
+  {
+    "batch": 5,
+    "sequence": 5,
+    "slug": "territoriya-kukol-vystavka-avtorskih-kukol-moskva",
+    "sourceChars": 1132,
+    "sourceMainChars": 1128,
+    "rewriteChars": 1574,
+    "paragraphs": 5,
+    "status": "PASS"
+  },
+  {
+    "batch": 5,
+    "sequence": 6,
+    "slug": "rok-hity-mtv-shou-koncert-sankt-peterburg-2",
+    "sourceChars": 1438,
+    "sourceMainChars": 1432,
+    "rewriteChars": 1461,
+    "paragraphs": 4,
+    "status": "PASS"
+  },
+  {
+    "batch": 5,
+    "sequence": 7,
+    "slug": "novogodnii-kvartirnik-s-vidom-moskva",
+    "sourceChars": 2261,
+    "sourceMainChars": 2257,
+    "rewriteChars": 2509,
+    "paragraphs": 7,
+    "status": "PASS"
+  },
+  {
+    "batch": 5,
+    "sequence": 8,
+    "slug": "iogann-shtraus-skazki-venskogo-lesa-orkestr-severnaya-veneciya-sankt-peterburg",
+    "sourceChars": 1462,
+    "sourceMainChars": 1457,
+    "rewriteChars": 1718,
+    "paragraphs": 6,
+    "status": "PASS"
+  },
+  {
+    "batch": 5,
+    "sequence": 9,
+    "slug": "kapella-retro-sun-in-december-moskva",
+    "sourceChars": 1214,
+    "sourceMainChars": 1212,
+    "rewriteChars": 1539,
+    "paragraphs": 5,
+    "status": "PASS"
+  },
+  {
+    "batch": 5,
+    "sequence": 10,
+    "slug": "v-zerkale-uhodyaschego-goda-maksim-chekmarev-fortepiannyi-koncert-sankt-peterburg-2",
+    "sourceChars": 1399,
+    "sourceMainChars": 1396,
+    "rewriteChars": 1683,
+    "paragraphs": 5,
+    "status": "PASS"
+  },
+  {
+    "batch": 5,
+    "sequence": 11,
+    "slug": "masha-i-vitya-protiv-dikih-gitar-moskva-2",
+    "sourceChars": 975,
+    "sourceMainChars": 969,
+    "rewriteChars": 1084,
+    "paragraphs": 4,
+    "status": "PASS"
+  },
+  {
+    "batch": 5,
+    "sequence": 12,
+    "slug": "nash-novogodnii-vecher-dlya-teh-kto-ne-hochet-byt-odin-i-iskrenne-hochet-otnoshenii-moskva",
+    "sourceChars": 3236,
+    "sourceMainChars": 3230,
+    "rewriteChars": 3455,
+    "paragraphs": 9,
+    "status": "PASS"
+  },
+  {
+    "batch": 5,
+    "sequence": 13,
+    "slug": "venecianskii-karnaval-v-atmosfere-istoricheskoi-kvartiry-semi-benua-sankt-peterburg",
+    "sourceChars": 1510,
+    "sourceMainChars": 1510,
+    "rewriteChars": 1569,
+    "paragraphs": 5,
+    "status": "PASS"
+  },
+  {
+    "batch": 5,
+    "sequence": 14,
+    "slug": "sbornyi-korporativ-25-dekabrya-2026-v-banketnom-zale-astrus",
+    "sourceChars": 1047,
+    "sourceMainChars": 1035,
+    "rewriteChars": 1084,
+    "paragraphs": 4,
+    "status": "PASS"
+  },
+  {
+    "batch": 5,
+    "sequence": 15,
+    "slug": "maskarad-u-snezhinki-sankt-peterburg",
+    "sourceChars": 1144,
+    "sourceMainChars": 1144,
+    "rewriteChars": 1437,
+    "paragraphs": 5,
+    "status": "PASS"
+  },
+  {
+    "batch": 5,
+    "sequence": 16,
+    "slug": "novogodnyaya-opera-prazdnichnyi-uzhin-koncert-za-stolikami-sankt-peterburg",
+    "sourceChars": 1799,
+    "sourceMainChars": 1753,
+    "rewriteChars": 2044,
+    "paragraphs": 6,
+    "status": "PASS"
+  },
+  {
+    "batch": 5,
+    "sequence": 17,
+    "slug": "chehov-so-smakom-teatr-traktir-s-literaturnym-menyu-v-dome-shredera-sankt-peterburg-4",
+    "sourceChars": 1327,
+    "sourceMainChars": 1323,
+    "rewriteChars": 1506,
+    "paragraphs": 5,
+    "status": "PASS"
+  },
+  {
+    "batch": 5,
+    "sequence": 18,
+    "slug": "novogodnii-koncert-diskoteka-mix-80-90-h-na-teplohode-imperatrica-moskva",
+    "sourceChars": 1141,
+    "sourceMainChars": 1135,
+    "rewriteChars": 1359,
+    "paragraphs": 5,
+    "status": "PASS"
+  },
+  {
+    "batch": 5,
+    "sequence": 19,
+    "slug": "legendy-disko-v-imperatorskom-geograficheskom-obschestve-ot-abba-do-queen-sankt-peterburg",
+    "sourceChars": 1253,
+    "sourceMainChars": 1253,
+    "rewriteChars": 1338,
+    "paragraphs": 5,
+    "status": "PASS"
+  },
+  {
+    "batch": 5,
+    "sequence": 20,
+    "slug": "novogodnee-shou-ot-kabare-skazki-na-noch-moskva",
+    "sourceChars": 2046,
+    "sourceMainChars": 2046,
+    "rewriteChars": 2173,
+    "paragraphs": 7,
+    "status": "PASS"
+  },
+  {
+    "batch": 5,
+    "sequence": 21,
+    "slug": "ekskursiya-v-osobnyak-shredera-fortepiannyi-koncert-vihri-valsa-s-furshetom-sankt-peterburg",
+    "sourceChars": 1276,
+    "sourceMainChars": 1265,
+    "rewriteChars": 1511,
+    "paragraphs": 5,
+    "status": "PASS"
+  },
+  {
+    "batch": 5,
+    "sequence": 22,
+    "slug": "olga-oleinikova-emergency-band-moskva",
+    "sourceChars": 1495,
+    "sourceMainChars": 1485,
+    "rewriteChars": 1540,
+    "paragraphs": 5,
+    "status": "PASS"
+  },
+  {
+    "batch": 5,
+    "sequence": 23,
+    "slug": "ushastyi-novyi-god-sankt-peterburg-7",
+    "sourceChars": 1222,
+    "sourceMainChars": 1220,
+    "rewriteChars": 1295,
+    "paragraphs": 5,
+    "status": "PASS"
+  },
+  {
+    "batch": 5,
+    "sequence": 24,
+    "slug": "gde-moi-2008-community-moskva",
+    "sourceChars": 1120,
+    "sourceMainChars": 1110,
+    "rewriteChars": 1319,
+    "paragraphs": 5,
+    "status": "PASS"
+  },
+  {
+    "batch": 5,
+    "sequence": 25,
+    "slug": "queen-v-imperatorskom-geograficheskom-obschestve-sankt-peterburg",
+    "sourceChars": 975,
+    "sourceMainChars": 975,
+    "rewriteChars": 1237,
+    "paragraphs": 5,
+    "status": "PASS"
+  },
+  {
+    "batch": 5,
+    "sequence": 26,
+    "slug": "12-noch-moskva-2",
+    "sourceChars": 1142,
+    "sourceMainChars": 1139,
+    "rewriteChars": 1421,
+    "paragraphs": 5,
+    "status": "PASS"
+  },
+  {
+    "batch": 5,
+    "sequence": 27,
+    "slug": "depeche-mode-tribute-show-sankt-peterburg",
+    "sourceChars": 1115,
+    "sourceMainChars": 1115,
+    "rewriteChars": 1341,
+    "paragraphs": 4,
+    "status": "PASS"
+  },
+  {
+    "batch": 5,
+    "sequence": 28,
+    "slug": "poka-chasy-dvenadcat-byut-pesni-iz-lyubimyh-kinofilmov-moskva",
+    "sourceChars": 975,
+    "sourceMainChars": 975,
+    "rewriteChars": 1179,
+    "paragraphs": 4,
+    "status": "PASS"
+  },
+  {
+    "batch": 5,
+    "sequence": 29,
+    "slug": "alexander-dovgopoly-project-eh-zimushka-zima-moskva",
+    "sourceChars": 1640,
+    "sourceMainChars": 1638,
+    "rewriteChars": 1934,
+    "paragraphs": 6,
+    "status": "PASS"
+  },
+  {
+    "batch": 5,
+    "sequence": 30,
+    "slug": "plyazh-moskva",
+    "sourceChars": 998,
+    "sourceMainChars": 995,
+    "rewriteChars": 1162,
+    "paragraphs": 4,
+    "status": "PASS"
+  }
+]

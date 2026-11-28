@@ -1,0 +1,2140 @@
+{
+  "startedAt": "2026-11-13T05:32:40.091Z",
+  "groups": [
+    {
+      "groupNo": 1,
+      "title": "Симфония Гарри Поттера и Саундтреки волшебных миров",
+      "tourGroupId": "0c5978b8-69a0-471f-ba3f-af97e255254d",
+      "pages": 9,
+      "cityRepresentatives": 9
+    },
+    {
+      "groupNo": 2,
+      "title": "Александр Бессонов. Почему девушки выбирают плохих парней?!",
+      "tourGroupId": "513ba4d9-06ae-46cd-90e5-b9c4b97714f2",
+      "pages": 8,
+      "cityRepresentatives": 8
+    },
+    {
+      "groupNo": 3,
+      "title": "Новый год в BANANA PARK",
+      "tourGroupId": "789e1df0-2b30-4c81-b698-39b9fc008536",
+      "pages": 4,
+      "cityRepresentatives": 2
+    },
+    {
+      "groupNo": 4,
+      "title": "Обе-Рек — «Лучшее и новое»",
+      "tourGroupId": "d914b5f1-a2bf-4fcf-b170-f7538de97db5",
+      "pages": 4,
+      "cityRepresentatives": 4
+    },
+    {
+      "groupNo": 5,
+      "title": "Мадияр Сатвалдин — сольный стендап-концерт",
+      "tourGroupId": "51783df8-b649-4ab5-a09e-19141750f6b9",
+      "pages": 4,
+      "cityRepresentatives": 4
+    },
+    {
+      "groupNo": 6,
+      "title": "Александр Демидов — «От мировых хитов до собственных сочинений»",
+      "tourGroupId": "1500b575-5489-42f5-b0a8-8b4ec1989dcf",
+      "pages": 4,
+      "cityRepresentatives": 4
+    },
+    {
+      "groupNo": 7,
+      "title": "«Алиса в Стране чудес» — иллюзионный спектакль",
+      "tourGroupId": "0d4440bd-25c0-4c6b-8d7b-c237102ce07c",
+      "pages": 4,
+      "cityRepresentatives": 3
+    },
+    {
+      "groupNo": 8,
+      "title": "«МОЙ 2008» в «Руки Вверх! Бар»",
+      "tourGroupId": "e8f5bb90-821f-467e-aca7-638020c237a1",
+      "pages": 4,
+      "cityRepresentatives": 4
+    },
+    {
+      "groupNo": 9,
+      "title": "Валерия Яковлева — «Расслабься, так у всех!»",
+      "tourGroupId": "6fb561a2-68bd-44dc-bf7e-f63d4f837bb6",
+      "pages": 4,
+      "cityRepresentatives": 4
+    },
+    {
+      "groupNo": 10,
+      "title": "Антон и Виктория Макарские — «Живая встреча»",
+      "tourGroupId": "63e0135c-2878-4405-9449-dea47042dfc7",
+      "pages": 5,
+      "cityRepresentatives": 5
+    },
+    {
+      "groupNo": 11,
+      "title": "Концерт этно-группы «Хун Хурту»",
+      "tourGroupId": "2caeae52-cff9-420f-b605-f77b7b23b584",
+      "pages": 3,
+      "cityRepresentatives": 3
+    },
+    {
+      "groupNo": 12,
+      "title": "«Мировые саундтреки при свечах — The Best» с АСО-оркестром",
+      "tourGroupId": "b20f9b60-1774-4a38-a77d-23036a5164d2",
+      "pages": 3,
+      "cityRepresentatives": 2
+    },
+    {
+      "groupNo": 13,
+      "title": "«ХРЕН» — презентация альбома «Мифическая реальность»",
+      "tourGroupId": "6fc920ad-4162-4f69-b678-425f18741ccc",
+      "pages": 3,
+      "cityRepresentatives": 3
+    },
+    {
+      "groupNo": 14,
+      "title": "Симфония рока - Акт первый",
+      "tourGroupId": "9ca50496-9d97-472c-a47d-f563f5306067",
+      "pages": 3,
+      "cityRepresentatives": 3
+    },
+    {
+      "groupNo": 15,
+      "title": "«Звёзды 80–90-х»",
+      "tourGroupId": "d67318a8-9118-469b-8e76-e0531b084839",
+      "pages": 3,
+      "cityRepresentatives": 2
+    },
+    {
+      "groupNo": 16,
+      "title": "Рок-опера «Гермес»",
+      "tourGroupId": "4bc13b1d-7685-49af-a278-688cc0c6cb41",
+      "pages": 3,
+      "cityRepresentatives": 2
+    },
+    {
+      "groupNo": 17,
+      "title": "TumaniYO",
+      "tourGroupId": "f30d0ecc-6eb3-49a2-8154-edaa8345a587",
+      "pages": 3,
+      "cityRepresentatives": 3
+    },
+    {
+      "groupNo": 18,
+      "title": "«Для милых дам! Мировые саундтреки при свечах»",
+      "tourGroupId": "dd3b8cea-3f85-4eb8-a2ec-b2f636637fa9",
+      "pages": 3,
+      "cityRepresentatives": 3
+    },
+    {
+      "groupNo": 19,
+      "title": "Ростислав Чебыкин — акустика",
+      "tourGroupId": "3fa15d91-efc1-41f3-bb6c-1db4d7592465",
+      "pages": 3,
+      "cityRepresentatives": 3
+    },
+    {
+      "groupNo": 20,
+      "title": "Фаина Раневская — «Одинокая насмешница»",
+      "tourGroupId": "a9426bd1-b377-4a66-9c31-b0ed1463d49e",
+      "pages": 3,
+      "cityRepresentatives": 3
+    },
+    {
+      "groupNo": 21,
+      "title": "«Сериалы мира при свечах» с АСО-оркестром",
+      "tourGroupId": "f4d94b9b-2444-4983-8c45-5fe4280e6b89",
+      "pages": 2,
+      "cityRepresentatives": 2
+    },
+    {
+      "groupNo": 22,
+      "title": "Антон и Виктория Макарские — «Живой концерт»",
+      "tourGroupId": "4a52af41-9bf2-4e21-b34f-a386f1c4e88c",
+      "pages": 2,
+      "cityRepresentatives": 2
+    },
+    {
+      "groupNo": 23,
+      "title": "«Шоу под дождём: Мужчина VS Женщина»",
+      "tourGroupId": "6e773911-665b-4f19-bc2b-8426ed1aaf0f",
+      "pages": 2,
+      "cityRepresentatives": 2
+    },
+    {
+      "groupNo": 24,
+      "title": "Неоклассический концерт Дениса Стельмаха",
+      "tourGroupId": "27b3c320-6433-4fcc-a86e-8eff0e694b30",
+      "pages": 2,
+      "cityRepresentatives": 2
+    },
+    {
+      "groupNo": 25,
+      "title": "«Что творят мужчины» с Сергеем Астаховым",
+      "tourGroupId": "54f26820-143c-468e-81c6-88e7e0af7545",
+      "pages": 2,
+      "cityRepresentatives": 2
+    },
+    {
+      "groupNo": 26,
+      "title": "HELVEGEN - презентация нового альбома",
+      "tourGroupId": "73c27b40-9726-4728-afa7-86857f77bf05",
+      "pages": 2,
+      "cityRepresentatives": 2
+    },
+    {
+      "groupNo": 27,
+      "title": "System of a Down Tribute — CHOPSY",
+      "tourGroupId": "3bb86ba9-351c-43b9-add3-f7c0c1f68536",
+      "pages": 2,
+      "cityRepresentatives": 2
+    },
+    {
+      "groupNo": 28,
+      "title": "Saphath",
+      "tourGroupId": "3e3df410-16e4-47ac-85e1-9e7eb4d5edea",
+      "pages": 2,
+      "cityRepresentatives": 2
+    },
+    {
+      "groupNo": 29,
+      "title": "СВАРГА — презентация альбома",
+      "tourGroupId": "46b0368c-1336-454e-86ee-bf1e882a702e",
+      "pages": 2,
+      "cityRepresentatives": 2
+    },
+    {
+      "groupNo": 30,
+      "title": "Нигатив с ансамблем",
+      "tourGroupId": "cb84cb59-383e-4921-a4af-1d5f977b8fe0",
+      "pages": 2,
+      "cityRepresentatives": 2
+    }
+  ],
+  "pages": [
+    {
+      "eventPageId": "945a3f6a-d846-454b-bf70-6dc6f1d59ed7",
+      "eventId": "evt_6abe622edf9164a6eb5f432a",
+      "eventIds": [
+        "evt_6abe622edf9164a6eb5f432a"
+      ],
+      "slug": "simfoniya-garri-pottera-i-saundtreki-volshebnyh-mirov-vladikavkaz",
+      "url": "https://daibilet.ru/events/simfoniya-garri-pottera-i-saundtreki-volshebnyh-mirov-vladikavkaz",
+      "title": "Симфония Гарри Поттера и Саундтреки волшебных миров",
+      "city": "Владикавказ",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T05:32:48.001Z",
+      "canonicalPath": "/events/simfoniya-garri-pottera-i-saundtreki-volshebnyh-mirov-vladikavkaz",
+      "seoDescription": "Симфония Гарри Поттера и Саундтреки волшебных миров. Концерт соединяет саундтреки из киносаги о Гарри Поттере с музыкой других историй о магии и путешествиях. Показ: Владикавказ, 21 ноября 2026 года в 19:00 (местное время); адрес: ул. Ватутина, 46.",
+      "tourGroupId": "0c5978b8-69a0-471f-ba3f-af97e255254d",
+      "revisionBefore": 1,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "bc3d85c5-6597-41f6-9706-38d6db2eb8f8",
+      "eventId": "evt_6abe874d06231d105a4d4127",
+      "eventIds": [
+        "evt_6abe874d06231d105a4d4127"
+      ],
+      "slug": "simfoniya-garri-pottera-i-saundtreki-volshebnyh-mirov-kazan",
+      "url": "https://daibilet.ru/events/simfoniya-garri-pottera-i-saundtreki-volshebnyh-mirov-kazan",
+      "title": "Симфония Гарри Поттера и Саундтреки волшебных миров",
+      "city": "Казань",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T05:32:48.331Z",
+      "canonicalPath": "/events/simfoniya-garri-pottera-i-saundtreki-volshebnyh-mirov-kazan",
+      "seoDescription": "Симфония Гарри Поттера и Саундтреки волшебных миров. Концерт соединяет саундтреки из киносаги о Гарри Поттере с музыкой других историй о магии и путешествиях. Показ: Казань, 24 ноября 2026 года в 19:00 (местное время); адрес: Копылова 2а.",
+      "tourGroupId": "0c5978b8-69a0-471f-ba3f-af97e255254d",
+      "revisionBefore": 1,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "3a0a19ba-1be7-4f84-9412-5c14b08ce1c6",
+      "eventId": "evt_6ac3dfacef1642f8e65eb798",
+      "eventIds": [
+        "evt_6ac3dfacef1642f8e65eb798"
+      ],
+      "slug": "novogodnii-koncert-v-siyanii-tysyachi-svechei-efremov",
+      "url": "https://daibilet.ru/events/novogodnii-koncert-v-siyanii-tysyachi-svechei-efremov",
+      "title": "СИМФОНИЯ ГАРРИ ПОТТЕРА И САУНДТРЕКИ ВОЛШЕБНЫХ МИРОВ",
+      "city": "Ефремов",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T05:32:48.647Z",
+      "canonicalPath": "/events/novogodnii-koncert-v-siyanii-tysyachi-svechei-efremov",
+      "seoDescription": "Симфония Гарри Поттера и Саундтреки волшебных миров. Концерт соединяет саундтреки из киносаги о Гарри Поттере с музыкой других историй о магии и путешествиях. Показ: Ефремов, 11 декабря 2026 года в 19:00 (местное время); адрес: ул. Ломоносова, 48.",
+      "tourGroupId": "0c5978b8-69a0-471f-ba3f-af97e255254d",
+      "revisionBefore": 1,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "b00f0eee-de7a-466b-bb18-ef853b51a68b",
+      "eventId": "evt_6ad0ebf7fb1b6f1e734b1717",
+      "eventIds": [
+        "evt_6ad0ebf7fb1b6f1e734b1717"
+      ],
+      "slug": "novogodnii-koncert-v-siyanii-tysyachi-svechei-ryazan",
+      "url": "https://daibilet.ru/events/novogodnii-koncert-v-siyanii-tysyachi-svechei-ryazan",
+      "title": "СИМФОНИЯ ГАРРИ ПОТТЕРА И САУНДТРЕКИ ВОЛШЕБНЫХ МИРОВ",
+      "city": "Рязань",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T05:32:48.965Z",
+      "canonicalPath": "/events/novogodnii-koncert-v-siyanii-tysyachi-svechei-ryazan",
+      "seoDescription": "Симфония Гарри Поттера и Саундтреки волшебных миров. Концерт соединяет саундтреки из киносаги о Гарри Поттере с музыкой других историй о магии и путешествиях. Показ: Рязань, 17 декабря 2026 года в 19:00 (местное время); адрес: улица Костычева, 1.",
+      "tourGroupId": "0c5978b8-69a0-471f-ba3f-af97e255254d",
+      "revisionBefore": 1,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "01e06f14-db05-4820-bd9f-abaf931ca790",
+      "eventId": "evt_6ad33fa34e98d1c8cd1307d2",
+      "eventIds": [
+        "evt_6ad33fa34e98d1c8cd1307d2"
+      ],
+      "slug": "simfoniya-garri-pottera-i-saundtreki-volshebnyh-mirov-zaraysk",
+      "url": "https://daibilet.ru/events/simfoniya-garri-pottera-i-saundtreki-volshebnyh-mirov-zaraysk",
+      "title": "Симфония Гарри Поттера и Саундтреки волшебных миров",
+      "city": "Зарайск",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T05:32:49.301Z",
+      "canonicalPath": "/events/simfoniya-garri-pottera-i-saundtreki-volshebnyh-mirov-zaraysk",
+      "seoDescription": "Симфония Гарри Поттера и Саундтреки волшебных миров. Концерт соединяет саундтреки из киносаги о Гарри Поттере с музыкой других историй о магии и путешествиях. Показ: Зарайск, 4 декабря 2026 года в 19:00 (местное время); адрес: площадь Бахрушиных, 1А.",
+      "tourGroupId": "0c5978b8-69a0-471f-ba3f-af97e255254d",
+      "revisionBefore": 1,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "d7a28851-6ec9-4f19-8ce3-245da1fed800",
+      "eventId": "evt_6ad34735a1e137b2b23bacfb",
+      "eventIds": [
+        "evt_6ad34735a1e137b2b23bacfb"
+      ],
+      "slug": "simfoniya-garri-pottera-i-saundtreki-volshebnyh-mirov-zelenograd",
+      "url": "https://daibilet.ru/events/simfoniya-garri-pottera-i-saundtreki-volshebnyh-mirov-zelenograd",
+      "title": "Симфония Гарри Поттера и Саундтреки волшебных миров",
+      "city": "Зеленоград",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T05:32:49.633Z",
+      "canonicalPath": "/events/simfoniya-garri-pottera-i-saundtreki-volshebnyh-mirov-zelenograd",
+      "seoDescription": "Симфония Гарри Поттера и Саундтреки волшебных миров. Концерт соединяет саундтреки из киносаги о Гарри Поттере с музыкой других историй о магии и путешествиях. Показ: Зеленоград, 3 декабря 2026 года в 19:00 (местное время); адрес: пл. Шокина, 1, стр.2.",
+      "tourGroupId": "0c5978b8-69a0-471f-ba3f-af97e255254d",
+      "revisionBefore": 1,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "ce6e923c-e2a5-4bee-ad39-07f764d6af06",
+      "eventId": "evt_6ad3506cf8d358a9098fae05",
+      "eventIds": [
+        "evt_6ad3506cf8d358a9098fae05"
+      ],
+      "slug": "simfoniya-garri-pottera-i-saundtreki-volshebnyh-mirov-sergiev-posad",
+      "url": "https://daibilet.ru/events/simfoniya-garri-pottera-i-saundtreki-volshebnyh-mirov-sergiev-posad",
+      "title": "Симфония Гарри Поттера и Саундтреки волшебных миров",
+      "city": "Сергиев Посад",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T05:32:49.950Z",
+      "canonicalPath": "/events/simfoniya-garri-pottera-i-saundtreki-volshebnyh-mirov-sergiev-posad",
+      "seoDescription": "Симфония Гарри Поттера и Саундтреки волшебных миров. Концерт соединяет саундтреки из киносаги о Гарри Поттере с музыкой других историй о магии и путешествиях. Показ: Сергиев Посад, 10 декабря 2026 года в 19:00 (местное время); адрес: ул. Центральная, д. 58.",
+      "tourGroupId": "0c5978b8-69a0-471f-ba3f-af97e255254d",
+      "revisionBefore": 1,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "9962c20b-8792-453e-9c0d-843acef2830a",
+      "eventId": "evt_6ad354b460fea60aa4882b0f",
+      "eventIds": [
+        "evt_6ad354b460fea60aa4882b0f"
+      ],
+      "slug": "simfoniya-garri-pottera-i-saundtreki-volshebnyh-mirov-solnechnogorsk",
+      "url": "https://daibilet.ru/events/simfoniya-garri-pottera-i-saundtreki-volshebnyh-mirov-solnechnogorsk",
+      "title": "Симфония Гарри Поттера и Саундтреки волшебных миров",
+      "city": "Солнечногорск",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T05:32:50.263Z",
+      "canonicalPath": "/events/simfoniya-garri-pottera-i-saundtreki-volshebnyh-mirov-solnechnogorsk",
+      "seoDescription": "Симфония Гарри Поттера и Саундтреки волшебных миров. Концерт соединяет саундтреки из киносаги о Гарри Поттере с музыкой других историй о магии и путешествиях. Показ: Солнечногорск, 19 декабря 2026 года в 19:00 (местное время); адрес: Подмосковная ул., 50, Солнечногорск-7, Тимоново.",
+      "tourGroupId": "0c5978b8-69a0-471f-ba3f-af97e255254d",
+      "revisionBefore": 1,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "79c1c1f5-d837-4b80-a40e-d31a13cc1506",
+      "eventId": "evt_6adc56849ba0bfd117232c2a",
+      "eventIds": [
+        "evt_6adc56849ba0bfd117232c2a"
+      ],
+      "slug": "simfoniya-garri-pottera-i-saundtreki-volshebnyh-mirov-vologda",
+      "url": "https://daibilet.ru/events/simfoniya-garri-pottera-i-saundtreki-volshebnyh-mirov-vologda",
+      "title": "Симфония Гарри Поттера и Саундтреки волшебных миров",
+      "city": "Вологда",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T05:32:50.577Z",
+      "canonicalPath": "/events/simfoniya-garri-pottera-i-saundtreki-volshebnyh-mirov-vologda",
+      "seoDescription": "Симфония Гарри Поттера и Саундтреки волшебных миров. Концерт соединяет саундтреки из киносаги о Гарри Поттере с музыкой других историй о магии и путешествиях. Показ: Вологда, 16 декабря 2026 года в 19:00 (местное время); адрес: ул. Ленинградская, 89.",
+      "tourGroupId": "0c5978b8-69a0-471f-ba3f-af97e255254d",
+      "revisionBefore": 1,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "5f56e71f-2a78-44e9-86c2-0b8249201d2d",
+      "eventId": "evt_6aacc7056e9b538df52ffabc",
+      "eventIds": [
+        "evt_6aacc7056e9b538df52ffabc"
+      ],
+      "slug": "aleksandr-bessonov-pochemu-devushki-vybirayut-plohih-parnei-volgograd",
+      "url": "https://daibilet.ru/events/aleksandr-bessonov-pochemu-devushki-vybirayut-plohih-parnei-volgograd",
+      "title": "Александр Бессонов. Почему девушки выбирают плохих парней?!",
+      "city": "Волгоград",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T05:32:50.930Z",
+      "canonicalPath": "/events/aleksandr-bessonov-pochemu-devushki-vybirayut-plohih-parnei-volgograd",
+      "seoDescription": "Александр Бессонов. Почему девушки выбирают плохих парней?!. Александр Бессонов посвящает новую программу своему герою Олегу Фролову — обаятельному мошеннику из рассказов автора. Показ: Волгоград, 19 ноября 2026 года в 19:00 (местное время); адрес: пр. имени В.И. Ленина, 97.",
+      "tourGroupId": "513ba4d9-06ae-46cd-90e5-b9c4b97714f2",
+      "revisionBefore": 1,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "adb64f66-0eeb-482c-ba54-2522d61aff5a",
+      "eventId": "evt_6aaccb226e9b538df52ffc8e",
+      "eventIds": [
+        "evt_6aaccb226e9b538df52ffc8e"
+      ],
+      "slug": "aleksandr-bessonov-pochemu-devushki-vybirayut-plohih-parnei-penza",
+      "url": "https://daibilet.ru/events/aleksandr-bessonov-pochemu-devushki-vybirayut-plohih-parnei-penza",
+      "title": "Александр Бессонов. Почему девушки выбирают плохих парней?!",
+      "city": "Пенза",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T05:32:51.274Z",
+      "canonicalPath": "/events/aleksandr-bessonov-pochemu-devushki-vybirayut-plohih-parnei-penza",
+      "seoDescription": "Александр Бессонов. Почему девушки выбирают плохих парней?!. Александр Бессонов посвящает новую программу своему герою Олегу Фролову — обаятельному мошеннику из рассказов автора. Показ: Пенза, 21 ноября 2026 года в 18:00 (местное время); адрес: г. Пенза, ул. Ленинградская, д. 1а.",
+      "tourGroupId": "513ba4d9-06ae-46cd-90e5-b9c4b97714f2",
+      "revisionBefore": 1,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "a2583299-5a1c-436c-926f-6b741dbe3b71",
+      "eventId": "evt_6abb72955205569562304800",
+      "eventIds": [
+        "evt_6abb72955205569562304800"
+      ],
+      "slug": "aleksandr-bessonov-pochemu-devushki-vybirayut-plohih-parnei-saratov",
+      "url": "https://daibilet.ru/events/aleksandr-bessonov-pochemu-devushki-vybirayut-plohih-parnei-saratov",
+      "title": "Александр Бессонов. Почему девушки выбирают плохих парней?!",
+      "city": "Саратов",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-12T21:03:36.119Z",
+      "canonicalPath": "/events/aleksandr-bessonov-pochemu-devushki-vybirayut-plohih-parnei-saratov",
+      "seoDescription": "Александр Бессонов. Почему девушки выбирают плохих парней?!. Александр Бессонов посвящает новую программу своему герою Олегу Фролову — обаятельному мошеннику из рассказов автора. Показ: Саратов, 20 ноября 2026 года в 19:00 (местное время); адрес: Железнодорожная улица, 72, корп. 1.",
+      "tourGroupId": "513ba4d9-06ae-46cd-90e5-b9c4b97714f2",
+      "revisionBefore": 3,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "f71d91e9-c0bc-49da-b4bd-9f5e3db93c95",
+      "eventId": "evt_6ac4b849eccb39198d6ede53",
+      "eventIds": [
+        "evt_6ac4b849eccb39198d6ede53"
+      ],
+      "slug": "aleksandr-bessonov-pochemu-devushki-vybirayut-plohih-parnei-yoshkar-ola",
+      "url": "https://daibilet.ru/events/aleksandr-bessonov-pochemu-devushki-vybirayut-plohih-parnei-yoshkar-ola",
+      "title": "Александр Бессонов. Почему девушки выбирают плохих парней?!",
+      "city": "Йошкар-Ола",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T05:32:51.871Z",
+      "canonicalPath": "/events/aleksandr-bessonov-pochemu-devushki-vybirayut-plohih-parnei-yoshkar-ola",
+      "seoDescription": "Александр Бессонов. Почему девушки выбирают плохих парней?!. Александр Бессонов посвящает новую программу своему герою Олегу Фролову — обаятельному мошеннику из рассказов автора. Показ: Йошкар-Ола, 1 декабря 2026 года в 19:00 (местное время); адрес: Воскресенский, 11.",
+      "tourGroupId": "513ba4d9-06ae-46cd-90e5-b9c4b97714f2",
+      "revisionBefore": 1,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "41de85af-9f98-429b-9e1c-0872430aa027",
+      "eventId": "evt_6ac4c615afd9cdfa8f9d65a3",
+      "eventIds": [
+        "evt_6ac4c615afd9cdfa8f9d65a3"
+      ],
+      "slug": "aleksandr-bessonov-pochemu-devushki-vybirayut-plohih-parnei-cheboksary",
+      "url": "https://daibilet.ru/events/aleksandr-bessonov-pochemu-devushki-vybirayut-plohih-parnei-cheboksary",
+      "title": "Александр Бессонов. Почему девушки выбирают плохих парней?!",
+      "city": "Чебоксары",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T05:32:52.217Z",
+      "canonicalPath": "/events/aleksandr-bessonov-pochemu-devushki-vybirayut-plohih-parnei-cheboksary",
+      "seoDescription": "Александр Бессонов. Почему девушки выбирают плохих парней?!. Александр Бессонов посвящает новую программу своему герою Олегу Фролову — обаятельному мошеннику из рассказов автора. Показ: Чебоксары, 2 декабря 2026 года в 19:00 (местное время); адрес: К.Маркса, 52.",
+      "tourGroupId": "513ba4d9-06ae-46cd-90e5-b9c4b97714f2",
+      "revisionBefore": 1,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "cfdd8908-b016-47ea-9496-321206f29b53",
+      "eventId": "evt_6ac4c9c87ea79a9a28fc621d",
+      "eventIds": [
+        "evt_6ac4c9c87ea79a9a28fc621d"
+      ],
+      "slug": "aleksandr-bessonov-pochemu-devushki-vybirayut-plohih-parnei-perm",
+      "url": "https://daibilet.ru/events/aleksandr-bessonov-pochemu-devushki-vybirayut-plohih-parnei-perm",
+      "title": "Александр Бессонов. Почему девушки выбирают плохих парней?!",
+      "city": "Пермь",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T05:32:52.539Z",
+      "canonicalPath": "/events/aleksandr-bessonov-pochemu-devushki-vybirayut-plohih-parnei-perm",
+      "seoDescription": "Александр Бессонов. Почему девушки выбирают плохих парней?!. Александр Бессонов посвящает новую программу своему герою Олегу Фролову — обаятельному мошеннику из рассказов автора. Показ: Пермь, 13 декабря 2026 года в 19:00 (местное время); адрес: пр-т Комсомольский, 79.",
+      "tourGroupId": "513ba4d9-06ae-46cd-90e5-b9c4b97714f2",
+      "revisionBefore": 1,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "04bae8ce-be28-4d3f-a853-90285992131b",
+      "eventId": "evt_6ac4cefb3eedfe712bb4b652",
+      "eventIds": [
+        "evt_6ac4cefb3eedfe712bb4b652"
+      ],
+      "slug": "aleksandr-bessonov-pochemu-devushki-vybirayut-plohih-parnei-izhevsk",
+      "url": "https://daibilet.ru/events/aleksandr-bessonov-pochemu-devushki-vybirayut-plohih-parnei-izhevsk",
+      "title": "Александр Бессонов. Почему девушки выбирают плохих парней?!",
+      "city": "Ижевск",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T05:32:52.885Z",
+      "canonicalPath": "/events/aleksandr-bessonov-pochemu-devushki-vybirayut-plohih-parnei-izhevsk",
+      "seoDescription": "Александр Бессонов. Почему девушки выбирают плохих парней?!. Александр Бессонов посвящает новую программу своему герою Олегу Фролову — обаятельному мошеннику из рассказов автора. Показ: Ижевск, 14 декабря 2026 года в 19:00 (местное время); адрес: Милиционная ул., 4.",
+      "tourGroupId": "513ba4d9-06ae-46cd-90e5-b9c4b97714f2",
+      "revisionBefore": 1,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "65bc66c7-c2df-49e2-8056-102213275bc9",
+      "eventId": "evt_6ac4d47464851febcd6eb107",
+      "eventIds": [
+        "evt_6ac4d47464851febcd6eb107"
+      ],
+      "slug": "aleksandr-bessonov-pochemu-devushki-vybirayut-plohih-parnei-naberezhnye-chelny",
+      "url": "https://daibilet.ru/events/aleksandr-bessonov-pochemu-devushki-vybirayut-plohih-parnei-naberezhnye-chelny",
+      "title": "Александр Бессонов. Почему девушки выбирают плохих парней?!",
+      "city": "Набережные Челны",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T05:32:53.211Z",
+      "canonicalPath": "/events/aleksandr-bessonov-pochemu-devushki-vybirayut-plohih-parnei-naberezhnye-chelny",
+      "seoDescription": "Александр Бессонов. Почему девушки выбирают плохих парней?!. В городе Набережные Челны — 15 декабря 2026 года в 19:00 (местное время); адрес: пр. Мира, 50/15, Набережные Челны, Респ. Татарстан, Россия, 423819.",
+      "tourGroupId": "513ba4d9-06ae-46cd-90e5-b9c4b97714f2",
+      "revisionBefore": 1,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "105148a2-106d-4cfd-978e-44382d399f6c",
+      "eventId": "evt_6ad9cd80853a9e43322d12b8",
+      "eventIds": [
+        "evt_6ad9cd80853a9e43322d12b8",
+        "evt_6ad9cd82853a9e43322d12e0",
+        "evt_6ad9cd82853a9e43322d12d8",
+        "evt_6ad9cd81853a9e43322d12d0",
+        "evt_6ad9cd81853a9e43322d12c8",
+        "evt_6ad9cd80853a9e43322d12c0"
+      ],
+      "slug": "novyi-god-v-banana-park-novosibirsk",
+      "url": "https://daibilet.ru/events/novyi-god-v-banana-park-novosibirsk",
+      "title": "Новый год в BANANA PARK",
+      "city": "Новосибирск",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T05:32:55.182Z",
+      "canonicalPath": "/events/novyi-god-v-banana-park-novosibirsk",
+      "seoDescription": "Новый год в BANANA PARK. Праздничная программа рассчитана на детей и взрослых, которые хотят встретить Новый год вместе, а не разделяться на зрителей и сопровождающих. Показ: Новосибирск, 25 декабря 2026 года в 15:00 (местное время); адрес: Гусинобродское ш., 20, Новосибирск, Новосибирская обл., Россия, 630039.",
+      "tourGroupId": "789e1df0-2b30-4c81-b698-39b9fc008536",
+      "revisionBefore": 6,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "b71a3712-6d69-4aa8-8665-c192c480270f",
+      "eventId": "evt_6ad9cf01853a9e43322d12f4",
+      "eventIds": [
+        "evt_6ad9cf01853a9e43322d12f4",
+        "evt_6ad9cf04853a9e43322d131c",
+        "evt_6ad9cf04853a9e43322d1314",
+        "evt_6ad9cf03853a9e43322d130c",
+        "evt_6ad9cf02853a9e43322d1304",
+        "evt_6ad9cf02853a9e43322d12fc"
+      ],
+      "slug": "novyi-god-v-banana-park-novosibirsk-2",
+      "url": "https://daibilet.ru/events/novyi-god-v-banana-park-novosibirsk-2",
+      "title": "Новый год в BANANA PARK",
+      "city": "Новосибирск",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T05:32:58.785Z",
+      "canonicalPath": "/events/novyi-god-v-banana-park-novosibirsk-2",
+      "seoDescription": "Новый год в BANANA PARK. Праздничная программа рассчитана на детей и взрослых, которые хотят встретить Новый год вместе, а не разделяться на зрителей и сопровождающих. Показ: Новосибирск, 25 декабря 2026 года в 15:00 (местное время); адрес: ул. Ленина, 84, Новосибирск, Новосибирская обл., Россия, 630004.",
+      "tourGroupId": null,
+      "revisionBefore": 6,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "4423e433-b6af-4011-b11e-fcc7d0a234cf",
+      "eventId": "evt_6ad9d046774d2dcae9fdf68d",
+      "eventIds": [
+        "evt_6ad9d046774d2dcae9fdf68d",
+        "evt_6ad9d049774d2dcae9fdf6b5",
+        "evt_6ad9d048774d2dcae9fdf6ad",
+        "evt_6ad9d048774d2dcae9fdf6a5",
+        "evt_6ad9d047774d2dcae9fdf69d",
+        "evt_6ad9d047774d2dcae9fdf695"
+      ],
+      "slug": "novyi-god-v-banana-park-novosibirsk-3",
+      "url": "https://daibilet.ru/events/novyi-god-v-banana-park-novosibirsk-3",
+      "title": "Новый год в BANANA PARK",
+      "city": "Новосибирск",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T05:33:01.583Z",
+      "canonicalPath": "/events/novyi-god-v-banana-park-novosibirsk-3",
+      "seoDescription": "Новый год в BANANA PARK. Праздничная программа рассчитана на детей и взрослых, которые хотят встретить Новый год вместе, а не разделяться на зрителей и сопровождающих. Показ: Новосибирск, 25 декабря 2026 года в 15:00 (местное время); адрес: ул. Троллейная, 130А, Новосибирск, Новосибирская обл., Россия, 630107.",
+      "tourGroupId": null,
+      "revisionBefore": 6,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "f3e94f0d-1adb-4a26-aae6-e3b076fbfd7d",
+      "eventId": "evt_6ad9c8c6d6418312142d12b8",
+      "eventIds": [
+        "evt_6ad9c8c6d6418312142d12b8",
+        "evt_6ad9c8c9d6418312142d12e0",
+        "evt_6ad9c8c9d6418312142d12d8",
+        "evt_6ad9c8c8d6418312142d12d0",
+        "evt_6ad9c8c8d6418312142d12c8",
+        "evt_6ad9c8c7d6418312142d12c0"
+      ],
+      "slug": "novyi-god-v-banana-park-omsk",
+      "url": "https://daibilet.ru/events/novyi-god-v-banana-park-omsk",
+      "title": "Новый год в BANANA PARK",
+      "city": "Омск",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T05:33:04.997Z",
+      "canonicalPath": "/events/novyi-god-v-banana-park-omsk",
+      "seoDescription": "Новый год в BANANA PARK. Праздничная программа рассчитана на детей и взрослых, которые хотят встретить Новый год вместе, а не разделяться на зрителей и сопровождающих. Показ: Омск, 25 декабря 2026 года в 15:00 (местное время); адрес: Карла Маркса просп., 24, Омск, Омская обл., Россия, 644042.",
+      "tourGroupId": "789e1df0-2b30-4c81-b698-39b9fc008536",
+      "revisionBefore": 6,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "f6ba0637-113a-4c18-b6b5-222fcf2d496a",
+      "eventId": "evt_6a69e7c8bd078947eca44c44",
+      "eventIds": [
+        "evt_6a69e7c8bd078947eca44c44"
+      ],
+      "slug": "obe-rek-moskva-15-11-moskva",
+      "url": "https://daibilet.ru/events/obe-rek-moskva-15-11-moskva",
+      "title": "Обе-Рек | Москва | 15.11",
+      "city": "Москва",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T05:33:07.007Z",
+      "canonicalPath": "/events/obe-rek-moskva-15-11-moskva",
+      "seoDescription": "Обе-Рек — «Лучшее и новое». В программе соединены песни разных периодов группы: свежие композиции 2025–2026 годов, концептуальные треки из прежних этапов и хиты, которые давно сопровождают слушателей. Показ: Москва, 15 ноября 2026 года в 19:00 (местное время); адрес: 1-я Дубровская улица, 13Ас1.",
+      "tourGroupId": "d914b5f1-a2bf-4fcf-b170-f7538de97db5",
+      "revisionBefore": 1,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "447e3175-44fb-4f1c-9416-cc5284e092a1",
+      "eventId": "evt_6a88a634b5cc470905136330",
+      "eventIds": [
+        "evt_6a88a634b5cc470905136330"
+      ],
+      "slug": "obe-rek-sankt-peterburg-29-11-sankt-peterburg",
+      "url": "https://daibilet.ru/events/obe-rek-sankt-peterburg-29-11-sankt-peterburg",
+      "title": "Обе-Рек | Санкт-Петербург | 29.11",
+      "city": "Санкт-Петербург",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T05:33:07.354Z",
+      "canonicalPath": "/events/obe-rek-sankt-peterburg-29-11-sankt-peterburg",
+      "seoDescription": "Обе-Рек — «Лучшее и новое». В программе соединены песни разных периодов группы: свежие композиции 2025–2026 годов, концептуальные треки из прежних этапов и хиты, которые давно сопровождают слушателей. Показ: Санкт-Петербург, 29 ноября 2026 года в 20:00 (местное время); адрес: Лиговский проспект 50, корпус 16.",
+      "tourGroupId": "d914b5f1-a2bf-4fcf-b170-f7538de97db5",
+      "revisionBefore": 1,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "50038c0e-c77c-4e95-bb9c-1b7069d23cec",
+      "eventId": "evt_6a9bf53d6a4139a34b41ef25",
+      "eventIds": [
+        "evt_6a9bf53d6a4139a34b41ef25"
+      ],
+      "slug": "obe-rek-smolensk-22-11-smolensk",
+      "url": "https://daibilet.ru/events/obe-rek-smolensk-22-11-smolensk",
+      "title": "Обе-Рек | Смоленск | 22.11",
+      "city": "Смоленск",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T05:33:07.667Z",
+      "canonicalPath": "/events/obe-rek-smolensk-22-11-smolensk",
+      "seoDescription": "Обе-Рек — «Лучшее и новое». В программе соединены песни разных периодов группы: свежие композиции 2025–2026 годов, концептуальные треки из прежних этапов и хиты, которые давно сопровождают слушателей. Показ: Смоленск, 22 ноября 2026 года в 20:00 (местное время); адрес: Карачевский переулок 4.",
+      "tourGroupId": "d914b5f1-a2bf-4fcf-b170-f7538de97db5",
+      "revisionBefore": 1,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "84db60e5-de98-4fc3-bdd6-88a267722cba",
+      "eventId": "evt_6aee0a58354757d998871257",
+      "eventIds": [
+        "evt_6aee0a58354757d998871257"
+      ],
+      "slug": "obe-rek-bryansk-21-11-bryansk",
+      "url": "https://daibilet.ru/events/obe-rek-bryansk-21-11-bryansk",
+      "title": "Обе-Рек | Брянск | 21.11",
+      "city": "Брянск",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T05:33:07.981Z",
+      "canonicalPath": "/events/obe-rek-bryansk-21-11-bryansk",
+      "seoDescription": "Обе-Рек — «Лучшее и новое». В программе соединены песни разных периодов группы: свежие композиции 2025–2026 годов, концептуальные треки из прежних этапов и хиты, которые давно сопровождают слушателей. Показ: Брянск, 21 ноября 2026 года в 20:00 (местное время); адрес: калинина 117.",
+      "tourGroupId": "d914b5f1-a2bf-4fcf-b170-f7538de97db5",
+      "revisionBefore": 1,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "71e54652-e33a-43c5-b772-3c1666d60017",
+      "eventId": "evt_6a98156354890bd4b287af8b",
+      "eventIds": [
+        "evt_6a98156354890bd4b287af8b"
+      ],
+      "slug": "madiyar-satvaldin-solnyi-stendap-koncert-voronezh",
+      "url": "https://daibilet.ru/events/madiyar-satvaldin-solnyi-stendap-koncert-voronezh",
+      "title": "Мадияр Сатвалдин - сольный стендап-концерт",
+      "city": "Воронеж",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T05:33:08.324Z",
+      "canonicalPath": "/events/madiyar-satvaldin-solnyi-stendap-koncert-voronezh",
+      "seoDescription": "Мадияр Сатвалдин — сольный стендап-концерт. Мадияр Сатвалдин рассказывает о повседневной жизни и семейных отношениях, превращая бытовые наблюдения в материал для стендапа. Показ: Воронеж, 8 декабря 2026 года в 20:00 (местное время); адрес: проспект Революции, 39.",
+      "tourGroupId": "51783df8-b649-4ab5-a09e-19141750f6b9",
+      "revisionBefore": 1,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "2d17027b-7afd-454b-917a-f7b7db6bfc7d",
+      "eventId": "evt_6aad4f470e483b04d2060ed2",
+      "eventIds": [
+        "evt_6aad4f470e483b04d2060ed2"
+      ],
+      "slug": "madiyar-satvaldin-solnyi-stendap-koncert-ekaterinburg",
+      "url": "https://daibilet.ru/events/madiyar-satvaldin-solnyi-stendap-koncert-ekaterinburg",
+      "title": "Мадияр Сатвалдин - сольный стендап-концерт",
+      "city": "Екатеринбург",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T05:33:08.673Z",
+      "canonicalPath": "/events/madiyar-satvaldin-solnyi-stendap-koncert-ekaterinburg",
+      "seoDescription": "Мадияр Сатвалдин — сольный стендап-концерт. Мадияр Сатвалдин рассказывает о повседневной жизни и семейных отношениях, превращая бытовые наблюдения в материал для стендапа. Показ: Екатеринбург, 27 ноября 2026 года в 20:00 (местное время); адрес: Московская, 287.",
+      "tourGroupId": "51783df8-b649-4ab5-a09e-19141750f6b9",
+      "revisionBefore": 1,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "d8c52577-8abd-4c9f-9598-3a03b9b302a1",
+      "eventId": "evt_6aad54a1471813dff6897225",
+      "eventIds": [
+        "evt_6aad54a1471813dff6897225"
+      ],
+      "slug": "madiyar-satvaldin-solnyi-stendap-koncert-tyumen",
+      "url": "https://daibilet.ru/events/madiyar-satvaldin-solnyi-stendap-koncert-tyumen",
+      "title": "Мадияр Сатвалдин - сольный стендап-концерт",
+      "city": "Тюмень",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T05:33:09.005Z",
+      "canonicalPath": "/events/madiyar-satvaldin-solnyi-stendap-koncert-tyumen",
+      "seoDescription": "Мадияр Сатвалдин — сольный стендап-концерт. Мадияр Сатвалдин рассказывает о повседневной жизни и семейных отношениях, превращая бытовые наблюдения в материал для стендапа. Показ: Тюмень, 29 ноября 2026 года в 19:00 (местное время); адрес: ул. Осипенко, д. 81.",
+      "tourGroupId": "51783df8-b649-4ab5-a09e-19141750f6b9",
+      "revisionBefore": 1,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "036e511b-8c5f-4a3f-8db3-d6d19b201aa7",
+      "eventId": "evt_6aad5b499b856a310a36b82d",
+      "eventIds": [
+        "evt_6aad5b499b856a310a36b82d"
+      ],
+      "slug": "madiyar-satvaldin-solnyi-stendap-koncert-krasnodar",
+      "url": "https://daibilet.ru/events/madiyar-satvaldin-solnyi-stendap-koncert-krasnodar",
+      "title": "Мадияр Сатвалдин - сольный стендап-концерт",
+      "city": "Краснодар",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T05:33:09.317Z",
+      "canonicalPath": "/events/madiyar-satvaldin-solnyi-stendap-koncert-krasnodar",
+      "seoDescription": "Мадияр Сатвалдин — сольный стендап-концерт. Мадияр Сатвалдин рассказывает о повседневной жизни и семейных отношениях, превращая бытовые наблюдения в материал для стендапа. Показ: Краснодар, 10 декабря 2026 года в 18:30 (местное время); адрес: красная 118.",
+      "tourGroupId": "51783df8-b649-4ab5-a09e-19141750f6b9",
+      "revisionBefore": 1,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "679d1aba-7d93-4694-8cb7-fd7bd419bd71",
+      "eventId": "evt_6ab2ed5bb746ce86fed44e47",
+      "eventIds": [
+        "evt_6ab2ed5bb746ce86fed44e47"
+      ],
+      "slug": "aleksandr-demidov-ot-mirovyh-hitov-do-sobstvennyh-sochinenii-samara",
+      "url": "https://daibilet.ru/events/aleksandr-demidov-ot-mirovyh-hitov-do-sobstvennyh-sochinenii-samara",
+      "title": "Александр Демидов. От мировых хитов до собственных сочинений",
+      "city": "Самара",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T05:33:09.657Z",
+      "canonicalPath": "/events/aleksandr-demidov-ot-mirovyh-hitov-do-sobstvennyh-sochinenii-samara",
+      "seoDescription": "Александр Демидов — «От мировых хитов до собственных сочинений». Александр Демидов — композитор и мультиинструменталист, работающий со скрипкой, фортепиано, синтезатором и гитарой. Показ: Самара, 22 ноября 2026 года в 19:00 (местное время); адрес: ул. Ново-Садовая, 260А.",
+      "tourGroupId": "1500b575-5489-42f5-b0a8-8b4ec1989dcf",
+      "revisionBefore": 1,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "b736b9fc-4779-4f74-ad4e-6274b261049b",
+      "eventId": "evt_6ab2ef0a7d596bd57e6af3fe",
+      "eventIds": [
+        "evt_6ab2ef0a7d596bd57e6af3fe"
+      ],
+      "slug": "aleksandr-demidov-ot-mirovyh-hitov-do-sobstvennyh-sochinenii-kazan",
+      "url": "https://daibilet.ru/events/aleksandr-demidov-ot-mirovyh-hitov-do-sobstvennyh-sochinenii-kazan",
+      "title": "Александр Демидов. От мировых хитов до собственных сочинений",
+      "city": "Казань",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T05:33:10.013Z",
+      "canonicalPath": "/events/aleksandr-demidov-ot-mirovyh-hitov-do-sobstvennyh-sochinenii-kazan",
+      "seoDescription": "Александр Демидов — «От мировых хитов до собственных сочинений». Александр Демидов — композитор и мультиинструменталист, работающий со скрипкой, фортепиано, синтезатором и гитарой. Показ: Казань, 13 декабря 2026 года в 19:00 (местное время); адрес: ул. Карла Маркса 26.",
+      "tourGroupId": "1500b575-5489-42f5-b0a8-8b4ec1989dcf",
+      "revisionBefore": 1,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "dc79b8fe-20c3-4d19-b3d0-72ec13d9ce6a",
+      "eventId": "evt_6ab3d5e729220f8b76951c4e",
+      "eventIds": [
+        "evt_6ab3d5e729220f8b76951c4e"
+      ],
+      "slug": "kompozitor-aleksandr-demidov-ot-mirovyh-hitov-do-sobstvennyh-sochinenii-saratov",
+      "url": "https://daibilet.ru/events/kompozitor-aleksandr-demidov-ot-mirovyh-hitov-do-sobstvennyh-sochinenii-saratov",
+      "title": "Александр Демидов. От мировых хитов до собственных сочинений",
+      "city": "Саратов",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-12T21:03:35.540Z",
+      "canonicalPath": "/events/kompozitor-aleksandr-demidov-ot-mirovyh-hitov-do-sobstvennyh-sochinenii-saratov",
+      "seoDescription": "Александр Демидов — «От мировых хитов до собственных сочинений». Александр Демидов — композитор и мультиинструменталист, работающий со скрипкой, фортепиано, синтезатором и гитарой. Показ: Саратов, 20 ноября 2026 года в 19:00 (местное время); адрес: Ул. Симбирская 36.",
+      "tourGroupId": "1500b575-5489-42f5-b0a8-8b4ec1989dcf",
+      "revisionBefore": 3,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "4e41af42-fe23-439e-a6ac-179a935efae4",
+      "eventId": "evt_6ac37beed8fee5392fc8316e",
+      "eventIds": [
+        "evt_6ac37beed8fee5392fc8316e"
+      ],
+      "slug": "aleksandr-demidov-ot-mirovyh-hitov-do-sobstvennyh-sochinenii-ekaterinburg",
+      "url": "https://daibilet.ru/events/aleksandr-demidov-ot-mirovyh-hitov-do-sobstvennyh-sochinenii-ekaterinburg",
+      "title": "Александр Демидов. От мировых хитов до собственных сочинений",
+      "city": "Екатеринбург",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T05:33:10.608Z",
+      "canonicalPath": "/events/aleksandr-demidov-ot-mirovyh-hitov-do-sobstvennyh-sochinenii-ekaterinburg",
+      "seoDescription": "Александр Демидов — «От мировых хитов до собственных сочинений». Александр Демидов — композитор и мультиинструменталист, работающий со скрипкой, фортепиано, синтезатором и гитарой. Показ: Екатеринбург, 11 декабря 2026 года в 19:00 (местное время); адрес: ул. Свердлова, 30, Екатеринбург, Свердловская обл., 620027.",
+      "tourGroupId": "1500b575-5489-42f5-b0a8-8b4ec1989dcf",
+      "revisionBefore": 1,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "fe549c3a-ee9f-4bd2-b641-957015664727",
+      "eventId": "evt_6ac6101fef0a1350c4e3d4f1",
+      "eventIds": [
+        "evt_6ac6101fef0a1350c4e3d4f1"
+      ],
+      "slug": "alisa-v-strane-chudes-illyuzionnyi-spektakl-dlya-vsei-semi-nizhniy-tagil",
+      "url": "https://daibilet.ru/events/alisa-v-strane-chudes-illyuzionnyi-spektakl-dlya-vsei-semi-nizhniy-tagil",
+      "title": "Алиса в стране чудес-иллюзионный спектакль для всей семьи.",
+      "city": "Нижний Тагил",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T05:33:10.938Z",
+      "canonicalPath": "/events/alisa-v-strane-chudes-illyuzionnyi-spektakl-dlya-vsei-semi-nizhniy-tagil",
+      "seoDescription": "«Алиса в Стране чудес» — иллюзионный спектакль. Спектакль «Алиса в Стране чудес» соединяет сказочный сюжет, театральную игру и фокусы. Показ: Нижний Тагил, 3 декабря 2026 года в 15:00 (местное время); адрес: ул. Пархоменко, 37.",
+      "tourGroupId": "0d4440bd-25c0-4c6b-8d7b-c237102ce07c",
+      "revisionBefore": 1,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "e21a338f-8dcf-482a-bb9b-ea9f28d7eb46",
+      "eventId": "evt_6ac6132c564f202d035b72b9",
+      "eventIds": [
+        "evt_6ac6132c564f202d035b72b9"
+      ],
+      "slug": "alisa-v-strane-chudes-illyuzionnyi-spektakl-dlya-vsei-semi-nizhniy-tagil-2",
+      "url": "https://daibilet.ru/events/alisa-v-strane-chudes-illyuzionnyi-spektakl-dlya-vsei-semi-nizhniy-tagil-2",
+      "title": "Алиса в стране чудес-иллюзионный спектакль для всей семьи.",
+      "city": "Нижний Тагил",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T05:33:11.261Z",
+      "canonicalPath": "/events/alisa-v-strane-chudes-illyuzionnyi-spektakl-dlya-vsei-semi-nizhniy-tagil-2",
+      "seoDescription": "«Алиса в Стране чудес» — иллюзионный спектакль. Спектакль «Алиса в Стране чудес» соединяет сказочный сюжет, театральную игру и фокусы. Показ: Нижний Тагил, 3 декабря 2026 года в 18:00 (местное время); адрес: ул. Пархоменко, 37.",
+      "tourGroupId": null,
+      "revisionBefore": 1,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "4340e45c-f5c5-4e09-a141-8aa124439d87",
+      "eventId": "evt_6adf49c27304e111d97bf476",
+      "eventIds": [
+        "evt_6adf49c27304e111d97bf476"
+      ],
+      "slug": "alisa-v-strane-chudes-illyuzionnyi-spektakl-dlya-vsei-semi-serov",
+      "url": "https://daibilet.ru/events/alisa-v-strane-chudes-illyuzionnyi-spektakl-dlya-vsei-semi-serov",
+      "title": "Алиса в стране чудес-иллюзионный спектакль для всей семьи.",
+      "city": "Серов",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T05:33:11.528Z",
+      "canonicalPath": "/events/alisa-v-strane-chudes-illyuzionnyi-spektakl-dlya-vsei-semi-serov",
+      "seoDescription": "«Алиса в Стране чудес» — иллюзионный спектакль. Спектакль «Алиса в Стране чудес» соединяет сказочный сюжет, театральную игру и фокусы. Показ: Серов, 4 декабря 2026 года в 16:00 (местное время); адрес: ул. проспект Серова, 1а.",
+      "tourGroupId": "0d4440bd-25c0-4c6b-8d7b-c237102ce07c",
+      "revisionBefore": 1,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "343a076e-63fe-405d-bbfd-b8a19598fde8",
+      "eventId": "evt_6ae38bd98c4db6305748b783",
+      "eventIds": [
+        "evt_6ae38bd98c4db6305748b783"
+      ],
+      "slug": "alisa-v-strane-chudes-illyuzionnyi-spektakl-dlya-vsei-semi-ekaterinburg",
+      "url": "https://daibilet.ru/events/alisa-v-strane-chudes-illyuzionnyi-spektakl-dlya-vsei-semi-ekaterinburg",
+      "title": "Алиса в стране чудес-иллюзионный спектакль для всей семьи.",
+      "city": "Екатеринбург",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T05:33:11.877Z",
+      "canonicalPath": "/events/alisa-v-strane-chudes-illyuzionnyi-spektakl-dlya-vsei-semi-ekaterinburg",
+      "seoDescription": "«Алиса в Стране чудес» — иллюзионный спектакль. Спектакль «Алиса в Стране чудес» соединяет сказочный сюжет, театральную игру и фокусы. Показ: Екатеринбург, 13 января 2027 года в 15:00 (местное время); адрес: Челюскинцев, 102.",
+      "tourGroupId": "0d4440bd-25c0-4c6b-8d7b-c237102ce07c",
+      "revisionBefore": 1,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "595bdbd3-e6fb-470e-89e5-8ef2fe93c2e2",
+      "eventId": "evt_6af3aade41b951a9ec457e28",
+      "eventIds": [
+        "evt_6af3aade41b951a9ec457e28"
+      ],
+      "slug": "moi-2008-ruki-vverh-bar-arhangelsk",
+      "url": "https://daibilet.ru/events/moi-2008-ruki-vverh-bar-arhangelsk",
+      "title": "МОЙ 2008 @РУКИ ВВЕРХ БАР",
+      "city": "Архангельск",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T05:33:12.223Z",
+      "canonicalPath": "/events/moi-2008-ruki-vverh-bar-arhangelsk",
+      "seoDescription": "«МОЙ 2008» в «Руки Вверх! Бар». «МОЙ 2008» — тематическая вечеринка команды DISCOTHÈQUE, посвящённая клубной музыке нулевых. Показ: Архангельск, 12 февраля 2027 года в 21:00 (местное время); адрес: Архангельск, Воскресенская 20.",
+      "tourGroupId": "e8f5bb90-821f-467e-aca7-638020c237a1",
+      "revisionBefore": 1,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "00417c1f-2ab8-4513-a536-1cb8cfe824de",
+      "eventId": "evt_6af398adf164eb98eecd19f2",
+      "eventIds": [
+        "evt_6af398adf164eb98eecd19f2"
+      ],
+      "slug": "moi-2008-ruki-vverh-bar-ryazan",
+      "url": "https://daibilet.ru/events/moi-2008-ruki-vverh-bar-ryazan",
+      "title": "МОЙ 2008 @РУКИ ВВЕРХ БАР",
+      "city": "Рязань",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T05:33:12.540Z",
+      "canonicalPath": "/events/moi-2008-ruki-vverh-bar-ryazan",
+      "seoDescription": "«МОЙ 2008» в «Руки Вверх! Бар». «МОЙ 2008» — тематическая вечеринка команды DISCOTHÈQUE, посвящённая клубной музыке нулевых. Показ: Рязань, 23 января 2027 года в 21:00 (местное время); адрес: проезд Завражнова, 4.",
+      "tourGroupId": "e8f5bb90-821f-467e-aca7-638020c237a1",
+      "revisionBefore": 1,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "61df2003-2932-4957-9e43-90c534403163",
+      "eventId": "evt_6af394de4718c42365b45f6e",
+      "eventIds": [
+        "evt_6af394de4718c42365b45f6e"
+      ],
+      "slug": "moi-2008-ruki-vverh-bar-cherepovec",
+      "url": "https://daibilet.ru/events/moi-2008-ruki-vverh-bar-cherepovec",
+      "title": "МОЙ 2008 @РУКИ ВВЕРХ БАР",
+      "city": "Череповец",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T05:33:12.858Z",
+      "canonicalPath": "/events/moi-2008-ruki-vverh-bar-cherepovec",
+      "seoDescription": "«МОЙ 2008» в «Руки Вверх! Бар». «МОЙ 2008» — тематическая вечеринка команды DISCOTHÈQUE, посвящённая клубной музыке нулевых. Показ: Череповец, 16 января 2027 года в 21:00 (местное время); адрес: ул. Леднева, 4.",
+      "tourGroupId": "e8f5bb90-821f-467e-aca7-638020c237a1",
+      "revisionBefore": 1,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "f972e15a-dfcc-4016-9c44-f06730ebc0ca",
+      "eventId": "evt_6af380a6e199d1ef519d55ac",
+      "eventIds": [
+        "evt_6af380a6e199d1ef519d55ac"
+      ],
+      "slug": "moi-2008-ruki-vverh-bar-yaroslavl",
+      "url": "https://daibilet.ru/events/moi-2008-ruki-vverh-bar-yaroslavl",
+      "title": "МОЙ 2008 @РУКИ ВВЕРХ БАР",
+      "city": "Ярославль",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T05:33:13.188Z",
+      "canonicalPath": "/events/moi-2008-ruki-vverh-bar-yaroslavl",
+      "seoDescription": "«МОЙ 2008» в «Руки Вверх! Бар». «МОЙ 2008» — тематическая вечеринка команды DISCOTHÈQUE, посвящённая клубной музыке нулевых. Показ: Ярославль, 15 января 2027 года в 21:00 (местное время); адрес: Первомайский бульвар, дом 1.",
+      "tourGroupId": "e8f5bb90-821f-467e-aca7-638020c237a1",
+      "revisionBefore": 1,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "248f7ab7-fa16-49ca-8768-abea1e0ab5cf",
+      "eventId": "evt_6af1c5cfe0b630c24fb9537c",
+      "eventIds": [
+        "evt_6af1c5cfe0b630c24fb9537c"
+      ],
+      "slug": "solnyi-stendap-koncert-rasslabsya-tak-u-vseh-kaliningrad",
+      "url": "https://daibilet.ru/events/solnyi-stendap-koncert-rasslabsya-tak-u-vseh-kaliningrad",
+      "title": "Сольный стендап концерт \"Расслабься так у всех \"",
+      "city": "Калининград",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T05:33:13.533Z",
+      "canonicalPath": "/events/solnyi-stendap-koncert-rasslabsya-tak-u-vseh-kaliningrad",
+      "seoDescription": "Валерия Яковлева — «Расслабься, так у всех!». В сольном концерте «Расслабься, так у всех! Показ: Калининград, 11 декабря 2026 года в 20:30 (местное время); адрес: пр-кт Мира, 41/43, 236022.",
+      "tourGroupId": "6fb561a2-68bd-44dc-bf7e-f63d4f837bb6",
+      "revisionBefore": 1,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "cf9cc6ac-2b15-4371-b608-7a08eab07e2a",
+      "eventId": "evt_6aedcdfbfbc44cde53b15ef9",
+      "eventIds": [
+        "evt_6aedcdfbfbc44cde53b15ef9"
+      ],
+      "slug": "solnyi-stendap-koncert-rasslabsya-tak-u-vseh-kirov-kirovskaya-oblast",
+      "url": "https://daibilet.ru/events/solnyi-stendap-koncert-rasslabsya-tak-u-vseh-kirov-kirovskaya-oblast",
+      "title": "Сольный стендап концерт \"Расслабься так у всех \"",
+      "city": "Киров (Кировская область)",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T05:33:13.893Z",
+      "canonicalPath": "/events/solnyi-stendap-koncert-rasslabsya-tak-u-vseh-kirov-kirovskaya-oblast",
+      "seoDescription": "Валерия Яковлева — «Расслабься, так у всех!». В сольном концерте «Расслабься, так у всех! Показ: Киров (Кировская область), 27 ноября 2026 года в 20:00 (местное время); адрес: ул. Владимирская, 21.",
+      "tourGroupId": "6fb561a2-68bd-44dc-bf7e-f63d4f837bb6",
+      "revisionBefore": 1,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "10245629-af80-4ca6-aba9-dc034dcb9ae9",
+      "eventId": "evt_6ae9c83b0af34f653ffdfcf5",
+      "eventIds": [
+        "evt_6ae9c83b0af34f653ffdfcf5"
+      ],
+      "slug": "solnyi-stendap-koncert-rasslabsya-tak-u-vseh-chita",
+      "url": "https://daibilet.ru/events/solnyi-stendap-koncert-rasslabsya-tak-u-vseh-chita",
+      "title": "Сольный стендап концерт \"Расслабься так у всех \"",
+      "city": "Чита",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-12T20:54:23.376Z",
+      "canonicalPath": "/events/solnyi-stendap-koncert-rasslabsya-tak-u-vseh-chita",
+      "seoDescription": "Валерия Яковлева — «Расслабься, так у всех!». В сольном концерте «Расслабься, так у всех! Показ: Чита, 21 ноября 2026 года в 18:00 (местное время); адрес: Ангарская ул., 44.",
+      "tourGroupId": "6fb561a2-68bd-44dc-bf7e-f63d4f837bb6",
+      "revisionBefore": 3,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "78604721-59c9-45eb-8e6a-a91285e3f440",
+      "eventId": "evt_6ae9846a7abc68d125ac1140",
+      "eventIds": [
+        "evt_6ae9846a7abc68d125ac1140"
+      ],
+      "slug": "solnyi-stendap-koncert-rasslabsya-tak-u-vseh-ulan-ude",
+      "url": "https://daibilet.ru/events/solnyi-stendap-koncert-rasslabsya-tak-u-vseh-ulan-ude",
+      "title": "Сольный стендап концерт \"Расслабься так у всех \"",
+      "city": "Улан-Удэ",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T05:33:14.514Z",
+      "canonicalPath": "/events/solnyi-stendap-koncert-rasslabsya-tak-u-vseh-ulan-ude",
+      "seoDescription": "Валерия Яковлева — «Расслабься, так у всех!». В сольном концерте «Расслабься, так у всех! Показ: Улан-Удэ, 22 ноября 2026 года в 18:00 (местное время); адрес: ул. Цивилева, 50а.",
+      "tourGroupId": "6fb561a2-68bd-44dc-bf7e-f63d4f837bb6",
+      "revisionBefore": 1,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "78b573fd-f192-43d2-bf42-ff3f7b4eaab5",
+      "eventId": "evt_6ad9c0d8573c2c79917ebafe",
+      "eventIds": [
+        "evt_6ad9c0d8573c2c79917ebafe"
+      ],
+      "slug": "anton-i-viktoriya-makarskie-zhivaya-vstrecha-v-novocherkasske-novocherkassk",
+      "url": "https://daibilet.ru/events/anton-i-viktoriya-makarskie-zhivaya-vstrecha-v-novocherkasske-novocherkassk",
+      "title": "Антон и Виктория Макарские \"Живая Встреча\" в Новочеркасске",
+      "city": "Новочеркасск",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T05:33:14.842Z",
+      "canonicalPath": "/events/anton-i-viktoriya-makarskie-zhivaya-vstrecha-v-novocherkasske-novocherkassk",
+      "seoDescription": "Антон и Виктория Макарские — «Живая встреча». «Живая встреча» объединяет разговор со зрителями, музыкальные номера и поэтические произведения. Показ: Новочеркасск, 15 мая 2027 года в 19:00 (местное время); адрес: пр. Платовский, 72.",
+      "tourGroupId": "63e0135c-2878-4405-9449-dea47042dfc7",
+      "revisionBefore": 1,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "8e1629d7-fe4c-48db-a5d8-e94f15b3f2af",
+      "eventId": "evt_6aa44c3e9af053acd38b387d",
+      "eventIds": [
+        "evt_6aa44c3e9af053acd38b387d"
+      ],
+      "slug": "anton-i-viktoriya-makarskie-zhivaya-vstrecha-v-pskove-pskov",
+      "url": "https://daibilet.ru/events/anton-i-viktoriya-makarskie-zhivaya-vstrecha-v-pskove-pskov",
+      "title": "Антон и Виктория Макарские \"Живая Встреча\" в Пскове",
+      "city": "Псков",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T05:33:15.190Z",
+      "canonicalPath": "/events/anton-i-viktoriya-makarskie-zhivaya-vstrecha-v-pskove-pskov",
+      "seoDescription": "Антон и Виктория Макарские — «Живая встреча». «Живая встреча» объединяет разговор со зрителями, музыкальные номера и поэтические произведения. Показ: Псков, 16 февраля 2027 года в 19:00 (местное время); адрес: пл. Победы, 1, Псков, Псковская обл., Россия, 180017.",
+      "tourGroupId": "63e0135c-2878-4405-9449-dea47042dfc7",
+      "revisionBefore": 1,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "6a77c425-95f8-416b-b5af-8dc60181bf40",
+      "eventId": "evt_6ad5f94e7c4af5283541e135",
+      "eventIds": [
+        "evt_6ad5f94e7c4af5283541e135"
+      ],
+      "slug": "anton-i-viktoriya-makarskie-zhivaya-vstrecha-v-taganroge-taganrog",
+      "url": "https://daibilet.ru/events/anton-i-viktoriya-makarskie-zhivaya-vstrecha-v-taganroge-taganrog",
+      "title": "Антон и Виктория Макарские \"Живая Встреча\" в Таганроге",
+      "city": "Таганрог",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T05:33:15.528Z",
+      "canonicalPath": "/events/anton-i-viktoriya-makarskie-zhivaya-vstrecha-v-taganroge-taganrog",
+      "seoDescription": "Антон и Виктория Макарские — «Живая встреча». «Живая встреча» объединяет разговор со зрителями, музыкальные номера и поэтические произведения. Показ: Таганрог, 19 мая 2027 года в 19:00 (местное время); адрес: Петровская ул., д. 104-1.",
+      "tourGroupId": "63e0135c-2878-4405-9449-dea47042dfc7",
+      "revisionBefore": 1,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "85e8c264-0712-4e5d-a38e-ebf1d1f501fe",
+      "eventId": "evt_6ad715176ff9a9da7c297c73",
+      "eventIds": [
+        "evt_6ad715176ff9a9da7c297c73"
+      ],
+      "slug": "anton-i-viktoriya-makarskie-zhivaya-vstrecha-matveev-kurgan",
+      "url": "https://daibilet.ru/events/anton-i-viktoriya-makarskie-zhivaya-vstrecha-matveev-kurgan",
+      "title": "Антон и Виктория Макарские \"Живая Встреча\" Матвеев Курган",
+      "city": "Матвеев Курган",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T05:33:15.895Z",
+      "canonicalPath": "/events/anton-i-viktoriya-makarskie-zhivaya-vstrecha-matveev-kurgan",
+      "seoDescription": "Антон и Виктория Макарские — «Живая встреча». «Живая встреча» объединяет разговор со зрителями, музыкальные номера и поэтические произведения. Показ: Матвеев Курган, 20 мая 2027 года в 19:00 (местное время); адрес: ул. 1-я Пятилетка 107.",
+      "tourGroupId": "63e0135c-2878-4405-9449-dea47042dfc7",
+      "revisionBefore": 1,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "0dc5e681-9edc-4e40-aea7-c83847c5a843",
+      "eventId": "evt_6ad608df9f31e0335054088f",
+      "eventIds": [
+        "evt_6ad608df9f31e0335054088f"
+      ],
+      "slug": "anton-i-viktoriya-makarskie-zhivaya-vstrecha-azov",
+      "url": "https://daibilet.ru/events/anton-i-viktoriya-makarskie-zhivaya-vstrecha-azov",
+      "title": "Антон и Виктория Макарские \"Живая Встреча\"",
+      "city": "Азов",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T05:33:16.226Z",
+      "canonicalPath": "/events/anton-i-viktoriya-makarskie-zhivaya-vstrecha-azov",
+      "seoDescription": "Антон и Виктория Макарские — «Живая встреча». «Живая встреча» объединяет разговор со зрителями, музыкальные номера и поэтические произведения. Показ: Азов, 16 мая 2027 года в 18:00 (местное время); адрес: Петровский б-р, 44.",
+      "tourGroupId": "63e0135c-2878-4405-9449-dea47042dfc7",
+      "revisionBefore": 1,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "98306fda-940f-4ccb-a5e8-0f17e17dd252",
+      "eventId": "evt_69725db3d8e73e68b0ddb045",
+      "eventIds": [
+        "evt_69725db3d8e73e68b0ddb045"
+      ],
+      "slug": "koncert-etno-gruppy-hun-hurtu-g-chelyabinsk",
+      "url": "https://daibilet.ru/events/koncert-etno-gruppy-hun-hurtu-g-chelyabinsk",
+      "title": "Концерт этно-группы \"Хун Хурту\". г.Челябинск",
+      "city": "Челябинск",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T05:33:16.595Z",
+      "canonicalPath": "/events/koncert-etno-gruppy-hun-hurtu-g-chelyabinsk",
+      "seoDescription": "Концерт этно-группы «Хун Хурту». «Хун Хурту» исполняет музыку, основанную на тувинском фольклоре и традиции горлового пения. Показ: Челябинск, 29 ноября 2026 года в 19:00 (местное время); адрес: проспект Ленина, 35.",
+      "tourGroupId": "2caeae52-cff9-420f-b605-f77b7b23b584",
+      "revisionBefore": 1,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "78f1f696-d03b-4c9b-ae26-475ebed947cd",
+      "eventId": "evt_697251e4bbd03282f108041f",
+      "eventIds": [
+        "evt_697251e4bbd03282f108041f"
+      ],
+      "slug": "koncert-etno-gruppy-hun-hurtu-g-cheboksary",
+      "url": "https://daibilet.ru/events/koncert-etno-gruppy-hun-hurtu-g-cheboksary",
+      "title": "Концерт этно-группы \"Хун Хурту\". г.Чебоксары",
+      "city": "Чебоксары",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T05:33:16.953Z",
+      "canonicalPath": "/events/koncert-etno-gruppy-hun-hurtu-g-cheboksary",
+      "seoDescription": "Концерт этно-группы «Хун Хурту». «Хун Хурту» исполняет музыку, основанную на тувинском фольклоре и традиции горлового пения. Показ: Чебоксары, 21 ноября 2026 года в 19:00 (местное время); адрес: Ленинградская улица, 32.",
+      "tourGroupId": "2caeae52-cff9-420f-b605-f77b7b23b584",
+      "revisionBefore": 1,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "b2e8dfa9-ba13-4e2b-88a8-f87bc4f3f302",
+      "eventId": "evt_6969096667d658c3cf145aaa",
+      "eventIds": [
+        "evt_6969096667d658c3cf145aaa"
+      ],
+      "slug": "koncert-etno-gruppy-hun-hurtu-g-sankt-peterburg",
+      "url": "https://daibilet.ru/events/koncert-etno-gruppy-hun-hurtu-g-sankt-peterburg",
+      "title": "Концерт этно-группы \"Хун Хурту\". г.Санкт-Петербург",
+      "city": "Санкт-Петербург",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T05:33:17.271Z",
+      "canonicalPath": "/events/koncert-etno-gruppy-hun-hurtu-g-sankt-peterburg",
+      "seoDescription": "Концерт этно-группы «Хун Хурту». «Хун Хурту» исполняет музыку, основанную на тувинском фольклоре и традиции горлового пения. Показ: Санкт-Петербург, 16 ноября 2026 года в 19:00 (местное время); адрес: проспект Невский 100.",
+      "tourGroupId": "2caeae52-cff9-420f-b605-f77b7b23b584",
+      "revisionBefore": 1,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "3a724b72-f5ab-4cad-81d8-f6320e97b94c",
+      "eventId": "evt_69e28c43b77192b8f6ec6e0e",
+      "eventIds": [
+        "evt_69e28c43b77192b8f6ec6e0e"
+      ],
+      "slug": "mirovye-saundtreki-pri-svechah-the-best-s-aso-orkestrom-krasnodar",
+      "url": "https://daibilet.ru/events/mirovye-saundtreki-pri-svechah-the-best-s-aso-orkestrom-krasnodar",
+      "title": "Мировые Саундтреки при свечах -The Best с АСО-оркестром",
+      "city": "Краснодар",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T05:33:17.598Z",
+      "canonicalPath": "/events/mirovye-saundtreki-pri-svechah-the-best-s-aso-orkestrom-krasnodar",
+      "seoDescription": "«Мировые саундтреки при свечах — The Best» с АСО-оркестром. Программа «The Best» собирает музыку из известных фильмов и исполняется АСО-оркестром — Avatar Cinematic Orchestra. Показ: Краснодар, 30 ноября 2026 года в 19:00 (местное время); адрес: улица Красная, 55.",
+      "tourGroupId": "b20f9b60-1774-4a38-a77d-23036a5164d2",
+      "revisionBefore": 1,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "861f70be-be44-458b-ad71-ffeb3b9a9433",
+      "eventId": "evt_6a91ff4a37fed9e2c480e5b3",
+      "eventIds": [
+        "evt_6a91ff4a37fed9e2c480e5b3"
+      ],
+      "slug": "mirovye-saundtreki-pri-svechah-the-best-s-aso-orkestrom-rostov-na-donu",
+      "url": "https://daibilet.ru/events/mirovye-saundtreki-pri-svechah-the-best-s-aso-orkestrom-rostov-na-donu",
+      "title": "Мировые Саундтреки при свечах -The Best с АСО-оркестром",
+      "city": "Ростов-на-Дону",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T05:33:17.937Z",
+      "canonicalPath": "/events/mirovye-saundtreki-pri-svechah-the-best-s-aso-orkestrom-rostov-na-donu",
+      "seoDescription": "«Мировые саундтреки при свечах — The Best» с АСО-оркестром. Программа «The Best» собирает музыку из известных фильмов и исполняется АСО-оркестром — Avatar Cinematic Orchestra. Показ: Ростов-на-Дону, 20 февраля 2027 года в 19:00 (местное время); адрес: пр. Сельмаш, 3.",
+      "tourGroupId": null,
+      "revisionBefore": 1,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "31abbb1a-81af-4ccc-84ff-836a1609c547",
+      "eventId": "evt_6aedcba465e55f8d911c2909",
+      "eventIds": [
+        "evt_6aedcba465e55f8d911c2909"
+      ],
+      "slug": "mirovye-saundtreki-pri-svechah-the-best-s-aso-orkestrom-rostov-na-donu-2",
+      "url": "https://daibilet.ru/events/mirovye-saundtreki-pri-svechah-the-best-s-aso-orkestrom-rostov-na-donu-2",
+      "title": "Мировые Саундтреки при свечах -The Best с АСО-оркестром",
+      "city": "Ростов-на-Дону",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T05:33:18.225Z",
+      "canonicalPath": "/events/mirovye-saundtreki-pri-svechah-the-best-s-aso-orkestrom-rostov-na-donu-2",
+      "seoDescription": "«Мировые саундтреки при свечах — The Best» с АСО-оркестром. Программа «The Best» собирает музыку из известных фильмов и исполняется АСО-оркестром — Avatar Cinematic Orchestra. Показ: Ростов-на-Дону, 5 декабря 2026 года в 19:00 (местное время); адрес: пр. Сельмаш, 3.",
+      "tourGroupId": "b20f9b60-1774-4a38-a77d-23036a5164d2",
+      "revisionBefore": 1,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "8844e3ea-cb0f-4015-b53e-6d9b2f9fe3cf",
+      "eventId": "evt_6a2165a3fda45c3dbab8de0b",
+      "eventIds": [
+        "evt_6a2165a3fda45c3dbab8de0b"
+      ],
+      "slug": "hren-prezentaciya-alboma-yaroslavl",
+      "url": "https://daibilet.ru/events/hren-prezentaciya-alboma-yaroslavl",
+      "title": "ХРЕН - Презентация альбома.",
+      "city": "Ярославль",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-12T21:03:38.309Z",
+      "canonicalPath": "/events/hren-prezentaciya-alboma-yaroslavl",
+      "seoDescription": "«ХРЕН» — презентация альбома «Мифическая реальность». На гастрольных концертах группа «ХРЕН» представляет альбом «Мифическая реальность». Показ: Ярославль, 20 ноября 2026 года в 20:00 (местное время); адрес: ул. Терешковой, д. 13.",
+      "tourGroupId": "6fc920ad-4162-4f69-b678-425f18741ccc",
+      "revisionBefore": 3,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "963779e2-849f-4946-a437-cf5fa9c93ec3",
+      "eventId": "evt_6a216b182f03321d1c32f439",
+      "eventIds": [
+        "evt_6a216b182f03321d1c32f439"
+      ],
+      "slug": "hren-prezentaciya-alboma-nizhniy-novgorod",
+      "url": "https://daibilet.ru/events/hren-prezentaciya-alboma-nizhniy-novgorod",
+      "title": "ХРЕН - презентация альбома.",
+      "city": "Нижний Новгород",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T05:33:18.862Z",
+      "canonicalPath": "/events/hren-prezentaciya-alboma-nizhniy-novgorod",
+      "seoDescription": "«ХРЕН» — презентация альбома «Мифическая реальность». На гастрольных концертах группа «ХРЕН» представляет альбом «Мифическая реальность». Показ: Нижний Новгород, 21 ноября 2026 года в 20:00 (местное время); адрес: ул. Почаинская, 17С.",
+      "tourGroupId": "6fc920ad-4162-4f69-b678-425f18741ccc",
+      "revisionBefore": 1,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "42f4344f-1f79-4cc5-85c7-5ae531e206f8",
+      "eventId": "evt_6a216d744e095dda3595dfc9",
+      "eventIds": [
+        "evt_6a216d744e095dda3595dfc9"
+      ],
+      "slug": "hren-prezentaciya-alboma-kazan",
+      "url": "https://daibilet.ru/events/hren-prezentaciya-alboma-kazan",
+      "title": "ХРЕН - Презентация альбома!",
+      "city": "Казань",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T05:33:19.213Z",
+      "canonicalPath": "/events/hren-prezentaciya-alboma-kazan",
+      "seoDescription": "«ХРЕН» — презентация альбома «Мифическая реальность». На гастрольных концертах группа «ХРЕН» представляет альбом «Мифическая реальность». Показ: Казань, 22 ноября 2026 года в 20:00 (местное время); адрес: ул. Кремлевская, 21.",
+      "tourGroupId": "6fc920ad-4162-4f69-b678-425f18741ccc",
+      "revisionBefore": 1,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "48c818c1-d023-4167-bfd1-8bc3e489fe44",
+      "eventId": "evt_6a48f77538bdf7b85c2fa7bf",
+      "eventIds": [
+        "evt_6a48f77538bdf7b85c2fa7bf"
+      ],
+      "slug": "simfoniya-roka-akt-pervyi-cheboksary",
+      "url": "https://daibilet.ru/events/simfoniya-roka-akt-pervyi-cheboksary",
+      "title": "Симфония рока: Акт первый",
+      "city": "Чебоксары",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-12T20:39:34.742Z",
+      "canonicalPath": "/events/simfoniya-roka-akt-pervyi-cheboksary",
+      "seoDescription": "«Симфония рока: Акт первый». «Симфония рока: Акт первый» соединяет оркестровое звучание с музыкой рок-групп разных направлений. Показ: Чебоксары, 20 ноября 2026 года в 19:00 (местное время); адрес: ул. Университетская, 38.",
+      "tourGroupId": "9ca50496-9d97-472c-a47d-f563f5306067",
+      "revisionBefore": 4,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "9dd73a25-5a85-4922-98da-7339f96024ee",
+      "eventId": "evt_6a4b8c8aa9413e29dc81751d",
+      "eventIds": [
+        "evt_6a4b8c8aa9413e29dc81751d"
+      ],
+      "slug": "simfoniya-roka-akt-pervyi-ulyanovsk",
+      "url": "https://daibilet.ru/events/simfoniya-roka-akt-pervyi-ulyanovsk",
+      "title": "Симфония рока: Акт первый",
+      "city": "Ульяновск",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T05:33:19.830Z",
+      "canonicalPath": "/events/simfoniya-roka-akt-pervyi-ulyanovsk",
+      "seoDescription": "«Симфония рока: Акт первый». «Симфония рока: Акт первый» соединяет оркестровое звучание с музыкой рок-групп разных направлений. Показ: Ульяновск, 19 ноября 2026 года в 19:00 (местное время); адрес: ул. 40-летия Победы, 15, Ульяновск, Ульяновская обл.,.",
+      "tourGroupId": "9ca50496-9d97-472c-a47d-f563f5306067",
+      "revisionBefore": 2,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "6a96b975-0578-484d-ae67-0b68f9be0234",
+      "eventId": "evt_6abe4f638e2a1ee5f42ebcc1",
+      "eventIds": [
+        "evt_6abe4f638e2a1ee5f42ebcc1"
+      ],
+      "slug": "simfoniya-roka-akt-pervyi-volzhsk",
+      "url": "https://daibilet.ru/events/simfoniya-roka-akt-pervyi-volzhsk",
+      "title": "Симфония рока: Акт первый",
+      "city": "Волжск",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-12T19:37:32.723Z",
+      "canonicalPath": "/events/simfoniya-roka-akt-pervyi-volzhsk",
+      "seoDescription": "«Симфония рока: Акт первый». «Симфония рока: Акт первый» соединяет оркестровое звучание с музыкой рок-групп разных направлений. Показ: Волжск, 13 ноября 2026 года в 18:00 (местное время); адрес: Ул. Дружбы, 16а.",
+      "tourGroupId": "9ca50496-9d97-472c-a47d-f563f5306067",
+      "revisionBefore": 4,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "47649c0b-b383-47c2-b3a1-441e50d27905",
+      "eventId": "evt_6a6a0479b80542e4a61cbbb3",
+      "eventIds": [
+        "evt_6a6a0479b80542e4a61cbbb3"
+      ],
+      "slug": "zvezdy-80-90-h-moskva",
+      "url": "https://daibilet.ru/events/zvezdy-80-90-h-moskva",
+      "title": "Звёзды 80-90-х",
+      "city": "Москва",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T05:33:20.345Z",
+      "canonicalPath": "/events/zvezdy-80-90-h-moskva",
+      "seoDescription": "«Звёзды 80–90-х». Концерт «Звёзды 80–90-х» собирает на одной сцене исполнителей, чьи песни стали частью музыкальной памяти нескольких поколений. Показ: Москва, 4 января 2027 года в 19:00 (местное время); адрес: Ленинский просп., 105.",
+      "tourGroupId": "d67318a8-9118-469b-8e76-e0531b084839",
+      "revisionBefore": 1,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "f962342b-3867-4e01-ba55-b25af4dcc577",
+      "eventId": "evt_6aabf990e35e4ed6cdcfcfde",
+      "eventIds": [
+        "evt_6aabf990e35e4ed6cdcfcfde"
+      ],
+      "slug": "zvezdy-80-90-h-zelenograd",
+      "url": "https://daibilet.ru/events/zvezdy-80-90-h-zelenograd",
+      "title": "Звёзды 80-90-х",
+      "city": "Зеленоград",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T05:33:20.691Z",
+      "canonicalPath": "/events/zvezdy-80-90-h-zelenograd",
+      "seoDescription": "«Звёзды 80–90-х». Концерт «Звёзды 80–90-х» собирает на одной сцене исполнителей, чьи песни стали частью музыкальной памяти нескольких поколений. Показ: Зеленоград, 2 января 2027 года в 19:00 (местное время); адрес: пл. Шокина, 1, стр.2.",
+      "tourGroupId": "d67318a8-9118-469b-8e76-e0531b084839",
+      "revisionBefore": 1,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "9704d7e7-c1c2-45cf-97c2-77991cd986ae",
+      "eventId": "evt_6ae9acb5119fbaedaa5e5d9d",
+      "eventIds": [
+        "evt_6ae9acb5119fbaedaa5e5d9d"
+      ],
+      "slug": "zvezdy-80-90-h-moskva-2",
+      "url": "https://daibilet.ru/events/zvezdy-80-90-h-moskva-2",
+      "title": "ЗВЁЗДЫ 80-90-х",
+      "city": "Москва",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T05:33:21.021Z",
+      "canonicalPath": "/events/zvezdy-80-90-h-moskva-2",
+      "seoDescription": "«Звёзды 80–90-х». Концерт «Звёзды 80–90-х» собирает на одной сцене исполнителей, чьи песни стали частью музыкальной памяти нескольких поколений. Показ: Москва, 8 марта 2027 года в 19:30 (местное время); адрес: ул. Барклая, 9.",
+      "tourGroupId": null,
+      "revisionBefore": 1,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "5cdb78ae-41a4-4836-b2c2-ec9da747bf36",
+      "eventId": "evt_6a808d7e8763c98c4692af5a",
+      "eventIds": [
+        "evt_6a808d7e8763c98c4692af5a"
+      ],
+      "slug": "rok-opera-germes-moskva",
+      "url": "https://daibilet.ru/events/rok-opera-germes-moskva",
+      "title": "Рок-опера Гермес",
+      "city": "Москва",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T05:33:21.294Z",
+      "canonicalPath": "/events/rok-opera-germes-moskva",
+      "seoDescription": "Рок-опера «Гермес». Рок-опера «Гермес» продолжает мир произведения «Орфей» Ольги Вайнер и переосмысляет знакомый древнегреческий миф. Показ: Москва, 13 декабря 2026 года в 14:00 (местное время); адрес: Москва, Измайловское шоссе, д.71, корп.5.",
+      "tourGroupId": null,
+      "revisionBefore": 1,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "7bddbf11-2b4c-470f-a177-f7395f43118a",
+      "eventId": "evt_6a80997dc65e77b41ef07fcb",
+      "eventIds": [
+        "evt_6a80997dc65e77b41ef07fcb"
+      ],
+      "slug": "rok-opera-germes-moskva-2",
+      "url": "https://daibilet.ru/events/rok-opera-germes-moskva-2",
+      "title": "Рок-опера Гермес",
+      "city": "Москва",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T05:33:21.556Z",
+      "canonicalPath": "/events/rok-opera-germes-moskva-2",
+      "seoDescription": "Рок-опера «Гермес». Рок-опера «Гермес» продолжает мир произведения «Орфей» Ольги Вайнер и переосмысляет знакомый древнегреческий миф. Показ: Москва, 15 ноября 2026 года в 19:00 (местное время); адрес: Москва, Измайловское шоссе, д.71, корп.5.",
+      "tourGroupId": "4bc13b1d-7685-49af-a278-688cc0c6cb41",
+      "revisionBefore": 1,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "abea6f71-815e-4529-91d8-51c4be5f00bd",
+      "eventId": "evt_6aac2834130a69f63fddc3a8",
+      "eventIds": [
+        "evt_6aac2834130a69f63fddc3a8"
+      ],
+      "slug": "rok-opera-germes-sankt-peterburg",
+      "url": "https://daibilet.ru/events/rok-opera-germes-sankt-peterburg",
+      "title": "Рок-опера Гермес",
+      "city": "Санкт-Петербург",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T05:33:21.877Z",
+      "canonicalPath": "/events/rok-opera-germes-sankt-peterburg",
+      "seoDescription": "Рок-опера «Гермес». Рок-опера «Гермес» продолжает мир произведения «Орфей» Ольги Вайнер и переосмысляет знакомый древнегреческий миф. Показ: Санкт-Петербург, 21 февраля 2027 года в 14:00 (местное время); адрес: Новоизмайловский пр. д. 48.",
+      "tourGroupId": "4bc13b1d-7685-49af-a278-688cc0c6cb41",
+      "revisionBefore": 1,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "b7829c6d-0c5e-4815-8600-a5faaae33f89",
+      "eventId": "evt_6a904b5e4f67383c9a12c562",
+      "eventIds": [
+        "evt_6a904b5e4f67383c9a12c562"
+      ],
+      "slug": "tumaniyo-nizhniy-novgorod",
+      "url": "https://daibilet.ru/events/tumaniyo-nizhniy-novgorod",
+      "title": "TumaniYO",
+      "city": "Нижний Новгород",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T05:33:22.206Z",
+      "canonicalPath": "/events/tumaniyo-nizhniy-novgorod",
+      "seoDescription": "TumaniYO. TumaniYO выступает с сольной программой, в которой соединяются его главные композиции и свежие релизы. Показ: Нижний Новгород, 16 декабря 2026 года в 19:30 (местное время); адрес: ул. Родионова, 4.",
+      "tourGroupId": "f30d0ecc-6eb3-49a2-8154-edaa8345a587",
+      "revisionBefore": 1,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "7711b830-0618-447d-b373-348e0d46aa68",
+      "eventId": "evt_6a904fc254b57a20ffa256f4",
+      "eventIds": [
+        "evt_6a904fc254b57a20ffa256f4"
+      ],
+      "slug": "tumaniyo-samara",
+      "url": "https://daibilet.ru/events/tumaniyo-samara",
+      "title": "TumaniYO",
+      "city": "Самара",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T05:33:22.515Z",
+      "canonicalPath": "/events/tumaniyo-samara",
+      "seoDescription": "TumaniYO. TumaniYO выступает с сольной программой, в которой соединяются его главные композиции и свежие релизы. Показ: Самара, 18 декабря 2026 года в 19:30 (местное время); адрес: ул. Лесная 23, корпус 2.",
+      "tourGroupId": "f30d0ecc-6eb3-49a2-8154-edaa8345a587",
+      "revisionBefore": 1,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "fddf0b32-3f3c-461b-a601-fa25fd2a61ef",
+      "eventId": "evt_6a9051c3865c314176c839da",
+      "eventIds": [
+        "evt_6a9051c3865c314176c839da"
+      ],
+      "slug": "tumaniyo-kazan",
+      "url": "https://daibilet.ru/events/tumaniyo-kazan",
+      "title": "TumaniYO",
+      "city": "Казань",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T05:33:22.853Z",
+      "canonicalPath": "/events/tumaniyo-kazan",
+      "seoDescription": "TumaniYO. TumaniYO выступает с сольной программой, в которой соединяются его главные композиции и свежие релизы. Показ: Казань, 17 декабря 2026 года в 19:30 (местное время); адрес: ул. Габдуллы Тукая, 115, корп. 6.",
+      "tourGroupId": "f30d0ecc-6eb3-49a2-8154-edaa8345a587",
+      "revisionBefore": 1,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "8e139338-1ee5-4db7-a1e1-49ecb18ca2f8",
+      "eventId": "evt_6a9322e5e5696954117db0dc",
+      "eventIds": [
+        "evt_6a9322e5e5696954117db0dc"
+      ],
+      "slug": "dlya-milyh-dam-mirovye-saundtreki-pri-svechah-s-aso-orkestrom-rostov-na-donu",
+      "url": "https://daibilet.ru/events/dlya-milyh-dam-mirovye-saundtreki-pri-svechah-s-aso-orkestrom-rostov-na-donu",
+      "title": "Для милых дам! Мировые саундтреки при свечах с АСО-оркестром",
+      "city": "Ростов-на-Дону",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T05:33:23.205Z",
+      "canonicalPath": "/events/dlya-milyh-dam-mirovye-saundtreki-pri-svechah-s-aso-orkestrom-rostov-na-donu",
+      "seoDescription": "«Для милых дам! Мировые саундтреки при свечах». «Для милых дам» — праздничная версия мультимедийного симфонического шоу АСО-оркестра. Показ: Ростов-на-Дону, 8 марта 2027 года в 19:00 (местное время); адрес: пр. Сельмаш, 3.",
+      "tourGroupId": "dd3b8cea-3f85-4eb8-a2ec-b2f636637fa9",
+      "revisionBefore": 1,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "c97df886-1c7d-41ce-9d2a-c125c0340044",
+      "eventId": "evt_6a93283167fa1108c4a38e04",
+      "eventIds": [
+        "evt_6a93283167fa1108c4a38e04"
+      ],
+      "slug": "dlya-milyh-dam-mirovye-saundtreki-pri-svechah-s-aso-orkestrom-ufa",
+      "url": "https://daibilet.ru/events/dlya-milyh-dam-mirovye-saundtreki-pri-svechah-s-aso-orkestrom-ufa",
+      "title": "Для милых дам! Мировые саундтреки при свечах с АСО-оркестром",
+      "city": "Уфа",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T05:33:23.544Z",
+      "canonicalPath": "/events/dlya-milyh-dam-mirovye-saundtreki-pri-svechah-s-aso-orkestrom-ufa",
+      "seoDescription": "«Для милых дам! Мировые саундтреки при свечах». «Для милых дам» — праздничная версия мультимедийного симфонического шоу АСО-оркестра. Показ: Уфа, 8 марта 2027 года в 19:00 (местное время); адрес: ул. Заки Валиди, д.2.",
+      "tourGroupId": "dd3b8cea-3f85-4eb8-a2ec-b2f636637fa9",
+      "revisionBefore": 1,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "febbaf03-41ed-400c-a6f8-ad8de6b287ab",
+      "eventId": "evt_6af0b3d4454f9eea24cf15e1",
+      "eventIds": [
+        "evt_6af0b3d4454f9eea24cf15e1"
+      ],
+      "slug": "dlya-milyh-dam-mirovye-saundtreki-pri-svechah-s-aso-orkestrom-krasnodar",
+      "url": "https://daibilet.ru/events/dlya-milyh-dam-mirovye-saundtreki-pri-svechah-s-aso-orkestrom-krasnodar",
+      "title": "Для милых дам! Мировые саундтреки при свечах с АСО-оркестром",
+      "city": "Краснодар",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T05:33:23.883Z",
+      "canonicalPath": "/events/dlya-milyh-dam-mirovye-saundtreki-pri-svechah-s-aso-orkestrom-krasnodar",
+      "seoDescription": "«Для милых дам! Мировые саундтреки при свечах». «Для милых дам» — праздничная версия мультимедийного симфонического шоу АСО-оркестра. Показ: Краснодар, 3 марта 2027 года в 19:00 (местное время); адрес: улица Красная, 55.",
+      "tourGroupId": "dd3b8cea-3f85-4eb8-a2ec-b2f636637fa9",
+      "revisionBefore": 1,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "823ca0d6-b006-48ce-a3db-e7c71a63b997",
+      "eventId": "evt_6aa085b900fb4f7e54f589f4",
+      "eventIds": [
+        "evt_6aa085b900fb4f7e54f589f4"
+      ],
+      "slug": "rostislav-chebykin-akustika-omsk",
+      "url": "https://daibilet.ru/events/rostislav-chebykin-akustika-omsk",
+      "title": "Ростислав Чебыкин | Акустика",
+      "city": "Омск",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T05:33:24.240Z",
+      "canonicalPath": "/events/rostislav-chebykin-akustika-omsk",
+      "seoDescription": "Ростислав Чебыкин — акустика. В сольном акустическом концерте Ростислав Чебыкин исполняет песни под гитару. Показ: Омск, 15 ноября 2026 года в 19:00 (местное время); адрес: ул. Ленина 14/1.",
+      "tourGroupId": "3fa15d91-efc1-41f3-bb6c-1db4d7592465",
+      "revisionBefore": 1,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "18de8ac6-2e70-461f-a84c-f83fc3fafc44",
+      "eventId": "evt_6aa2e93e8e40a9ea0ebc7913",
+      "eventIds": [
+        "evt_6aa2e93e8e40a9ea0ebc7913"
+      ],
+      "slug": "rostislav-chebykin-akustika-ekaterinburg",
+      "url": "https://daibilet.ru/events/rostislav-chebykin-akustika-ekaterinburg",
+      "title": "Ростислав Чебыкин | Акустика",
+      "city": "Екатеринбург",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T05:33:24.585Z",
+      "canonicalPath": "/events/rostislav-chebykin-akustika-ekaterinburg",
+      "seoDescription": "Ростислав Чебыкин — акустика. В сольном акустическом концерте Ростислав Чебыкин исполняет песни под гитару. Показ: Екатеринбург, 19 ноября 2026 года в 20:00 (местное время); адрес: улица Бебеля, 124.",
+      "tourGroupId": "3fa15d91-efc1-41f3-bb6c-1db4d7592465",
+      "revisionBefore": 1,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "b107633e-1c22-4f61-82d5-e760e23a0515",
+      "eventId": "evt_6ad0b182f4f98cbce4bd9d31",
+      "eventIds": [
+        "evt_6ad0b182f4f98cbce4bd9d31"
+      ],
+      "slug": "rostislav-chebykin-akustika-ufa",
+      "url": "https://daibilet.ru/events/rostislav-chebykin-akustika-ufa",
+      "title": "Ростислав Чебыкин | Акустика",
+      "city": "Уфа",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T05:33:24.887Z",
+      "canonicalPath": "/events/rostislav-chebykin-akustika-ufa",
+      "seoDescription": "Ростислав Чебыкин — акустика. В сольном акустическом концерте Ростислав Чебыкин исполняет песни под гитару. Показ: Уфа, 21 ноября 2026 года в 19:00 (местное время); адрес: улица Ленина, 39/2.",
+      "tourGroupId": "3fa15d91-efc1-41f3-bb6c-1db4d7592465",
+      "revisionBefore": 1,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "92114b4d-7b8b-4bc8-a5c4-0c9d64c81877",
+      "eventId": "evt_6ace480b395cca569dc1d0c4",
+      "eventIds": [
+        "evt_6ace480b395cca569dc1d0c4"
+      ],
+      "slug": "faina-ranevskaya-odinokaya-nasmeshnica-moskva",
+      "url": "https://daibilet.ru/events/faina-ranevskaya-odinokaya-nasmeshnica-moskva",
+      "title": "Фаина Раневская. Одинокая насмешница.",
+      "city": "Москва",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T05:33:25.296Z",
+      "canonicalPath": "/events/faina-ranevskaya-odinokaya-nasmeshnica-moskva",
+      "seoDescription": "Фаина Раневская — «Одинокая насмешница». «Одинокая насмешница» — история памяти великой актрисы, действие которой разворачивается в последний год её жизни и в московской квартире Раневской. Показ: Москва, 6 марта 2027 года в 19:00 (местное время); адрес: ул. Барклая, 9.",
+      "tourGroupId": "a9426bd1-b377-4a66-9c31-b0ed1463d49e",
+      "revisionBefore": 1,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "0dd89da9-19cc-4aa1-bfb7-f20eacded251",
+      "eventId": "evt_6ace4dbda4220a8e147f569e",
+      "eventIds": [
+        "evt_6ace4dbda4220a8e147f569e"
+      ],
+      "slug": "faina-ranevskaya-odinokaya-nasmeshnica-podolsk",
+      "url": "https://daibilet.ru/events/faina-ranevskaya-odinokaya-nasmeshnica-podolsk",
+      "title": "Фаина Раневская. Одинокая насмешница",
+      "city": "Подольск",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T05:33:26.038Z",
+      "canonicalPath": "/events/faina-ranevskaya-odinokaya-nasmeshnica-podolsk",
+      "seoDescription": "Фаина Раневская — «Одинокая насмешница». «Одинокая насмешница» — история памяти великой актрисы, действие которой разворачивается в последний год её жизни и в московской квартире Раневской. Показ: Подольск, 8 марта 2027 года в 18:00 (местное время); адрес: Революционный проспект,д.27.",
+      "tourGroupId": "a9426bd1-b377-4a66-9c31-b0ed1463d49e",
+      "revisionBefore": 1,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "59ef9c4c-b8f2-4bfa-b3b3-c533c98e7e20",
+      "eventId": "evt_6ace5dc4ede317eea823d640",
+      "eventIds": [
+        "evt_6ace5dc4ede317eea823d640"
+      ],
+      "slug": "faina-ranevskaya-odinokaya-nasmeshnica-zheleznodorozhnyy",
+      "url": "https://daibilet.ru/events/faina-ranevskaya-odinokaya-nasmeshnica-zheleznodorozhnyy",
+      "title": "Фаина Раневская. Одинокая насмешница",
+      "city": "Железнодорожный",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T05:33:26.490Z",
+      "canonicalPath": "/events/faina-ranevskaya-odinokaya-nasmeshnica-zheleznodorozhnyy",
+      "seoDescription": "Фаина Раневская — «Одинокая насмешница». «Одинокая насмешница» — история памяти великой актрисы, действие которой разворачивается в последний год её жизни и в московской квартире Раневской. Показ: Железнодорожный, 27 марта 2027 года в 18:00 (местное время); адрес: ул. Новая, 55.",
+      "tourGroupId": "a9426bd1-b377-4a66-9c31-b0ed1463d49e",
+      "revisionBefore": 1,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "700a899f-a2eb-4ad4-96e5-a5dac1739003",
+      "eventId": "evt_6ae15083cef8d450f91b27e9",
+      "eventIds": [
+        "evt_6ae15083cef8d450f91b27e9"
+      ],
+      "slug": "serialy-mira-pri-svechah-s-aso-orkestrom-premera-rostov-na-donu",
+      "url": "https://daibilet.ru/events/serialy-mira-pri-svechah-s-aso-orkestrom-premera-rostov-na-donu",
+      "title": "Сериалы мира при свечах с АСО-оркестром. Премьера!",
+      "city": "Ростов-на-Дону",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T05:33:26.828Z",
+      "canonicalPath": "/events/serialy-mira-pri-svechah-s-aso-orkestrom-premera-rostov-na-donu",
+      "seoDescription": "«Сериалы мира при свечах» с АСО-оркестром. Премьера АСО-оркестра посвящена музыке популярных сериалов и экранных историй. Показ: Ростов-на-Дону, 11 декабря 2026 года в 19:00 (местное время); адрес: пр. Сельмаш, 3.",
+      "tourGroupId": "f4d94b9b-2444-4983-8c45-5fe4280e6b89",
+      "revisionBefore": 1,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "293bf176-c4c6-479d-ab55-e4510133133a",
+      "eventId": "evt_6af0acfb27978f4b6ce41f3a",
+      "eventIds": [
+        "evt_6af0acfb27978f4b6ce41f3a"
+      ],
+      "slug": "serialy-mira-pri-svechah-s-aso-orkestrom-premera-krasnodar",
+      "url": "https://daibilet.ru/events/serialy-mira-pri-svechah-s-aso-orkestrom-premera-krasnodar",
+      "title": "Сериалы мира при свечах с АСО-оркестром. Премьера!",
+      "city": "Краснодар",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T05:33:27.171Z",
+      "canonicalPath": "/events/serialy-mira-pri-svechah-s-aso-orkestrom-premera-krasnodar",
+      "seoDescription": "«Сериалы мира при свечах» с АСО-оркестром. Премьера АСО-оркестра посвящена музыке популярных сериалов и экранных историй. Показ: Краснодар, 25 января 2027 года в 19:00 (местное время); адрес: улица Красная, 55.",
+      "tourGroupId": "f4d94b9b-2444-4983-8c45-5fe4280e6b89",
+      "revisionBefore": 1,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "ac9c0f08-3bdd-42fa-b339-92f128ba5a1f",
+      "eventId": "evt_6a9a5503bbe3e32a158db230",
+      "eventIds": [
+        "evt_6a9a5503bbe3e32a158db230"
+      ],
+      "slug": "anton-i-viktoriya-makarskie-zhivoi-koncert-v-orehovo-zuevo",
+      "url": "https://daibilet.ru/events/anton-i-viktoriya-makarskie-zhivoi-koncert-v-orehovo-zuevo",
+      "title": "Антон и Виктория Макарские. \"Живой Концерт\" в Орехово-Зуево",
+      "city": "Орехово-Зуево",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T05:33:27.541Z",
+      "canonicalPath": "/events/anton-i-viktoriya-makarskie-zhivoi-koncert-v-orehovo-zuevo",
+      "seoDescription": "Антон и Виктория Макарские — «Живой концерт». Антон и Виктория Макарские представляют интерактивную музыкальную программу, в которой зрители участвуют в выборе и развитии вечера. Показ: Орехово-Зуево, 11 апреля 2027 года в 18:00 (местное время); адрес: ул. Бугрова, 5.",
+      "tourGroupId": "4a52af41-9bf2-4e21-b34f-a386f1c4e88c",
+      "revisionBefore": 1,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "d4d98185-c822-4eda-8e05-f1d9bc6a22eb",
+      "eventId": "evt_6a72fda1c26f5eac0d7eedc1",
+      "eventIds": [
+        "evt_6a72fda1c26f5eac0d7eedc1"
+      ],
+      "slug": "anton-i-viktoriya-makarskie-zhivoi-koncert-v-domodedovo",
+      "url": "https://daibilet.ru/events/anton-i-viktoriya-makarskie-zhivoi-koncert-v-domodedovo",
+      "title": "Антон и Виктория Макарские. \"Живой Концерт\" в Домодедово",
+      "city": "Домодедово",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T05:33:27.857Z",
+      "canonicalPath": "/events/anton-i-viktoriya-makarskie-zhivoi-koncert-v-domodedovo",
+      "seoDescription": "Антон и Виктория Макарские — «Живой концерт». Антон и Виктория Макарские представляют интерактивную музыкальную программу, в которой зрители участвуют в выборе и развитии вечера. Показ: Домодедово, 1 апреля 2027 года в 19:00 (местное время); адрес: Каширское шоссе, дом 100А.",
+      "tourGroupId": "4a52af41-9bf2-4e21-b34f-a386f1c4e88c",
+      "revisionBefore": 1,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "52c3a6ba-95d4-4d81-a000-9e723c488742",
+      "eventId": "evt_6aa7f9b040b9c016d914c32f",
+      "eventIds": [
+        "evt_6aa7f9b040b9c016d914c32f"
+      ],
+      "slug": "shou-pod-dozhdem-muzhchina-vs-zhenschina-kirovo-chepeck",
+      "url": "https://daibilet.ru/events/shou-pod-dozhdem-muzhchina-vs-zhenschina-kirovo-chepeck",
+      "title": "Шоу под дождем \"Мужчина VS Женщина\"",
+      "city": "Кирово-Чепецк",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T05:33:28.217Z",
+      "canonicalPath": "/events/shou-pod-dozhdem-muzhchina-vs-zhenschina-kirovo-chepeck",
+      "seoDescription": "«Шоу под дождём: Мужчина VS Женщина». Постановка «Мужчина VS Женщина» рассказывает о столкновении двух характеров и взглядов через танец, пластику и сценические истории. Показ: Кирово-Чепецк, 24 марта 2027 года в 19:00 (местное время); адрес: ул. Ленина, 22.",
+      "tourGroupId": "6e773911-665b-4f19-bc2b-8426ed1aaf0f",
+      "revisionBefore": 1,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "ee0dbab9-6eb6-41b2-a49a-b53a359e5000",
+      "eventId": "evt_6ae47980eeac0f24bd167a3a",
+      "eventIds": [
+        "evt_6ae47980eeac0f24bd167a3a"
+      ],
+      "slug": "shou-pod-dozhdem-muzhchina-vs-zhenschina-syktyvkar",
+      "url": "https://daibilet.ru/events/shou-pod-dozhdem-muzhchina-vs-zhenschina-syktyvkar",
+      "title": "Шоу под дождем \"Мужчина VS Женщина\"",
+      "city": "Сыктывкар",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T05:33:28.524Z",
+      "canonicalPath": "/events/shou-pod-dozhdem-muzhchina-vs-zhenschina-syktyvkar",
+      "seoDescription": "«Шоу под дождём: Мужчина VS Женщина». Постановка «Мужчина VS Женщина» рассказывает о столкновении двух характеров и взглядов через танец, пластику и сценические истории. Показ: Сыктывкар, 27 марта 2027 года в 19:00 (местное время); адрес: ул. Димитрова 14/1.",
+      "tourGroupId": "6e773911-665b-4f19-bc2b-8426ed1aaf0f",
+      "revisionBefore": 1,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "658e0c7d-cbd9-4e89-9bcf-858a80b80660",
+      "eventId": "evt_6a5b5f3a22df122781b0e622",
+      "eventIds": [
+        "evt_6a5b5f3a22df122781b0e622"
+      ],
+      "slug": "neoklassicheskii-koncert-kompozitora-denisa-stelmaha-v-irkutske-irkutsk",
+      "url": "https://daibilet.ru/events/neoklassicheskii-koncert-kompozitora-denisa-stelmaha-v-irkutske-irkutsk",
+      "title": "Неоклассический концерт композитора Дениса Стельмаха в Иркутске.",
+      "city": "Иркутск",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-12T20:39:31.319Z",
+      "canonicalPath": "/events/neoklassicheskii-koncert-kompozitora-denisa-stelmaha-v-irkutske-irkutsk",
+      "seoDescription": "Неоклассический концерт Дениса Стельмаха. Денис Стельмах — пианист и композитор из Архангельска, который более десяти лет представляет свою музыку слушателям в разных странах. Показ: Иркутск, 20 ноября 2026 года в 18:30 (местное время); адрес: Сухэ-Батора, 1.",
+      "tourGroupId": "27b3c320-6433-4fcc-a86e-8eff0e694b30",
+      "revisionBefore": 3,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "1e83c514-aac7-4271-a807-14aa3df4d7a6",
+      "eventId": "evt_6a385b2f7eb54b99d9f681c5",
+      "eventIds": [
+        "evt_6a385b2f7eb54b99d9f681c5"
+      ],
+      "slug": "neoklassicheskii-koncert-kompozitora-denisa-stelmaha-v-novosibirske-novosibirsk",
+      "url": "https://daibilet.ru/events/neoklassicheskii-koncert-kompozitora-denisa-stelmaha-v-novosibirske-novosibirsk",
+      "title": "Неоклассический концерт композитора Дениса Стельмаха в Новосибирске.",
+      "city": "Новосибирск",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T05:33:29.156Z",
+      "canonicalPath": "/events/neoklassicheskii-koncert-kompozitora-denisa-stelmaha-v-novosibirske-novosibirsk",
+      "seoDescription": "Неоклассический концерт Дениса Стельмаха. Денис Стельмах — пианист и композитор из Архангельска, который более десяти лет представляет свою музыку слушателям в разных странах. Показ: Новосибирск, 22 ноября 2026 года в 19:00 (местное время); адрес: Комсомольский проспект 20.",
+      "tourGroupId": "27b3c320-6433-4fcc-a86e-8eff0e694b30",
+      "revisionBefore": 1,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "979e9692-dfa2-4849-8053-49be803d3d52",
+      "eventId": "evt_6ae88e3dbfe08b07425c94c6",
+      "eventIds": [
+        "evt_6ae88e3dbfe08b07425c94c6"
+      ],
+      "slug": "spektakl-chto-tvoryat-muzhchiny-s-sergeem-astahovym-v-surovikino",
+      "url": "https://daibilet.ru/events/spektakl-chto-tvoryat-muzhchiny-s-sergeem-astahovym-v-surovikino",
+      "title": "Спектакль Что Творят Мужчины с Сергеем Астаховым в Суровикино",
+      "city": "Суровикино",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T05:33:29.477Z",
+      "canonicalPath": "/events/spektakl-chto-tvoryat-muzhchiny-s-sergeem-astahovym-v-surovikino",
+      "seoDescription": "«Что творят мужчины» с Сергеем Астаховым. В спектакле «Что творят мужчины» Сергей Астахов играет бывшего матроса, которому предстоит руководить театром. Показ: Суровикино, 20 декабря 2026 года в 13:00 (местное время); адрес: ул. Ленина, 78, Суровикино, Волгоградская обл., Россия, 404415.",
+      "tourGroupId": "54f26820-143c-468e-81c6-88e7e0af7545",
+      "revisionBefore": 1,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "c4bf1618-bd01-46d4-b8a9-ae1a9dba0fb1",
+      "eventId": "evt_6aec9f5b3ebbbc1c3188563f",
+      "eventIds": [
+        "evt_6aec9f5b3ebbbc1c3188563f"
+      ],
+      "slug": "spektakl-chto-tvoryat-muzhchiny-s-sergeem-astahovym-v-kotovo",
+      "url": "https://daibilet.ru/events/spektakl-chto-tvoryat-muzhchiny-s-sergeem-astahovym-v-kotovo",
+      "title": "Спектакль Что Творят Мужчины с Сергеем Астаховым в Котово",
+      "city": "Котово",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T05:33:29.805Z",
+      "canonicalPath": "/events/spektakl-chto-tvoryat-muzhchiny-s-sergeem-astahovym-v-kotovo",
+      "seoDescription": "«Что творят мужчины» с Сергеем Астаховым. В спектакле «Что творят мужчины» Сергей Астахов играет бывшего матроса, которому предстоит руководить театром. Показ: Котово, 15 декабря 2026 года в 18:30 (местное время); адрес: ул. Мира, д. 128.",
+      "tourGroupId": "54f26820-143c-468e-81c6-88e7e0af7545",
+      "revisionBefore": 1,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "1412abfb-be64-4e9f-97b8-babb0e436cbf",
+      "eventId": "evt_69ce823069d25036357a0839",
+      "eventIds": [
+        "evt_69ce823069d25036357a0839"
+      ],
+      "slug": "helvegen-prezentaciya-novogo-alboma-sankt-peterburg",
+      "url": "https://daibilet.ru/events/helvegen-prezentaciya-novogo-alboma-sankt-peterburg",
+      "title": "HELVEGEN. Презентация нового альбома.",
+      "city": "Санкт-Петербург",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-12T19:37:36.309Z",
+      "canonicalPath": "/events/helvegen-prezentaciya-novogo-alboma-sankt-peterburg",
+      "seoDescription": "HELVEGEN — презентация альбома «V». Группа HELVEGEN отправляется в тур с презентацией пятого альбома «V». Показ: Санкт-Петербург, 13 ноября 2026 года в 19:00 (местное время); адрес: ул. Комсомола, 2 (Вход через арку Арсенальная наб., 1).",
+      "tourGroupId": "73c27b40-9726-4728-afa7-86857f77bf05",
+      "revisionBefore": 4,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "6978ed1d-dfb7-44ad-9fe1-059aa8dd7edd",
+      "eventId": "evt_69ce8519d0b4bfe9ed5811c1",
+      "eventIds": [
+        "evt_69ce8519d0b4bfe9ed5811c1"
+      ],
+      "slug": "helvegen-prezentaciya-novogo-alboma-moskva",
+      "url": "https://daibilet.ru/events/helvegen-prezentaciya-novogo-alboma-moskva",
+      "title": "HELVEGEN. Презентация нового альбома.",
+      "city": "Москва",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T05:33:30.315Z",
+      "canonicalPath": "/events/helvegen-prezentaciya-novogo-alboma-moskva",
+      "seoDescription": "HELVEGEN — презентация альбома «V». Группа HELVEGEN отправляется в тур с презентацией пятого альбома «V». Показ: Москва, 14 ноября 2026 года в 19:00 (местное время); адрес: Ленинградский просп., 47, стр. 19.",
+      "tourGroupId": "73c27b40-9726-4728-afa7-86857f77bf05",
+      "revisionBefore": 2,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "733430a3-8969-48ed-a624-11c3388b4753",
+      "eventId": "evt_6a08cea59fb097caec2f1996",
+      "eventIds": [
+        "evt_6a08cea59fb097caec2f1996"
+      ],
+      "slug": "system-of-a-down-tribute-chopsy-msk-nizhniy-novgorod",
+      "url": "https://daibilet.ru/events/system-of-a-down-tribute-chopsy-msk-nizhniy-novgorod",
+      "title": "System Of A Down Tribute - CHOPSY (МСК)",
+      "city": "Нижний Новгород",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T05:33:30.562Z",
+      "canonicalPath": "/events/system-of-a-down-tribute-chopsy-msk-nizhniy-novgorod",
+      "seoDescription": "System of a Down Tribute — CHOPSY. CHOPSY исполняет музыку System of a Down — группы, которая стала одним из заметных коллективов альтернативного рока начала 2000-х. Показ: Нижний Новгород, 12 декабря 2026 года в 20:00 (местное время); адрес: ул. Почаинская, 17С.",
+      "tourGroupId": "3bb86ba9-351c-43b9-add3-f7c0c1f68536",
+      "revisionBefore": 1,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "d34aa564-7189-4749-8b8c-52ff8b02cc23",
+      "eventId": "evt_6a0d7509a6250196032056a6",
+      "eventIds": [
+        "evt_6a0d7509a6250196032056a6"
+      ],
+      "slug": "system-of-a-down-tribute-chopsy-msk-saratov",
+      "url": "https://daibilet.ru/events/system-of-a-down-tribute-chopsy-msk-saratov",
+      "title": "System of a Down Tribute. CHOPSY (МСК)",
+      "city": "Саратов",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T05:33:30.904Z",
+      "canonicalPath": "/events/system-of-a-down-tribute-chopsy-msk-saratov",
+      "seoDescription": "System of a Down Tribute — CHOPSY. CHOPSY исполняет музыку System of a Down — группы, которая стала одним из заметных коллективов альтернативного рока начала 2000-х. Показ: Саратов, 6 декабря 2026 года в 19:00 (местное время); адрес: ул. Октябрьская, 43.",
+      "tourGroupId": "3bb86ba9-351c-43b9-add3-f7c0c1f68536",
+      "revisionBefore": 1,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "0c9d5d25-0099-4d33-a572-612cf4112006",
+      "eventId": "evt_6a15c0fe30864ce0d67dbc02",
+      "eventIds": [
+        "evt_6a15c0fe30864ce0d67dbc02"
+      ],
+      "slug": "saphath-sankt-peterburg",
+      "url": "https://daibilet.ru/events/saphath-sankt-peterburg",
+      "title": "Saphath",
+      "city": "Санкт-Петербург",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T05:33:31.229Z",
+      "canonicalPath": "/events/saphath-sankt-peterburg",
+      "seoDescription": "Saphath. Saphath — группа из Южно-Сахалинска, которая соединяет элементы симфонического, готического и дэт-метала с более современными музыкальными решениями. Показ: Санкт-Петербург, 18 ноября 2026 года в 19:00 (местное время); адрес: ул. Комсомола, 2 (Вход через арку Арсенальная наб., 1).",
+      "tourGroupId": "3e3df410-16e4-47ac-85e1-9e7eb4d5edea",
+      "revisionBefore": 1,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "f08f5535-d1c2-4996-afeb-564365244dda",
+      "eventId": "evt_6a15c2846624caa51424ec68",
+      "eventIds": [
+        "evt_6a15c2846624caa51424ec68"
+      ],
+      "slug": "saphath-moskva",
+      "url": "https://daibilet.ru/events/saphath-moskva",
+      "title": "Saphath",
+      "city": "Москва",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T05:33:31.553Z",
+      "canonicalPath": "/events/saphath-moskva",
+      "seoDescription": "Saphath. Saphath — группа из Южно-Сахалинска, которая соединяет элементы симфонического, готического и дэт-метала с более современными музыкальными решениями. Показ: Москва, 19 ноября 2026 года в 19:00 (местное время); адрес: Варшавское шоссе, 26с12.",
+      "tourGroupId": "3e3df410-16e4-47ac-85e1-9e7eb4d5edea",
+      "revisionBefore": 1,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "17130850-04a3-494d-8d57-c3c48daec1b6",
+      "eventId": "evt_6a16ea8b01ec22e527388063",
+      "eventIds": [
+        "evt_6a16ea8b01ec22e527388063"
+      ],
+      "slug": "svarga-prezentaciya-alboma-moskva",
+      "url": "https://daibilet.ru/events/svarga-prezentaciya-alboma-moskva",
+      "title": "СВАРГА - Презентация Альбома",
+      "city": "Москва",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T05:33:31.867Z",
+      "canonicalPath": "/events/svarga-prezentaciya-alboma-moskva",
+      "seoDescription": "СВАРГА — презентация альбома. Группа СВАРГА приглашает на концерт-презентацию новой пластинки. Показ: Москва, 14 ноября 2026 года в 19:00 (местное время); адрес: 1-я Дубровская улица, 13Ас1.",
+      "tourGroupId": "46b0368c-1336-454e-86ee-bf1e882a702e",
+      "revisionBefore": 1,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "91b770fe-6304-4945-9681-e37462006848",
+      "eventId": "evt_6a97f8e774915b9d2ad137e3",
+      "eventIds": [
+        "evt_6a97f8e774915b9d2ad137e3"
+      ],
+      "slug": "svarga-prezentaciya-alboma-sankt-peterburg",
+      "url": "https://daibilet.ru/events/svarga-prezentaciya-alboma-sankt-peterburg",
+      "title": "СВАРГА - Презентация Альбома",
+      "city": "Санкт-Петербург",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T05:33:32.196Z",
+      "canonicalPath": "/events/svarga-prezentaciya-alboma-sankt-peterburg",
+      "seoDescription": "СВАРГА — презентация альбома. Группа СВАРГА приглашает на концерт-презентацию новой пластинки. Показ: Санкт-Петербург, 19 декабря 2026 года в 20:00 (местное время); адрес: Лиговский пр., 113.",
+      "tourGroupId": "46b0368c-1336-454e-86ee-bf1e882a702e",
+      "revisionBefore": 1,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "3dd3dd48-9f67-429d-9e7b-61a9ad5f7b34",
+      "eventId": "evt_6a212682146c2182881ba3f9",
+      "eventIds": [
+        "evt_6a212682146c2182881ba3f9"
+      ],
+      "slug": "nigativ-c-ansamblem-26-11-tyumen-maksimilians-tyumen",
+      "url": "https://daibilet.ru/events/nigativ-c-ansamblem-26-11-tyumen-maksimilians-tyumen",
+      "title": "Нигатив c ансамблем | 26.11 | Тюмень | Максимилианс",
+      "city": "Тюмень",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T05:33:32.519Z",
+      "canonicalPath": "/events/nigativ-c-ansamblem-26-11-tyumen-maksimilians-tyumen",
+      "seoDescription": "Нигатив с ансамблем. Нигатив представляет специальную программу с живым ансамблем. Показ: Тюмень, 26 ноября 2026 года в 20:00 (местное время); адрес: 50 лет октября 8Б.",
+      "tourGroupId": "cb84cb59-383e-4921-a4af-1d5f977b8fe0",
+      "revisionBefore": 1,
+      "alreadyApplied": false
+    },
+    {
+      "eventPageId": "72ec1b7b-4131-4eea-bdb1-0bb84a54c0bf",
+      "eventId": "evt_6a2128a89cfced81d2437089",
+      "eventIds": [
+        "evt_6a2128a89cfced81d2437089"
+      ],
+      "slug": "nigativ-c-ansamblem-25-11-ekaterinburg-maksimilians-ekaterinburg",
+      "url": "https://daibilet.ru/events/nigativ-c-ansamblem-25-11-ekaterinburg-maksimilians-ekaterinburg",
+      "title": "Нигатив c ансамблем | 25.11 | Екатеринбург | Максимилианс",
+      "city": "Екатеринбург",
+      "status": "READY",
+      "isIndexable": true,
+      "publishedAt": "2026-11-13T05:33:32.843Z",
+      "canonicalPath": "/events/nigativ-c-ansamblem-25-11-ekaterinburg-maksimilians-ekaterinburg",
+      "seoDescription": "Нигатив с ансамблем. Нигатив представляет специальную программу с живым ансамблем. Показ: Екатеринбург, 25 ноября 2026 года в 20:00 (местное время); адрес: ул. Куйбышева 44 Д.",
+      "tourGroupId": "cb84cb59-383e-4921-a4af-1d5f977b8fe0",
+      "revisionBefore": 1,
+      "alreadyApplied": false
+    }
+  ],
+  "sameCityUnassigned": 6,
+  "completedAt": "2026-11-13T05:33:33.003Z",
+  "completed": true
+}
