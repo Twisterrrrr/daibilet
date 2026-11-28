@@ -101,7 +101,6 @@ export function CitiesIndexChrome({ destinations }: { destinations: PublicDestin
   }, [allCities, queryDraft]);
 
   const showSuggestions = focused && suggestions.length > 0;
-  const sortTitle = sort === 'name' ? 'По алфавиту' : 'По популярности';
   const countLabel = urlQuery
     ? filteredCities.length
       ? pluralCities(filteredCities.length)
@@ -221,7 +220,7 @@ export function CitiesIndexChrome({ destinations }: { destinations: PublicDestin
         <div className="mb-4 flex items-start justify-between gap-3 sm:mb-5">
           <div className="min-w-0">
             <h2 className="font-display text-xl font-bold tracking-tight text-slate-900 sm:text-2xl">
-              {sortTitle}
+              Городские афиши и направления
             </h2>
             <p className="mt-1 text-sm text-slate-500">{countLabel}</p>
           </div>

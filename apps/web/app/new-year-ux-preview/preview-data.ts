@@ -6,7 +6,7 @@ import { getNewYearPreviewPage, sortNewYearPreviewEvents } from '@/lib/new-year-
 import { isRelevantToNewYearLanding } from '@/lib/new-year-preview-relevance';
 import cityRouting from '../../../../data/geo/city-routing.ru.json';
 import regionHubs from '../../../../data/geo/region-hubs.ru.json';
-import { resolvePreviewFormat, visibleNewYearFormatNames } from './preview-format';
+import { resolvePreviewFormat, resolveThematicFormats, visibleNewYearFormatNames, visibleThematicFormatNames, type PreviewTheme } from './preview-format';
 import type { CompactPreviewEvent, NewYearPreviewIndex } from './preview-index';
 
 export type PreviewSlot = {
@@ -53,6 +53,7 @@ export type PreviewEvent = {
   description?: string | null;
   imageUrl?: string | null;
   ageLimit?: string | null;
+  formats?: string[];
   upcomingSlots?: PreviewSlot[];
 };
 
@@ -69,6 +70,8 @@ export type PreviewFilters = {
   q?: string;
   sort?: string;
   lowStock?: boolean;
+  availableOnly?: boolean;
+  ageLimit?: string;
   offset?: number;
 };
 
@@ -159,7 +162,7 @@ function slotDayKey(slot: PreviewSlot, fallbackTimeZone = 'Europe/Moscow'): stri
   return value;
 }
 
-function seasonalSlots(event: PreviewEvent): PreviewSlot[] {
+function seasonalSlots(event: PreviewEvent, restrictToSeason = true): PreviewSlot[] {
   if (!event.purchaseReady) return [];
   const eventTimeZone = resolveSessionTimeZone(event);
   const eventPurchaseUrl = event.purchaseUrl || event.widgetUrl || null;
@@ -182,7 +185,7 @@ function seasonalSlots(event: PreviewEvent): PreviewSlot[] {
   }
   return slots.filter((slot) => {
     const day = slotDayKey(slot, eventTimeZone);
-    return Boolean(day && day >= FIRST_SEASON_DATE && day <= LAST_SEASON_DATE && slot.vacant !== 0);
+    return Boolean(day && (!restrictToSeason || (day >= FIRST_SEASON_DATE && day <= LAST_SEASON_DATE)) && slot.vacant !== 0);
   });
 }
 
@@ -207,14 +210,16 @@ function recurringProgramIdentity(event: PreviewEvent): { key: string; title: st
   };
 }
 
-function groupEvents(events: PreviewEvent[]): PreviewEvent[] {
+function groupEvents(events: PreviewEvent[], options: { restrictToSeason?: boolean; splitByDate?: boolean } = {}): PreviewEvent[] {
+  const restrictToSeason = options.restrictToSeason ?? true;
+  const splitByDate = options.splitByDate ?? true;
   const candidateGroups = new Map<string, { identity: { key: string; title: string }; rows: PreviewEvent[] }>();
   const directGroups = new Map<string, PreviewEvent[]>();
   const slotsByEvent = new Map<PreviewEvent, PreviewSlot[]>();
   const getSlots = (event: PreviewEvent) => {
     let slots = slotsByEvent.get(event);
     if (!slots) {
-      slots = seasonalSlots(event);
+      slots = seasonalSlots(event, restrictToSeason);
       slotsByEvent.set(event, slots);
     }
     return slots;
@@ -255,7 +260,12 @@ function groupEvents(events: PreviewEvent[]): PreviewEvent[] {
         byDate.set(date, dailyRows);
       }
     }
-    for (const [date, dailyRows] of byDate) datedGroups.push({ rows: dailyRows, identity, date });
+    if (splitByDate) {
+      for (const [date, dailyRows] of byDate) datedGroups.push({ rows: dailyRows, identity, date });
+    } else {
+      const allRows = [...byDate.values()].flat();
+      if (allRows.length) datedGroups.push({ rows: allRows, identity, date: 'all' });
+    }
   };
 
   for (const group of candidateGroups.values()) {
@@ -319,14 +329,20 @@ function groupEvents(events: PreviewEvent[]): PreviewEvent[] {
   }).filter((event) => event.upcomingSlots?.length);
 }
 
-function slotsForDate(event: PreviewEvent, date: string): PreviewSlot[] {
+function slotsForDate(event: PreviewEvent, date: string, restrictToSeason = true): PreviewSlot[] {
   const slots = event.upcomingSlots || [];
   if (!date || date === 'all') return slots;
   const eventTimeZone = resolveSessionTimeZone(event);
+  const today = dayKey(new Date().toISOString(), eventTimeZone) || '';
+  const tomorrowDate = today ? new Date(`${today}T00:00:00Z`) : null;
+  tomorrowDate?.setUTCDate(tomorrowDate.getUTCDate() + 1);
+  const tomorrow = tomorrowDate?.toISOString().slice(0, 10) || '';
   if (/^\d{4}-\d{2}-\d{2}$/.test(date)) return slots.filter((slot) => slotDayKey(slot, eventTimeZone) === date);
   return slots.filter((slot) => {
     const day = slotDayKey(slot, eventTimeZone);
     if (!day) return false;
+    if (date === 'today') return day === today;
+    if (date === 'tomorrow') return day === tomorrow;
     if (date === 'dec31') return day === '2026-12-31';
     if (date === 'dec24to31') return day >= '2026-12-24' && day <= '2026-12-31';
     if (date === 'jan1') return day === '2027-01-01';
@@ -340,10 +356,10 @@ function slotsForDate(event: PreviewEvent, date: string): PreviewSlot[] {
   });
 }
 
-function slotsForDateRange(event: PreviewEvent, from?: string, to?: string): PreviewSlot[] {
-  if (!from && !to) return seasonalSlots(event);
+function slotsForDateRange(event: PreviewEvent, from?: string, to?: string, restrictToSeason = true): PreviewSlot[] {
+  if (!from && !to) return seasonalSlots(event, restrictToSeason);
   const eventTimeZone = resolveSessionTimeZone(event);
-  return seasonalSlots(event).filter((slot) => {
+  return seasonalSlots(event, restrictToSeason).filter((slot) => {
     const day = slotDayKey(slot, eventTimeZone);
     return Boolean(day && (!from || day >= from) && (!to || day <= to));
   });
@@ -374,12 +390,17 @@ function lowStock(event: PreviewEvent): boolean {
   return typeof event.vacant === 'number' && event.vacant > 0 && event.vacant <= 8;
 }
 
-async function fetchCatalogPage(offset: number): Promise<EventsResponse | null> {
+function normalizeAgeLimit(value?: string | null): string | null {
+  const match = String(value || '').match(/(?:^|\D)(0|3|6|12|16|18)\s*\+/u);
+  return match?.[1] ? `${match[1]}+` : null;
+}
+
+async function fetchCatalogPage(landingSlug: string, offset: number): Promise<EventsResponse | null> {
   const allowCiBuildFallback =
     process.env.DAIBILET_CI_ALLOW_EMPTY_NEW_YEAR === '1' && isProductionBuildPhase();
 
   return fetchPublicApiJson<EventsResponse | null>('/api/public/events', {
-    searchParams: { landing: 'new-year', limit: 200, offset },
+    searchParams: { landing: landingSlug, limit: 200, offset },
     timeoutMs: 60_000,
     revalidateSeconds: 300,
     // The generic CI build has no API process. In that build only, render an
@@ -389,8 +410,20 @@ async function fetchCatalogPage(offset: number): Promise<EventsResponse | null> 
   });
 }
 
-const fetchCatalogSnapshot = unstable_cache(async (): Promise<PreviewCatalogSnapshot> => {
-  const first = await fetchCatalogPage(0);
+const fetchCachedCatalogPage = (landingSlug: string, offset: number) => unstable_cache(
+  () => fetchCatalogPage(landingSlug, offset),
+  [
+    'thematic-preview-catalog-page-v2',
+    `${landingSlug}:${offset}`,
+    // Keep local catalog previews isolated when they switch between the local
+    // API and the read-only production catalog.
+    process.env.DAIBILET_PUBLIC_CATALOG_API_INTERNAL_URL?.trim() || 'default-api',
+  ],
+  { revalidate: 300, tags: ['thematic-preview-catalog'] },
+)();
+
+async function fetchCatalogSnapshot(landingSlug: string): Promise<PreviewCatalogSnapshot> {
+  const first = await fetchCachedCatalogPage(landingSlug, 0);
   if (!first) return EMPTY_CATALOG_SNAPSHOT;
   const events = first.items || [];
   const total = Number(first.total) || events.length;
@@ -399,40 +432,48 @@ const fetchCatalogSnapshot = unstable_cache(async (): Promise<PreviewCatalogSnap
     { length: Math.max(0, Math.ceil(total / pageSize) - 1) },
     (_, index) => (index + 1) * pageSize,
   );
-  const remainingPages = await Promise.all(offsets.map((offset) => fetchCatalogPage(offset)));
+  // Cache pages separately. A whole thematic catalog can exceed Next's 2 MB
+  // per-item data-cache limit even though each API page is safely below it.
+  const remainingPages: Array<EventsResponse | null> = [];
+  for (const offset of offsets) {
+    remainingPages.push(await fetchCachedCatalogPage(landingSlug, offset));
+  }
   if (remainingPages.some((page) => !page)) return EMPTY_CATALOG_SNAPSHOT;
   events.push(...remainingPages.flatMap((page) => page?.items || []));
   return { events, total, generatedAt: first.generatedAt || null };
-}, ['new-year-preview-catalog-v1'], { revalidate: 300, tags: ['new-year-preview-catalog'] });
+}
 
-export async function buildNewYearPreviewData(filters: PreviewFilters = {}) {
-  const snapshot = await fetchCatalogSnapshot();
+export async function buildThematicPreviewData(landingSlug: PreviewTheme, filters: PreviewFilters = {}) {
+  const snapshot = await fetchCatalogSnapshot(landingSlug);
   const rawEvents = snapshot.events;
   const sourceTotal = snapshot.total;
 
   // First narrow the seasonal source to explicitly holiday-related events,
   // then group sessions and derive the user-facing format facets.
-  const grouped = groupEvents(rawEvents.filter(isRelevantToNewYearLanding));
+  const relevantEvents = landingSlug === 'new-year' ? rawEvents.filter(isRelevantToNewYearLanding) : rawEvents;
+  const grouped = groupEvents(relevantEvents, { restrictToSeason: landingSlug === 'new-year', splitByDate: landingSlug === 'new-year' });
   const query = String(filters.q || '').trim().toLocaleLowerCase('ru');
   const dateFilter = filters.date || 'all';
   const priceFilter = filters.price || 'all';
   const formatFilter = filters.format || '';
-  type Axis = 'geo' | 'date' | 'price' | 'format' | 'stock' | 'q';
+  type Axis = 'geo' | 'date' | 'price' | 'format' | 'stock' | 'q' | 'age';
   type IndexedEvent = {
     event: PreviewEvent;
     city: string;
     region: string | null;
     format: string;
+    formats: string[];
     upcomingSlots: PreviewSlot[];
     matches: Record<Axis, boolean>;
   };
   const indexed = grouped.map((event): IndexedEvent => {
     const city = event.city || '';
     const region = cityRegion(city);
-    const format = resolvePreviewFormat(event);
+    const formats = resolveThematicFormats(event, landingSlug);
+    const format = formats[0] || (landingSlug === 'family-kids' ? 'Другие мероприятия' : 'Другие жанры');
     const upcomingSlots = filters.dateFrom || filters.dateTo
-      ? slotsForDateRange(event, filters.dateFrom, filters.dateTo)
-      : slotsForDate(event, dateFilter);
+      ? slotsForDateRange(event, filters.dateFrom, filters.dateTo, landingSlug === 'new-year')
+      : slotsForDate(event, dateFilter, landingSlug === 'new-year');
     const haystack = query
       ? [event.title, event.city, event.venue, event.category, event.catalogCategory, event.catalogSubcategory, ...(event.tagLabels || []), ...(event.tags || [])]
         .map(String).join(' ').toLocaleLowerCase('ru')
@@ -442,15 +483,17 @@ export async function buildNewYearPreviewData(filters: PreviewFilters = {}) {
       city,
       region,
       format,
+      formats,
       upcomingSlots,
       matches: {
         geo: (!filters.city || filters.city === 'Вся Россия' || event.city === filters.city) &&
           (!filters.region || (region === filters.region && !isRegionalCenter(city))),
         date: upcomingSlots.length > 0,
         price: matchesPrice(event, priceFilter) && matchesPriceRange(event, filters.priceFrom, filters.priceTo),
-        format: !formatFilter || formatFilter === 'Все форматы' || format === formatFilter,
-        stock: !filters.lowStock || lowStock(event),
+        format: !formatFilter || formatFilter === 'Все форматы' || formats.includes(formatFilter),
+        stock: (!filters.lowStock || lowStock(event)) && (!filters.availableOnly || (typeof event.vacant === 'number' && event.vacant > 0)),
         q: !query || haystack.includes(query),
+        age: !filters.ageLimit || normalizeAgeLimit(event.ageLimit) === filters.ageLimit,
       },
     };
   });
@@ -460,7 +503,8 @@ export async function buildNewYearPreviewData(filters: PreviewFilters = {}) {
     (except === 'price' || item.matches.price) &&
     (except === 'format' || item.matches.format) &&
     (except === 'stock' || item.matches.stock) &&
-    (except === 'q' || item.matches.q);
+    (except === 'q' || item.matches.q) &&
+    (except === 'age' || item.matches.age);
 
   const filtered = indexed.filter((item) => matchesExcept(item)).map(({ event, upcomingSlots }) => ({
     ...event,
@@ -468,13 +512,17 @@ export async function buildNewYearPreviewData(filters: PreviewFilters = {}) {
   }));
   const sorted = sortNewYearPreviewEvents(filtered, filters.sort === 'price' || filters.sort === 'price-desc' ? filters.sort : 'date');
 
-  const dateValues = ['all', 'dec24to31', 'dec31', 'jan1', 'jan1to14', 'weekend', 'holidays'];
+  const dateValues = landingSlug === 'new-year'
+    ? ['all', 'dec24to31', 'dec31', 'jan1', 'jan1to14', 'weekend', 'holidays']
+    : ['all', 'today', 'tomorrow', 'weekend'];
   const priceValues = ['all', 'free', 'under1000', 'under2000', 'over2000', 'over5000', 'over10000'];
   const cityCounts = new Map<string, number>();
   const regionCounts = new Map<string, number>();
   const dateCounts = new Map(dateValues.map((value) => [value, 0]));
   const priceCounts = new Map(priceValues.map((value) => [value, 0]));
   const formatCounts = new Map<string, number>();
+  const ageCounts = new Map<string, number>();
+  let allFormatsCount = 0;
   let lowStockCount = 0;
   let allGeoFacetCount = 0;
   for (const item of indexed) {
@@ -485,7 +533,7 @@ export async function buildNewYearPreviewData(filters: PreviewFilters = {}) {
     }
     if (matchesExcept(item, 'date')) {
       for (const value of dateValues) {
-        if (slotsForDate(item.event, value).length) dateCounts.set(value, (dateCounts.get(value) || 0) + 1);
+        if (slotsForDate(item.event, value, landingSlug === 'new-year').length) dateCounts.set(value, (dateCounts.get(value) || 0) + 1);
       }
     }
     if (matchesExcept(item, 'price')) {
@@ -493,12 +541,19 @@ export async function buildNewYearPreviewData(filters: PreviewFilters = {}) {
         if (matchesPrice(item.event, value)) priceCounts.set(value, (priceCounts.get(value) || 0) + 1);
       }
     }
-    if (matchesExcept(item, 'format')) formatCounts.set(item.format, (formatCounts.get(item.format) || 0) + 1);
+    if (matchesExcept(item, 'format')) {
+      allFormatsCount++;
+      for (const label of item.formats) formatCounts.set(label, (formatCounts.get(label) || 0) + 1);
+    }
+    if (matchesExcept(item, 'age')) {
+      const age = normalizeAgeLimit(item.event.ageLimit);
+      if (age) ageCounts.set(age, (ageCounts.get(age) || 0) + 1);
+    }
     if (matchesExcept(item, 'stock') && lowStock(item.event)) lowStockCount++;
   }
   const cities = [...new Set(indexed.map((item) => item.city).filter(Boolean))].sort((a, b) => a.localeCompare(b, 'ru'));
   const regions = [...regionCounts.keys()];
-  const visibleFormatNames = visibleNewYearFormatNames(formatCounts);
+  const visibleFormatNames = visibleThematicFormatNames(formatCounts, landingSlug);
   const facets = {
     cities: [{ name: 'Вся Россия', count: allGeoFacetCount, filterable: true }, ...cities.map((name) => {
       const normalizedName = name.replace(/\s*\([^)]*\)\s*$/u, '').trim();
@@ -514,9 +569,10 @@ export async function buildNewYearPreviewData(filters: PreviewFilters = {}) {
     dates: dateValues.map((value) => ({ value, count: dateCounts.get(value) || 0 })),
     prices: priceValues.map((value) => ({ value, count: priceCounts.get(value) || 0 })),
     formats: [
-      { name: 'Все форматы', count: [...formatCounts.values()].reduce((sum, value) => sum + value, 0) },
+      { name: 'Все форматы', count: allFormatsCount },
       ...visibleFormatNames.map((name) => ({ name, count: formatCounts.get(name) || 0 })),
     ],
+    ages: [...ageCounts.entries()].sort((a, b) => Number(a[0].replace('+', '')) - Number(b[0].replace('+', ''))).map(([name, count]) => ({ name, value: name, count })),
     lowStock: lowStockCount,
     priceRange: (() => {
       const values = indexed.flatMap(({ event }) => [event.priceFrom, event.priceTo])
@@ -537,10 +593,15 @@ export async function buildNewYearPreviewData(filters: PreviewFilters = {}) {
   };
 }
 
+export function buildNewYearPreviewData(filters: PreviewFilters = {}) {
+  return buildThematicPreviewData('new-year', filters);
+}
+
 /** Compact browser-side index. Rich descriptions and image data stay in SSR/detail requests. */
-export async function buildNewYearPreviewIndex(): Promise<NewYearPreviewIndex> {
-  const snapshot = await fetchCatalogSnapshot();
-  const events: CompactPreviewEvent[] = groupEvents(snapshot.events.filter(isRelevantToNewYearLanding)).map((event) => {
+export async function buildThematicPreviewIndex(landingSlug: PreviewTheme): Promise<NewYearPreviewIndex> {
+  const snapshot = await fetchCatalogSnapshot(landingSlug);
+  const relevantEvents = landingSlug === 'new-year' ? snapshot.events.filter(isRelevantToNewYearLanding) : snapshot.events;
+  const events: CompactPreviewEvent[] = groupEvents(relevantEvents, { restrictToSeason: landingSlug === 'new-year', splitByDate: landingSlug === 'new-year' }).map((event) => {
     const region = cityRegion(event.city);
     const cleanCity = (event.city || '').replace(/\s*\([^)]*\)\s*$/u, '').trim();
     const catalogCategory = typeof event.catalogCategory === 'string'
@@ -597,7 +658,8 @@ export async function buildNewYearPreviewIndex(): Promise<NewYearPreviewIndex> {
       region,
       regionCenter: isRegionalCenter(event.city),
       standaloneCity: STANDALONE_CITY_NAMES.has(cleanCity),
-      format: resolvePreviewFormat(event),
+      format: resolveThematicFormats(event, landingSlug)[0] || (landingSlug === 'family-kids' ? 'Другие мероприятия' : 'Другие жанры'),
+      formats: resolveThematicFormats(event, landingSlug),
       searchText,
     };
   });
@@ -607,8 +669,13 @@ export async function buildNewYearPreviewIndex(): Promise<NewYearPreviewIndex> {
   return {
     events,
     total: events.length,
+    theme: landingSlug,
     sourceTotal: snapshot.total,
     generatedAt: snapshot.generatedAt,
     priceRange: { min: 0, max: Math.max(10_000, Math.ceil(max / 1_000) * 1_000) },
   };
+}
+
+export function buildNewYearPreviewIndex(): Promise<NewYearPreviewIndex> {
+  return buildThematicPreviewIndex('new-year');
 }

@@ -41,6 +41,7 @@ import { splitLongTitleAtBreak } from '@/lib/split-long-title';
 import { buildEventBreadcrumbs } from '@/lib/structured-data';
 import { HeroImageWithBlur } from '@/components/HeroImageWithBlur.client';
 import { resolveEventHeroObjectPosition } from '@/lib/event-image-focus';
+import { eventSeoOverride } from '@/lib/event-seo-overrides';
 import { venueHref } from '@/lib/routes';
 import { formatStreetAddress } from '@/lib/address';
 import { resolveCityTimeZone } from '@/lib/city-timezone';
@@ -703,7 +704,8 @@ export function EventHero({
     'inline-flex max-w-full items-center gap-1 rounded-full bg-slate-950/75 px-2.5 py-1 text-[11px] font-medium text-white';
   const solidChipLinkClassName = `${solidChipClassName} cursor-pointer transition hover:bg-slate-950/90 hover:underline hover:decoration-white/50 hover:underline-offset-2`;
 
-  const titleSource = String(payload.eventPage?.seoH1 || payload.eventPage?.title || event.seoH1 || event.title || '').trim();
+  const routeTitle = eventSeoOverride(payload.eventPageRoute?.slug || event.slug)?.h1;
+  const titleSource = String(routeTitle || payload.eventPage?.seoH1 || payload.eventPage?.title || event.seoH1 || event.title || '').trim();
   const escapedCity = String(event.city || '').trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   const titleWithoutCityCandidate = escapedCity
     ? titleSource.replace(new RegExp(`(?:\\s*[-–—,|]\\s*|\\s+(?:г\\.?\\s*)?)${escapedCity}\\s*$`, 'iu'), '').trim()

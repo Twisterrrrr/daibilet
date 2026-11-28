@@ -706,6 +706,9 @@ export function PlacesHubView({
       />
 
       <div className="container-page py-5 sm:py-7">
+        <h2 className="mb-4 font-display text-xl font-bold tracking-tight text-slate-900 sm:text-2xl">
+          Площадки и достопримечательности по городам России
+        </h2>
         <section className="places-filter-surface" aria-label="Поиск и фильтры мест">
           <div className="flex min-w-0 items-center gap-2">
             <PlacesSearch mode="hub" initialQuery={q} tone="outlined" />

@@ -14,7 +14,8 @@ export function RequisitesPageContent() {
           </div>
         </div>
 
-        <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+        <section aria-labelledby="requisites-details-title" className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+          <h2 id="requisites-details-title" className="mb-5 text-lg font-semibold text-slate-900">Данные для договоров и расчётов</h2>
           <div className="space-y-4">
             <div className="flex items-start gap-3">
               <Building2 className="mt-0.5 h-5 w-5 shrink-0 text-slate-400" />
@@ -67,7 +68,7 @@ export function RequisitesPageContent() {
               <p className="font-mono text-slate-900">30101810145250000974</p>
             </div>
           </div>
-        </div>
+        </section>
       </div>
     </div>
   );

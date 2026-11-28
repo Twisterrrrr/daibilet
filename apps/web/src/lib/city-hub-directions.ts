@@ -151,6 +151,7 @@ export function resolveFeaturedDirections(input: {
   landings: LandingLike[];
   categories: Array<[string, number]>;
   citySlug?: string | null;
+  seasonalTheme?: 'new-year';
   limit?: number;
 }): ResolvedFeaturedDirection[] {
   const limit = input.limit ?? 6;
@@ -159,7 +160,34 @@ export function resolveFeaturedDirections(input: {
   const usedLandingSlugs = new Set<string>();
   const usedCategories = new Set<string>();
 
-  for (const item of configured) {
+  const isNewYear = input.seasonalTheme === 'new-year';
+  const seasonalConfigured = configured.filter(
+    (item) => !isNewYear || !WATER_LANDING_SLUGS.has(String(item.landingSlug || '').trim().toLowerCase()),
+  );
+
+  if (isNewYear) {
+    const newYear = landingBySlug(input.landings, 'new-year');
+    if (
+      newYear &&
+      Number(newYear.events) > 0 &&
+      isLandingAllowedInCityHub(newYear.slug, input.citySlug)
+    ) {
+      resolved.push({
+        id: 'seasonal:new-year',
+        label: 'Отмечаем Новый год',
+        slug: newYear.slug,
+        title: 'Отмечаем Новый год',
+        subtitle: newYear.subtitle ?? null,
+        events: newYear.events,
+        priceFrom: newYear.priceFrom ?? null,
+        href: landingCategoryHref(newYear.slug, input.citySlug),
+        emphasis: 'primary',
+      });
+      usedLandingSlugs.add(newYear.slug);
+    }
+  }
+
+  for (const item of seasonalConfigured) {
     const row = resolveDirectionFromConfig(item, input.landings, input.categories, input.citySlug);
     if (!row) continue;
     if (row.slug && usedLandingSlugs.has(row.slug)) continue;
@@ -173,6 +201,7 @@ export function resolveFeaturedDirections(input: {
   const landingFallback = input.landings
     .filter((landing) => Number(landing.events) > 0)
     .filter((landing) => isLandingAllowedInCityHub(landing.slug, input.citySlug))
+    .filter((landing) => !isNewYear || !WATER_LANDING_SLUGS.has(landing.slug.trim().toLowerCase()))
     .filter((landing) => !usedLandingSlugs.has(landing.slug))
     .slice()
     .sort((a, b) => {

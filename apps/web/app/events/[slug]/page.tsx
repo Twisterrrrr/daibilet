@@ -23,6 +23,7 @@ import { getTicketPriceRange } from '@/lib/event-page-utils';
 import { pageTitle, buildShareMetadata } from '@/lib/seo-meta';
 import { resolveSsrOgImage } from '@/server/og-image';
 import { buildEventListingMeta, buildEventPageMetaTitle } from '@/lib/seo-event-meta';
+import { eventSeoOverride } from '@/lib/event-seo-overrides';
 import { buildEventPageJsonLd } from '@/lib/structured-data';
 import { pickRepresentativeSession } from '@/lib/event-purchase';
 import { safeNotFound, isNextControlFlowError } from '@/lib/safe-not-found';
@@ -40,6 +41,13 @@ export const dynamicParams = true;
 type PageProps = {
   params: Promise<{ slug: string }>;
 };
+
+function conciseEventLead(value: string): string {
+  const normalized = value.replace(/\s+/gu, ' ').trim();
+  if (normalized.length <= 110) return normalized.replace(/[.!?…]?$/u, '.');
+  const clipped = normalized.slice(0, 110).replace(/\s+\S*$/u, '').trim();
+  return clipped.replace(/[.!?…,:;]?$/u, '.');
+}
 
 function decodeEventParamSlug(slug: string): string {
   try {
@@ -123,20 +131,32 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       dateLabel: nextSession?.dateLabel,
       timeLabel: nextSession?.timeLabel,
     });
-    const title = pageTitle(hasPublishedStablePage ? stablePageTitle || disambiguatedTitle : expansionMeta?.title || disambiguatedTitle);
-    const shareTitle = !hasPublishedStablePage && expansionMeta ? expansionMeta.title : `${title} | Дайбилет`;
+    const seoOverride = eventSeoOverride(decodedSlug);
+    const title = pageTitle(seoOverride?.title || (hasPublishedStablePage ? stablePageTitle || disambiguatedTitle : expansionMeta?.title || disambiguatedTitle));
+    const shareTitle = seoOverride
+      ? `${seoOverride.title} | Дайбилет`
+      : !hasPublishedStablePage && expansionMeta
+        ? expansionMeta.title
+        : `${title} | Дайбилет`;
     const seoDescription = String(linkedEventPage?.seoDescription || event.seoDescription || '').trim();
     const genericSeo = /^Расписание, цены и билеты на /iu.test(seoDescription);
     const concertLead = isConcertLikeEvent(event) ? buildConcertLead(event) : '';
     const renderedLead = displayEventDescription(event).split(/\n\s*\n/u)[0] || '';
+    const eventLead = (genericSeo ? concertLead || renderedLead : stripSessionDateLines(seoDescription) || renderedLead)
+      .replace(/\s+/gu, ' ')
+      .trim();
     const description =
+      (!hasPublishedStablePage && !genericSeo ? expansionMeta?.description : '') ||
+      (genericSeo && eventLead
+        ? `${conciseEventLead(eventLead)} Расписание, цены и билеты на событие. Покупка через виджет билетной системы.`
+        : eventLead) ||
       (!hasPublishedStablePage ? expansionMeta?.description : '') ||
-      (genericSeo ? concertLead : stripSessionDateLines(seoDescription)) ||
-      renderedLead ||
       `${event.title} - билеты на Дайбилет`;
 
     return {
-      title: !hasPublishedStablePage && expansionMeta ? { absolute: expansionMeta.title } : title,
+      title: seoOverride || (!hasPublishedStablePage && expansionMeta)
+        ? { absolute: seoOverride ? `${seoOverride.title} | Дайбилет` : expansionMeta?.title || title }
+        : title,
       description,
       ...(urlPolicy.noindex
         ? { robots: { index: false, follow: true } }

@@ -18,7 +18,7 @@ export function PlacesHubSsrFallback({
 
   return (
     <main className="container-page py-8" data-ssr-places-catalog>
-      <h1 className="font-display text-3xl font-bold text-slate-950">{title}</h1>
+      <h2 className="font-display text-3xl font-bold text-slate-950">Площадки и локации России</h2>
       <p className="mt-2 text-sm text-slate-600">Площадки и локации с событиями и маршрутами</p>
       <ul className="catalog-card-grid mt-8">
         {page.venues.map((venue) => (

@@ -25,7 +25,11 @@ test('tourist hubs expose curated regional events and never show past in upcomin
         (event) => !event.datesLabel.includes('\u2014') && !event.blurb.includes('\u2014') && !event.title.includes('\u2014'),
       ),
     );
-    assert.ok([...upcoming, ...past].every((event) => event.sourceUrl.startsWith('https://')));
+    assert.ok(
+      [...upcoming, ...past].every(
+        (event) => event.sourceUrl === undefined || event.sourceUrl.startsWith('https://'),
+      ),
+    );
   }
 });
 

@@ -16,8 +16,8 @@ export type CityRegionalEvent = {
   datesLabel: string;
   place: string;
   blurb: string;
-  sourceUrl: string;
-  sourceLabel: string;
+  sourceUrl?: string;
+  sourceLabel?: string;
   /** Optional Daibilet event/venue path when catalog actually has it. */
   href?: string;
 };
@@ -68,8 +68,6 @@ export const CITY_REGIONAL_EVENTS: Record<string, CityRegionalEvent[]> = {
       place: 'Клубы и арт-площадки Москвы',
       blurb:
         'Большой независимый фестиваль комедии: сотни стендап-концертов, импровизация и открытые микрофоны.',
-      sourceUrl: 'https://www.mos.ru/',
-      sourceLabel: 'mos.ru',
     },
     {
       id: 'msk-zima-v-moskve-2026-27',
@@ -79,8 +77,6 @@ export const CITY_REGIONAL_EVENTS: Record<string, CityRegionalEvent[]> = {
       datesLabel: '1 декабря 2026 - 28 февраля 2027',
       place: 'Красная площадь, Тверской бульвар, ВДНХ',
       blurb: 'Главный зимний городской сезон: ярмарки, катки, иллюминация и праздничная программа по центру.',
-      sourceUrl: 'https://www.mos.ru/',
-      sourceLabel: 'mos.ru',
     },
     {
       id: 'msk-vremena-i-epohi-2026',
@@ -90,8 +86,6 @@ export const CITY_REGIONAL_EVENTS: Record<string, CityRegionalEvent[]> = {
       datesLabel: '10-14 июня 2026',
       place: 'Москва',
       blurb: 'Исторический фестиваль реконструкции - один из узнаваемых летних якорей города.',
-      sourceUrl: 'https://www.mos.ru/',
-      sourceLabel: 'mos.ru',
     },
     {
       id: 'msk-vk-fest-2026',
@@ -101,8 +95,6 @@ export const CITY_REGIONAL_EVENTS: Record<string, CityRegionalEvent[]> = {
       datesLabel: '11-12 июля 2026',
       place: 'Москва',
       blurb: 'Крупный летний open-air с музыкой и площадками VK.',
-      sourceUrl: 'https://www.mos.ru/',
-      sourceLabel: 'mos.ru',
     },
     {
       id: 'msk-piknik-afishi-2026',
@@ -112,8 +104,6 @@ export const CITY_REGIONAL_EVENTS: Record<string, CityRegionalEvent[]> = {
       datesLabel: '1-2 августа 2026',
       place: 'Коломенское',
       blurb: 'Культовый летний open-air: музыка, маркеты и площадки на территории музея-заповедника.',
-      sourceUrl: 'https://www.mos.ru/',
-      sourceLabel: 'mos.ru',
     },
   ],
 

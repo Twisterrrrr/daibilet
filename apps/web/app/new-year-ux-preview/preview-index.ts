@@ -1,5 +1,5 @@
 import { sortNewYearPreviewEvents } from '@/lib/new-year-preview-order';
-import { visibleNewYearFormatNames } from './preview-format';
+import { visibleThematicFormatNames, type PreviewTheme } from './preview-format';
 import type { PreviewEvent, PreviewSlot } from './preview-data';
 
 export type CompactPreviewSlot = PreviewSlot & { dayKey: string };
@@ -9,6 +9,7 @@ export type CompactPreviewEvent = Omit<PreviewEvent, 'description' | 'imageUrl' 
   regionCenter: boolean;
   standaloneCity: boolean;
   format: string;
+  formats: string[];
   searchText: string;
 };
 
@@ -18,6 +19,7 @@ export type NewYearPreviewIndex = {
   sourceTotal: number;
   generatedAt: string | null;
   priceRange: { min: number; max: number };
+  theme: PreviewTheme;
 };
 
 type LocalFilters = {
@@ -34,6 +36,8 @@ type LocalFilters = {
   q?: string;
   sort?: string;
   lowStock?: boolean;
+  availableOnly?: boolean;
+  ageLimit?: string;
 };
 type Facet = { name?: string; value?: string; count: number; region?: string; filterable?: boolean; geoKind?: 'city' | 'region' };
 export type LocalPreviewData = {
@@ -46,16 +50,27 @@ export type LocalPreviewData = {
   hasMore: boolean;
   generatedAt: string | null;
   priceFrom: number | null;
-  facets: { cities: Facet[]; regions: Facet[]; dates: Facet[]; prices: Facet[]; formats: Facet[]; lowStock: number; priceRange: { min: number; max: number } };
+  facets: { cities: Facet[]; regions: Facet[]; dates: Facet[]; prices: Facet[]; formats: Facet[]; ages: Facet[]; lowStock: number; priceRange: { min: number; max: number } };
 };
 
-const DATE_VALUES = ['all', 'dec24to31', 'dec31', 'jan1', 'jan1to14', 'weekend', 'holidays'];
+const DATE_VALUES = ['all', 'today', 'tomorrow', 'weekend', 'dec24to31', 'dec31', 'jan1', 'jan1to14', 'holidays'];
 const PRICE_VALUES = ['all', 'free', 'under1000', 'under2000', 'over2000', 'over5000', 'over10000'];
 function slotDayKey(slot: CompactPreviewSlot): string | null {
   return /^\d{4}-\d{2}-\d{2}$/u.test(slot.dayKey) ? slot.dayKey : null;
 }
 
+function dayKeyAt(now: Date, timeZone: string): string {
+  const parts = new Intl.DateTimeFormat('en-CA', { timeZone, year: 'numeric', month: '2-digit', day: '2-digit' }).formatToParts(now);
+  const get = (name: string) => parts.find((part) => part.type === name)?.value || '';
+  return `${get('year')}-${get('month')}-${get('day')}`;
+}
+
 function slotsForDate(event: CompactPreviewEvent, value: string, customDate?: string, from?: string, to?: string): CompactPreviewSlot[] {
+  const eventTimeZone = event.timeZone || 'Europe/Moscow';
+  const today = dayKeyAt(new Date(), eventTimeZone);
+  const tomorrowDate = new Date(`${today}T00:00:00Z`);
+  tomorrowDate.setUTCDate(tomorrowDate.getUTCDate() + 1);
+  const tomorrow = tomorrowDate.toISOString().slice(0, 10);
   return (event.upcomingSlots || []).filter((slot) => {
     const day = slotDayKey(slot);
     if (!day) return false;
@@ -63,6 +78,8 @@ function slotsForDate(event: CompactPreviewEvent, value: string, customDate?: st
     if (!value || value === 'all') return true;
     if (value === 'custom') return day === customDate;
     if (/^\d{4}-\d{2}-\d{2}$/u.test(value)) return day === value;
+    if (value === 'today') return day === today;
+    if (value === 'tomorrow') return day === tomorrow;
     if (value === 'dec24to31') return day >= '2026-12-24' && day <= '2026-12-31';
     if (value === 'dec31') return day === '2026-12-31';
     if (value === 'jan1') return day === '2027-01-01';
@@ -102,13 +119,18 @@ function isLowStock(event: PreviewEvent): boolean {
   return typeof event.vacant === 'number' && event.vacant > 0 && event.vacant <= 8;
 }
 
+function normalizeAgeLimit(value?: string | null): string | null {
+  const match = String(value || '').match(/(?:^|\D)(0|3|6|12|16|18)\s*\+/u);
+  return match?.[1] ? `${match[1]}+` : null;
+}
+
 export function deriveNewYearPreviewData(
   index: NewYearPreviewIndex,
   filters: LocalFilters,
   visibleCount: number,
   pageSize = 30,
 ): LocalPreviewData {
-  type Axis = 'geo' | 'date' | 'price' | 'format' | 'stock' | 'q';
+  type Axis = 'geo' | 'date' | 'price' | 'format' | 'stock' | 'q' | 'age';
   const query = String(filters.q || '').trim().toLocaleLowerCase('ru');
   const indexed = index.events.map((event) => {
     const slots = slotsForDate(event, String(filters.date || 'all'), filters.customDate, filters.dateFrom, filters.dateTo);
@@ -122,9 +144,10 @@ export function deriveNewYearPreviewData(
           (!filters.region || (event.region === filters.region && !event.regionCenter)),
         date: slots.length > 0,
         price: matchesPrice(event, String(filters.price || 'all')) && matchesPriceRange(event, filters.priceFrom, filters.priceTo),
-        format: !filters.format || filters.format === 'Все форматы' || event.format === filters.format,
-        stock: !filters.lowStock || isLowStock(event),
+        format: !filters.format || filters.format === 'Все форматы' || (event.formats || [event.format]).includes(filters.format),
+        stock: (!filters.lowStock || isLowStock(event)) && (!filters.availableOnly || (typeof event.vacant === 'number' && event.vacant > 0)),
         q: !query || event.searchText.includes(query),
+        age: !filters.ageLimit || normalizeAgeLimit(event.ageLimit) === filters.ageLimit,
       },
       min,
       max,
@@ -136,7 +159,8 @@ export function deriveNewYearPreviewData(
     (except === 'price' || item.matches.price) &&
     (except === 'format' || item.matches.format) &&
     (except === 'stock' || item.matches.stock) &&
-    (except === 'q' || item.matches.q);
+    (except === 'q' || item.matches.q) &&
+    (except === 'age' || item.matches.age);
 
   const filtered = indexed.filter((item) => matchesExcept(item)).map(({ event, slots }) => ({ ...event, upcomingSlots: slots }));
   const sorted = sortNewYearPreviewEvents(filtered, filters.sort === 'price' || filters.sort === 'price-desc' ? filters.sort : 'date');
@@ -145,6 +169,8 @@ export function deriveNewYearPreviewData(
   const dateCounts = new Map(DATE_VALUES.map((value) => [value, 0]));
   const priceCounts = new Map(PRICE_VALUES.map((value) => [value, 0]));
   const formatCounts = new Map<string, number>();
+  const ageCounts = new Map<string, number>();
+  let allFormatsCount = 0;
   let allGeoCount = 0;
   let lowStockCount = 0;
   for (const item of indexed) {
@@ -161,7 +187,14 @@ export function deriveNewYearPreviewData(
     if (matchesExcept(item, 'price')) {
       for (const value of PRICE_VALUES) if (matchesPrice(item.event, value)) priceCounts.set(value, (priceCounts.get(value) || 0) + 1);
     }
-    if (matchesExcept(item, 'format')) formatCounts.set(item.event.format, (formatCounts.get(item.event.format) || 0) + 1);
+    if (matchesExcept(item, 'format')) {
+      allFormatsCount++;
+      for (const value of item.event.formats || [item.event.format]) formatCounts.set(value, (formatCounts.get(value) || 0) + 1);
+    }
+    if (matchesExcept(item, 'age')) {
+      const age = normalizeAgeLimit(item.event.ageLimit);
+      if (age) ageCounts.set(age, (ageCounts.get(age) || 0) + 1);
+    }
     if (matchesExcept(item, 'stock') && isLowStock(item.event)) lowStockCount++;
   }
   const cities = [...new Set(index.events.map((event) => event.city).filter((value): value is string => Boolean(value)))].sort((a, b) => a.localeCompare(b, 'ru'));
@@ -172,7 +205,7 @@ export function deriveNewYearPreviewData(
   })];
   const regionFacets = [...regionCounts.keys()].sort((a, b) => (regionCounts.get(b) || 0) - (regionCounts.get(a) || 0) || a.localeCompare(b, 'ru'))
     .map((name) => ({ name, count: regionCounts.get(name) || 0 }));
-  const visibleFormats = visibleNewYearFormatNames(formatCounts);
+  const visibleFormats = visibleThematicFormatNames(formatCounts, index.theme);
   const prices = sorted.map((event) => event.priceFrom).filter((value): value is number => typeof value === 'number' && value > 0);
   const items = sorted.slice(0, visibleCount);
   return {
@@ -191,9 +224,10 @@ export function deriveNewYearPreviewData(
       dates: DATE_VALUES.map((value) => ({ value, count: dateCounts.get(value) || 0 })),
       prices: PRICE_VALUES.map((value) => ({ value, count: priceCounts.get(value) || 0 })),
       formats: [
-        { name: 'Все форматы', count: [...formatCounts.values()].reduce((sum, value) => sum + value, 0) },
+        { name: 'Все форматы', count: allFormatsCount },
         ...visibleFormats.map((name) => ({ name, count: formatCounts.get(name) || 0 })),
       ],
+      ages: [...ageCounts.entries()].sort((a, b) => Number(a[0].replace('+', '')) - Number(b[0].replace('+', ''))).map(([name, count]) => ({ name, value: name, count })),
       lowStock: lowStockCount,
       priceRange: index.priceRange,
     },

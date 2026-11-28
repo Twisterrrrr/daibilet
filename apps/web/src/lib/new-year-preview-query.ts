@@ -15,6 +15,8 @@ export type NewYearPreviewQuery = {
   q?: string;
   sort?: string;
   lowStock: boolean;
+  availableOnly: boolean;
+  ageLimit?: string;
   offset: number;
 };
 
@@ -33,20 +35,20 @@ function shortText(params: URLSearchParams, key: string, maxLength: number): str
   return value;
 }
 
-function validCustomDate(value: string): boolean {
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(value) || value < '2026-12-01' || value > '2027-01-14') return false;
+function validCustomDate(value: string, general = false): boolean {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(value) || (!general && (value < '2026-12-01' || value > '2027-01-14'))) return false;
   const date = new Date(`${value}T00:00:00.000Z`);
   return Number.isFinite(date.getTime()) && date.toISOString().slice(0, 10) === value;
 }
 
-export function parseNewYearPreviewQuery(params: URLSearchParams): NewYearPreviewQuery {
+export function parseNewYearPreviewQuery(params: URLSearchParams, general = false): NewYearPreviewQuery {
   const date = shortText(params, 'date', 20);
-  if (date && date !== 'all' && !DATES.has(date) && !validCustomDate(date)) {
+  if (date && date !== 'all' && !DATES.has(date) && !(general && ['today', 'tomorrow'].includes(date)) && !validCustomDate(date, general)) {
     throw new InvalidNewYearPreviewQuery('invalid_date');
   }
   const dateFrom = shortText(params, 'dateFrom', 10);
   const dateTo = shortText(params, 'dateTo', 10);
-  if ((dateFrom && !validCustomDate(dateFrom)) || (dateTo && !validCustomDate(dateTo))) {
+  if ((dateFrom && !validCustomDate(dateFrom, general)) || (dateTo && !validCustomDate(dateTo, general))) {
     throw new InvalidNewYearPreviewQuery('invalid_date_range');
   }
   if (dateFrom && dateTo && dateFrom > dateTo) throw new InvalidNewYearPreviewQuery('invalid_date_range');
@@ -72,6 +74,8 @@ export function parseNewYearPreviewQuery(params: URLSearchParams): NewYearPrevie
   if (lowStockValue !== null && lowStockValue !== '0' && lowStockValue !== '1') {
     throw new InvalidNewYearPreviewQuery('invalid_lowStock');
   }
+  const availableValue = one(params, 'available');
+  if (availableValue !== null && availableValue !== '0' && availableValue !== '1') throw new InvalidNewYearPreviewQuery('invalid_available');
   const offsetValue = one(params, 'offset');
   const offset = offsetValue === null ? 0 : /^\d+$/.test(offsetValue) ? Number(offsetValue) : NaN;
   if (!Number.isSafeInteger(offset) || offset < 0 || offset > 100_000) throw new InvalidNewYearPreviewQuery('invalid_offset');
@@ -89,6 +93,14 @@ export function parseNewYearPreviewQuery(params: URLSearchParams): NewYearPrevie
     q: shortText(params, 'q', 120),
     sort: sort || undefined,
     lowStock: lowStockValue === '1',
+    availableOnly: availableValue === '1',
+    ageLimit: shortText(params, 'ageLimit', 10),
     offset,
   };
+}
+
+export function parseThematicPreviewQuery(params: URLSearchParams): NewYearPreviewQuery {
+  const query = parseNewYearPreviewQuery(params, true);
+  if (query.ageLimit && !/^(0|3|6|12|16|18)\+$/u.test(query.ageLimit)) throw new InvalidNewYearPreviewQuery('invalid_ageLimit');
+  return query;
 }

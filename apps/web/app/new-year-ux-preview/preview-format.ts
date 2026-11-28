@@ -31,6 +31,68 @@ const NEW_YEAR_FORMATS = [
 const SECONDARY_NEW_YEAR_FORMATS = ['Выставки', 'Мастер-классы'] as const;
 const OPTIONAL_FORMAT_MIN_COUNT = 5;
 
+export type PreviewTheme = 'new-year' | 'concerts-genre' | 'family-kids';
+
+const CONCERT_GENRES: Array<{ label: string; patterns: RegExp[] }> = [
+  { label: 'Рок', patterns: [/\bрок\b/i, /rock/i, /металл/i, /metal/i, /альтернатив/i, /инди/i] },
+  { label: 'Поп', patterns: [/\bпоп\b/i, /эстрад/i, /pop/i] },
+  { label: 'Джаз и блюз', patterns: [/джаз/i, /jazz/i, /блюз/i, /blues/i] },
+  { label: 'Классическая музыка', patterns: [/классик/i, /classical/i, /симфони/i, /оркестр/i, /орган/i, /камерн/i, /академическ/i] },
+  { label: 'Электронная музыка', patterns: [/электрон/i, /electron/i, /dj[-\s]?set/i, /рейв/i] },
+  { label: 'Рэп и хип-хоп', patterns: [/рэп/i, /хип[\s-]?хоп/i, /hip[\s-]?hop/i] },
+  { label: 'Авторская песня', patterns: [/авторск/i, /бард/i, /шансон/i] },
+];
+
+const FAMILY_FORMATS: Array<{ label: string; patterns: RegExp[] }> = [
+  { label: 'Детские спектакли', patterns: [/детск.*спектакл/i, /спектакл.*дет/i, /театр.*дет/i, /детям/i] },
+  { label: 'Цирк', patterns: [/цирк/i] },
+  { label: 'Шоу и представления', patterns: [/шоу/i, /представлени/i, /иллюзион/i] },
+  { label: 'Мастер-классы', patterns: [/мастер.?класс/i, /творческ.*занят/i] },
+  { label: 'Экскурсии', patterns: [/экскурс/i] },
+  { label: 'Музеи и выставки', patterns: [/музе/i, /выставк/i, /экспозиц/i] },
+  { label: 'Интерактивные программы', patterns: [/интерактив/i, /анимац/i, /квест/i, /научн.*шоу/i] },
+  { label: 'Развлечения', patterns: [/развлечен/i, /аттракцион/i, /батут/i, /парк/i] },
+];
+
+function taxonomySource(event: PreviewFormatSource): string[] {
+  const taxonomy = [
+    event.category,
+    taxonomyTitle(event.catalogCategory),
+    taxonomySlug(event.catalogCategory),
+    taxonomyTitle(event.catalogSubcategory),
+    taxonomySlug(event.catalogSubcategory),
+    ...(event.subcategories || []),
+    ...(event.tagLabels || []),
+    ...(event.tags || []),
+  ];
+  return taxonomy.map((item) => String(item || '').trim()).filter(Boolean);
+}
+
+/** Genre facets use catalog taxonomy only; event-title keywords do not define a genre. */
+export function resolveConcertGenres(event: PreviewFormatSource): string[] {
+  const source = taxonomySource(event).join(' ');
+  const matches = CONCERT_GENRES.filter((genre) => genre.patterns.some((pattern) => pattern.test(source))).map((genre) => genre.label);
+  return matches.length ? matches : ['Другие жанры'];
+}
+
+/** Family formats are classified from catalog categories/tags, not guessed from the title. */
+export function resolveFamilyFormats(event: PreviewFormatSource): string[] {
+  const source = taxonomySource(event).join(' ');
+  const matches = FAMILY_FORMATS.filter((format) => format.patterns.some((pattern) => pattern.test(source))).map((format) => format.label);
+  return matches.length ? matches : ['Другие мероприятия'];
+}
+
+export function resolveThematicFormats(event: PreviewFormatSource, theme: PreviewTheme): string[] {
+  if (theme === 'concerts-genre') return resolveConcertGenres(event);
+  if (theme === 'family-kids') return resolveFamilyFormats(event);
+  return [resolvePreviewFormat(event)];
+}
+
+export function visibleThematicFormatNames(counts: Map<string, number>, theme: PreviewTheme): string[] {
+  if (theme === 'new-year') return visibleNewYearFormatNames(counts);
+  return [...counts.keys()].filter((name) => (counts.get(name) || 0) > 0).sort((a, b) => (counts.get(b) || 0) - (counts.get(a) || 0) || a.localeCompare(b, 'ru'));
+}
+
 export function resolvePreviewFormat(event: PreviewFormatSource): string {
   const title = String(event.title || '').toLocaleLowerCase('ru');
   const subcategory = taxonomyTitle(event.catalogSubcategory).toLocaleLowerCase('ru');

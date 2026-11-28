@@ -93,16 +93,18 @@ export function CityRegionalEvents({ citySlug, editorial = false, nested = false
                   </p>
                   <p className={`mt-1 text-xs ${editorial ? 'text-zinc-500' : 'text-slate-500'}`}>{event.place}</p>
                   <p className={`mt-2 text-sm leading-6 ${editorial ? 'text-zinc-600' : 'text-slate-600'}`}>{event.blurb}</p>
-                  <a
-                    href={event.href || event.sourceUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className={`mt-3 inline-flex text-xs font-semibold underline decoration-slate-300 underline-offset-2 hover:decoration-current ${
-                      editorial ? 'text-zinc-800' : 'text-slate-800'
-                    }`}
-                  >
-                    Источник: {event.sourceLabel}
-                  </a>
+                  {(event.href || event.sourceUrl) && event.sourceLabel ? (
+                    <a
+                      href={event.href || event.sourceUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={`mt-3 inline-flex text-xs font-semibold underline decoration-slate-300 underline-offset-2 hover:decoration-current ${
+                        editorial ? 'text-zinc-800' : 'text-slate-800'
+                      }`}
+                    >
+                      Источник: {event.sourceLabel}
+                    </a>
+                  ) : null}
                 </li>
               ))}
             </ul>

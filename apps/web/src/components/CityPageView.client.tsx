@@ -320,6 +320,15 @@ export function CityPageView({
   }, []);
   const guide = city ? cityGuideFor(city) : null;
   const hubConfig = React.useMemo(() => resolveCityHubConfig(slug), [slug]);
+  const moscowMonth = React.useMemo(
+    () => Number(new Intl.DateTimeFormat('en-US', { timeZone: 'Europe/Moscow', month: 'numeric' }).format(new Date())),
+    [],
+  );
+  const isNewYearSeason = moscowMonth === 11 || moscowMonth === 12 || moscowMonth === 1 || moscowMonth === 2;
+  const visibleVenues = React.useMemo(
+    () => payload?.venues?.filter((venue) => venue.slug !== 'art-galereya-v-kremle-v-izmailovo') || [],
+    [payload?.venues],
+  );
   const unifiedFaq = React.useMemo(() => {
     if (!city?.name) return [];
     return visibleCityFaqItems(city.name, guide?.faq, faqItems);
@@ -331,8 +340,9 @@ export function CityPageView({
         landings: payload?.landings || [],
         categories,
         citySlug: city?.slug || city?.sourceSlug || slug,
+        seasonalTheme: isNewYearSeason ? 'new-year' : undefined,
       }),
-    [hubConfig, payload?.landings, categories, city?.slug, city?.sourceSlug, slug],
+    [hubConfig, payload?.landings, categories, city?.slug, city?.sourceSlug, slug, isNewYearSeason],
   );
 
   const hasDirections = Boolean(
@@ -541,7 +551,7 @@ export function CityPageView({
                   city={city}
                   guide={guide}
                   categories={categories}
-                  venues={payload.venues}
+                  venues={visibleVenues}
                   landings={payload.landings}
                   editorial={editorial}
                   articles={[]}
@@ -638,8 +648,8 @@ export function CityPageView({
                 {hasVenues ? (
                   <VenueHighlights
                     city={city}
-                    venues={payload.venues}
-                    totalVenues={payload.stats?.venues || payload.venues.length}
+                    venues={visibleVenues}
+                    totalVenues={Math.max(0, (payload.stats?.venues || payload.venues.length) - (payload.venues.length - visibleVenues.length))}
                     topN={hubConfig?.venuesTopN}
                     editorial={editorial}
                     nested

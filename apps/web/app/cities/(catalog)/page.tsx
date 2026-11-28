@@ -44,7 +44,7 @@ export default async function CitiesIndexPage() {
       <Suspense
         fallback={
           <main className="container-page py-12" data-ssr-cities-catalog>
-            <h1 className="font-display text-3xl font-bold text-slate-950">Города России</h1>
+            <h2 className="font-display text-3xl font-bold text-slate-950">Городские афиши и направления</h2>
             <ul className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
               {destinations.filter((item) => item.type === 'city').map((city) => (
                 <li key={city.slug || city.name}>

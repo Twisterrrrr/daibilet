@@ -73,3 +73,4 @@ src/lib/event-redirect-map.test.ts
 src/lib/destination-pdp-labels.test.ts
 src/lib/city-first-route-slugs.test.ts
 src/lib/catalog-url.test.ts
+src/lib/thematic-preview.test.ts

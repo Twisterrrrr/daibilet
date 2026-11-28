@@ -197,7 +197,6 @@ const MOSCOW_ITEMS: CityLifehackItem[] = [
     cta: {
       kind: 'link',
       label: 'Тарифы «Тройки»',
-      href: 'https://transport.mos.ru/troika',
     },
   },
   {
@@ -246,12 +245,11 @@ const MOSCOW_ITEMS: CityLifehackItem[] = [
     body: body(
       '«Московская музейная неделя» - ',
       { s: 'каждую третью неделю месяца' },
-      '. Космонавтика, Царицыно, Коломенское и десятки площадок. Бесплатный билет заранее на mos.ru.',
+      '. Космонавтика, Царицыно, Коломенское и десятки площадок. Бесплатный билет заранее оформляют на сайте выбранного музея.',
     ),
     cta: {
       kind: 'link',
-      label: 'Билеты на mos.ru',
-      href: 'https://www.mos.ru/afisha/',
+      label: 'Уточнить условия у музея',
       extra: [{ label: 'Царицыно на карте', href: yandexMapsSearchUrl('музей-заповедник Царицыно') }],
     },
   },

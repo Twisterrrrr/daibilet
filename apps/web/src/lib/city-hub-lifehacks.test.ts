@@ -201,7 +201,9 @@ test('Moscow lifehacks: Troika, MOW, Annushka, museum week, GUM canteen', () => 
   ]);
   const week = pack.items.find((item) => item.id === 'msk-museum-week');
   assert.equal(week?.cta.kind, 'link');
-  assert.equal(week?.cta.href, 'https://www.mos.ru/afisha/');
+  assert.equal(week?.cta.href, undefined);
+  const troika = pack.items.find((item) => item.id === 'msk-troika');
+  assert.equal(troika?.cta.href, undefined);
   const fly = pack.items.find((item) => item.id === 'msk-mow-code');
   assert.equal(fly?.cta.kind, 'affiche');
   assert.match(lifehackBodyText(fly?.body || []), /MOW/);

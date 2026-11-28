@@ -45,7 +45,9 @@ export function BlogArticleHero({
       ? { lead: title.slice(0, colonIndex + 1), rest: title.slice(colonIndex + 1).trim() }
       : null);
 
-  const details = (overlay: boolean) => (
+  const details = (overlay: boolean, headingLevel: 'h1' | 'h2') => {
+    const Heading = headingLevel;
+    return (
     <div className={overlay ? 'max-w-6xl' : 'max-w-4xl'}>
       <div className="flex flex-wrap items-center gap-2">
         <p
@@ -93,7 +95,7 @@ export function BlogArticleHero({
         ) : null}
       </div>
 
-      <h1
+      <Heading
         className={`font-display mt-4 max-w-6xl text-[1.75rem] font-extrabold leading-[1.1] tracking-tight sm:text-3xl lg:text-4xl xl:text-[2.75rem] ${
           overlay
             ? 'text-white drop-shadow-[0_2px_10px_rgba(0,0,0,0.85)]'
@@ -109,7 +111,7 @@ export function BlogArticleHero({
         ) : (
           title
         )}
-      </h1>
+      </Heading>
 
       {description ? (
         <p
@@ -144,7 +146,8 @@ export function BlogArticleHero({
         ) : null}
       </div>
     </div>
-  );
+    );
+  };
 
   return (
     <>
@@ -167,7 +170,7 @@ export function BlogArticleHero({
           />
 
           <div className="container-page absolute inset-x-0 bottom-0 hidden pb-10 pt-24 lg:block xl:pb-12">
-            {details(true)}
+            {details(true, 'h1')}
           </div>
         </div>
 
@@ -184,7 +187,7 @@ export function BlogArticleHero({
                 fallback={<div className="absolute inset-0 bg-slate-100" />}
               />
             </div>
-            <div className="p-5 sm:p-8">{details(false)}</div>
+            <div className="p-5 sm:p-8">{details(false, 'h2')}</div>
           </div>
         </div>
       </section>

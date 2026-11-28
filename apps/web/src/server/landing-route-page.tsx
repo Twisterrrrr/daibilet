@@ -38,6 +38,8 @@ import { loadThinRelatedCardSessions } from '@/server/landing-thin-related';
 import { findSeoOverride } from '@/server/seo-override';
 import { NewYearLandingPage } from '../../app/new-year-ux-preview/landing-page';
 import { loadNewYearLandingData } from '../../app/new-year-ux-preview/new-year-landing-data';
+import { loadThematicLandingData } from '../../app/new-year-ux-preview/thematic-landing-data';
+import { ThematicLandingPage } from '../../app/new-year-ux-preview/thematic-landing-page';
 
 export const revalidate = 3600;
 
@@ -92,6 +94,34 @@ export async function buildLandingMetadata(pathname: string): Promise<Metadata> 
         path: canonical,
         image: resolveLandingCardImage(slug),
       }),
+    };
+  }
+  if (slug === 'concerts-genre' || slug === 'family-kids') {
+    const theme = slug;
+    const resolved = await loadThematicLandingData(theme, route.citySlug || null);
+    if (!resolved) notFound();
+    const geoName = resolved.geo.city || resolved.geo.region;
+    const geoCase = geoName ? resolveCityCases(geoName).prepositional || geoName : null;
+    const canonical = landingCategoryHref(slug, route.citySlug);
+    const isConcerts = theme === 'concerts-genre';
+    const title = isConcerts
+      ? geoCase ? `Концерты в ${geoCase}: афиша, расписание и билеты | Дайбилет` : 'Концерты в России: афиша, расписание и билеты | Дайбилет'
+      : geoCase ? `Куда сходить с детьми в ${geoCase}: афиша и билеты | Дайбилет` : 'Куда сходить с детьми: мероприятия, афиша и билеты | Дайбилет';
+    const description = isConcerts
+      ? `Афиша концертов${geoCase ? ` в ${geoCase}` : ' в России'}: рок, поп, джаз, классическая музыка и камерные выступления. Расписание и билеты онлайн.`
+      : `Детские спектакли, цирк, интерактивные шоу, мастер-классы, музеи и развлечения для всей семьи${geoCase ? ` в ${geoCase}` : ' в городах России'}. Выбирайте город, возраст и дату.`;
+    const indexable = isLandingRouteIndexable({
+      landingSlug: slug,
+      citySlugForSeo: route.citySlug || null,
+      offers: resolved.data.total,
+      hasEditorialSeoText: Boolean(route.citySlug && hasSeoListingEditorial(slug, route.citySlug)),
+    });
+    return {
+      title: { absolute: title },
+      description,
+      alternates: { canonical },
+      robots: robotsForListingIndexability(indexable),
+      ...buildShareMetadata({ title, description, path: canonical, image: resolveLandingCardImage(slug) }),
     };
   }
   const seoCitySlug =
@@ -203,6 +233,11 @@ export async function LandingRoutePage({ pathname }: { pathname: string }) {
   if (slug === 'new-year') {
     const newYearPage = await NewYearLandingPage({ geoSlug: route.citySlug || null });
     if (newYearPage) return newYearPage;
+    notFound();
+  }
+  if (slug === 'concerts-genre' || slug === 'family-kids') {
+    const page = await ThematicLandingPage({ theme: slug, geoSlug: route.citySlug || null });
+    if (page) return page;
     notFound();
   }
   const seoCitySlug =

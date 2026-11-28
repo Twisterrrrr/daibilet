@@ -1,14 +1,18 @@
-import { buildNewYearPreviewData, buildNewYearPreviewIndex, type PreviewFilters } from '../../new-year-ux-preview/preview-data';
-import { InvalidNewYearPreviewQuery, parseNewYearPreviewQuery } from '@/lib/new-year-preview-query';
+import { buildThematicPreviewData, buildThematicPreviewIndex, type PreviewFilters } from '../../new-year-ux-preview/preview-data';
+import { InvalidNewYearPreviewQuery, parseNewYearPreviewQuery, parseThematicPreviewQuery } from '@/lib/new-year-preview-query';
+import type { PreviewTheme } from '../../new-year-ux-preview/preview-format';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
 export async function GET(request: Request) {
   const params = new URL(request.url).searchParams;
+  const requestedTheme = params.get('theme');
+  const theme: PreviewTheme = requestedTheme === 'concerts-genre' || requestedTheme === 'family-kids' ? requestedTheme : 'new-year';
+  if (requestedTheme && theme === 'new-year') return Response.json({ error: 'unknown_thematic_landing' }, { status: 404 });
   if (params.get('index') === '1') {
     try {
-      return Response.json(await buildNewYearPreviewIndex(), {
+      return Response.json(await buildThematicPreviewIndex(theme), {
         headers: { 'Cache-Control': 'no-store' },
       });
     } catch (error) {
@@ -18,7 +22,7 @@ export async function GET(request: Request) {
   }
   let filters: PreviewFilters;
   try {
-    filters = parseNewYearPreviewQuery(params);
+    filters = theme === 'new-year' ? parseNewYearPreviewQuery(params) : parseThematicPreviewQuery(params);
   } catch (error) {
     if (error instanceof InvalidNewYearPreviewQuery) {
       return Response.json({ error: 'invalid_preview_query', detail: error.message }, { status: 400 });
@@ -26,7 +30,7 @@ export async function GET(request: Request) {
     return Response.json({ error: 'invalid_preview_query' }, { status: 400 });
   }
   try {
-    return Response.json(await buildNewYearPreviewData(filters), {
+    return Response.json(await buildThematicPreviewData(theme, filters), {
       headers: { 'Cache-Control': 'no-store' },
     });
   } catch (error) {
