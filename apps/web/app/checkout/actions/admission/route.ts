@@ -11,6 +11,12 @@ import { isBuyerTicketSmtpConfigured } from '@/server/buyer-ticket-mail';
 import { enqueueBuyerTicketEmail } from '@/server/buyer-ticket-delivery';
 import { fetchAdmissionProductBySlug } from '@/server/finance-projection-client';
 import { fetchPublicApiJson } from '@/server/public-api-client';
+import {
+  encodeOrderAccessProof,
+  ORDER_ACCESS_COOKIE_MAX_AGE_SECONDS,
+  ORDER_ACCESS_COOKIE_NAME,
+  ORDER_ACCESS_COOKIE_PATH,
+} from '@/lib/order-access-cookie';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -190,7 +196,7 @@ export async function POST(request: Request) {
     emailReason = 'email_missing';
   }
 
-  return NextResponse.json(
+  const response = NextResponse.json(
     {
       ok: true,
       mode: result.mode,
@@ -208,6 +214,20 @@ export async function POST(request: Request) {
       // Handoff note for finance: set YooKassa return_url to catalogReturnWithOrder (not supplier SPA).
       returnUrlHint: catalogReturnWithOrder,
     },
-    { status: 201 },
+    { status: 201, headers: { 'Cache-Control': 'private, no-store, max-age=0' } },
   );
+  if (result.orderAccessToken) {
+    response.cookies.set(
+      ORDER_ACCESS_COOKIE_NAME,
+      encodeOrderAccessProof({ publicCode: result.publicCode, token: result.orderAccessToken }),
+      {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        path: ORDER_ACCESS_COOKIE_PATH,
+        maxAge: ORDER_ACCESS_COOKIE_MAX_AGE_SECONDS,
+      },
+    );
+  }
+  return response;
 }
