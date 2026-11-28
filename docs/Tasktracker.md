@@ -4,13 +4,21 @@
 > повторной проверки по коду, staging/production и связанным отчётам. Закрытие
 > задачи фиксируйте в её записи, не копируйте её как открытую без новой даты.
 
+## 2026-11-28 - Завершение read-only SEO-аудита
+
+| ID | Задача | Приоритет | Статус |
+|----|--------|-----------|--------|
+| SEO.EVENT-GROUP-IDENTITY | Вручную проверить 4 подтверждённые пары Event ID / URL внутри общих `groupEventIds`; определить стабильный canonical owner | Высокий | ⏳ 4 группы, 8 URL. Оба адреса indexable и self-canonical. Не ставить редиректы до проверки identity. См. [отчёт](./reports/2026/seo-indexation-report.md) |
+| SEO.SITEMAP-POST-SYNC-DIFF | Сопоставлять события и sitemap по устойчивой group identity после ночной синхронизации; хранить snapshot/diff и UNKNOWN | Высокий | ⏳ В двух snapshot за 50 минут 14 URL добавились и 15 исчезли; 4 новых адреса связаны с предыдущими Event ID по `groupEventIds`. Изменения production не выполнять автоматически. См. [backlog](./reports/2026/seo-priority-backlog.md) |
+| SEO.REWRITE-OFFER-INDEXABILITY | Проверить согласованность продаваемых offers с robots/sitemap после синхронизации | Высокий | ⏳ 8 rewrite EventPage сейчас indexable без продаваемого предложения; 4 `noindex` URL остаются в sitemap. Повторить offer check после sync, решить каждую страницу отдельно. См. [backlog](./reports/2026/seo-priority-backlog.md) |
+| SEO.INTERNAL-LINK-GRAPH | Построить граф входящих ссылок из главной, `/events`, city hubs, landing и venue PDP | Средний | ⏳ 2 433 URL не получили inbound из event-only crawl, но полным orphan set не являются. Свежий `venues.xml` ответил 503; нужна повторная проверка доступности. См. [отчёт](./reports/2026/seo-indexation-report.md) |
 ## 2026-11-27 - EventPage SEO без рерайта: canonical split
 
 | ID | Задача | Приоритет | Статус |
 |----|--------|-----------|--------|
 | SEO.EVENTPAGE-CANONICAL-PILOT | Разделить рост индексируемости и URL-миграцию для EventPage без рерайта; утвердить безопасный сценарий старого и stable URL | Высокий | 🔄 live-аудит: 3 190 кандидатов, 0 новых canonical без миграции; 3 189 возможных миграций и 1 конфликт группировки. Нет выборки для пилота из 100. Нужны ручной разбор конфликтной группы и отдельное проектирование миграции/редиректов/внутренних ссылок/sitemap; production не менять. См. [отчёт 27.11](./reports/2026/seo-no-rewrite-canonical-audit-2026-11-27.md) |
-| SEO.CATALOG-INDEX-AUDIT | Завершить основной пятиартефактный SEO-аудит: URL/canonical inventory, отдельная сверка 551 URL вне sitemap, индексация Яндекс/Google либо `NOT_CHECKED`, приоритетный backlog; единая дата/snapshot | Высокий | 🔄 пятый артефакт — принятая [спецификация дашборда](./reports/2026/seo-admin-dashboard-spec.md). Остались четыре audit outputs. Реализация для production отложена до завершения владельцем рерайтов/проверки индексируемости и review четырёх audit outputs. После этого можно переходить к внедрению. |
-| SEO.ADMIN-DASHBOARD-SPEC | Спецификация счётчиков EventPage и уникальных canonical URL, без изменения runtime | Высокий | ✅ спецификация принята; реализацию v1 не начинать до завершения владельцем рерайтов и проверки их индексируемости, затем завершить и review четырёх остальных артефактов SEO-аудита. После выполнения условий можно применять релиз к production. Активации 7/30 дней исключены из v1; URL-счётчики открывают canonical-level список с раскрытием старого URL и EventPage. См. [спецификацию](./reports/2026/seo-admin-dashboard-spec.md) |
+| SEO.CATALOG-INDEX-AUDIT | Завершить основной пятиартефактный SEO-аудит: URL/canonical inventory, сверка 551 URL, поисковые данные либо `NOT_CHECKED`, приоритетный backlog | Высокий | ✅ Четыре audit outputs и пятый артефакт - dashboard spec - подготовлены на read-only срезе 28.11. Scoped event inventory: 4 709 URL; фактическая индексация GSC/Яндекс `NOT_CHECKED`. Full site-wide link graph ограничен ответом `venues.xml` 503; follow-up выделен выше. Production не менялся. См. [итоговый отчёт](./reports/2026/seo-indexation-report.md) |
+| SEO.ADMIN-DASHBOARD-SPEC | Спецификация счётчиков EventPage и уникальных canonical URL, без изменения runtime | Высокий | ✅ спецификация принята и обновлена текущим live-срезом 28.11. Реализация админки/API/schema - отдельная задача и не входит в read-only аудит. Активации 7/30 дней исключены из v1; URL-счётчики открывают canonical-level список с раскрытием старого URL и EventPage. См. [спецификацию](./reports/2026/seo-admin-dashboard-spec.md) |
 
 ## 2026-11-26 - Сверка документации и актуального backlog
 

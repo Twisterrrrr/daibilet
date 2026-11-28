@@ -17,6 +17,10 @@
 - [URL-аудит тематических посадок, 18.11](./2026/landing-url-architecture-and-audit-2026-11-18.md)
 
 ### SEO, производительность и медиа
+- [Live-аудит индексируемости Event URL и backlog, 28.11](./2026/seo-indexation-report.md)
+- [Приоритетный backlog SEO-аудита, 28.11](./2026/seo-priority-backlog.md)
+- [Шаблон импорта Google Search Console, 28.11](./2026/seo-google-search-console-import-template.csv)
+- [Шаблон импорта Яндекс Вебмастера, 28.11](./2026/seo-yandex-webmaster-import-template.csv)
 
 - [Спецификация SEO-счётчиков EventPage и canonical URL, 27.11](./2026/seo-admin-dashboard-spec.md)
 - [EventPage без рерайта: canonical-аудит и карта возможной миграции, 27.11](./2026/seo-no-rewrite-canonical-audit-2026-11-27.md)
